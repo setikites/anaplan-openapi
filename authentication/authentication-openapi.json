@@ -1,0 +1,336 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Official Anaplan Collection",
+    "version": "1.0.0",
+    "description": "**Welcome to the Anaplan Integration v2 Official Postman Collection**\n\n**Organization**\n\n> This collection is organized into  \n> logical groupings of requests. There are several common sequences of requests to achieve an outcome in Anaplan. The folders ending in \"Flow\" contain redundant requests organized sequentially.\n\n**Variables**\n\n> Collection level variables. These are set at the  \n> collection level and are available within each request. These include elements  \n> such as base URLs, model Id and workspace Id. Be sure to click \"Save\" when changing collection level variables.\n\n> Request specific variables. For variables  \n> specific to a request, we have provided an array in the pre-request script area  \n> for you to enter in request specific variables. These will be set prior to the  \n> request running.\n\n**Authentication**\n\n> There are three methods provided to  \n> authenticate into Anaplan. Once authenticated a Tests script sets the value of  \n> the generated token to a variable named \u201canaplan_auth_token\u201d. You may choose to  \n> enter in username/password combination or conversely choose to generate CA  \n> certificate signed string and public key combination."
+  },
+  "servers": [
+    {
+      "url": "https://auth.anaplan.com"
+    }
+  ],
+  "paths": {
+    "/token/authenticate": {
+      "post": {
+        "summary": "Create an Authentication Token (Basic)",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Contains the encoded credentials from the Pre-request Script",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Basic {{encodedCredentials}}"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful authentication.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tokenInfo": {
+                      "type": "object",
+                      "properties": {
+                        "expiresAt": {
+                          "type": "integer",
+                          "example": 1493036651173
+                        },
+                        "tokenId": {
+                          "type": "string",
+                          "example": "9aa99999-1111-11a2-b333-abc11223ab12"
+                        },
+                        "tokenValue": {
+                          "type": "string",
+                          "description": "Bearer token for subsequent requests.",
+                          "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.example.token"
+                        },
+                        "refreshTokenId": {
+                          "type": "string",
+                          "example": "3ab11111-2222-33e4-a111-01a1b222cd3a"
+                        }
+                      }
+                    },
+                    "status": {
+                      "type": "string",
+                      "example": "SUCCESS"
+                    },
+                    "statusMessage": {
+                      "type": "string",
+                      "example": "Login successful"
+                    },
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "validationUrl": {
+                          "type": "string",
+                          "example": "https://auth.anaplan.com/token/validate"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Invalid credentials provided.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid username or password."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Authentication",
+          "Basic Credentials"
+        ],
+        "security": [
+          {
+            "BasicAuth": []
+          }
+        ],
+        "description": "[https://anaplanauthentication.docs.apiary.io/#](https://anaplanauthentication.docs.apiary.io/#)\n\n## Create an Authentication Token\n\n`/token/authenticate`  \nTo use the version 2.0 API, you must use an Anaplan authentication token generated from the Anaplan Authentication Service. You can get an authentication token generated using a certificate from a recognized external public certificate authority (CA) or using your login and password.\n\n### Create an authentication token using a username & password\n\nCreates an AnaplanAuthToken.\n\nUse your Anaplan username and password to generate an authentication token. You can use this authentication token in your API requests.\n\n**Note**: If your workspace uses single sign-on (SSO), your user must be assigned as an Exception User to use basic authentication and obtain an Anaplan authentication token. For more information on exception users in Anaplan, see [Assign Exception Users](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Security/Single_Sign-on/Enforcing_SAML_Authentication.html) in Anapedia."
+      }
+    },
+    "/token/refresh": {
+      "post": {
+        "summary": "Refresh Authentication Token",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "This contains the auth token generated in a prior authentication request",
+            "schema": {
+              "type": "string"
+            },
+            "example": "AnaplanAuthToken {{anaplan_auth_token}}"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful authentication.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tokenInfo": {
+                      "type": "object",
+                      "properties": {
+                        "expiresAt": {
+                          "type": "integer",
+                          "example": 1493036651173
+                        },
+                        "tokenId": {
+                          "type": "string",
+                          "example": "9aa99999-1111-11a2-b333-abc11223ab12"
+                        },
+                        "tokenValue": {
+                          "type": "string",
+                          "description": "Bearer token for subsequent requests.",
+                          "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.example.token"
+                        },
+                        "refreshTokenId": {
+                          "type": "string",
+                          "example": "3ab11111-2222-33e4-a111-01a1b222cd3a"
+                        }
+                      }
+                    },
+                    "status": {
+                      "type": "string",
+                      "example": "SUCCESS"
+                    },
+                    "statusMessage": {
+                      "type": "string",
+                      "example": "Token refreshed"
+                    },
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "validationUrl": {
+                          "type": "string",
+                          "example": "https://auth.anaplan.com/token/validate"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Invalid credentials provided.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid username or password."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Authentication",
+          "Other Authentication Actions"
+        ],
+        "description": "## Refresh authentication token\n\n`/token/refresh`  \n\nGenerates a new authentication token from an existing\u00a0`{anaplan_auth_token}`\u00a0that you provide. You need to refresh your token if your session runs for longer than 30 minutes."
+      }
+    },
+    "/token/validate": {
+      "get": {
+        "summary": "Get Authentication Token Details",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "AnaplanAuthToken {{anaplan_auth_token}}"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful authentication.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tokenInfo": {
+                      "type": "object",
+                      "properties": {
+                        "expiresAt": {
+                          "type": "integer",
+                          "example": 1493036651173
+                        },
+                        "tokenId": {
+                          "type": "string",
+                          "example": "9aa99999-1111-11a2-b333-abc11223ab12"
+                        }
+                      }
+                    },
+                    "userInfo": {
+                      "type": "object",
+                      "properties": {
+                        "userGuid": {
+                          "type": "string",
+                          "example": "8a89d9999f3c7099015f999d5208458a"
+                        },
+                        "userId": {
+                          "type": "string",
+                          "example": "a.user@acme.com"
+                        },
+                        "customerGuid": {
+                          "type": "string",
+                          "example": "8a80d99a5bf97b99995c3d1577610415"
+                        }
+                      }
+                    },
+                    "status": {
+                      "type": "string",
+                      "example": "SUCCESS"
+                    },
+                    "statusMessage": {
+                      "type": "string",
+                      "example": "Token validated"
+                    },
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "validationUrl": {
+                          "type": "string",
+                          "example": "https://auth.anaplan.com/token/validate"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Invalid credentials provided.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid username or password."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Authentication",
+          "Other Authentication Actions"
+        ],
+        "description": "## Get authentication token details\n\n`/token/validate`  \n\nGets information on a provided\u00a0`{anaplan_auth_token}`. If the token is valid, returns the details of the\u00a0`{anaplan_auth_token}`. If the token is invalid, returns a \"401 UnAuthorized\" message."
+      }
+    },
+    "/token/logout": {
+      "post": {
+        "summary": "Log Out the User",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "example": "AnaplanAuthToken {{anaplan_auth_token}}"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successfully deleted authentication token"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials"
+          },
+          "400": {
+            "description": "Bad Request - Missing or malformed headers"
+          }
+        },
+        "tags": [
+          "Authentication",
+          "Other Authentication Actions"
+        ],
+        "description": "## Log out the user\n\n`/token/logout`  \n\nDeletes an\u00a0`{anaplan_auth_token}`. After the /logout command, the\u00a0`{anaplan_auth_token}`\u00a0is deleted and no longer valid.\n\nNo response body is expected. If response code is 204 then user has been logged out successfully."
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "BasicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    }
+  }
+}
