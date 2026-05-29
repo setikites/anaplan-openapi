@@ -1,0 +1,21 @@
+# Anaplan OpenAPI Specification Project
+
+## Overview
+
+This project generates OpenAPI 3.0 JSON specifications for the 9 publicly available Anaplan REST APIs, intended for API client code generation and community documentation.
+
+See [CONTEXT.md](./CONTEXT.md) for an overview of all 9 APIs, their sources, and testing coverage.
+
+## Agent skills
+
+### Issue tracker
+
+Issues live in GitHub Issues. Skills create and read issues via the `gh` CLI. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Standard triage labels: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context layout: `CONTEXT.md` + `docs/adr/` at repo root. See `docs/agents/domain.md`.
