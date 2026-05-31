@@ -53,15 +53,17 @@ ANAPLAN_CA_KEY_PASSWORD=optional_key_password \
 uv run pytest tests/test_auth_integration_live.py::test_auth_workflow_ca_cert --live
 ```
 
-**Test Flow:**
-The test implements the Anaplan certificate authentication flow as documented:
-1. Generates a random 100+ byte string (required by Anaplan)
-2. Signs it with the private key using SHA512withRSA algorithm
-3. Sends the certificate chain and signature to `/token/authenticate`
-4. Validates the returned token
-5. Logs out
+**Test Flow (matches anaplan-sdk implementation):**
+The test implements the Anaplan certificate authentication flow:
+1. Generates a random 150-byte string
+2. Base64-encodes the random data
+3. Signs the random data with the private key using SHA512withRSA algorithm
+4. Base64-encodes the signature
+5. Sends both `encodedData` and `encodedSignedData` to `/token/authenticate`
+6. Validates the returned token
+7. Logs out
 
-**Note:** If the test is skipped with "Certificate not registered for API authentication", the certificate exists but is not configured for API use in your Anaplan instance. Contact your Anaplan administrator to enable the certificate for API authentication.
+**Implementation Note:** This test implementation matches the official `anaplan-sdk` certificate authentication flow exactly, ensuring compatibility.
 
 ## Endpoints
 
