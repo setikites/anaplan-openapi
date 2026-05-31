@@ -40,26 +40,7 @@
                   "type": "object",
                   "properties": {
                     "tokenInfo": {
-                      "type": "object",
-                      "properties": {
-                        "expiresAt": {
-                          "type": "integer",
-                          "example": 1493036651173
-                        },
-                        "tokenId": {
-                          "type": "string",
-                          "example": "9aa99999-1111-11a2-b333-abc11223ab12"
-                        },
-                        "tokenValue": {
-                          "type": "string",
-                          "description": "Bearer token for subsequent requests.",
-                          "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.example.token"
-                        },
-                        "refreshTokenId": {
-                          "type": "string",
-                          "example": "3ab11111-2222-33e4-a111-01a1b222cd3a"
-                        }
-                      }
+                      "$ref": "#/components/schemas/TokenInfo"
                     },
                     "status": {
                       "type": "string",
@@ -70,13 +51,7 @@
                       "example": "Login successful"
                     },
                     "meta": {
-                      "type": "object",
-                      "properties": {
-                        "validationUrl": {
-                          "type": "string",
-                          "example": "https://auth.anaplan.com/token/validate"
-                        }
-                      }
+                      "$ref": "#/components/schemas/Schema3"
                     }
                   }
                 }
@@ -88,13 +63,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "Invalid username or password."
-                    }
-                  }
+                  "$ref": "#/components/schemas/Schema3"
                 }
               }
             }
@@ -128,26 +97,7 @@
                   "type": "object",
                   "properties": {
                     "tokenInfo": {
-                      "type": "object",
-                      "properties": {
-                        "expiresAt": {
-                          "type": "integer",
-                          "example": 1493036651173
-                        },
-                        "tokenId": {
-                          "type": "string",
-                          "example": "9aa99999-1111-11a2-b333-abc11223ab12"
-                        },
-                        "tokenValue": {
-                          "type": "string",
-                          "description": "Bearer token for subsequent requests.",
-                          "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.example.token"
-                        },
-                        "refreshTokenId": {
-                          "type": "string",
-                          "example": "3ab11111-2222-33e4-a111-01a1b222cd3a"
-                        }
-                      }
+                      "$ref": "#/components/schemas/TokenInfo"
                     },
                     "status": {
                       "type": "string",
@@ -158,13 +108,7 @@
                       "example": "Token refreshed"
                     },
                     "meta": {
-                      "type": "object",
-                      "properties": {
-                        "validationUrl": {
-                          "type": "string",
-                          "example": "https://auth.anaplan.com/token/validate"
-                        }
-                      }
+                      "$ref": "#/components/schemas/Schema3"
                     }
                   }
                 }
@@ -176,13 +120,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "Invalid username or password."
-                    }
-                  }
+                  "$ref": "#/components/schemas/Schema3"
                 }
               }
             }
@@ -253,13 +191,7 @@
                       "example": "Token validated"
                     },
                     "meta": {
-                      "type": "object",
-                      "properties": {
-                        "validationUrl": {
-                          "type": "string",
-                          "example": "https://auth.anaplan.com/token/validate"
-                        }
-                      }
+                      "$ref": "#/components/schemas/Schema3"
                     }
                   }
                 }
@@ -271,13 +203,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "Invalid username or password."
-                    }
-                  }
+                  "$ref": "#/components/schemas/Schema3"
                 }
               }
             }
@@ -374,6 +300,37 @@
             "description": "Signature payload"
           }
         }
+      },
+      "TokenInfo": {
+        "properties": {
+          "expiresAt": {
+            "example": 1493036651173,
+            "type": "integer"
+          },
+          "refreshTokenId": {
+            "example": "3ab11111-2222-33e4-a111-01a1b222cd3a",
+            "type": "string"
+          },
+          "tokenId": {
+            "example": "9aa99999-1111-11a2-b333-abc11223ab12",
+            "type": "string"
+          },
+          "tokenValue": {
+            "description": "Bearer token for subsequent requests.",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.example.token",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "Schema3": {
+        "properties": {
+          "validationUrl": {
+            "example": "https://auth.anaplan.com/token/validate",
+            "type": "string"
+          }
+        },
+        "type": "object"
       }
     }
   }
