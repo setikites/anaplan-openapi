@@ -165,3 +165,48 @@ def test_convert_postman_spec(spec_name):
 
     # Verify output is valid OpenAPI
     validate(result)
+
+
+@pytest.mark.parametrize("spec_name", ["authentication/postman-spec.yaml"])
+def test_no_duplicate_inline_schemas(spec_name):
+    """Complex reused schemas should be extracted to components/schemas, not duplicated inline."""
+    import pathlib
+
+    spec_file = pathlib.Path(__file__).parent.parent / spec_name
+    with open(spec_file, encoding="utf-8") as f:
+        postman_spec = yaml.safe_load(f)
+
+    result = convert_openapi_spec(postman_spec)
+
+    # Collect all complex inline schemas in paths (those with properties, oneOf, allOf)
+    inline_schemas = []
+
+    def collect_schemas(obj):
+        if isinstance(obj, dict):
+            if _is_complex_schema(obj):
+                schema_key = json.dumps(obj, sort_keys=True)
+                inline_schemas.append(schema_key)
+            for value in obj.values():
+                collect_schemas(value)
+        elif isinstance(obj, list):
+            for item in obj:
+                collect_schemas(item)
+
+    collect_schemas(result.get("paths", {}))
+
+    # Check for duplicates: complex schemas that appear more than once should have been extracted
+    schema_counts = {}
+    for schema in inline_schemas:
+        schema_counts[schema] = schema_counts.get(schema, 0) + 1
+
+    duplicates = {schema: count for schema, count in schema_counts.items() if count > 1}
+    assert not duplicates, f"Found duplicate complex inline schemas that should be in components/schemas: {len(duplicates)}"
+
+
+def _is_complex_schema(obj):
+    """Check if object is a complex schema worth extracting (has properties, oneOf, or allOf)."""
+    if not isinstance(obj, dict):
+        return False
+    if "$ref" in obj and len(obj) == 1:
+        return False
+    return "properties" in obj or "oneOf" in obj or "allOf" in obj
