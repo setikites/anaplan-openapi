@@ -60,13 +60,14 @@ paths:
   /token/authenticate:
     post:
       summary: Create an Authentication Token (Basic)
-      parameters:
-        - name: Authorization
-          in: header
-          description: Contains the encoded credentials from the Pre-request Script
-          schema:
-            type: string
-          example: Basic {{encodedCredentials}}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/EmptyPayload'
+                - $ref: '#/components/schemas/CertPayload'
       responses:
         '200':
           description: Successful authentication.
@@ -116,15 +117,14 @@ paths:
       tags:
         - Authentication
         - Basic Credentials
+        - Certificate Credentials
       security:
         - BasicAuth: []
         - CACertAuth: []
       description: >-
         [https://anaplanauthentication.docs.apiary.io/#](https://anaplanauthentication.docs.apiary.io/#)
 
-
         ## Create an Authentication Token
-
 
         `/token/authenticate`  
 
@@ -134,16 +134,9 @@ paths:
         external public certificate authority (CA) or using your login and
         password.
 
+        Use Basic HTTP Auth with no body, or Certificate Auth with the required body payload.
 
-        ### Create an authentication token using a username & password
-
-
-        Creates an AnaplanAuthToken.
-
-
-        Use your Anaplan username and password to generate an authentication
-        token. You can use this authentication token in your API requests.
-
+        Creates an AnaplanAuthToken. You can use this authentication token in your API requests.
 
         **Note**: If your workspace uses single sign-on (SSO), your user must be
         assigned as an Exception User to use basic authentication and obtain an
@@ -154,15 +147,6 @@ paths:
   /token/refresh:
     post:
       summary: Refresh Authentication Token
-      parameters:
-        - name: Authorization
-          in: header
-          description: >-
-            This contains the auth token generated in a prior authentication
-            request
-          schema:
-            type: string
-          example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
           description: Successful authentication.
@@ -215,16 +199,16 @@ paths:
       security:
         - BearerAuth: []
         - AnaplanAuth: []
-      description: "## Refresh authentication token\n\n`/token/refresh`  \n\nGenerates a new authentication token from an existing\_`{anaplan_auth_token}`\_that you provide. You need to refresh your token if your session runs for longer than 30 minutes."
+      description: >-
+        ## Refresh authentication token
+
+        `/token/refresh`  
+
+        Generates a new authentication token from an existing\_`{anaplan_auth_token}`\_that you provide.
+        You need to refresh your token if your session runs for longer than 30 minutes.
   /token/validate:
     get:
       summary: Get Authentication Token Details
-      parameters:
-        - name: Authorization
-          in: header
-          schema:
-            type: string
-          example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
           description: Successful authentication.
@@ -282,16 +266,17 @@ paths:
       security:
         - BearerAuth: []
         - AnaplanAuth: []
-      description: "## Get authentication token details\n\n`/token/validate`  \n\nGets information on a provided\_`{anaplan_auth_token}`. If the token is valid, returns the details of the\_`{anaplan_auth_token}`. If the token is invalid, returns a \"401 UnAuthorized\" message."
+      description: >-
+        ## Get authentication token details
+        
+        `/token/validate`
+        
+        Gets information on a provided\_`{anaplan_auth_token}`.
+        If the token is valid, returns the details of the\_`{anaplan_auth_token}`.
+        If the token is invalid, returns a \"401 UnAuthorized\" message.
   /token/logout:
     post:
       summary: Log Out the User
-      parameters:
-        - name: Authorization
-          in: header
-          schema:
-            type: string
-          example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '204':
           description: Successfully deleted authentication token
@@ -305,7 +290,14 @@ paths:
       security:
         - BearerAuth: []
         - AnaplanAuth: []
-      description: "## Log out the user\n\n`/token/logout`  \n\nDeletes an\_`{anaplan_auth_token}`. After the /logout command, the\_`{anaplan_auth_token}`\_is deleted and no longer valid.\n\nNo response body is expected. If response code is 204 then user has been logged out successfully."
+      description: >-
+        ## Log out the user
+        
+        `/token/logout`
+        
+        Deletes an\_`{anaplan_auth_token}`.
+        After the /logout command, the\_`{anaplan_auth_token}`\_is deleted and no longer valid.
+        No response body is expected. If response code is 204 then user has been logged out successfully.
 components:
   securitySchemes:
     BasicAuth:
@@ -325,3 +317,22 @@ components:
       in: header
       name: Authorization
       description: Custom CA Certificate token. Format `CACertificate {your_CA_certificate}`
+
+  schemas:
+    EmptyPayload:
+      type: object
+      description: Used for Basic Authentication. No body parameters are accepted or required.
+      properties: {}
+
+    CertPayload:
+      type: object
+      required:
+        - certificateChain
+        - signature
+      properties:
+        certificateChain:
+          type: string
+          description: Base64 encoded certificate chain
+        signature:
+          type: string
+          description: Signature payload
