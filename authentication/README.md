@@ -40,13 +40,24 @@ uv run pytest tests/test_auth_integration_live.py --live
 
 #### With CA Certificate Authentication
 
+To test CA certificate authentication, you need:
+- An X.509 certificate issued by a CA (PEM format)
+- The corresponding private key (PEM format)
+- Optional: password for the private key
+
 ```bash
-ANAPLAN_USERNAME=your_user \
-ANAPLAN_PASSWORD=your_pass \
 ANAPLAN_CA_CERT_PATH=/path/to/cert.pem \
-ANAPLAN_CA_SIGNATURE="signature_payload" \
-uv run pytest tests/test_auth_integration_live.py --live
+ANAPLAN_CA_KEY_PATH=/path/to/private_key.pem \
+ANAPLAN_CA_KEY_PASSWORD=optional_key_password \
+uv run pytest tests/test_auth_integration_live.py::test_auth_workflow_ca_cert --live
 ```
+
+The test implements the Anaplan certificate authentication flow:
+1. Generates a random 100+ byte string
+2. Signs it with the private key using SHA512withRSA
+3. Sends the certificate, encoded data, and signature to `/token/authenticate`
+4. Validates the returned token
+5. Logs out
 
 ## Endpoints
 
@@ -54,11 +65,17 @@ uv run pytest tests/test_auth_integration_live.py --live
 
 Generate an authentication token.
 
-**Supports:**
-- HTTP Basic Auth (`username:password` base64-encoded in `Authorization: Basic` header)
-- CA Certificate Auth (certificate and signature in request body)
+**HTTP Basic Auth:**
+- Header: `Authorization: Basic {base64(username:password)}`
 
-**Response:** 200 with tokenInfo containing:
+**CA Certificate Auth:**
+- Header: `Authorization: CACertificate {base64_encoded_certificate}`
+- Body (JSON):
+  - `certificateChain` - Base64-encoded certificate in PEM format
+  - `encodedData` - Base64-encoded random string (100+ bytes)
+  - `encodedSignature` - Base64-encoded signature of the random string, signed with the private key using SHA512withRSA
+
+**Response:** 200 or 201 with tokenInfo containing:
 - `tokenValue` - The authentication token
 - `tokenId` - Token identifier
 - `expiresAt` - Expiration timestamp (milliseconds)

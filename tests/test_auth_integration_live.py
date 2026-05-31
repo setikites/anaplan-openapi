@@ -13,11 +13,15 @@ These tests require:
 import base64
 import os
 import pathlib
+import secrets
 import warnings
 import pytest
 import httpx
 import yaml
 from openapi_spec_validator import validate
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.hazmat.backends import default_backend
 
 # Load spec for response validation
 SPEC_FILE = pathlib.Path(__file__).parent.parent / "authentication" / "postman-spec.yaml"
@@ -25,6 +29,27 @@ with open(SPEC_FILE, encoding="utf-8") as f:
     SPEC = yaml.safe_load(f)
 
 API_URL = "https://auth.anaplan.com"
+
+
+def _sign_data_with_private_key(data: bytes, key_path: str, key_password: str | None = None) -> str:
+    """Sign data with a private key using SHA512withRSA and return base64-encoded signature."""
+    with open(key_path, "rb") as f:
+        key_data = f.read()
+
+    password = key_password.encode() if key_password else None
+    private_key = serialization.load_pem_private_key(
+        key_data, password=password, backend=default_backend()
+    )
+
+    signature = private_key.sign(data, padding.PKCS1v15(), hashes.SHA512())
+    return base64.b64encode(signature).decode()
+
+
+def _load_certificate(cert_path: str) -> str:
+    """Load and return base64-encoded certificate in PEM format."""
+    with open(cert_path, "rb") as f:
+        cert_data = f.read()
+    return base64.b64encode(cert_data).decode()
 
 
 @pytest.fixture
@@ -41,20 +66,28 @@ def auth_creds():
 
 @pytest.fixture
 def ca_certs():
-    """Load CA certificate credentials from environment."""
+    """Load CA certificate paths from environment."""
     cert_path = os.getenv("ANAPLAN_CA_CERT_PATH")
-    signature = os.getenv("ANAPLAN_CA_SIGNATURE")
+    key_path = os.getenv("ANAPLAN_CA_KEY_PATH")
 
-    if not cert_path or not signature:
+    if not cert_path or not key_path:
         return None
 
-    if not pathlib.Path(cert_path).exists():
+    cert_file = pathlib.Path(cert_path)
+    key_file = pathlib.Path(key_path)
+
+    if not cert_file.exists():
         pytest.skip(f"CA certificate file not found: {cert_path}")
+    if not key_file.exists():
+        pytest.skip(f"Private key file not found: {key_path}")
 
-    with open(cert_path, encoding="utf-8") as f:
-        cert = f.read()
+    key_password = os.getenv("ANAPLAN_CA_KEY_PASSWORD")
 
-    return {"cert": cert, "signature": signature}
+    return {
+        "cert_path": str(cert_file),
+        "key_path": str(key_file),
+        "key_password": key_password,
+    }
 
 
 @pytest.mark.live
@@ -128,26 +161,47 @@ def test_auth_workflow_basic_auth(auth_creds):
 
 @pytest.mark.live
 def test_auth_workflow_ca_cert(ca_certs):
-    """Test full workflow with CA certificate authentication."""
+    """Test full workflow with CA certificate authentication.
+
+    Implements the Anaplan certificate auth flow:
+    1. Generate random 100+ byte string
+    2. Base64 encode it
+    3. Sign with private key using SHA512withRSA
+    4. Base64 encode signature
+    5. Send to /token/authenticate
+    """
     if not ca_certs:
         pytest.skip("CA certificate credentials not configured")
 
     discrepancies = []
 
+    # Generate random data (100+ bytes as required)
+    random_data = secrets.token_bytes(128)
+    encoded_data = base64.b64encode(random_data).decode()
+
+    # Sign the random data with the private key
+    signature = _sign_data_with_private_key(
+        random_data, ca_certs["key_path"], ca_certs["key_password"]
+    )
+
+    # Load the certificate in base64
+    cert_b64 = _load_certificate(ca_certs["cert_path"])
+
     with httpx.Client() as client:
         # 1. Authenticate with CA cert
         cert_payload = {
-            "certificateChain": ca_certs["cert"],
-            "signature": ca_certs["signature"],
+            "certificateChain": cert_b64,
+            "encodedData": encoded_data,
+            "encodedSignature": signature,
         }
 
         auth_response = client.post(
             f"{API_URL}/token/authenticate",
-            headers={"Authorization": f"CACertificate {ca_certs['cert']}"},
+            headers={"Authorization": f"CACertificate {cert_b64}"},
             json=cert_payload,
         )
 
-        assert_response_code(auth_response, [200], discrepancies)
+        assert_response_code(auth_response, [200, 201], discrepancies)
         auth_data = auth_response.json()
         token = auth_data.get("tokenInfo", {}).get("tokenValue")
         assert token, "No token returned from CA cert authentication"
