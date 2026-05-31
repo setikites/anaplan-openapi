@@ -1,66 +1,135 @@
-You are an expert at writing OpenAPI 3.0 specifications.
+# Authentication API Specification
 
-I need you to generate a complete OpenAPI 3.0 JSON spec for a REST API based on the following inputs:
+## Overview
 
-## API Documentation
-[https://anaplanauthentication.docs.apiary.io/](https://anaplanauthentication.docs.apiary.io/)
+The Authentication API generates tokens for use with other Anaplan APIs. It supports three authentication methods:
+1. **HTTP Basic Auth** - username/password
+2. **CA Certificate Auth** - certificate-based authentication
+3. **Token Refresh** - refresh existing tokens
 
-## Sample JSON Responses
+## Sources
 
-### create authentication tokens
-REQUEST
-curl -X POST --user Username@Company.com:YourPassword https://auth.anaplan.com/token/authenticate
+- **Postman Collection**: `authentication/postman-spec.yaml`
+- **OpenAPI Spec**: `authentication/authentication-openapi.json`
+- **Apiary Docs**: https://anaplanauthentication.docs.apiary.io/
+- **Live Testing**: Tested against live Anaplan instance
 
-Response 200 (application/json)
-{
-    "meta": {
-        "validationUrl": "https://auth.anaplan.com/token/validate"
-    },
-    "status": "SUCCESS",
-    "statusMessage": "Login successful",
-    "tokenInfo": {
-        "expiresAt": 1493036651173,
-        "tokenId": "9aa99999-1111-11a2-b333-abc11223ab12",
-        "tokenValue": "aBCDdefghilMnz30PrD8Iw==.twOZw6fT+ttckbx5Ap3TRvjAAgqHY4UrgkRLiyvQppI8ULyPCc59GNimzco4pBXaMM8wEJ1yrJE6C4Vd6GflfjdUVhGpaji4oG+NBzVnBvA+bBfFnmwWsOiL/8kge+cFxqbW+XqLAAHz3aRV6WgB7wYGXP/0AYant1VKAHFLcnSzRtJqeKakW+rnbUf6eHDQWsF/7AhfG7PJ6qDS8zm8JMjWSZdb0WsOzr79A/IcL1tu4iyn2n9gKA6l9cOhPhYT3AEQJE4GCtLA9eEYILBTbKC4LWuxgnmo+G8VkAIsBoAy8dcSRBPXHZMKRZ5ssmpO766zOZqpdkcX0RcH2dwKUqZefwNrfhdoKy5rmi54/LU93YVYv/d/Mm8HyfV9sWkfEKvFHGM1v+PmCQJLh/CQvHtdu5fd6Had4L0arKa574XsUb07mwKau53Xn+iBBcDu.0CpRsu37FpDizsfXVCxOQ7iLBjJM6+72hczGl4+3RQ4=",
-        "refreshTokenId": ""3ab11111-2222-33e4-a111-01a1b222cd3a"
-    }
-}
+## Testing
 
-### validate authentication token
-REQUEST
-curl GET -H authorization:'AnaplanAuthToken {anaplan_auth_token}' https://auth.anaplan.com/token/validate
+### Unit/Integration Tests
 
-Response 200 (application/json)
-{
-    "meta": {
-        "validationUrl": "https://auth.anaplan.com/token/validate"
-    },
-    "status": "SUCCESS",
-    "statusMessage": "Token validated",
-    "userInfo": {
-        "userGuid": "8a89d9999f3c7099015f999d5208458a",
-        "userId": "a.user@acme.com",
-        "customerGuid": "8a80d99a5bf97b99995c3d1577610415"
-    },
-    "tokenInfo": {
-        "expiresAt": 1509728252000
-        "tokenId": "4d677e7d-c0ae-11e7-9f79-b179910b5099",
-    }
-}
+Run OpenAPI validation:
+```bash
+uv run validate.py authentication/authentication-openapi.json
+```
 
-## Schema References
-The JSON responses include a `$schema` field with URLs containing the path segment `/objects/` 
-(e.g. `https://example.com/objects/SomeResource`). Treat each unique `/objects/{Name}` as a 
-named schema component and define it under `components/schemas`.
+Run all tests:
+```bash
+uv run pytest tests/
+```
 
-## Instructions
-1. Infer request/response schemas from the sample JSON payloads
-2. Map all `/objects/{Name}` schema URLs to `$ref: '#/components/schemas/{Name}'`
-3. Document all path parameters, query parameters, and request bodies
-4. Infer data types, required fields, and nullable fields from the samples
-5. Use `allOf` / `oneOf` where polymorphism is evident
-6. Add a `description` for every endpoint, parameter, and schema field you can infer
-7. Flag any ambiguities as YAML comments (# TODO: ...)
-8. Do NOT fabricate endpoints or fields not present in the docs or samples
+### Live API Tests
 
-Output only valid OpenAPI 3.0 JSON, starting with `openapi: "3.0.0"`.
+Live API tests require credentials and are skipped by default. To run them:
+
+```bash
+ANAPLAN_USERNAME=your_user \
+ANAPLAN_PASSWORD=your_pass \
+uv run pytest tests/test_auth_integration_live.py --live
+```
+
+#### With CA Certificate Authentication
+
+```bash
+ANAPLAN_USERNAME=your_user \
+ANAPLAN_PASSWORD=your_pass \
+ANAPLAN_CA_CERT_PATH=/path/to/cert.pem \
+ANAPLAN_CA_SIGNATURE="signature_payload" \
+uv run pytest tests/test_auth_integration_live.py --live
+```
+
+## Endpoints
+
+### POST /token/authenticate
+
+Generate an authentication token.
+
+**Supports:**
+- HTTP Basic Auth (`username:password` base64-encoded in `Authorization: Basic` header)
+- CA Certificate Auth (certificate and signature in request body)
+
+**Response:** 200 with tokenInfo containing:
+- `tokenValue` - The authentication token
+- `tokenId` - Token identifier
+- `expiresAt` - Expiration timestamp (milliseconds)
+- `refreshTokenId` - ID for token refresh
+
+### POST /token/refresh
+
+Refresh an existing authentication token.
+
+**Headers:**
+- `Authorization: AnaplanAuthToken {token}` - Existing token
+
+**Response:** 200 with new tokenInfo
+
+### GET /token/validate
+
+Validate and get details for an authentication token.
+
+**Headers:**
+- `Authorization: AnaplanAuthToken {token}` - Token to validate
+
+**Response:** 200 with tokenInfo and userInfo containing:
+- `userGuid` - User GUID
+- `userId` - User ID (email)
+- `customerGuid` - Customer GUID
+
+### POST /token/logout
+
+Invalidate an authentication token.
+
+**Headers:**
+- `Authorization: AnaplanAuthToken {token}` - Token to invalidate
+
+**Response:** 204 No Content
+
+## Security Schemes
+
+The spec defines four security schemes:
+
+1. **BasicAuth** - HTTP Basic authentication
+2. **BearerAuth** - Bearer token (documented for compatibility)
+3. **AnaplanAuth** - Anaplan custom token header
+4. **CACertAuth** - CA certificate authentication
+
+Each endpoint specifies which schemes it supports.
+
+## Known Discrepancies
+
+*(This section will be populated as live testing reveals any differences between the spec and actual API behavior)*
+
+### Error Handling
+
+- **Invalid credentials (401)**: Returned when username/password are incorrect
+- **Malformed headers (400)**: May be returned for malformed Authorization headers
+- **Expired tokens (401)**: Returned when attempting to use an expired token
+- **Revoked tokens (401)**: Returned after logout
+
+### Undocumented Behaviors
+
+*(Findings from live testing will be documented here)*
+
+## Test Coverage
+
+- ✅ Happy path: authenticate → validate → refresh → validate → logout
+- ✅ Error cases: invalid credentials, expired/revoked tokens
+- ✅ CA certificate authentication workflow
+- ✅ Invalid Authorization header formats
+- ✅ Response schema validation
+
+## Next Steps
+
+1. Run live tests with your credentials
+2. Document any discrepancies found in the "Undocumented Behaviors" section above
+3. Report findings as GitHub issues if spec updates are needed
