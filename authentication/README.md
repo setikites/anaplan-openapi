@@ -107,7 +107,20 @@ Each endpoint specifies which schemes it supports.
 
 ## Known Discrepancies
 
-*(This section will be populated as live testing reveals any differences between the spec and actual API behavior)*
+The following discrepancies between the OpenAPI specification and actual API behavior were discovered during live testing:
+
+### Status Code Variations
+
+- **POST /token/authenticate**: Returns `201 Created` in addition to `200 OK` documented in spec
+- **POST /token/refresh**: Returns `201 Created` in addition to `200 OK` documented in spec
+
+### Token Refresh Behavior
+
+- **POST /token/refresh**: Returns the same token value instead of a new token. The token's internal expiration is extended, but the `tokenValue` itself does not change.
+
+### Client-Level Header Validation
+
+- Some invalid Authorization header formats (e.g., `"Basic "` with trailing space) are rejected by the HTTP client library before reaching the API server, preventing end-to-end validation of API error handling for malformed headers.
 
 ### Error Handling
 
@@ -118,7 +131,11 @@ Each endpoint specifies which schemes it supports.
 
 ### Undocumented Behaviors
 
-*(Findings from live testing will be documented here)*
+Based on live testing against the Anaplan Authentication API:
+
+- **Token Expiration**: Tokens have both an `expiresAt` timestamp and an internal expiration. The `/token/validate` endpoint returns the current token's expiration details even after refresh.
+- **Refresh Token Persistence**: The `refreshTokenId` remains consistent across refresh operations, allowing continuous token refresh without re-authentication.
+- **Logout Behavior**: After logout, subsequent validation attempts return `401 Unauthorized`, confirming token revocation is immediate.
 
 ## Test Coverage
 
