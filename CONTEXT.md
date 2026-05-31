@@ -130,6 +130,10 @@ Anaplan APIs use **at least two different authentication schemes**:
 Each API spec documents which scheme(s) it supports. Code generators should check the spec for the correct auth pattern rather than assuming consistency.
 Every spec must contain securitySchemes that it supports and global security if standard across all paths or path-level security.
 
+### Schema Extraction
+
+Schemas are extracted to `components/schemas` only if they are actually reused/duplicated in the spec. Single-use schemas stay inline for readability. This keeps specs lean and avoids unnecessary indirection for one-off objects.
+
 ### Pagination
 
 Pagination patterns differ across APIs. Some may use:
