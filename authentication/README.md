@@ -147,10 +147,11 @@ The following discrepancies between the OpenAPI specification and actual API beh
   - Example: `c2fe098f-5d19-11f1-b2db-efadbac143e7` ✓
   
 - **userGuid and customerGuid**: **NOT** standard UUID format despite their names
-  - Format: 32-character hexadecimal strings with NO hyphens
+  - Format: 32-character hexadecimal strings with NO hyphens (validated with regex pattern)
+  - Pattern: `^[0-9a-f]{32}$`
   - Example: `8a868cd97b120fc7017b36d7331d74be`
   - These are Anaplan's internal identifiers, not RFC 4122 UUIDs
-  - **Spec has been corrected** to document this
+  - Note: OpenAPI 3.0 has no built-in format for hex strings, so pattern validation is used
 
 ### Client-Level Header Validation
 

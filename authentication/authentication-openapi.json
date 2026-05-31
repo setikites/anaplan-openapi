@@ -172,7 +172,8 @@
                         "userGuid": {
                           "type": "string",
                           "example": "8a89d9999f3c7099015f999d5208458a",
-                          "description": "User identifier (32-character hex string, not a standard UUID)"
+                          "description": "User identifier (32-character hex string)",
+                          "pattern": "^[0-9a-f]{32}$"
                         },
                         "userId": {
                           "type": "string",
@@ -181,7 +182,8 @@
                         "customerGuid": {
                           "type": "string",
                           "example": "8a80d99a5bf97b99995c3d1577610415",
-                          "description": "Customer identifier (32-character hex string, not a standard UUID)"
+                          "description": "Customer identifier (32-character hex string)",
+                          "pattern": "^[0-9a-f]{32}$"
                         }
                       }
                     },
