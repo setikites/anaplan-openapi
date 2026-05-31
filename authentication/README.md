@@ -40,10 +40,11 @@ uv run pytest tests/test_auth_integration_live.py --live
 
 #### With CA Certificate Authentication
 
-To test CA certificate authentication, you need:
+**Prerequisites:**
 - An X.509 certificate issued by a CA (PEM format)
 - The corresponding private key (PEM format)
 - Optional: password for the private key
+- **Important:** The certificate must be registered and enabled for API authentication in your Anaplan instance. SMIME/email certificates alone will not work for API authentication.
 
 ```bash
 ANAPLAN_CA_CERT_PATH=/path/to/cert.pem \
@@ -52,12 +53,15 @@ ANAPLAN_CA_KEY_PASSWORD=optional_key_password \
 uv run pytest tests/test_auth_integration_live.py::test_auth_workflow_ca_cert --live
 ```
 
-The test implements the Anaplan certificate authentication flow:
-1. Generates a random 100+ byte string
-2. Signs it with the private key using SHA512withRSA
-3. Sends the certificate, encoded data, and signature to `/token/authenticate`
+**Test Flow:**
+The test implements the Anaplan certificate authentication flow as documented:
+1. Generates a random 100+ byte string (required by Anaplan)
+2. Signs it with the private key using SHA512withRSA algorithm
+3. Sends the certificate chain and signature to `/token/authenticate`
 4. Validates the returned token
 5. Logs out
+
+**Note:** If the test is skipped with "Certificate not registered for API authentication", the certificate exists but is not configured for API use in your Anaplan instance. Contact your Anaplan administrator to enable the certificate for API authentication.
 
 ## Endpoints
 
