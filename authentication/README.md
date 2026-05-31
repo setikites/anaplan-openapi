@@ -75,7 +75,7 @@ Generate an authentication token.
   - `encodedData` - Base64-encoded random string (100+ bytes)
   - `encodedSignature` - Base64-encoded signature of the random string, signed with the private key using SHA512withRSA
 
-**Response:** 200 or 201 with tokenInfo containing:
+**Response:** 201 Created with tokenInfo containing:
 - `tokenValue` - The authentication token
 - `tokenId` - Token identifier
 - `expiresAt` - Expiration timestamp (milliseconds)
@@ -128,8 +128,8 @@ The following discrepancies between the OpenAPI specification and actual API beh
 
 ### Status Code Variations
 
-- **POST /token/authenticate**: Returns `201 Created` in addition to `200 OK` documented in spec
-- **POST /token/refresh**: Returns `201 Created` in addition to `200 OK` documented in spec
+- **POST /token/authenticate**: Returns `201 Created`, not `200 OK` as documented in spec
+- **POST /token/refresh**: Returns `200 OK` as documented (no variation)
 
 ### Token Refresh Behavior
 

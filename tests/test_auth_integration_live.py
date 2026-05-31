@@ -104,7 +104,7 @@ def test_auth_workflow_basic_auth(auth_creds):
             headers={"Authorization": f"Basic {auth_header}"},
         )
 
-        assert_response_code(auth_response, [200, 201], discrepancies)
+        assert_response_code(auth_response, [201], discrepancies)
         auth_data = auth_response.json()
         token = auth_data.get("tokenInfo", {}).get("tokenValue")
         assert token, "No token returned from authenticate"
@@ -125,7 +125,7 @@ def test_auth_workflow_basic_auth(auth_creds):
             headers={"Authorization": f"AnaplanAuthToken {token}"},
         )
 
-        assert_response_code(refresh_response, [200, 201], discrepancies)
+        assert_response_code(refresh_response, [200], discrepancies)
         refresh_data = refresh_response.json()
         new_token = refresh_data.get("tokenInfo", {}).get("tokenValue")
         assert new_token, "No token returned from refresh"
@@ -201,7 +201,7 @@ def test_auth_workflow_ca_cert(ca_certs):
             json=cert_payload,
         )
 
-        assert_response_code(auth_response, [200, 201], discrepancies)
+        assert_response_code(auth_response, [201], discrepancies)
         auth_data = auth_response.json()
         token = auth_data.get("tokenInfo", {}).get("tokenValue")
         assert token, "No token returned from CA cert authentication"
@@ -292,7 +292,7 @@ def test_response_schemas_valid(auth_creds):
             headers={"Authorization": f"Basic {auth_header}"},
         )
 
-        if response.status_code in [200, 201]:
+        if response.status_code == 201:
             # Validate the spec itself is valid
             validate(SPEC)
 
