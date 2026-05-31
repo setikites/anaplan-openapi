@@ -25,3 +25,9 @@ Single-context layout: `CONTEXT.md` + `docs/adr/` at repo root. See `docs/agents
 Always use `uv` to run Python scripts in this project. Examples:
 - `uv run main.py`
 - `uv run pytest tests/`
+
+## GitHub CLI
+
+The `gh` CLI is installed at: `C:\Program Files\GitHub CLI\gh.exe`
+
+When running `gh` commands, use the full path since it may not be in the PATH for non-interactive shells.
