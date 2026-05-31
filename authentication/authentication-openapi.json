@@ -161,7 +161,8 @@
                         },
                         "tokenId": {
                           "type": "string",
-                          "example": "9aa99999-1111-11a2-b333-abc11223ab12"
+                          "example": "9aa99999-1111-11a2-b333-abc11223ab12",
+                          "format": "uuid"
                         }
                       }
                     },
@@ -170,7 +171,8 @@
                       "properties": {
                         "userGuid": {
                           "type": "string",
-                          "example": "8a89d9999f3c7099015f999d5208458a"
+                          "example": "8a89d9999f3c7099015f999d5208458a",
+                          "description": "User identifier (32-character hex string, not a standard UUID)"
                         },
                         "userId": {
                           "type": "string",
@@ -178,7 +180,8 @@
                         },
                         "customerGuid": {
                           "type": "string",
-                          "example": "8a80d99a5bf97b99995c3d1577610415"
+                          "example": "8a80d99a5bf97b99995c3d1577610415",
+                          "description": "Customer identifier (32-character hex string, not a standard UUID)"
                         }
                       }
                     },
@@ -309,11 +312,13 @@
           },
           "refreshTokenId": {
             "example": "3ab11111-2222-33e4-a111-01a1b222cd3a",
-            "type": "string"
+            "type": "string",
+            "format": "uuid"
           },
           "tokenId": {
             "example": "9aa99999-1111-11a2-b333-abc11223ab12",
-            "type": "string"
+            "type": "string",
+            "format": "uuid"
           },
           "tokenValue": {
             "description": "Bearer token for subsequent requests.",

@@ -141,6 +141,17 @@ The following discrepancies between the OpenAPI specification and actual API beh
 
 - **POST /token/refresh**: Returns the same token value instead of a new token. The token's internal expiration is extended, but the `tokenValue` itself does not change.
 
+### UUID/GUID Format
+
+- **tokenId and refreshTokenId**: Correctly formatted as OpenAPI 3.0 UUID format (8-4-4-4-12 hex digits with hyphens)
+  - Example: `c2fe098f-5d19-11f1-b2db-efadbac143e7` ✓
+  
+- **userGuid and customerGuid**: **NOT** standard UUID format despite their names
+  - Format: 32-character hexadecimal strings with NO hyphens
+  - Example: `8a868cd97b120fc7017b36d7331d74be`
+  - These are Anaplan's internal identifiers, not RFC 4122 UUIDs
+  - **Spec has been corrected** to document this
+
 ### Client-Level Header Validation
 
 - Some invalid Authorization header formats (e.g., `"Basic "` with trailing space) are rejected by the HTTP client library before reaching the API server, preventing end-to-end validation of API error handling for malformed headers.
