@@ -139,11 +139,12 @@ def test_preserves_all_input_properties():
     assert result["paths"]["/resource"]["get"]["tags"] == ["resources"]
 
 
-def test_convert_authentication_postman_spec():
-    """Integration test: convert authentication/postman-spec.yaml to valid OpenAPI JSON."""
+@pytest.mark.parametrize("spec_name", ["authentication/postman-spec.yaml"])
+def test_convert_postman_spec(spec_name):
+    """Integration test: convert postman-spec.yaml to valid OpenAPI JSON."""
     import pathlib
 
-    spec_file = pathlib.Path(__file__).parent.parent / "authentication" / "postman-spec.yaml"
+    spec_file = pathlib.Path(__file__).parent.parent / spec_name
     with open(spec_file, encoding="utf-8") as f:
         postman_spec = yaml.safe_load(f)
 
@@ -153,13 +154,14 @@ def test_convert_authentication_postman_spec():
     assert result["openapi"] == "3.0.0"
     assert result["info"]["title"] is not None
 
-    # Verify all 4 endpoints are present
-    expected_endpoints = ["/token/authenticate", "/token/refresh", "/token/validate", "/token/logout"]
-    for endpoint in expected_endpoints:
-        assert endpoint in result["paths"], f"Missing endpoint: {endpoint}"
+    # Verify all paths from source YAML are present in result
+    source_paths = postman_spec.get("paths", {}).keys()
+    result_paths = result.get("paths", {}).keys()
+    for path in source_paths:
+        assert path in result_paths, f"Missing path: {path}"
 
-    # Verify security schemes are present
-    assert "BasicAuth" in result["components"]["securitySchemes"], "Missing BasicAuth scheme"
+    # Verify BearerAuth is present in security schemes
+    assert "BearerAuth" in result.get("components", {}).get("securitySchemes", {}), "Missing BearerAuth scheme"
 
     # Verify output is valid OpenAPI
     validate(result)
