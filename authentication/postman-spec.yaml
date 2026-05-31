@@ -118,6 +118,7 @@ paths:
         - Basic Credentials
       security:
         - BasicAuth: []
+        - CACertAuth: []
       description: >-
         [https://anaplanauthentication.docs.apiary.io/#](https://anaplanauthentication.docs.apiary.io/#)
 
@@ -211,6 +212,9 @@ paths:
       tags:
         - Authentication
         - Other Authentication Actions
+      security:
+        - BearerAuth: []
+        - AnaplanAuth: []
       description: "## Refresh authentication token\n\n`/token/refresh`  \n\nGenerates a new authentication token from an existing\_`{anaplan_auth_token}`\_that you provide. You need to refresh your token if your session runs for longer than 30 minutes."
   /token/validate:
     get:
@@ -275,6 +279,9 @@ paths:
       tags:
         - Authentication
         - Other Authentication Actions
+      security:
+        - BearerAuth: []
+        - AnaplanAuth: []
       description: "## Get authentication token details\n\n`/token/validate`  \n\nGets information on a provided\_`{anaplan_auth_token}`. If the token is valid, returns the details of the\_`{anaplan_auth_token}`. If the token is invalid, returns a \"401 UnAuthorized\" message."
   /token/logout:
     post:
@@ -295,9 +302,26 @@ paths:
       tags:
         - Authentication
         - Other Authentication Actions
+      security:
+        - BearerAuth: []
+        - AnaplanAuth: []
       description: "## Log out the user\n\n`/token/logout`  \n\nDeletes an\_`{anaplan_auth_token}`. After the /logout command, the\_`{anaplan_auth_token}`\_is deleted and no longer valid.\n\nNo response body is expected. If response code is 204 then user has been logged out successfully."
 components:
   securitySchemes:
     BasicAuth:
       type: http
       scheme: basic
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: Enter your valid application authentication token.
+    AnaplanAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Custom API Key token. Format `AnaplanAuthToken {anaplan_auth_token}`
+    CACertAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Custom CA Certificate token. Format `CACertificate {your_CA_certificate}`

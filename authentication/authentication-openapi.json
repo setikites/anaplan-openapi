@@ -101,6 +101,9 @@
         "security": [
           {
             "BasicAuth": []
+          },
+          {
+            "CACertAuth": []
           }
         ],
         "description": "[https://anaplanauthentication.docs.apiary.io/#](https://anaplanauthentication.docs.apiary.io/#)\n\n## Create an Authentication Token\n\n`/token/authenticate`  \nTo use the version 2.0 API, you must use an Anaplan authentication token generated from the Anaplan Authentication Service. You can get an authentication token generated using a certificate from a recognized external public certificate authority (CA) or using your login and password.\n\n### Create an authentication token using a username & password\n\nCreates an AnaplanAuthToken.\n\nUse your Anaplan username and password to generate an authentication token. You can use this authentication token in your API requests.\n\n**Note**: If your workspace uses single sign-on (SSO), your user must be assigned as an Exception User to use basic authentication and obtain an Anaplan authentication token. For more information on exception users in Anaplan, see [Assign Exception Users](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Security/Single_Sign-on/Enforcing_SAML_Authentication.html) in Anapedia."
@@ -192,6 +195,14 @@
         "tags": [
           "Authentication",
           "Other Authentication Actions"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "AnaplanAuth": []
+          }
         ],
         "description": "## Refresh authentication token\n\n`/token/refresh`  \n\nGenerates a new authentication token from an existing\u00a0`{anaplan_auth_token}`\u00a0that you provide. You need to refresh your token if your session runs for longer than 30 minutes."
       }
@@ -290,6 +301,14 @@
           "Authentication",
           "Other Authentication Actions"
         ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "AnaplanAuth": []
+          }
+        ],
         "description": "## Get authentication token details\n\n`/token/validate`  \n\nGets information on a provided\u00a0`{anaplan_auth_token}`. If the token is valid, returns the details of the\u00a0`{anaplan_auth_token}`. If the token is invalid, returns a \"401 UnAuthorized\" message."
       }
     },
@@ -321,6 +340,14 @@
           "Authentication",
           "Other Authentication Actions"
         ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "AnaplanAuth": []
+          }
+        ],
         "description": "## Log out the user\n\n`/token/logout`  \n\nDeletes an\u00a0`{anaplan_auth_token}`. After the /logout command, the\u00a0`{anaplan_auth_token}`\u00a0is deleted and no longer valid.\n\nNo response body is expected. If response code is 204 then user has been logged out successfully."
       }
     }
@@ -330,6 +357,23 @@
       "BasicAuth": {
         "type": "http",
         "scheme": "basic"
+      },
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Enter your valid application authentication token."
+      },
+      "AnaplanAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "Custom API Key token. Format `AnaplanAuthToken {anaplan_auth_token}`"
+      },
+      "CACertAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "Custom CA Certificate token. Format `CACertificate {your_CA_certificate}`"
       }
     }
   }

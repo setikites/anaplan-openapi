@@ -128,6 +128,7 @@ Anaplan APIs use **at least two different authentication schemes**:
    Used by: Authentication API to generate tokens
 
 Each API spec documents which scheme(s) it supports. Code generators should check the spec for the correct auth pattern rather than assuming consistency.
+Every spec must contain securitySchemes that it supports and global security if standard across all paths or path-level security.
 
 ### Pagination
 

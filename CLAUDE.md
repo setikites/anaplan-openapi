@@ -19,3 +19,9 @@ Standard triage labels: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-
 ### Domain docs
 
 Single-context layout: `CONTEXT.md` + `docs/adr/` at repo root. See `docs/agents/domain.md`.
+
+## Python tooling
+
+Always use `uv` to run Python scripts in this project. Examples:
+- `uv run main.py`
+- `uv run pytest tests/`
