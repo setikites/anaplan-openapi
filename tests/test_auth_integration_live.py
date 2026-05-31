@@ -175,7 +175,7 @@ def test_auth_workflow_ca_cert(ca_certs):
 
     discrepancies = []
 
-    # Generate random data (150 bytes as per anaplan-sdk)
+    # Generate random data (150 bytes)
     random_data = secrets.token_bytes(150)
     encoded_data = base64.b64encode(random_data).decode()
 
@@ -189,7 +189,6 @@ def test_auth_workflow_ca_cert(ca_certs):
 
     with httpx.Client() as client:
         # 1. Authenticate with CA cert
-        # Payload format matches anaplan-sdk: encodedData + encodedSignedData
         cert_payload = {
             "encodedData": encoded_data,
             "encodedSignedData": signature,

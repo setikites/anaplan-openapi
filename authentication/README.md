@@ -63,7 +63,7 @@ The test implements the Anaplan certificate authentication flow:
 6. Validates the returned token
 7. Logs out
 
-**Implementation Note:** This test implementation matches the official `anaplan-sdk` certificate authentication flow exactly, ensuring compatibility.
+**Implementation Note:** This test implementation matches the community-contributed `anaplan-sdk` library's certificate authentication flow, ensuring compatibility with the established approach in the Anaplan ecosystem.
 
 ## Endpoints
 
