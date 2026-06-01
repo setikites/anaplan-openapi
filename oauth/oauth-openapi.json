@@ -7,7 +7,52 @@
   },
   "servers": [
     {
-      "url": "https://us1a.app.anaplan.com"
+      "url": "https://us1a.app.anaplan.com",
+      "description": "US1 (Data Center - US East), US2 (Data Center - US West), US5 (Cloud - US East), US7 (Cloud - US), AP1 (Cloud - Japan), EU1 (Data Center - Netherlands), EU2 (Data Center - Germany), EU4 (Cloud - Europe)"
+    },
+    {
+      "url": "https://us9.app.anaplan.com",
+      "description": "US9 (Cloud - US)"
+    },
+    {
+      "url": "https://eu3.app.anaplan.com",
+      "description": "EU3 (Cloud - Europe)"
+    },
+    {
+      "url": "https://eu5.app.anaplan.com",
+      "description": "EU5 (Cloud - Europe)"
+    },
+    {
+      "url": "https://gb1.app.anaplan.com",
+      "description": "GB1 (Cloud - UK)"
+    },
+    {
+      "url": "https://ca1a.app.anaplan.com",
+      "description": "CA1 (Cloud - Canada)"
+    },
+    {
+      "url": "https://sg1.app.anaplan.com",
+      "description": "SG1 (Cloud - Singapore)"
+    },
+    {
+      "url": "https://ae1.app.anaplan.com",
+      "description": "AE1 (Cloud - UAE)"
+    },
+    {
+      "url": "https://me1.app.anaplan.com",
+      "description": "ME1 (Cloud - Saudi Arabia)"
+    },
+    {
+      "url": "https://in1.app.anaplan.com",
+      "description": "IN1 (Cloud - India)"
+    },
+    {
+      "url": "https://id1.app.anaplan.com",
+      "description": "ID1 (Cloud - Indonesia)"
+    },
+    {
+      "url": "https://au1a.app2.anaplan.com",
+      "description": "AU1 (Cloud - Australia)"
     }
   ],
   "paths": {

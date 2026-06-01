@@ -8,11 +8,33 @@
 | Postman collection | ✗ | Not included in official Anaplan Postman collection |
 | Live testing | Partial | See Testing Coverage below |
 
-## Server
+## Servers
 
-`https://us1a.app.anaplan.com`
+The OAuth 2.0 API is served from `{region}.app.anaplan.com`. The correct URL depends on which Anaplan region your tenant is hosted in. Source: [URL, IP, and allowlist requirements](https://support.anaplan.com/url-ip-and-allowlist-requirements-c8235c7d-8af2-413b-a9ff-d465978806b9).
 
-The Apiary docs list `https://auth.anaplan.com` as the production URL, but live testing shows the OAuth endpoints (`/oauth/device/code`, `/oauth/token`, `/auth/prelogin`) are served at `us1a.app.anaplan.com`. The `auth.anaplan.com` domain hosts the separate Authentication Service API (`/token/authenticate`, etc.).
+The Apiary docs incorrectly list `https://auth.anaplan.com` as the OAuth API URL — that domain hosts the separate Authentication Service API (`/token/authenticate`, etc.).
+
+| Region code | Description | OAuth 2.0 API base URL |
+|-------------|-------------|------------------------|
+| us1 | Data Center - US East | `https://us1a.app.anaplan.com` |
+| us2 | Data Center - US West | `https://us1a.app.anaplan.com` |
+| us5 | Cloud - US East | `https://us1a.app.anaplan.com` |
+| us7 | Cloud - US | `https://us1a.app.anaplan.com` |
+| us9 | Cloud - US | `https://us9.app.anaplan.com` |
+| eu1 | Data Center - Netherlands | `https://us1a.app.anaplan.com` |
+| eu2 | Data Center - Germany | `https://us1a.app.anaplan.com` |
+| eu3 | Cloud - Europe | `https://eu3.app.anaplan.com` |
+| eu4 | Cloud - Europe | `https://us1a.app.anaplan.com` |
+| eu5 | Cloud - Europe | `https://eu5.app.anaplan.com` |
+| gb1 | Cloud - UK | `https://gb1.app.anaplan.com` |
+| ap1 | Cloud - Japan | `https://us1a.app.anaplan.com` |
+| au1 | Cloud - Australia | `https://au1a.app2.anaplan.com` |
+| ca1 | Cloud - Canada | `https://ca1a.app.anaplan.com` |
+| sg1 | Cloud - Singapore | `https://sg1.app.anaplan.com` |
+| ae1 | Cloud - UAE | `https://ae1.app.anaplan.com` |
+| in1 | Cloud - India | `https://in1.app.anaplan.com` |
+| id1 | Cloud - Indonesia | `https://id1.app.anaplan.com` |
+| me1 | Cloud - Saudi Arabia | `https://me1.app.anaplan.com` |
 
 ## OAuth Flows
 
@@ -69,7 +91,7 @@ None of the OAuth service endpoints require an `Authorization` request header. A
 
 ## Discrepancies and Notes
 
-- **Server URL differs from Apiary docs**: Apiary lists `https://auth.anaplan.com` as the production URL, but live testing confirmed the OAuth endpoints are served at `https://us1a.app.anaplan.com`. The `auth.anaplan.com` domain hosts only the Authentication Service API.
+- **Server URL differs from Apiary docs**: Apiary lists `https://auth.anaplan.com` as the production URL, but live testing confirmed the OAuth endpoints are served at `{region}.app.anaplan.com` (e.g. `us1a.app.anaplan.com`). The `auth.anaplan.com` domain hosts only the Authentication Service API. See the Servers table above for all regional URLs.
 - **`/auth/prelogin` vs `/auth/authorize`**: The Apiary docs document `/auth/authorize` as the Authorization Code Grant entry point. Live testing and the `anaplan-sdk` library show that `/auth/prelogin` is the actual endpoint used — it returns a 200 HTML login page directly, while `/auth/authorize` returns a 302 redirect. Both paths are at `us1a.app.anaplan.com`.
 - **`expires_in` vs `expiresAt`**: The token response `expires_in` field follows RFC 6749 (seconds until expiry, e.g. `3600`). The `expiresAt` field inside `anaplan_token.tokenInfo` is an absolute milliseconds-since-epoch timestamp. The original Apiary docs were ambiguous and the handwritten draft conflated these with a Unix epoch example value on `expires_in`.
 - **`status_message` casing**: The `anaplan_token` object uses `status_message` (snake_case), whereas the Authentication Service API uses `statusMessage` (camelCase) for the same field. This inconsistency exists in the Apiary source.
