@@ -1,0 +1,290 @@
+openapi: 3.0.0
+info:
+  title: Anaplan Authentication Service API
+  version: 1.0.0
+  description: 'Generates and manages authentication tokens for use with Anaplan REST
+    APIs. Supports three authentication methods: HTTP Basic (username/password), CA
+    Certificate (X.509 certificate with SHA512withRSA signature), and token refresh.
+    Tokens are issued at `https://auth.anaplan.com` and expire after 35 minutes.'
+servers:
+- url: https://auth.anaplan.com
+paths:
+  /token/authenticate:
+    post:
+      summary: Create an Authentication Token (Basic)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - $ref: '#/components/schemas/EmptyPayload'
+              - $ref: '#/components/schemas/CertPayload'
+      responses:
+        '201':
+          description: Authentication token created.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tokenInfo:
+                    $ref: '#/components/schemas/TokenInfo'
+                  status:
+                    type: string
+                    enum:
+                    - SUCCESS
+                  statusMessage:
+                    type: string
+                    enum:
+                    - Login successful
+                  meta:
+                    $ref: '#/components/schemas/ValidationUrl'
+        '401':
+          description: Unauthorized. Invalid credentials provided.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+      - Authentication
+      - Basic Credentials
+      - Certificate Credentials
+      security:
+      - BasicAuth: []
+      - CACertAuth: []
+      description: 'Creates an AnaplanAuthToken for use with other Anaplan REST APIs.
+        Returns 201 on success.
+
+
+        **HTTP Basic Auth:** Send `Authorization: Basic {base64(username:password)}`
+        with no request body.
+
+
+        **CA Certificate Auth:** Send `Authorization: CACertificate {base64_encoded_certificate}`
+        with a JSON body containing `encodedData` (base64-encoded random bytes, 100+)
+        and `encodedSignedData` (SHA512withRSA signature of the raw random bytes,
+        base64-encoded). The certificate must be registered for API authentication
+        in your Anaplan instance.
+
+
+        **SSO workspaces:** Users must be assigned as an Exception User to use Basic
+        authentication. See [Assign Exception Users](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Security/Single_Sign-on/Enforcing_SAML_Authentication.html)
+        in Anapedia.'
+  /token/refresh:
+    post:
+      summary: Refresh Authentication Token
+      responses:
+        '200':
+          description: Successful authentication.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tokenInfo:
+                    $ref: '#/components/schemas/TokenInfo'
+                  status:
+                    type: string
+                    enum:
+                    - SUCCESS
+                  statusMessage:
+                    type: string
+                    enum:
+                    - Token refreshed
+                  meta:
+                    $ref: '#/components/schemas/ValidationUrl'
+        '400':
+          description: Bad Request. Malformed Authorization header.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized. Invalid or expired token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+      - Authentication
+      - Other Authentication Actions
+      security:
+      - BearerAuth: []
+      - AnaplanAuth: []
+      description: 'Extends the session for an existing AnaplanAuthToken. Tokens expire
+        after 35 minutes; call this endpoint before expiry to maintain a session without
+        re-authenticating.
+
+
+        **Note:** Live testing shows the response returns the same `tokenValue` —
+        the token string itself does not change, but its internal expiration is reset.'
+  /token/validate:
+    get:
+      summary: Get Authentication Token Details
+      responses:
+        '200':
+          description: Successful authentication.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tokenInfo:
+                    type: object
+                    properties:
+                      expiresAt:
+                        type: integer
+                        description: Token expiry time as milliseconds since Unix
+                          epoch.
+                        example: 1493036651173
+                      tokenId:
+                        type: string
+                        example: 9aa99999-1111-11a2-b333-abc11223ab12
+                        format: uuid
+                  userInfo:
+                    type: object
+                    properties:
+                      userGuid:
+                        type: string
+                        example: 8a89d9999f3c7099015f999d5208458a
+                        description: User identifier (32-character hex string)
+                        pattern: ^[0-9a-f]{32}$
+                      userId:
+                        type: string
+                        example: a.user@acme.com
+                      customerGuid:
+                        type: string
+                        example: 8a80d99a5bf97b99995c3d1577610415
+                        description: Customer identifier (32-character hex string)
+                        pattern: ^[0-9a-f]{32}$
+                  status:
+                    type: string
+                    enum:
+                    - SUCCESS
+                  statusMessage:
+                    type: string
+                    enum:
+                    - Token validated
+                  meta:
+                    $ref: '#/components/schemas/ValidationUrl'
+        '400':
+          description: Bad Request. Malformed Authorization header.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized. Invalid or expired token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+      - Authentication
+      - Other Authentication Actions
+      security:
+      - BearerAuth: []
+      - AnaplanAuth: []
+      description: 'Returns details for a valid AnaplanAuthToken, including expiry
+        timestamp, token ID, and user/customer identifiers. Returns 401 if the token
+        is invalid, expired, or has been revoked by logout.
+
+
+        **Note:** `userGuid` and `customerGuid` are 32-character hexadecimal strings
+        (no hyphens), not standard UUIDs.'
+  /token/logout:
+    post:
+      summary: Log Out the User
+      responses:
+        '204':
+          description: Successfully deleted authentication token
+        '401':
+          description: Unauthorized - Invalid or missing credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+      - Authentication
+      - Other Authentication Actions
+      security:
+      - BearerAuth: []
+      - AnaplanAuth: []
+      description: Immediately invalidates an AnaplanAuthToken. Returns 204 with no
+        body on success. Any subsequent use of the token — including validation or
+        refresh — returns 401.
+components:
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: Enter your valid application authentication token.
+    AnaplanAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Custom API Key token. Format `AnaplanAuthToken {anaplan_auth_token}`
+    CACertAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Custom CA Certificate token. Format `CACertificate {your_CA_certificate}`
+  schemas:
+    EmptyPayload:
+      type: object
+      description: Used for Basic Authentication. No body parameters are accepted
+        or required.
+      properties: {}
+    CertPayload:
+      type: object
+      required:
+      - certificateChain
+      - signature
+      properties:
+        certificateChain:
+          type: string
+          description: Base64 encoded certificate chain
+        signature:
+          type: string
+          description: Signature payload
+    TokenInfo:
+      properties:
+        expiresAt:
+          type: integer
+          description: Token expiry time as milliseconds since Unix epoch.
+          example: 1493036651173
+        refreshTokenId:
+          example: 3ab11111-2222-33e4-a111-01a1b222cd3a
+          type: string
+          format: uuid
+        tokenId:
+          example: 9aa99999-1111-11a2-b333-abc11223ab12
+          type: string
+          format: uuid
+        tokenValue:
+          description: Bearer token for subsequent requests.
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.example.token
+          type: string
+      type: object
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - FAILURE_BAD_HEADER
+          - FAILURE_BAD_CREDENTIAL
+        statusMessage:
+          type: string
+          example: Invalid header. Verify the header.
+    ValidationUrl:
+      properties:
+        validationUrl:
+          enum:
+          - https://auth.anaplan.com/token/validate
+          type: string
+      type: object
