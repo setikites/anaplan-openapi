@@ -139,6 +139,21 @@ def test_preserves_all_input_properties():
     assert result["paths"]["/resource"]["get"]["tags"] == ["resources"]
 
 
+@pytest.mark.parametrize("spec_path", [
+    "authentication/authentication-openapi.json",
+    "oauth/oauth-openapi.json",
+])
+def test_validate_final_spec(spec_path):
+    """Each completed *-openapi.json passes openapi-spec-validator without errors."""
+    import pathlib
+
+    spec_file = pathlib.Path(__file__).parent.parent / spec_path
+    with open(spec_file, encoding="utf-8") as f:
+        spec = json.load(f)
+
+    validate(spec)
+
+
 @pytest.mark.parametrize("spec_name", ["authentication/postman-spec.yaml"])
 def test_convert_postman_spec(spec_name):
     """Integration test: convert postman-spec.yaml to valid OpenAPI JSON."""
