@@ -3,11 +3,56 @@
   "info": {
     "title": "Anaplan Authentication Service API",
     "version": "1.0.0",
-    "description": "Generates and manages authentication tokens for use with Anaplan REST APIs. Supports three authentication methods: HTTP Basic (username/password), CA Certificate (X.509 certificate with SHA512withRSA signature), and token refresh. Tokens are issued at `https://auth.anaplan.com` and expire after 35 minutes."
+    "description": "Generates and manages authentication tokens for use with Anaplan REST APIs. Supports three authentication methods: HTTP Basic (username/password), CA Certificate (X.509 certificate with SHA512withRSA signature), and token refresh. Tokens expire after 35 minutes. The correct server URL depends on your Anaplan region — see the servers list below."
   },
   "servers": [
     {
-      "url": "https://auth.anaplan.com"
+      "url": "https://auth.anaplan.com",
+      "description": "US1 (Data Center - US East), US2 (Data Center - US West), US5 (Cloud - US East), US7 (Cloud - US), EU1 (Data Center - Netherlands), EU2 (Data Center - Germany), EU4 (Cloud - Europe), AP1 (Cloud - Japan)"
+    },
+    {
+      "url": "https://us9.auth.anaplan.com",
+      "description": "US9 (Cloud - US)"
+    },
+    {
+      "url": "https://eu3.auth.anaplan.com",
+      "description": "EU3 (Cloud - Europe)"
+    },
+    {
+      "url": "https://eu5.auth.anaplan.com",
+      "description": "EU5 (Cloud - Europe)"
+    },
+    {
+      "url": "https://gb1.auth.anaplan.com",
+      "description": "GB1 (Cloud - UK)"
+    },
+    {
+      "url": "https://ca1a.auth.anaplan.com",
+      "description": "CA1 (Cloud - Canada)"
+    },
+    {
+      "url": "https://sg1.auth.anaplan.com",
+      "description": "SG1 (Cloud - Singapore)"
+    },
+    {
+      "url": "https://ae1.auth.anaplan.com",
+      "description": "AE1 (Cloud - UAE)"
+    },
+    {
+      "url": "https://in1.auth.anaplan.com",
+      "description": "IN1 (Cloud - India)"
+    },
+    {
+      "url": "https://id1.auth.anaplan.com",
+      "description": "ID1 (Cloud - Indonesia)"
+    },
+    {
+      "url": "https://me1.auth.anaplan.com",
+      "description": "ME1 (Cloud - Saudi Arabia)"
+    },
+    {
+      "url": "https://au1a.app2.anaplan.com",
+      "description": "AU1 (Cloud - Australia)"
     }
   ],
   "paths": {
