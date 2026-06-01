@@ -10,7 +10,9 @@
 
 ## Server
 
-`https://auth.anaplan.com`
+`https://us1a.app.anaplan.com`
+
+The Apiary docs list `https://auth.anaplan.com` as the production URL, but live testing shows the OAuth endpoints (`/oauth/device/code`, `/oauth/token`, `/auth/prelogin`) are served at `us1a.app.anaplan.com`. The `auth.anaplan.com` domain hosts the separate Authentication Service API (`/token/authenticate`, etc.).
 
 ## OAuth Flows
 
@@ -44,6 +46,13 @@ Refresh tokens may be rotatable (new token on each use, 30-day rotation) or non-
 | `email` | User's primary email address |
 | `offline_access` | Request a refresh token for long-lived access |
 
+## Client IDs
+
+The Authorization Code Grant and Device Authorization Grant use **separate client registrations** in Anaplan Administration > OAuth. The same `client_id` value cannot be used for both flows. In `.env`:
+
+- `ANAPLAN_OAUTH_CLIENT_ID` — client ID for Authorization Code Grant
+- `ANAPLAN_OAUTH_DEVICE_CLIENT_ID` — client ID for Device Authorization Grant
+
 ## Authentication
 
 None of the OAuth service endpoints require an `Authorization` request header. All authentication parameters are passed in the request body or query string. This API is the auth server itself, not an API protected by OAuth.
@@ -60,6 +69,8 @@ None of the OAuth service endpoints require an `Authorization` request header. A
 
 ## Discrepancies and Notes
 
+- **Server URL differs from Apiary docs**: Apiary lists `https://auth.anaplan.com` as the production URL, but live testing confirmed the OAuth endpoints are served at `https://us1a.app.anaplan.com`. The `auth.anaplan.com` domain hosts only the Authentication Service API.
+- **`/auth/prelogin` vs `/auth/authorize`**: The Apiary docs document `/auth/authorize` as the Authorization Code Grant entry point. Live testing and the `anaplan-sdk` library show that `/auth/prelogin` is the actual endpoint used — it returns a 200 HTML login page directly, while `/auth/authorize` returns a 302 redirect. Both paths are at `us1a.app.anaplan.com`.
 - **`expires_in` vs `expiresAt`**: The token response `expires_in` field follows RFC 6749 (seconds until expiry, e.g. `3600`). The `expiresAt` field inside `anaplan_token.tokenInfo` is an absolute milliseconds-since-epoch timestamp. The original Apiary docs were ambiguous and the handwritten draft conflated these with a Unix epoch example value on `expires_in`.
 - **`status_message` casing**: The `anaplan_token` object uses `status_message` (snake_case), whereas the Authentication Service API uses `statusMessage` (camelCase) for the same field. This inconsistency exists in the Apiary source.
 - **`audience` parameter**: Documented in the Apiary docs as optional on `POST /oauth/device/code`. Not mentioned for other endpoints.
