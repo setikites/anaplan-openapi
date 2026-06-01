@@ -33,10 +33,10 @@ uv run pytest tests/
 Live API tests require credentials and are skipped by default. To run them:
 
 ```bash
-ANAPLAN_USERNAME=your_user \
-ANAPLAN_PASSWORD=your_pass \
-uv run pytest tests/test_auth_integration_live.py --live
+uv run --env-file .env pytest tests/test_auth_integration_live.py --live
 ```
+
+Credentials are read from `.env` at the repo root. The `--env-file` flag handles special characters in passwords and Windows paths correctly.
 
 #### With CA Certificate Authentication
 
@@ -47,11 +47,10 @@ uv run pytest tests/test_auth_integration_live.py --live
 - **Important:** The certificate must be registered and enabled for API authentication in your Anaplan instance. SMIME/email certificates alone will not work for API authentication.
 
 ```bash
-ANAPLAN_CA_CERT_PATH=/path/to/cert.pem \
-ANAPLAN_CA_KEY_PATH=/path/to/private_key.pem \
-ANAPLAN_CA_KEY_PASSWORD=optional_key_password \
-uv run pytest tests/test_auth_integration_live.py::test_auth_workflow_ca_cert --live
+uv run --env-file .env pytest tests/test_auth_integration_live.py::test_auth_workflow_ca_cert --live
 ```
+
+Set `ANAPLAN_CA_CERT_PATH`, `ANAPLAN_CA_KEY_PATH`, and optionally `ANAPLAN_CA_KEY_PASSWORD` in `.env`.
 
 **Test Flow (matches anaplan-sdk implementation):**
 The test implements the Anaplan certificate authentication flow:
@@ -168,7 +167,7 @@ The following discrepancies between the OpenAPI specification and actual API beh
 
 Based on live testing against the Anaplan Authentication API:
 
-- **Token Expiration**: Tokens have both an `expiresAt` timestamp and an internal expiration. The `/token/validate` endpoint returns the current token's expiration details even after refresh.
+- **Token Expiration**: Tokens expire 35 minutes after issue (the spec description says 30 minutes, but live testing shows the API grants 35). The `/token/validate` endpoint returns the current token's expiration details even after refresh.
 - **Refresh Token Persistence**: The `refreshTokenId` remains consistent across refresh operations, allowing continuous token refresh without re-authentication.
 - **Logout Behavior**: After logout, subsequent validation attempts return `401 Unauthorized`, confirming token revocation is immediate.
 

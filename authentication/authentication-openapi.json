@@ -32,8 +32,8 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "Successful authentication.",
+          "201": {
+            "description": "Authentication token created.",
             "content": {
               "application/json": {
                 "schema": {
@@ -44,14 +44,14 @@
                     },
                     "status": {
                       "type": "string",
-                      "example": "SUCCESS"
+                      "enum": ["SUCCESS"]
                     },
                     "statusMessage": {
                       "type": "string",
-                      "example": "Login successful"
+                      "enum": ["Login successful"]
                     },
                     "meta": {
-                      "$ref": "#/components/schemas/Schema3"
+                      "$ref": "#/components/schemas/ValidationUrl"
                     }
                   }
                 }
@@ -63,7 +63,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Schema3"
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -101,26 +101,36 @@
                     },
                     "status": {
                       "type": "string",
-                      "example": "SUCCESS"
+                      "enum": ["SUCCESS"]
                     },
                     "statusMessage": {
                       "type": "string",
-                      "example": "Token refreshed"
+                      "enum": ["Token refreshed"]
                     },
                     "meta": {
-                      "$ref": "#/components/schemas/Schema3"
+                      "$ref": "#/components/schemas/ValidationUrl"
                     }
                   }
                 }
               }
             }
           },
-          "401": {
-            "description": "Unauthorized. Invalid credentials provided.",
+          "400": {
+            "description": "Bad Request. Malformed Authorization header.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Schema3"
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Invalid or expired token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -189,26 +199,36 @@
                     },
                     "status": {
                       "type": "string",
-                      "example": "SUCCESS"
+                      "enum": ["SUCCESS"]
                     },
                     "statusMessage": {
                       "type": "string",
-                      "example": "Token validated"
+                      "enum": ["Token validated"]
                     },
                     "meta": {
-                      "$ref": "#/components/schemas/Schema3"
+                      "$ref": "#/components/schemas/ValidationUrl"
                     }
                   }
                 }
               }
             }
           },
-          "401": {
-            "description": "Unauthorized. Invalid credentials provided.",
+          "400": {
+            "description": "Bad Request. Malformed Authorization header.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Schema3"
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Invalid or expired token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -237,10 +257,14 @@
             "description": "Successfully deleted authentication token"
           },
           "401": {
-            "description": "Unauthorized - Invalid credentials"
-          },
-          "400": {
-            "description": "Bad Request - Missing or malformed headers"
+            "description": "Unauthorized - Invalid or missing credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -330,10 +354,23 @@
         },
         "type": "object"
       },
-      "Schema3": {
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["FAILURE"]
+          },
+          "statusMessage": {
+            "type": "string",
+            "enum": ["Token is not valid"]
+          }
+        }
+      },
+      "ValidationUrl": {
         "properties": {
           "validationUrl": {
-            "example": "https://auth.anaplan.com/token/validate",
+            "enum": ["https://auth.anaplan.com/token/validate"],
             "type": "string"
           }
         },

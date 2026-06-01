@@ -1,13 +1,17 @@
 """
 Live API integration tests for Authentication API.
 
-Run with: uv run pytest tests/test_auth_integration_live.py --live
+Run with:
+    uv run --env-file .env pytest tests/test_auth_integration_live.py --live
 
-These tests require:
-- ANAPLAN_USERNAME: username for basic auth
-- ANAPLAN_PASSWORD: password for basic auth
-- ANAPLAN_CA_CERT_PATH: path to CA certificate file (optional, for CA cert auth)
-- ANAPLAN_CA_SIGNATURE: signature payload for CA cert auth (optional)
+Credentials are read from .env at the repo root. Required variables:
+    ANAPLAN_USERNAME       - username for basic auth
+    ANAPLAN_PASSWORD       - password for basic auth
+
+Optional variables (for CA certificate auth):
+    ANAPLAN_CA_CERT_PATH   - path to CA certificate file (PEM format)
+    ANAPLAN_CA_KEY_PATH    - path to private key file (PEM format)
+    ANAPLAN_CA_KEY_PASSWORD - password for the private key (if encrypted)
 """
 
 import base64
@@ -255,34 +259,58 @@ def test_invalid_credentials(auth_creds):
 
 
 @pytest.mark.live
-def test_invalid_auth_header_formats(auth_creds):
-    """Test with invalid Authorization header formats."""
+def test_invalid_auth_header_formats():
+    """Test all endpoints return 401 for invalid Authorization header formats,
+    and that 401 response bodies match the spec's ValidationUrl schema."""
     discrepancies = []
 
     invalid_formats = [
-        ("InvalidScheme xyz", "Unknown auth scheme"),
-        ("Bearer xyz", "Bearer instead of Basic"),
-        ("xyz", "No scheme"),
+        ("InvalidScheme xyz", "unknown scheme"),
+        ("Bearer xyz", "Bearer instead of AnaplanAuthToken"),
+        ("xyz", "no scheme"),
+    ]
+
+    # (method, path, expected_4xx_code)
+    # /token/refresh and /token/validate return 400 for malformed headers;
+    # /token/authenticate and /token/logout return 401.
+    endpoints = [
+        ("POST", "/token/authenticate", 401),
+        ("POST", "/token/refresh",      400),
+        ("GET",  "/token/validate",     400),
+        ("POST", "/token/logout",       401),
     ]
 
     with httpx.Client() as client:
-        for auth_header, description in invalid_formats:
-            try:
-                response = client.post(
-                    f"{API_URL}/token/authenticate",
-                    headers={"Authorization": auth_header},
-                )
-                if response.status_code not in [400, 401, 403]:
-                    discrepancies.append(
-                        f"{description}: got {response.status_code}, expected 400/401/403"
-                    )
-            except (httpx.LocalProtocolError, ValueError) as e:
-                discrepancies.append(
-                    f"{description}: client rejected ({type(e).__name__})"
-                )
+        for method, path, expected_code in endpoints:
+            url = f"{API_URL}{path}"
+            for auth_header, description in invalid_formats:
+                label = f"{method} {path} [{description}]"
+                try:
+                    request_fn = client.get if method == "GET" else client.post
+                    response = request_fn(url, headers={"Authorization": auth_header})
+
+                    if response.status_code != expected_code:
+                        discrepancies.append(
+                            f"{label}: got {response.status_code}, expected {expected_code}"
+                        )
+                        continue
+
+                    # All 4xx responses should return ErrorResponse: {status, statusMessage}
+                    try:
+                        body = response.json()
+                        for field in ("status", "statusMessage"):
+                            if field not in body:
+                                discrepancies.append(
+                                    f"{label}: {expected_code} body missing '{field}', got keys={list(body.keys())}"
+                                )
+                    except Exception:
+                        discrepancies.append(f"{label}: {expected_code} response is not valid JSON")
+
+                except (httpx.LocalProtocolError, ValueError) as e:
+                    discrepancies.append(f"{label}: client rejected ({type(e).__name__}: {e})")
 
     if discrepancies:
-        msg = f"Found {len(discrepancies)} discrepancy/ies in invalid auth formats"
+        msg = "Discrepancies in invalid auth header formats:\n" + "\n".join(f"  - {d}" for d in discrepancies)
         warnings.warn(msg, UserWarning, stacklevel=2)
 
 
