@@ -1,0 +1,375 @@
+openapi: 3.0.3
+info:
+  title: Anaplan OAuth2 service API
+  version: 1.0.0
+  description: >-
+    Anaplan's OAuth supports these two OAuth version 2.0 flows: Authorization
+    code grant, and Device authorization code grant. Authorization code grant
+    supports both Single sign-on (SSO) and basic authentication. Device
+    authorization code grant only supports basic authentication.
+
+servers:
+  - url: https://us1a.app.anaplan.com
+
+paths:
+  /auth/authorize:
+    get:
+      summary: Get Authentication Token Details
+      parameters:
+        - name: response_type
+          in: query
+          required: true
+          description: Tells the authorization server which grant to execute
+          schema:
+            type: string
+            enum: [code]
+        - name: redirect_uri
+          in: query
+          required: true
+          description: A redirect_uri parameter is used as a callback URL. This must be the same as what you specified in the administration for the client.
+          schema:
+            type: string
+            format: uri
+            example: https://www.example.com
+        - name: client_id
+          in: query
+          required: true
+          description: Your application's client ID
+          schema:
+            type: string
+            example: '8a89d9999f3c7099015f999d5208458a'
+            pattern: '^[0-9a-f]{32}$'
+        - name: scope
+          in: query
+          required: true
+          description: The scope of the issued tokens
+          schema:
+            type: string
+            example: openid profile email offline_access
+        - name: state
+          in: query
+          required: false
+          description: The state parameter is used to protect against cross-site request forgery (XSRF).  A base 64 encoded or decoded value.
+          schema:
+            type: string
+            format: byte
+            example: 'CCFKPwXcnMsQ5UAfQmPRfqyIPvpghT'
+      responses:
+        '302':
+          description: Temporary redirect to the new endpoint.
+          headers:
+            Location:
+              description: The URL of the temporary resource location.
+              schema:
+                type: string
+                example: 'https://www.example.com/?code=M5mbhGs5Xy7f5ptGYe_Mt8Enh18bCencyV2K70VMpRVmn&state=CCFKPwXcnMsQ5UAfQmPRfqyIPvpghT'
+        '401':
+          description: Unauthorized. Invalid credentials provided.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Invalid username or password.
+      tags:
+        - Authentication
+        - Other Authentication Actions
+      security:
+        - BearerAuth: []
+        - AnaplanAuth: []
+      description: >-
+        ## Get authentication token details
+        
+        `/token/validate`
+        
+        Gets information on a provided\_`{anaplan_auth_token}`.
+        If the token is valid, returns the details of the\_`{anaplan_auth_token}`.
+        If the token is invalid, returns a \"401 UnAuthorized\" message.
+  /oauth/device/code:
+    post:
+      summary: Obtain access token using authorization code
+      description: The client sends a request with a device grant type to the endpoint /oauth/device/code, followed with an audience (optional), scope and client_id.  This is the start of the device flow.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - client_id
+                - scope
+              properties:
+                  client_id:
+                    type: string
+                    example: '8a89d9999f3c7099015f999d5208458a'
+                    pattern: '^[0-9a-f]{32}$'
+                    description: Your application's client ID
+                  scope:
+                    type: string
+                    example: openid profile email offline_access
+                    description: The scope of the issued tokens
+      responses:
+        '200':
+          description: Successful authentication.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  device_code:
+                    type: string
+                    example: "hqaQb8VKlJBk5KV"
+                    description: The devide code
+                  user_code:
+                    type: string
+                    example: "1GMV-ATBA"
+                    description: Code for the user to confirm access
+                  verification_uri:
+                    type: string
+                    format: uri
+                    example: https://iam.anaplan.com/activate
+                  expires_in:
+                    type: integer
+                    example: 900
+                    description: Device code expires in this many seconds.
+                  interval:
+                    type: integer
+                    example: 5
+                    description: unknown
+                  verification_uri_complete:
+                    type: string
+                    example: https://iam.anaplan.com/activate?user_code=1GMV-ATBA
+                    description: Verification URI with user code
+        '400':
+          $ref: '#/components/responses/StandardError'
+        '403':
+          $ref: '#/components/responses/StandardError'
+        '500':
+          $ref: '#/components/responses/StandardError'
+  /oauth/token:
+    post:
+      summary: Obtain access token using authorization code
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - $ref: '#/components/schemas/AuthPayload'
+              - $ref: '#/components/schemas/DevicePayload'
+              - $ref: '#/components/schemas/RefreshPayload'
+      responses:
+        '200':
+          description: Successful authentication.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                    example: "hqaQb8VKlJBk5KV"
+                    description: The header token
+                  id_token:
+                    type: string
+                    example: "eyJhbGciOiJS"
+                    description: The ID for this access token
+                  refresh_token:
+                    type: string
+                    example: "kdUMF0fMUhx7H0ddj1"
+                    description: A token to use to refresh the access token
+                  scope:
+                    type: string
+                    example: openid profile email offline_access
+                    description: The scope of the issued tokens
+                  expires_in:
+                    type: integer
+                    example: 1493036651173
+                    description: Token expiry time as milliseconds since Unix epoch.
+                  token_type:
+                    type: string
+                    enum: ['Bearer']
+                    description: The kind of access token returned.
+                  anaplan_token:
+                    type: object
+                    description: Same object as authentication /token/authenticate response
+                    properties:
+                      status:
+                        type: string
+                        enum: ['SUCCESS']
+                      status_message:
+                        type: string
+                        example: 'Successful Assertion'
+                      meta:
+                        type: object
+                        properties:
+                          validationUrl:
+                            type: string
+                            example: 'https://iam.anaplan.com/token/validate'
+                      tokenInfo:
+                        $ref: '#/components/schemas/TokenInfo'
+                      
+        '400':
+          $ref: '#/components/responses/StandardError'
+        '401':
+          $ref: '#/components/responses/StandardError'
+        '403':
+          $ref: '#/components/responses/StandardError'
+        '500':
+          $ref: '#/components/responses/StandardError'
+      security:
+        - OAuth2AuthCode:
+            - read:pets
+  
+
+
+security:
+  - OAuth2AuthCode:
+      - openid
+      - profile
+      - email
+      - offline_access
+
+components:
+  securitySchemes:
+    OAuth2AuthCode:
+      type: oauth2
+      description: OAuth2 Authorization Code Flow with Refresh Tokens
+      flows:
+        authorizationCode:
+          authorizationUrl: https://example.com
+          tokenUrl: https://example.com
+          refreshUrl: https://example.com
+          scopes:
+            openid: Trigger OIDC flow to return JWT verifying user identity
+            profile: Grants access to basic non-sensitive user information.
+            email: Grants access to the user's primary email address and a boolean claim verifying if that email address has been verified.
+            offline_access: Tells the authorization server to issue a refresh token. 
+  responses:
+    StandardError:
+      description: An error occurred while processing the request.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorPayload'
+  schemas:
+    EmptyPayload:
+      type: object
+      description: Used for Basic Authentication. No body parameters are accepted or required.
+      properties: {}
+
+    ErrorPayload:
+      type: object
+      required:
+        - error
+        - error_description
+      properties:
+        error:
+          type: string
+          enum: ['invalid_grant','access_denied','invalid_request','unauthorized_client','authorization_pending']
+          description: Base64 encoded certificate chain
+        error_description:
+          type: string
+          description: Description of this error.
+        error_uri:
+          type: string
+          format: uri
+          example: https://ma0-dev.anaplan.com/docs/clients/client-grant-types
+          description: URI for this error.
+
+    AuthPayload:
+      type: object
+      required:
+        - grant_type
+        - code
+        - client_id
+        - client_secret
+        - redirect_uri
+      properties:
+          grant_type:
+            type: string
+            enum: ['authorization_code']
+            description: Authorization code grant
+          code:
+            type: string
+            example: 'M5mbhGs5Xy7f5ptGYe_Mt8Enh18bCencyV2K70VMpRVmn'
+            description: The code must be copied from step 2 (Obtain an authorization code ) to exchange for an access token
+          client_id:
+            type: string
+            example: '8a89d9999f3c7099015f999d5208458a'
+            pattern: '^[0-9a-f]{32}$'
+            description: Your application's client ID
+          client_secret:
+            type: string
+            description: Your application's client secret. You can find this value in Administration > OAuth
+            example: XPkIavE7K0d
+          redirect_uri:
+            type: string
+            format: uri
+            example: https://www.example.com
+            description: The request parameter is used as a callback URL. This must be the same as what you specified in the administration for the client.
+    DevicePayload:
+      type: object
+      required:
+        - grant_type
+        - device_code
+        - client_id
+      properties:
+          grant_type:
+            type: string
+            enum: ['urn:ietf:params:oauth:grant-type:device_code']
+            description: Device code grant
+          device_code:
+            type: string
+            example: '_XPkIavE7K0d-28sD6-TapQ'
+            description: The device verification code, device_code from the device authorization response.
+          client_id:
+            type: string
+            example: '8a89d9999f3c7099015f999d5208458a'
+            pattern: '^[0-9a-f]{32}$'
+            description: Your device grant client ID
+    RefreshPayload:
+      type: object
+      required:
+        - grant_type
+        - client_id
+        - refresh_token
+      properties:
+          grant_type:
+            type: string
+            enum: ['refresh_token']
+            description: Authorization code grant
+          client_id:
+            type: string
+            example: '8a89d9999f3c7099015f999d5208458a'
+            pattern: '^[0-9a-f]{32}$'
+            description: Your application's client ID
+          refresh_token:
+            type: string
+            example: 'PuheeaOPVlO_MvWif11qWhvQFRfh2KyGpVioOS_7EdgyC'
+            description: A token to use to refresh the access token
+          client_secret:
+            type: string
+            description: Your application's client secret. You can find this value in Administration > OAuth.  Include client_secret for Authorization Request and exclude for Device flow.
+            example: XPkIavE7K0d
+    TokenInfo:
+      properties:
+        expiresAt:
+          type: integer
+          description: Token expiry time as milliseconds since Unix epoch.
+          example: 1493036651173
+        refreshTokenId:
+          example: 3ab11111-2222-33e4-a111-01a1b222cd3a
+          type: string
+          format: uuid
+        tokenId:
+          example: 9aa99999-1111-11a2-b333-abc11223ab12
+          type: string
+          format: uuid
+        tokenValue:
+          description: Bearer token for subsequent requests.
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.example.token
+          type: string
+      type: object
