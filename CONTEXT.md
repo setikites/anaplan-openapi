@@ -175,6 +175,44 @@ The Apiary identifier is the subdomain from the API's documentation URL (e.g. `h
 | Financial Consolidation | *(verify)* |
 | Exception Users | *(verify)* |
 
+### Regional server URLs
+
+Each API has region-specific base URLs. Source: [URL, IP, and allowlist requirements](https://support.anaplan.com/url-ip-and-allowlist-requirements-c8235c7d-8af2-413b-a9ff-d465978806b9) (also saved as `oauth/URL, IP, and allowlist requirements _ Anaplan Support.pdf`).
+
+The URL pattern varies by API type:
+
+| API type | URL pattern |
+|----------|-------------|
+| OAuth 2.0 API | `https://{region}.app.anaplan.com` |
+| Integration, ALM, SCIM, Audit, Exception Users, CloudWorks | `https://{region}.api.anaplan.com` |
+| Authentication (Auth) API | `https://{region}.auth.anaplan.com` |
+
+Full regional URL table (19 regions):
+
+| Region | Description | App (OAuth) | API | Auth |
+|--------|-------------|-------------|-----|------|
+| us1 | Data Center - US East | `us1a.app.anaplan.com` | `api.anaplan.com` | `auth.anaplan.com` |
+| us2 | Data Center - US West | `us1a.app.anaplan.com` | `api.anaplan.com` | `auth.anaplan.com` |
+| us5 | Cloud - US East | `us1a.app.anaplan.com` | `api.anaplan.com` | `auth.anaplan.com` |
+| us7 | Cloud - US | `us1a.app.anaplan.com` | `api.anaplan.com` | `auth.anaplan.com` |
+| us9 | Cloud - US | `us9.app.anaplan.com` | `us9.api.anaplan.com` | `us9.auth.anaplan.com` |
+| eu1 | Data Center - Netherlands | `us1a.app.anaplan.com` | `api.anaplan.com` | `auth.anaplan.com` |
+| eu2 | Data Center - Germany | `us1a.app.anaplan.com` | `api.anaplan.com` | `auth.anaplan.com` |
+| eu3 | Cloud - Europe | `eu3.app.anaplan.com` | `eu3.api.anaplan.com` | `eu3.auth.anaplan.com` |
+| eu4 | Cloud - Europe | `us1a.app.anaplan.com` | `api.anaplan.com` | `auth.anaplan.com` |
+| eu5 | Cloud - Europe | `eu5.app.anaplan.com` | `eu5.api.anaplan.com` | `eu5.auth.anaplan.com` |
+| gb1 | Cloud - UK | `gb1.app.anaplan.com` | `gb1.api.anaplan.com` | `gb1.auth.anaplan.com` |
+| ap1 | Cloud - Japan | `us1a.app.anaplan.com` | `api.anaplan.com` | `auth.anaplan.com` |
+| au1 | Cloud - Australia | `au1a.app2.anaplan.com` | `au1a.api2.anaplan.com` *(verify)* | `au1a.app2.anaplan.com` |
+| ca1 | Cloud - Canada | `ca1a.app.anaplan.com` | `ca1a.api.anaplan.com` *(verify)* | `ca1a.auth.anaplan.com` |
+| sg1 | Cloud - Singapore | `sg1.app.anaplan.com` | `sg1.api.anaplan.com` | `sg1.auth.anaplan.com` |
+| ae1 | Cloud - UAE | `ae1.app.anaplan.com` | `ae1.api.anaplan.com` | `ae1.auth.anaplan.com` |
+| in1 | Cloud - India | `in1.app.anaplan.com` | `in1.api.anaplan.com` | `in1.auth.anaplan.com` |
+| id1 | Cloud - Indonesia | `id1.app.anaplan.com` | `id1.api.anaplan.com` | `id1.auth.anaplan.com` |
+| me1 | Cloud - Saudi Arabia | `me1.app.anaplan.com` | `me1.api.anaplan.com` | `me1.auth.anaplan.com` |
+
+Legacy regions (us1–us7, eu1, eu2, eu4, ap1) share the older non-prefixed `api.anaplan.com` / `auth.anaplan.com` / `us1a.app.anaplan.com` endpoints. Newer cloud regions have fully independent regional endpoints.
+
 ### Confidence table
 
 | API | Apiary | Postman | Extracted Schemas | Live Testing | Confidence |
