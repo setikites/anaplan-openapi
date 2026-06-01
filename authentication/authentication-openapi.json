@@ -167,6 +167,7 @@
                       "properties": {
                         "expiresAt": {
                           "type": "integer",
+                          "description": "Token expiry time as milliseconds since Unix epoch.",
                           "example": 1493036651173
                         },
                         "tokenId": {
@@ -333,8 +334,9 @@
       "TokenInfo": {
         "properties": {
           "expiresAt": {
-            "example": 1493036651173,
-            "type": "integer"
+            "type": "integer",
+            "description": "Token expiry time as milliseconds since Unix epoch.",
+            "example": 1493036651173
           },
           "refreshTokenId": {
             "example": "3ab11111-2222-33e4-a111-01a1b222cd3a",
