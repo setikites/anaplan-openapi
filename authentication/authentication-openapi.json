@@ -1,9 +1,9 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "Official Anaplan Collection",
+    "title": "Anaplan Authentication Service API",
     "version": "1.0.0",
-    "description": "**Welcome to the Anaplan Integration v2 Official Postman Collection**\n\n**Organization**\n\n> This collection is organized into  \n> logical groupings of requests. There are several common sequences of requests to achieve an outcome in Anaplan. The folders ending in \"Flow\" contain redundant requests organized sequentially.\n\n**Variables**\n\n> Collection level variables. These are set at the  \n> collection level and are available within each request. These include elements  \n> such as base URLs, model Id and workspace Id. Be sure to click \"Save\" when changing collection level variables.\n\n> Request specific variables. For variables  \n> specific to a request, we have provided an array in the pre-request script area  \n> for you to enter in request specific variables. These will be set prior to the  \n> request running.\n\n**Authentication**\n\n> There are three methods provided to  \n> authenticate into Anaplan. Once authenticated a Tests script sets the value of  \n> the generated token to a variable named \u201canaplan_auth_token\u201d. You may choose to  \n> enter in username/password combination or conversely choose to generate CA  \n> certificate signed string and public key combination."
+    "description": "Generates and manages authentication tokens for use with Anaplan REST APIs. Supports three authentication methods: HTTP Basic (username/password), CA Certificate (X.509 certificate with SHA512withRSA signature), and token refresh. Tokens are issued at `https://auth.anaplan.com` and expire after 35 minutes."
   },
   "servers": [
     {
@@ -82,7 +82,7 @@
             "CACertAuth": []
           }
         ],
-        "description": "[https://anaplanauthentication.docs.apiary.io/#](https://anaplanauthentication.docs.apiary.io/#)\n## Create an Authentication Token\n`/token/authenticate`  \nTo use the version 2.0 API, you must use an Anaplan authentication token generated from the Anaplan Authentication Service. You can get an authentication token generated using a certificate from a recognized external public certificate authority (CA) or using your login and password.\nUse Basic HTTP Auth with no body, or Certificate Auth with the required body payload.\nCreates an AnaplanAuthToken. You can use this authentication token in your API requests.\n**Note**: If your workspace uses single sign-on (SSO), your user must be assigned as an Exception User to use basic authentication and obtain an Anaplan authentication token. For more information on exception users in Anaplan, see [Assign Exception Users](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Security/Single_Sign-on/Enforcing_SAML_Authentication.html) in Anapedia."
+        "description": "Creates an AnaplanAuthToken for use with other Anaplan REST APIs. Returns 201 on success.\n\n**HTTP Basic Auth:** Send `Authorization: Basic {base64(username:password)}` with no request body.\n\n**CA Certificate Auth:** Send `Authorization: CACertificate {base64_encoded_certificate}` with a JSON body containing `encodedData` (base64-encoded random bytes, 100+) and `encodedSignedData` (SHA512withRSA signature of the raw random bytes, base64-encoded). The certificate must be registered for API authentication in your Anaplan instance.\n\n**SSO workspaces:** Users must be assigned as an Exception User to use Basic authentication. See [Assign Exception Users](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Security/Single_Sign-on/Enforcing_SAML_Authentication.html) in Anapedia."
       }
     },
     "/token/refresh": {
@@ -148,7 +148,7 @@
             "AnaplanAuth": []
           }
         ],
-        "description": "## Refresh authentication token\n`/token/refresh`  \nGenerates a new authentication token from an existing\\_`{anaplan_auth_token}`\\_that you provide. You need to refresh your token if your session runs for longer than 30 minutes."
+        "description": "Extends the session for an existing AnaplanAuthToken. Tokens expire after 35 minutes; call this endpoint before expiry to maintain a session without re-authenticating.\n\n**Note:** Live testing shows the response returns the same `tokenValue` — the token string itself does not change, but its internal expiration is reset."
       }
     },
     "/token/validate": {
@@ -246,7 +246,7 @@
             "AnaplanAuth": []
           }
         ],
-        "description": "## Get authentication token details\n`/token/validate`\nGets information on a provided\\_`{anaplan_auth_token}`. If the token is valid, returns the details of the\\_`{anaplan_auth_token}`. If the token is invalid, returns a \\\"401 UnAuthorized\\\" message."
+        "description": "Returns details for a valid AnaplanAuthToken, including expiry timestamp, token ID, and user/customer identifiers. Returns 401 if the token is invalid, expired, or has been revoked by logout.\n\n**Note:** `userGuid` and `customerGuid` are 32-character hexadecimal strings (no hyphens), not standard UUIDs."
       }
     },
     "/token/logout": {
@@ -279,7 +279,7 @@
             "AnaplanAuth": []
           }
         ],
-        "description": "## Log out the user\n`/token/logout`\nDeletes an\\_`{anaplan_auth_token}`. After the /logout command, the\\_`{anaplan_auth_token}`\\_is deleted and no longer valid. No response body is expected. If response code is 204 then user has been logged out successfully."
+        "description": "Immediately invalidates an AnaplanAuthToken. Returns 204 with no body on success. Any subsequent use of the token — including validation or refresh — returns 401."
       }
     }
   },
