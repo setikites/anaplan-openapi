@@ -150,6 +150,33 @@ Error response formats vary. Apiary docs and live testing will reveal the actual
 
 ## Sources and Confidence Levels
 
+### Accessing Apiary documentation
+
+Each Anaplan API is documented on Apiary. The public documentation page renders via JavaScript, but the underlying content can be fetched as JSON directly:
+
+```
+https://jsapi.apiary.io/apis/{api-identifier}.json
+```
+
+For example, the OAuth API (`anaplanoauth2service`) is at:
+`https://jsapi.apiary.io/apis/anaplanoauth2service.json`
+
+The Apiary identifier is the subdomain from the API's documentation URL (e.g. `https://{identifier}.docs.apiary.io/`). This JSON endpoint is readable by automated tools without a browser and returns structured endpoint documentation.
+
+| API | Apiary identifier |
+|-----|------------------|
+| Authentication | `anaplauthentication` *(verify)* |
+| OAuth | `anaplanoauth2service` |
+| Integration | `anaplan` *(verify)* |
+| CloudWorks | *(verify)* |
+| SCIM | *(verify)* |
+| ALM | *(verify)* |
+| Audit | *(verify)* |
+| Financial Consolidation | *(verify)* |
+| Exception Users | *(verify)* |
+
+### Confidence table
+
 | API | Apiary | Postman | Extracted Schemas | Live Testing | Confidence |
 |-----|--------|---------|-------------------|--------------|-----------|
 | Authentication | ✓ | ✓ | — | High | High |
