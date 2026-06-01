@@ -359,11 +359,11 @@
         "properties": {
           "status": {
             "type": "string",
-            "enum": ["FAILURE"]
+            "enum": ["FAILURE_BAD_HEADER", "FAILURE_BAD_CREDENTIAL"]
           },
           "statusMessage": {
             "type": "string",
-            "enum": ["Token is not valid"]
+            "example": "Invalid header. Verify the header."
           }
         }
       },

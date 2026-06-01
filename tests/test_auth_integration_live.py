@@ -303,6 +303,10 @@ def test_invalid_auth_header_formats():
                                 discrepancies.append(
                                     f"{label}: {expected_code} body missing '{field}', got keys={list(body.keys())}"
                                 )
+                        if body.get("status") not in ("FAILURE_BAD_HEADER", "FAILURE_BAD_CREDENTIAL"):
+                            discrepancies.append(
+                                f"{label} status: expected FAILURE_BAD_HEADER or FAILURE_BAD_CREDENTIAL, got {body.get('status')!r}"
+                            )
                     except Exception:
                         discrepancies.append(f"{label}: {expected_code} response is not valid JSON")
 
@@ -311,6 +315,68 @@ def test_invalid_auth_header_formats():
 
     if discrepancies:
         msg = "Discrepancies in invalid auth header formats:\n" + "\n".join(f"  - {d}" for d in discrepancies)
+        warnings.warn(msg, UserWarning, stacklevel=2)
+
+
+@pytest.mark.live
+def test_response_enum_values(auth_creds):
+    """Verify response bodies match the enum values defined in the spec."""
+    username, password = auth_creds["username"], auth_creds["password"]
+    discrepancies = []
+
+    with httpx.Client() as client:
+        auth_b64 = base64.b64encode(f"{username}:{password}".encode()).decode()
+
+        # POST /token/authenticate 201
+        auth_response = client.post(
+            f"{API_URL}/token/authenticate",
+            headers={"Authorization": f"Basic {auth_b64}"},
+        )
+        body = auth_response.json()
+        assert_enum_value(body, "status", "SUCCESS", discrepancies, "POST /token/authenticate status")
+        assert_enum_value(body, "statusMessage", "Login successful", discrepancies, "POST /token/authenticate statusMessage")
+        assert_enum_value(body.get("meta", {}), "validationUrl", "https://auth.anaplan.com/token/validate", discrepancies, "POST /token/authenticate meta.validationUrl")
+
+        token = body.get("tokenInfo", {}).get("tokenValue")
+        if not token:
+            pytest.skip("No token returned, cannot continue enum tests")
+
+        # POST /token/refresh 200
+        refresh_response = client.post(
+            f"{API_URL}/token/refresh",
+            headers={"Authorization": f"AnaplanAuthToken {token}"},
+        )
+        body = refresh_response.json()
+        assert_enum_value(body, "status", "SUCCESS", discrepancies, "POST /token/refresh status")
+        assert_enum_value(body, "statusMessage", "Token refreshed", discrepancies, "POST /token/refresh statusMessage")
+        assert_enum_value(body.get("meta", {}), "validationUrl", "https://auth.anaplan.com/token/validate", discrepancies, "POST /token/refresh meta.validationUrl")
+
+        # GET /token/validate 200
+        validate_response = client.get(
+            f"{API_URL}/token/validate",
+            headers={"Authorization": f"AnaplanAuthToken {token}"},
+        )
+        body = validate_response.json()
+        assert_enum_value(body, "status", "SUCCESS", discrepancies, "GET /token/validate status")
+        assert_enum_value(body, "statusMessage", "Token validated", discrepancies, "GET /token/validate statusMessage")
+        assert_enum_value(body.get("meta", {}), "validationUrl", "https://auth.anaplan.com/token/validate", discrepancies, "GET /token/validate meta.validationUrl")
+
+        client.post(f"{API_URL}/token/logout", headers={"Authorization": f"AnaplanAuthToken {token}"})
+
+        # ErrorResponse: invalid credentials on /token/authenticate
+        bad_b64 = base64.b64encode(f"{username}:wrong_password".encode()).decode()
+        error_response = client.post(
+            f"{API_URL}/token/authenticate",
+            headers={"Authorization": f"Basic {bad_b64}"},
+        )
+        body = error_response.json()
+        if body.get("status") not in ("FAILURE_BAD_HEADER", "FAILURE_BAD_CREDENTIAL"):
+            discrepancies.append(
+                f"ErrorResponse status: expected FAILURE_BAD_HEADER or FAILURE_BAD_CREDENTIAL, got {body.get('status')!r}"
+            )
+
+    if discrepancies:
+        msg = "Enum value discrepancies:\n" + "\n".join(f"  - {d}" for d in discrepancies)
         warnings.warn(msg, UserWarning, stacklevel=2)
 
 
@@ -344,3 +410,10 @@ def assert_response_code(response, expected_codes, discrepancies):
         discrepancies.append(
             f"Got {response.status_code}, expected one of {expected_codes}"
         )
+
+
+def assert_enum_value(body, field, expected, discrepancies, label):
+    """Assert body[field] matches the expected enum value from the spec."""
+    actual = body.get(field)
+    if actual != expected:
+        discrepancies.append(f"{label}: expected {expected!r}, got {actual!r}")
