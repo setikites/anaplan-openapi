@@ -4,6 +4,7 @@ from CONTEXT.md. These tests run without network access.
 
 Invariants checked:
   Universal   — version, info, servers[], paths, responses, refs, security
+  Cross-spec  — no path appears in more than one spec file
   Server URLs — each API family must use its correct host pattern
   Auth API    — BasicAuth + AnaplanAuthToken schemes; core endpoints present
   OAuth API   — core endpoints present; TokenResponse schema complete
@@ -172,6 +173,34 @@ def test_security_requirements_reference_declared_schemes(spec_path):
                     f"{method.upper()} {path_str}: security references "
                     f"undeclared scheme {scheme_name!r}"
                 )
+
+
+# ─── Cross-spec invariants ────────────────────────────────────────────────
+
+def test_no_path_appears_in_more_than_one_spec():
+    """Each URL path must be documented in exactly one spec file.
+
+    Paths duplicated across specs cause client-generator confusion and drift
+    when the two copies fall out of sync.
+    """
+    seen: dict[str, str] = {}  # path → first spec that defines it
+    duplicates: list[str] = []
+
+    for spec_path in SPEC_FILES:
+        spec = _load(spec_path)
+        api_name = spec_path.parent.name
+        for path in spec.get("paths", {}):
+            if path in seen:
+                duplicates.append(
+                    f"{path!r}: defined in both {seen[path]!r} and {api_name!r}"
+                )
+            else:
+                seen[path] = api_name
+
+    assert not duplicates, (
+        "The following paths appear in more than one spec:\n"
+        + "\n".join(f"  {d}" for d in duplicates)
+    )
 
 
 # ─── Server URL pattern invariants ────────────────────────────────────────
