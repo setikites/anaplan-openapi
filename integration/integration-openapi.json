@@ -1,0 +1,154 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Anaplan Integration API",
+    "version": "2.0.0",
+    "description": "Core API for managing Anaplan workspaces, models, dimensions, modules, views, lists, and data. Supports both standard Bearer token authentication (RFC 6750) and the proprietary AnaplanAuthToken scheme. Source of truth: Apiary (https://anaplan.docs.apiary.io/) and the Official Anaplan Postman Collection."
+  },
+  "servers": [
+    {
+      "url": "https://api.anaplan.com",
+      "description": "US1 (Data Center - US East), US2 (Data Center - US West), US5 (Cloud - US East), US7 (Cloud - US), EU1 (Data Center - Netherlands), EU2 (Data Center - Germany), EU4 (Cloud - Europe), AP1 (Cloud - Japan)"
+    },
+    {
+      "url": "https://us9.api.anaplan.com",
+      "description": "US9 (Cloud - US)"
+    },
+    {
+      "url": "https://eu3.api.anaplan.com",
+      "description": "EU3 (Cloud - Europe)"
+    },
+    {
+      "url": "https://eu5.api.anaplan.com",
+      "description": "EU5 (Cloud - Europe)"
+    },
+    {
+      "url": "https://gb1.api.anaplan.com",
+      "description": "GB1 (Cloud - UK)"
+    },
+    {
+      "url": "https://ca1a.api.anaplan.com",
+      "description": "CA1 (Cloud - Canada)"
+    },
+    {
+      "url": "https://sg1.api.anaplan.com",
+      "description": "SG1 (Cloud - Singapore)"
+    },
+    {
+      "url": "https://ae1.api.anaplan.com",
+      "description": "AE1 (Cloud - UAE)"
+    },
+    {
+      "url": "https://me1.api.anaplan.com",
+      "description": "ME1 (Cloud - Saudi Arabia)"
+    },
+    {
+      "url": "https://in1.api.anaplan.com",
+      "description": "IN1 (Cloud - India)"
+    },
+    {
+      "url": "https://id1.api.anaplan.com",
+      "description": "ID1 (Cloud - Indonesia)"
+    },
+    {
+      "url": "https://au1a.api2.anaplan.com",
+      "description": "AU1 (Cloud - Australia)"
+    }
+  ],
+  "security": [
+    {"BearerAuth": []},
+    {"AnaplanAuthToken": []}
+  ],
+  "paths": {
+    "/2/0/workspaces": {
+      "get": {
+        "summary": "List Workspaces",
+        "operationId": "listWorkspaces",
+        "description": "Returns all workspaces accessible to the authenticated user.",
+        "responses": {
+          "200": {
+            "description": "List of workspaces.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "$ref": "#/components/schemas/Status"
+                    },
+                    "workspaces": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Workspace"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication credentials missing or invalid."
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Standard OAuth 2.0 Bearer token (RFC 6750). Use `Authorization: Bearer <token>`."
+      },
+      "AnaplanAuthToken": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "Anaplan proprietary token scheme. Use `Authorization: AnaplanAuthToken <token>` obtained from the Authentication API."
+      }
+    },
+    "schemas": {
+      "Status": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "example": 200
+          },
+          "message": {
+            "type": "string",
+            "example": "Success"
+          }
+        }
+      },
+      "Workspace": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "8a81b09b5e97e9ab015e97eb74060076",
+            "description": "Workspace identifier."
+          },
+          "name": {
+            "type": "string",
+            "example": "My Workspace",
+            "description": "Human-readable workspace name."
+          },
+          "active": {
+            "type": "boolean",
+            "example": true
+          },
+          "sizeAllowance": {
+            "type": "integer",
+            "example": 0
+          },
+          "currentSize": {
+            "type": "integer",
+            "example": 0
+          }
+        }
+      }
+    }
+  }
+}

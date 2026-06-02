@@ -353,13 +353,16 @@ def test_oauth_error_schema_has_rfc_6749_fields():
 # ─── Integration API ───────────────────────────────────────────────────────
 # Integration API accepts Bearer token OR AnaplanAuthToken (both must be declared).
 
-@pytest.mark.skipif(
-    not (REPO_ROOT / "integration" / "integration-openapi.json").exists(),
-    reason="integration spec not yet written",
+_INTEGRATION_SPEC = REPO_ROOT / "integration" / "integration-openapi.json"
+_skip_integration = pytest.mark.skipif(
+    not _INTEGRATION_SPEC.exists(), reason="integration spec not yet written"
 )
+
+
+@_skip_integration
 def test_integration_spec_declares_anaplan_token_scheme():
     """Integration API uses AnaplanAuthToken — must be declared as a securityScheme."""
-    spec = _load(REPO_ROOT / "integration" / "integration-openapi.json")
+    spec = _load(_INTEGRATION_SPEC)
     schemes = spec.get("components", {}).get("securitySchemes", {})
     # AnaplanAuthToken arrives as an apiKey in Authorization or its own header
     anaplan = [
@@ -373,6 +376,20 @@ def test_integration_spec_declares_anaplan_token_scheme():
     assert anaplan, (
         "integration spec must declare an AnaplanAuthToken security scheme "
         "(type: apiKey, in: header)"
+    )
+
+
+@_skip_integration
+def test_integration_spec_declares_bearer_auth():
+    """Integration API also accepts standard Bearer tokens — BearerAuth must be declared."""
+    spec = _load(_INTEGRATION_SPEC)
+    schemes = spec.get("components", {}).get("securitySchemes", {})
+    bearer = [
+        name for name, d in schemes.items()
+        if d.get("type") == "http" and d.get("scheme") == "bearer"
+    ]
+    assert bearer, (
+        "integration spec must declare a BearerAuth scheme (type: http, scheme: bearer)"
     )
 
 
