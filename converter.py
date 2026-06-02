@@ -39,7 +39,7 @@ def _parse_input(input_spec):
 
 
 def _enhance_endpoints(spec):
-    """Add missing descriptions and summaries to endpoints."""
+    """Add missing descriptions, summaries, and placeholder responses to endpoints."""
     if "paths" not in spec:
         return spec
 
@@ -48,6 +48,8 @@ def _enhance_endpoints(spec):
             if isinstance(operation, dict) and method in ["get", "post", "put", "delete", "patch", "options", "head"]:
                 if "description" not in operation and "summary" not in operation:
                     operation["summary"] = f"{method.upper()} {path}"
+                if not operation.get("responses"):
+                    operation["responses"] = {"200": {"description": "TODO: document response"}}
 
     return spec
 

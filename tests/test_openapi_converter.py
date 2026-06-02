@@ -143,6 +143,27 @@ def test_endpoint_missing_description_gets_added():
     assert "description" in endpoint or "summary" in endpoint
 
 
+def test_operation_with_empty_responses_gets_placeholder():
+    """Operation with responses: {} gets a 200 placeholder so openapi-spec-validator accepts it."""
+    input_spec = {
+        "openapi": "3.0.0",
+        "info": {"title": "Test API", "version": "1.0.0"},
+        "servers": [{"url": "https://example.com"}],
+        "paths": {
+            "/items": {
+                "get": {"responses": {}},
+                "post": {"responses": {}},
+            }
+        },
+    }
+
+    result = convert_openapi_spec(input_spec)
+
+    validate(result)
+    assert result["paths"]["/items"]["get"]["responses"]
+    assert result["paths"]["/items"]["post"]["responses"]
+
+
 def test_preserves_all_input_properties():
     """Function preserves all properties from input spec."""
     input_spec = {
