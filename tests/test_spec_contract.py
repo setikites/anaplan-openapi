@@ -13,6 +13,7 @@ Invariants checked:
 """
 
 import json
+import re
 from pathlib import Path
 
 import pytest
@@ -421,6 +422,80 @@ def test_integration_spec_declares_bearer_auth():
         "integration spec must declare a BearerAuth scheme (type: http, scheme: bearer)"
     )
 
+
+# ─── Description cleanliness ──────────────────────────────────────────────
+
+
+def _all_description_strings(spec: dict):
+    """Yield every string value stored under a 'description' key anywhere in spec."""
+    def _walk(obj):
+        if isinstance(obj, dict):
+            for k, v in obj.items():
+                if k == "description" and isinstance(v, str):
+                    yield v
+                else:
+                    yield from _walk(v)
+        elif isinstance(obj, list):
+            for item in obj:
+                yield from _walk(item)
+    yield from _walk(spec)
+
+
+# HTML tags that are noise outside of Markdown table cells.
+# <br> inside a GFM table cell (line starting with |) is the standard way to
+# add line breaks within cells -- those are kept. All other known HTML tags are noise.
+_KNOWN_HTML_TAGS = re.compile(
+    r"</?("
+    r"p|strong|b|em|i|u|s|code|pre|a|ul|ol|li"
+    r"|table|thead|tbody|tr|th|td|blockquote|hr|h[1-6]|span|div"
+    r")(\s[^>]*)?>",
+    re.IGNORECASE,
+)
+_BR_OUTSIDE_TABLE = re.compile(r"<br\s*/?>", re.IGNORECASE)
+
+
+def _has_html_noise(description: str) -> bool:
+    """Return True if description contains known HTML tags that should be Markdown."""
+    if _KNOWN_HTML_TAGS.search(description):
+        return True
+    # <br> is acceptable inside table cell lines (lines starting with |);
+    # flag it only when it appears outside of table cells.
+    for line in description.splitlines():
+        if not line.lstrip().startswith("|") and _BR_OUTSIDE_TABLE.search(line):
+            return True
+    return False
+
+
+@pytest.mark.parametrize("spec_path", SPEC_FILES, ids=lambda p: p.parent.name)
+def test_descriptions_have_no_nbsp(spec_path):
+    """Non-breaking spaces are invisible noise; all descriptions must use regular spaces."""
+    spec = _load(spec_path)
+    violations = [
+        repr(d[:120]) for d in _all_description_strings(spec) if "\xa0" in d
+    ]
+    assert not violations, (
+        "{}: {} description(s) contain NBSP (\\u00a0):\n".format(
+            spec_path.parent.name, len(violations)
+        )
+        + "\n".join("  " + v for v in violations[:3])
+    )
+
+
+@pytest.mark.parametrize("spec_path", SPEC_FILES, ids=lambda p: p.parent.name)
+def test_descriptions_have_no_html_tags(spec_path):
+    """Known HTML tags outside table cells must be converted to Markdown equivalents."""
+    spec = _load(spec_path)
+    violations = [
+        repr(d[:120])
+        for d in _all_description_strings(spec)
+        if _has_html_noise(d)
+    ]
+    assert not violations, (
+        "{}: {} description(s) contain raw HTML tags:\n".format(
+            spec_path.parent.name, len(violations)
+        )
+        + "\n".join("  " + v for v in violations[:3])
+    )
 
 # ─── SCIM API ──────────────────────────────────────────────────────────────
 # SCIM is a standard (RFC 7644) and uses Bearer token authentication.

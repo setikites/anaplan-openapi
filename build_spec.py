@@ -76,6 +76,36 @@ _API_FAMILY: dict[str, list[dict]] = {
     "exception": _SERVERS_API,
 }
 
+# authentication and oauth manage their own auth schemes; every other API
+# gets AnaplanAuthToken + BearerAuth injected as a baseline.
+_DEFAULT_SECURITY_SCHEMES: dict[str, dict] = {
+    "AnaplanAuthToken": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "Anaplan authentication token. Format: `AnaplanAuthToken {token}`",
+    },
+    "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+    },
+}
+
+_APIS_WITH_DEFAULT_SCHEMES: frozenset[str] = (
+    frozenset(_API_FAMILY) - {"authentication", "oauth"}
+)
+
+# Paths owned by authentication or oauth that the Postman collection duplicates.
+_EXCLUDE_PATHS: dict[str, frozenset[str]] = {
+    "integration": frozenset({
+        "/token/authenticate",
+        "/token/refresh",
+        "/token/validate",
+        "/token/logout",
+        "/oauth/token",
+    }),
+}
+
 
 def servers_for_api(api_name: str) -> list[dict]:
     """Return the servers[] list for the given API name."""
@@ -83,6 +113,25 @@ def servers_for_api(api_name: str) -> list[dict]:
         known = ", ".join(sorted(_API_FAMILY))
         raise ValueError(f"Unknown API {api_name!r}. Known APIs: {known}")
     return _API_FAMILY[api_name]
+
+
+def _apply_api_defaults(api_name: str, spec: dict) -> dict:
+    """Inject default security schemes and remove excluded paths for api_name."""
+    if api_name in _APIS_WITH_DEFAULT_SCHEMES:
+        components = spec.setdefault("components", {})
+        schemes = components.setdefault("securitySchemes", {})
+        for name, defn in _DEFAULT_SECURITY_SCHEMES.items():
+            schemes.setdefault(name, defn)
+
+    excluded = _EXCLUDE_PATHS.get(api_name, frozenset())
+    if excluded:
+        spec["paths"] = {
+            path: item
+            for path, item in spec.get("paths", {}).items()
+            if path not in excluded
+        }
+
+    return spec
 
 
 def build_spec_from_postman(
@@ -97,6 +146,7 @@ def build_spec_from_postman(
 
     spec = convert_openapi_spec(raw)
     spec["servers"] = servers_for_api(api_name)
+    spec = _apply_api_defaults(api_name, spec)
 
     validate(spec)
 
@@ -121,6 +171,7 @@ def build_spec_from_apiary(
     apiary_json = fetch_apiary(identifier)
     skeleton = apiary_to_openapi_skeleton(apiary_json, servers=servers_for_api(api_name))
     spec = convert_openapi_spec(skeleton)
+    spec = _apply_api_defaults(api_name, spec)
 
     validate(spec)
 

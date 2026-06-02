@@ -21,6 +21,7 @@ def convert_openapi_spec(input_spec):
     spec = _parse_input(input_spec)
     spec = _enhance_endpoints(spec)
     spec = _extract_reused_schemas(spec)
+    spec = clean_descriptions(spec)
     return spec
 
 
@@ -167,6 +168,22 @@ def _replace_schemas_with_refs(spec, schema_obj, schema_name, locations):
     replace_in_object(spec)
 
 
+# ─── Description cleaning ────────────────────────────────────────────
+
+
+def clean_descriptions(spec: dict) -> dict:
+    """Replace non-breaking spaces in every 'description' string value. Idempotent."""
+    def _walk(obj):
+        if isinstance(obj, dict):
+            return {
+                k: v.replace(" ", " ") if k == "description" and isinstance(v, str) else _walk(v)
+                for k, v in obj.items()
+            }
+        if isinstance(obj, list):
+            return [_walk(item) for item in obj]
+        return obj
+
+    return _walk(spec)
 # ─── Apiary fetch and skeleton builder ───────────────────────────────────────
 
 
