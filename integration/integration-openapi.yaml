@@ -51,7 +51,18 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                  status:
+                    type: object
+                  user:
+                    $ref: '#/components/schemas/User'
       tags:
       - User Data
       description: "## Retrieve your user\n\n`/users/me`  \n\nRetrieves your user based on your Anaplan authentication token.\n\
@@ -72,7 +83,18 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                  status:
+                    type: object
+                  user:
+                    $ref: '#/components/schemas/User'
       tags:
       - User Data
       description: "## Retrieve user information\n\n`/users/{userId}`  \nRetrieves information about the specified user.\n\
@@ -99,7 +121,20 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                  status:
+                    type: object
+                  models:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Model'
       tags:
       - General Workspace & Model Metadata
       description: "## Retrieve models\n\n`/models`  \nRetrieves information about all models in the user's default tenant.\n\
@@ -192,7 +227,20 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                  status:
+                    type: object
+                  workspace:
+                    $ref: '#/components/schemas/Workspace'
+        '404':
+          description: Workspace not found or caller lacks Workspace Administrator role
       tags:
       - General Workspace & Model Metadata
     parameters:
@@ -218,7 +266,18 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                  status:
+                    type: object
+                  model:
+                    $ref: '#/components/schemas/Model'
       tags:
       - General Workspace & Model Metadata
     parameters:
@@ -5145,3 +5204,6 @@ components:
           type: string
         successful:
           type: boolean
+security:
+- AnaplanAuthToken: []
+- BearerAuth: []
