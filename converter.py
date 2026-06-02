@@ -168,15 +168,42 @@ def _replace_schemas_with_refs(spec, schema_obj, schema_name, locations):
     replace_in_object(spec)
 
 
-# ─── Description cleaning ────────────────────────────────────────────
+# ─── Description cleaning ────────────────────────────────────────────────────
+
+import re as _re
+
+_BARE_JSON_LINE = _re.compile(r"^\s*[{\[]")
+
+
+def _fence_bare_json(text: str) -> str:
+    """Wrap bare JSON lines outside fenced blocks in ```json fences. Idempotent."""
+    lines = text.splitlines()
+    result = []
+    in_fence = False
+    for line in lines:
+        if line.startswith("```"):
+            in_fence = not in_fence
+            result.append(line)
+        elif not in_fence and _BARE_JSON_LINE.match(line):
+            result.append("```json")
+            result.append(line)
+            result.append("```")
+        else:
+            result.append(line)
+    return "\n".join(result)
 
 
 def clean_descriptions(spec: dict) -> dict:
-    """Replace non-breaking spaces in every 'description' string value. Idempotent."""
+    """Clean all 'description' strings: strip NBSP and fence bare JSON. Idempotent."""
+    def _clean(text: str) -> str:
+        text = text.replace("\xa0", " ")
+        text = _fence_bare_json(text)
+        return text
+
     def _walk(obj):
         if isinstance(obj, dict):
             return {
-                k: v.replace(" ", " ") if k == "description" and isinstance(v, str) else _walk(v)
+                k: _clean(v) if k == "description" and isinstance(v, str) else _walk(v)
                 for k, v in obj.items()
             }
         if isinstance(obj, list):
@@ -184,6 +211,7 @@ def clean_descriptions(spec: dict) -> dict:
         return obj
 
     return _walk(spec)
+
 # ─── Apiary fetch and skeleton builder ───────────────────────────────────────
 
 

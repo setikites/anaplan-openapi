@@ -2876,12 +2876,12 @@ paths:
         \n#### Request\n\n```\ncurl -X POST \\\nhttps://api.anaplan.com/2/0/workspaces/{workspaceId}/models/{modelId}/exports/{exportId}/tasks\
         \ \\\n-H 'authorization: AnaplanAuthToken {anaplan_auth_token}'  \\\n-H \"Content-Type:application/json\" \\\n-d '{\"\
         localeName\": \"en_US\"}'\n\n```\n\n#### Headers\n\n*   `Authorization:AnaplanAuthToken {anaplan_auth_token}`\n* \
-        \  `Content-Type:application/json`\n    \n\n#### Body\n\n{\"localeName\": \"en_US\"}\n\n#### Parameters\n\n| **Parameter**\
-        \ | **Description** |\n| --- | --- |\n| `workspaceId` | <br><br>*   Required<br>*   Type: string<br>*   Description:\
-        \ The workspace ID<br>*   Example: `8a8b8c8d8e8f8g8i`<br><br> |\n| `modelId` | <br><br>*   Required<br>*   Type: string<br>*\
-        \   Description: The model ID<br>*   Example: `75A40874E6B64FA3AE0743278996850F`<br><br> |\n| `exportId` | <br><br>*\
-        \   Required<br>*   Type: number<br>*   Description: The export definition ID<br>*   Example: `116000000001`<br><br>\
-        \ |\n\n#### Response 200 (application/json)\n\n```\n{\n   \"meta\":{\n      \"schema\":\"https://api.anaplan.com//2/0/models/736367E9DB484E3AB3A50C3704FD33ED/objects/task\"\
+        \  `Content-Type:application/json`\n    \n\n#### Body\n\n```json\n{\"localeName\": \"en_US\"}\n```\n\n#### Parameters\n\
+        \n| **Parameter** | **Description** |\n| --- | --- |\n| `workspaceId` | <br><br>*   Required<br>*   Type: string<br>*\
+        \   Description: The workspace ID<br>*   Example: `8a8b8c8d8e8f8g8i`<br><br> |\n| `modelId` | <br><br>*   Required<br>*\
+        \   Type: string<br>*   Description: The model ID<br>*   Example: `75A40874E6B64FA3AE0743278996850F`<br><br> |\n|\
+        \ `exportId` | <br><br>*   Required<br>*   Type: number<br>*   Description: The export definition ID<br>*   Example:\
+        \ `116000000001`<br><br> |\n\n#### Response 200 (application/json)\n\n```\n{\n   \"meta\":{\n      \"schema\":\"https://api.anaplan.com//2/0/models/736367E9DB484E3AB3A50C3704FD33ED/objects/task\"\
         \n   },\n   \"status\":{\n      \"code\":200,\n      \"message\":\"Success\"\n   },\n   \"task\":{\n      \"taskId\"\
         :\"F362B99442C54425970E200037D48A91\"\n   }\n}\n```"
       requestBody:
@@ -3046,9 +3046,9 @@ paths:
         ### Run the process\n\n#### Request\n\n```\ncurl -X POST \\\nhttps://api.anaplan.com/2/0/workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks\n\
         -H 'authorization: AnaplanAuthToken {anaplan_auth_token}' \\\n-H \"Content-Type:application/json\" \\\n-d '{\"localeName\"\
         : \"en_US\"}'\n\n```\n\n#### Headers\n\n*   `Authorization:AnaplanAuthToken {anaplan_auth_token}`\n*   `Content-Type:application/json`\n\
-        \    \n\n#### Body\n\n{\"localeName\": \"en_US\"}\n\n#### Parameters\n\n| **Parameter** | **Description** |\n| ---\
-        \ | --- |\n| `workspaceId` | <br><br>*   Required<br>*   Type: string<br>*   Description: The workspace ID<br>*  \
-        \ Example: `8a8b8c8d8e8f8g8i`<br><br> |\n| `modelId` | <br><br>*   Required<br>*   Type: string<br>*   Description:\
+        \    \n\n#### Body\n\n```json\n{\"localeName\": \"en_US\"}\n```\n\n#### Parameters\n\n| **Parameter** | **Description**\
+        \ |\n| --- | --- |\n| `workspaceId` | <br><br>*   Required<br>*   Type: string<br>*   Description: The workspace ID<br>*\
+        \   Example: `8a8b8c8d8e8f8g8i`<br><br> |\n| `modelId` | <br><br>*   Required<br>*   Type: string<br>*   Description:\
         \ The model ID<br>*   Example: `75A40874E6B64FA3AE0743278996850F`<br><br> |\n| `processId` | <br><br>*   Required<br>*\
         \   Type: number<br>*   Description: The process ID<br>*   Example: `118000000002`<br><br> |\n\n#### Response 200\
         \ (application/json)\n\n```\n{\n  \"taskId\" : \"E1F648F527AF4297B09E06C278B99F4C\"\n}\n\n\n\n```"
@@ -3089,12 +3089,13 @@ paths:
         \ GET \\\nhttps://api.anaplan.com/2/0/workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks \\\n-H\
         \ 'authorization: AnaplanAuthToken {anaplan_auth_token}' \\\n-H \"Content-Type:application/json\"\n```\n\n#### Headers\n\
         \n*   `Authorization:AnaplanAuthToken {anaplan_auth_token}`\n*   `Content-Type:application/json`\n    \n\n#### Body\n\
-        \n{\"localeName\": \"en_US\"}\n\n#### Parameters\n\n| **Parameter** | **Description** |\n| --- | --- |\n| `workspaceId`\
-        \ | <br><br>*   Required<br>*   Type: string<br>*   Description: The workspace ID<br>*   Example: `8a8b8c8d8e8f8g8i`<br><br>\
-        \ |\n| `modelId` | <br><br>*   Required<br>*   Type: string<br>*   Description: The model ID<br>*   Example: `75A40874E6B64FA3AE0743278996850F`<br><br>\
-        \ |\n| `processId` | <br><br>*   Required<br>*   Type: number<br>*   Description: The process ID<br>*   Example: `118000000002`<br><br>\
-        \ |\n\n#### Response 200 (application/json)\n\n```\n{\n   \"taskId\":\"BAB7819744034F25BF73EA1B41804478\",\n   \"\
-        taskState\":\"IN_PROGRESS\",\n   \"creationTime\":1535145539157\n}\n\n```"
+        \n```json\n{\"localeName\": \"en_US\"}\n```\n\n#### Parameters\n\n| **Parameter** | **Description** |\n| --- | ---\
+        \ |\n| `workspaceId` | <br><br>*   Required<br>*   Type: string<br>*   Description: The workspace ID<br>*   Example:\
+        \ `8a8b8c8d8e8f8g8i`<br><br> |\n| `modelId` | <br><br>*   Required<br>*   Type: string<br>*   Description: The model\
+        \ ID<br>*   Example: `75A40874E6B64FA3AE0743278996850F`<br><br> |\n| `processId` | <br><br>*   Required<br>*   Type:\
+        \ number<br>*   Description: The process ID<br>*   Example: `118000000002`<br><br> |\n\n#### Response 200 (application/json)\n\
+        \n```\n{\n   \"taskId\":\"BAB7819744034F25BF73EA1B41804478\",\n   \"taskState\":\"IN_PROGRESS\",\n   \"creationTime\"\
+        :1535145539157\n}\n\n```"
   /2/0/workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks:
     post:
       summary: Start Other Action
@@ -3115,12 +3116,12 @@ paths:
         \n### Run deletion\n\n#### Request\n\n```\ncurl -X POST \\\nhttps://api.anaplan.com/2/0/workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks\
         \ \\\n-H 'authorization: AnaplanAuthToken {anaplan_auth_token}'\\\n-H \"Content-Type:application/json\" \\\n-d '{\"\
         localeName\": \"en_US\"}'\n\n```\n\n#### Headers\n\n*   `Authorization:AnaplanAuthToken {anaplan_auth_token}`\n* \
-        \  `Content-Type:application/json`\n    \n\n#### Body\n\n{\"localeName\": \"en_US\"}\n\n#### Parameters\n\n| **Parameter**\
-        \ | **Description** |\n| --- | --- |\n| `workspaceId` | <br><br>*   Required<br>*   Type: string<br>*   Description:\
-        \ The workspace ID<br>*   Example: `8a8b8c8d8e8f8g8i`<br><br> |\n| `modelId` | <br><br>*   Required<br>*   Type: string<br>*\
-        \   Description: The model ID<br>*   Example: `75A40874E6B64FA3AE0743278996850F`<br><br> |\n| `actionId` | <br><br>*\
-        \   Required<br>*   Type: number<br>*   Description: The ID for the Delete action.<br>*   Example: `117000000019`<br><br>\
-        \ |\n\n#### Response 200 (application/json)\n\n```\n{\n   \"task\":{\n      \"taskId\":\"0690AA1C761F48549C3442A02F91D962\"\
+        \  `Content-Type:application/json`\n    \n\n#### Body\n\n```json\n{\"localeName\": \"en_US\"}\n```\n\n#### Parameters\n\
+        \n| **Parameter** | **Description** |\n| --- | --- |\n| `workspaceId` | <br><br>*   Required<br>*   Type: string<br>*\
+        \   Description: The workspace ID<br>*   Example: `8a8b8c8d8e8f8g8i`<br><br> |\n| `modelId` | <br><br>*   Required<br>*\
+        \   Type: string<br>*   Description: The model ID<br>*   Example: `75A40874E6B64FA3AE0743278996850F`<br><br> |\n|\
+        \ `actionId` | <br><br>*   Required<br>*   Type: number<br>*   Description: The ID for the Delete action.<br>*   Example:\
+        \ `117000000019`<br><br> |\n\n#### Response 200 (application/json)\n\n```\n{\n   \"task\":{\n      \"taskId\":\"0690AA1C761F48549C3442A02F91D962\"\
         \n   }\n}\n\n```"
     parameters:
     - name: workspaceId

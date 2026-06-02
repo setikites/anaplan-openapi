@@ -515,3 +515,39 @@ def test_scim_spec_declares_bearer_auth():
     assert bearer, (
         "scim spec must declare a Bearer security scheme (type: http, scheme: bearer)"
     )
+
+
+# ─── Description formatting ────────────────────────────────────────────────
+
+
+@pytest.mark.parametrize("spec_path", SPEC_FILES, ids=lambda p: p.parent.name)
+def test_json_samples_use_fenced_code_blocks(spec_path):
+    """Bare JSON objects/arrays in descriptions must be wrapped in fenced code blocks."""
+    spec = _load(spec_path)
+    violations = []
+    for d in _all_description_strings(spec):
+        in_fence = False
+        for line in d.splitlines():
+            if line.startswith("```"):
+                in_fence = not in_fence
+            elif not in_fence and re.match(r"^\s*[{\[]", line):
+                violations.append(repr(line[:80]))
+    assert not violations, (
+        "{}: {} bare JSON line(s) found outside fenced code blocks:\n".format(
+            spec_path.parent.name, len(violations)
+        )
+        + "\n".join("  " + v for v in violations[:3])
+    )
+
+
+def test_clean_descriptions_is_idempotent():
+    """Running clean_descriptions twice on a dirty spec produces the same result as once."""
+    from converter import clean_descriptions
+    dirty = {
+        "paths": {
+            "/test": {"get": {"description": "has\xa0nbsp and bare JSON:\n{\"k\": 1}"}}
+        }
+    }
+    once = clean_descriptions(dirty)
+    twice = clean_descriptions(once)
+    assert once == twice
