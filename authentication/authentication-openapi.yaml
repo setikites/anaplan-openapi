@@ -2,12 +2,35 @@ openapi: 3.0.0
 info:
   title: Anaplan Authentication Service API
   version: 1.0.0
-  description: 'Generates and manages authentication tokens for use with Anaplan REST
-    APIs. Supports three authentication methods: HTTP Basic (username/password), CA
-    Certificate (X.509 certificate with SHA512withRSA signature), and token refresh.
-    Tokens are issued at `https://auth.anaplan.com` and expire after 35 minutes.'
+  description: 'Generates and manages authentication tokens for use with Anaplan REST APIs. Supports three authentication
+    methods: HTTP Basic (username/password), CA Certificate (X.509 certificate with SHA512withRSA signature), and token refresh.
+    Tokens expire after 35 minutes. The correct server URL depends on your Anaplan region — see the servers list below.'
 servers:
 - url: https://auth.anaplan.com
+  description: US1 (Data Center - US East), US2 (Data Center - US West), US5 (Cloud - US East), US7 (Cloud - US), EU1 (Data
+    Center - Netherlands), EU2 (Data Center - Germany), EU4 (Cloud - Europe), AP1 (Cloud - Japan)
+- url: https://us9.auth.anaplan.com
+  description: US9 (Cloud - US)
+- url: https://eu3.auth.anaplan.com
+  description: EU3 (Cloud - Europe)
+- url: https://eu5.auth.anaplan.com
+  description: EU5 (Cloud - Europe)
+- url: https://gb1.auth.anaplan.com
+  description: GB1 (Cloud - UK)
+- url: https://ca1a.auth.anaplan.com
+  description: CA1 (Cloud - Canada)
+- url: https://sg1.auth.anaplan.com
+  description: SG1 (Cloud - Singapore)
+- url: https://ae1.auth.anaplan.com
+  description: AE1 (Cloud - UAE)
+- url: https://in1.auth.anaplan.com
+  description: IN1 (Cloud - India)
+- url: https://id1.auth.anaplan.com
+  description: ID1 (Cloud - Indonesia)
+- url: https://me1.auth.anaplan.com
+  description: ME1 (Cloud - Saudi Arabia)
+- url: https://au1a.app2.anaplan.com
+  description: AU1 (Cloud - Australia)
 paths:
   /token/authenticate:
     post:
@@ -53,23 +76,19 @@ paths:
       security:
       - BasicAuth: []
       - CACertAuth: []
-      description: 'Creates an AnaplanAuthToken for use with other Anaplan REST APIs.
-        Returns 201 on success.
+      description: 'Creates an AnaplanAuthToken for use with other Anaplan REST APIs. Returns 201 on success.
 
 
-        **HTTP Basic Auth:** Send `Authorization: Basic {base64(username:password)}`
-        with no request body.
+        **HTTP Basic Auth:** Send `Authorization: Basic {base64(username:password)}` with no request body.
 
 
-        **CA Certificate Auth:** Send `Authorization: CACertificate {base64_encoded_certificate}`
-        with a JSON body containing `encodedData` (base64-encoded random bytes, 100+)
-        and `encodedSignedData` (SHA512withRSA signature of the raw random bytes,
-        base64-encoded). The certificate must be registered for API authentication
-        in your Anaplan instance.
+        **CA Certificate Auth:** Send `Authorization: CACertificate {base64_encoded_certificate}` with a JSON body containing
+        `encodedData` (base64-encoded random bytes, 100+) and `encodedSignedData` (SHA512withRSA signature of the raw random
+        bytes, base64-encoded). The certificate must be registered for API authentication in your Anaplan instance.
 
 
-        **SSO workspaces:** Users must be assigned as an Exception User to use Basic
-        authentication. See [Assign Exception Users](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Security/Single_Sign-on/Enforcing_SAML_Authentication.html)
+        **SSO workspaces:** Users must be assigned as an Exception User to use Basic authentication. See [Assign Exception
+        Users](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Security/Single_Sign-on/Enforcing_SAML_Authentication.html)
         in Anapedia.'
   /token/refresh:
     post:
@@ -112,13 +131,12 @@ paths:
       security:
       - BearerAuth: []
       - AnaplanAuth: []
-      description: 'Extends the session for an existing AnaplanAuthToken. Tokens expire
-        after 35 minutes; call this endpoint before expiry to maintain a session without
-        re-authenticating.
+      description: 'Extends the session for an existing AnaplanAuthToken. Tokens expire after 35 minutes; call this endpoint
+        before expiry to maintain a session without re-authenticating.
 
 
-        **Note:** Live testing shows the response returns the same `tokenValue` —
-        the token string itself does not change, but its internal expiration is reset.'
+        **Note:** Live testing shows the response returns the same `tokenValue` — the token string itself does not change,
+        but its internal expiration is reset.'
   /token/validate:
     get:
       summary: Get Authentication Token Details
@@ -135,8 +153,7 @@ paths:
                     properties:
                       expiresAt:
                         type: integer
-                        description: Token expiry time as milliseconds since Unix
-                          epoch.
+                        description: Token expiry time as milliseconds since Unix epoch.
                         example: 1493036651173
                       tokenId:
                         type: string
@@ -186,13 +203,11 @@ paths:
       security:
       - BearerAuth: []
       - AnaplanAuth: []
-      description: 'Returns details for a valid AnaplanAuthToken, including expiry
-        timestamp, token ID, and user/customer identifiers. Returns 401 if the token
-        is invalid, expired, or has been revoked by logout.
+      description: 'Returns details for a valid AnaplanAuthToken, including expiry timestamp, token ID, and user/customer
+        identifiers. Returns 401 if the token is invalid, expired, or has been revoked by logout.
 
 
-        **Note:** `userGuid` and `customerGuid` are 32-character hexadecimal strings
-        (no hyphens), not standard UUIDs.'
+        **Note:** `userGuid` and `customerGuid` are 32-character hexadecimal strings (no hyphens), not standard UUIDs.'
   /token/logout:
     post:
       summary: Log Out the User
@@ -211,9 +226,8 @@ paths:
       security:
       - BearerAuth: []
       - AnaplanAuth: []
-      description: Immediately invalidates an AnaplanAuthToken. Returns 204 with no
-        body on success. Any subsequent use of the token — including validation or
-        refresh — returns 401.
+      description: Immediately invalidates an AnaplanAuthToken. Returns 204 with no body on success. Any subsequent use of
+        the token — including validation or refresh — returns 401.
 components:
   securitySchemes:
     BasicAuth:
@@ -236,8 +250,7 @@ components:
   schemas:
     EmptyPayload:
       type: object
-      description: Used for Basic Authentication. No body parameters are accepted
-        or required.
+      description: Used for Basic Authentication. No body parameters are accepted or required.
       properties: {}
     CertPayload:
       type: object

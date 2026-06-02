@@ -1,0 +1,49 @@
+"""Regenerate an OpenAPI YAML spec from its canonical JSON source.
+
+Usage:
+    uv run sync_yaml.py <path/to/spec.json>
+
+Writes the corresponding .yaml file in the same directory.
+"""
+
+import json
+import sys
+from pathlib import Path
+
+import yaml
+
+
+def sync_yaml(json_path: Path) -> Path:
+    yaml_path = json_path.with_suffix(".yaml")
+
+    with json_path.open(encoding="utf-8") as f:
+        spec = json.load(f)
+
+    with yaml_path.open("w", encoding="utf-8", newline="\n") as f:
+        yaml.dump(
+            spec,
+            f,
+            allow_unicode=True,
+            default_flow_style=False,
+            sort_keys=False,
+            width=120,
+        )
+
+    return yaml_path
+
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print(f"Usage: uv run {Path(sys.argv[0]).name} <path/to/spec.json>")
+        sys.exit(1)
+
+    json_path = Path(sys.argv[1])
+    if not json_path.exists():
+        print(f"Error: {json_path} not found", file=sys.stderr)
+        sys.exit(1)
+    if json_path.suffix != ".json":
+        print(f"Error: expected a .json file, got {json_path.suffix}", file=sys.stderr)
+        sys.exit(1)
+
+    yaml_path = sync_yaml(json_path)
+    print(f"Written: {yaml_path}")
