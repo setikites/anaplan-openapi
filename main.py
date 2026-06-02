@@ -1,24 +1,15 @@
-import json
-import pathlib
-import yaml
-from converter import convert_openapi_spec
+"""Thin wrapper — use build_spec.py for all spec generation."""
+
+from pathlib import Path
+from build_spec import build_spec_from_postman
 
 
 def main():
-    """Convert Postman specs to OpenAPI JSON files."""
-    # Convert authentication API
-    auth_postman = pathlib.Path("authentication/postman-spec.yaml")
-    with open(auth_postman, encoding="utf-8") as f:
-        auth_spec = yaml.safe_load(f)
-
-    auth_openapi = convert_openapi_spec(auth_spec)
-
-    # Write authentication-openapi.json
-    output_file = pathlib.Path("authentication/authentication-openapi.json")
-    with open(output_file, "w", encoding="utf-8") as f:
-        json.dump(auth_openapi, f, indent=2)
-
-    print(f"Generated {output_file}")
+    path = build_spec_from_postman(
+        "authentication",
+        Path("authentication/postman-spec.yaml"),
+    )
+    print(f"Generated {path}")
 
 
 if __name__ == "__main__":
