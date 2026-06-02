@@ -423,6 +423,29 @@ def test_integration_spec_declares_bearer_auth():
     )
 
 
+@_skip_integration
+def test_integration_spec_has_component_schemas():
+    """Object schemas from the live /objects/ endpoints must appear in components/schemas."""
+    spec = _load(_INTEGRATION_SPEC)
+    schemas = spec.get("components", {}).get("schemas", {})
+    for expected in ("Workspace", "Model", "User", "Dimension", "Module"):
+        assert expected in schemas, (
+            f"integration spec must include {expected!r} in components/schemas"
+        )
+
+
+@_skip_integration
+def test_integration_response_examples_match_schemas():
+    """Every response example that has a sibling schema must validate against it."""
+    from schema_importer import validate_response_examples
+    spec = _load(_INTEGRATION_SPEC)
+    warnings = validate_response_examples(spec)
+    assert not warnings, (
+        f"{len(warnings)} example/schema mismatch(es):\n"
+        + "\n".join(f"  {w}" for w in warnings)
+    )
+
+
 # ─── Description cleanliness ──────────────────────────────────────────────
 
 

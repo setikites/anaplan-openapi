@@ -13,7 +13,12 @@ import yaml
 from openapi_spec_validator import validate
 
 from converter import apiary_to_openapi_skeleton, convert_openapi_spec, fetch_apiary
+from schema_importer import load_object_schemas, validate_response_examples, wire_response_schema_refs
 from sync_yaml import sync_yaml
+
+# Source files for integration schema injection.
+_INTEGRATION_OBJECT_SCHEMA = "integration/objectSchema.json"
+_INTEGRATION_MODEL_SCHEMA = "integration/modelObjectschema.json"
 
 _REPO_ROOT = Path(__file__).parent
 
@@ -134,6 +139,27 @@ def _apply_api_defaults(api_name: str, spec: dict) -> dict:
     return spec
 
 
+def _inject_object_schemas(api_name: str, spec: dict, repo_root: Path) -> dict:
+    """For the integration API: load live object schemas, inject into components/schemas,
+    wire response $refs, and print any example/schema validation warnings."""
+    if api_name != "integration":
+        return spec
+
+    obj_path = repo_root / _INTEGRATION_OBJECT_SCHEMA
+    mod_path = repo_root / _INTEGRATION_MODEL_SCHEMA
+    if not obj_path.exists() or not mod_path.exists():
+        return spec
+
+    schemas = load_object_schemas(obj_path, mod_path)
+    spec.setdefault("components", {}).setdefault("schemas", {}).update(schemas)
+    spec = wire_response_schema_refs(spec)
+
+    for warning in validate_response_examples(spec):
+        print(f"WARNING: {warning}")
+
+    return spec
+
+
 def build_spec_from_postman(
     api_name: str,
     file: Path,
@@ -147,6 +173,7 @@ def build_spec_from_postman(
     spec = convert_openapi_spec(raw)
     spec["servers"] = servers_for_api(api_name)
     spec = _apply_api_defaults(api_name, spec)
+    spec = _inject_object_schemas(api_name, spec, repo_root)
 
     validate(spec)
 
