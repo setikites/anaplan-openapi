@@ -20,6 +20,22 @@ Standard triage labels: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-
 
 Single-context layout: `CONTEXT.md` + `docs/adr/` at repo root. See `docs/agents/domain.md`.
 
+## Spec build pipeline
+
+`build_spec.py` generates an initial OpenAPI spec from Apiary or Postman source data. It is a **one-time bootstrap** per API — run it once to create the spec, then stop.
+
+Once a spec has live tests (a `tests/test_*_live.py` file exists for that API), the spec is **hand-maintained**. Do not run `build_spec.py` against it again — doing so will overwrite response schemas, security declarations, and any other edits derived from live testing.
+
+After editing a hand-maintained JSON spec, regenerate its YAML counterpart with:
+```
+uv run sync_yaml.py <api>/<api>-openapi.json
+```
+
+The current hand-maintained specs (live tests exist — do not rebuild):
+- `authentication/authentication-openapi.json`
+- `oauth/oauth-openapi.json`
+- `integration/integration-openapi.json`
+
 ## Python tooling
 
 Always use `uv` to run Python scripts in this project. Examples:

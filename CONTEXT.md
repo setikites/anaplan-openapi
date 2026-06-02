@@ -220,17 +220,19 @@ Legacy regions (us1–us7, eu1, eu2, eu4, ap1) share the older non-prefixed `api
 
 ### Confidence table
 
-| API | Apiary | Postman | Extracted Schemas | Live Testing | Confidence |
-|-----|--------|---------|-------------------|--------------|-----------|
-| Authentication | ✓ | ✓ | — | High | High |
-| OAuth | ✓ | — | — | Partial (device flow happy path + error cases; auth code flow not automatable) | High |
-| Integration | ✓ | ✓ | ✓ | High | High |
-| CloudWorks | ✓ | — | — | Medium | Medium |
-| SCIM | ✓ | — | ✓ | Medium | Medium |
-| ALM | ✓ | — | — | Medium | Medium |
-| Audit | ✓ | — | — | Medium | Medium |
-| Financial Consolidation | ✓ | — | — | Low | Low |
-| Exception Users | ✓ | — | ✓ | Low | Low |
+`build_spec.py` is a one-time bootstrap per API. Once live tests exist the spec is hand-maintained — do not run `build_spec.py` against it again (see `CLAUDE.md`).
+
+| API | Apiary | Postman | Extracted Schemas | Live Testing | Confidence | Spec lifecycle |
+|-----|--------|---------|-------------------|--------------|------------|----------------|
+| Authentication | ✓ | ✓ | — | High | High | hand-maintained (do not rebuild) |
+| OAuth | ✓ | — | — | Partial (device flow happy path + error cases; auth code flow not automatable) | High | hand-maintained (do not rebuild) |
+| Integration | ✓ | ✓ | ✓ | High | High | hand-maintained (do not rebuild) |
+| CloudWorks | ✓ | — | — | Medium | Medium | bootstrap only |
+| SCIM | ✓ | — | ✓ | Medium | Medium | bootstrap only |
+| ALM | ✓ | — | — | Medium | Medium | bootstrap only |
+| Audit | ✓ | — | — | Medium | Medium | bootstrap only |
+| Financial Consolidation | ✓ | — | — | Low | Low | bootstrap only |
+| Exception Users | ✓ | — | ✓ | Low | Low | bootstrap only |
 
 ## Project Structure
 
