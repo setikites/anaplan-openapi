@@ -404,6 +404,104 @@ def test_response_schemas_valid(auth_creds):
             assert "statusMessage" in auth_data
 
 
+@pytest.mark.live
+def test_security_scheme_bearer_with_basic_auth_token(auth_creds):
+    """Probe whether Bearer scheme accepts tokens obtained via Basic Auth.
+
+    Hypothesis: Bearer {token} is rejected (400/401), confirming that basic-auth
+    tokens must be sent as AnaplanAuthToken. If Bearer is unexpectedly accepted,
+    the spec's BearerAuth listing on these endpoints is valid for all token types.
+    """
+    username, password = auth_creds["username"], auth_creds["password"]
+    findings = []
+
+    with httpx.Client() as client:
+        auth_b64 = base64.b64encode(f"{username}:{password}".encode()).decode()
+        auth_response = client.post(
+            f"{API_URL}/token/authenticate",
+            headers={"Authorization": f"Basic {auth_b64}"},
+        )
+        assert auth_response.status_code == 201, f"Failed to get token: {auth_response.status_code}"
+        token = auth_response.json()["tokenInfo"]["tokenValue"]
+
+        try:
+            for endpoint, method in [
+                ("/token/validate", "GET"),
+                ("/token/refresh", "POST"),
+            ]:
+                url = f"{API_URL}{endpoint}"
+                request_fn = client.get if method == "GET" else client.post
+
+                bearer = request_fn(url, headers={"Authorization": f"Bearer {token}"})
+                anaplan = request_fn(url, headers={"Authorization": f"AnaplanAuthToken {token}"})
+
+                findings.append(
+                    f"{method} {endpoint}: Bearer={bearer.status_code}, AnaplanAuthToken={anaplan.status_code}"
+                )
+
+                if anaplan.status_code != 200:
+                    pytest.fail(f"AnaplanAuthToken unexpectedly rejected on {method} {endpoint}: {anaplan.status_code}")
+
+                if bearer.status_code == 200:
+                    warnings.warn(
+                        f"Bearer scheme accepted on {method} {endpoint} with a basic-auth token — "
+                        "spec BearerAuth listing is valid for all token types",
+                        UserWarning,
+                        stacklevel=2,
+                    )
+                elif bearer.status_code not in (400, 401):
+                    warnings.warn(
+                        f"Bearer on {method} {endpoint}: unexpected status {bearer.status_code}",
+                        UserWarning,
+                        stacklevel=2,
+                    )
+        finally:
+            client.post(f"{API_URL}/token/logout", headers={"Authorization": f"AnaplanAuthToken {token}"})
+
+    # Always print findings so the result is visible in -v output
+    print("\nSecurity scheme probe results (basic-auth token):")
+    for finding in findings:
+        print(f"  {finding}")
+
+
+@pytest.mark.live
+def test_security_scheme_oauth_bearer_on_token_endpoints():
+    """Probe whether an OAuth Bearer token works on token-operation endpoints.
+
+    Requires ANAPLAN_OAUTH_ACCESS_TOKEN in .env — skip if absent.
+    Hypothesis: OAuth Bearer tokens are rejected since these endpoints manage
+    AnaplanAuthTokens specifically, not OAuth sessions.
+    """
+    oauth_token = os.getenv("ANAPLAN_OAUTH_ACCESS_TOKEN")
+    if not oauth_token:
+        pytest.skip("ANAPLAN_OAUTH_ACCESS_TOKEN not set")
+
+    findings = []
+
+    with httpx.Client() as client:
+        for endpoint, method in [
+            ("/token/validate", "GET"),
+            ("/token/refresh", "POST"),
+        ]:
+            url = f"{API_URL}{endpoint}"
+            request_fn = client.get if method == "GET" else client.post
+
+            response = request_fn(url, headers={"Authorization": f"Bearer {oauth_token}"})
+            findings.append(f"{method} {endpoint}: Bearer(OAuth)={response.status_code}")
+
+            if response.status_code == 200:
+                warnings.warn(
+                    f"OAuth Bearer token accepted on {method} {endpoint} — "
+                    "these endpoints work with both AnaplanAuth and OAuth Bearer tokens",
+                    UserWarning,
+                    stacklevel=2,
+                )
+
+    print("\nSecurity scheme probe results (OAuth Bearer token):")
+    for finding in findings:
+        print(f"  {finding}")
+
+
 def assert_response_code(response, expected_codes, discrepancies):
     """Assert response code is in expected_codes, track discrepancies."""
     if response.status_code not in expected_codes:

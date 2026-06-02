@@ -129,7 +129,6 @@ paths:
       - Authentication
       - Other Authentication Actions
       security:
-      - BearerAuth: []
       - AnaplanAuth: []
       description: 'Extends the session for an existing AnaplanAuthToken. Tokens expire after 35 minutes; call this endpoint
         before expiry to maintain a session without re-authenticating.
@@ -201,7 +200,6 @@ paths:
       - Authentication
       - Other Authentication Actions
       security:
-      - BearerAuth: []
       - AnaplanAuth: []
       description: 'Returns details for a valid AnaplanAuthToken, including expiry timestamp, token ID, and user/customer
         identifiers. Returns 401 if the token is invalid, expired, or has been revoked by logout.
@@ -224,7 +222,6 @@ paths:
       - Authentication
       - Other Authentication Actions
       security:
-      - BearerAuth: []
       - AnaplanAuth: []
       description: Immediately invalidates an AnaplanAuthToken. Returns 204 with no body on success. Any subsequent use of
         the token — including validation or refresh — returns 401.
@@ -233,10 +230,6 @@ components:
     BasicAuth:
       type: http
       scheme: basic
-    BearerAuth:
-      type: http
-      scheme: bearer
-      description: Enter your valid application authentication token.
     AnaplanAuth:
       type: apiKey
       in: header

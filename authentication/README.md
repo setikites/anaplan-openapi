@@ -118,14 +118,19 @@ Invalidate an authentication token.
 
 ## Security Schemes
 
-The spec defines four security schemes:
+The spec defines three security schemes:
 
-1. **BasicAuth** - HTTP Basic authentication
-2. **BearerAuth** - Bearer token (documented for compatibility)
-3. **AnaplanAuth** - Anaplan custom token header
-4. **CACertAuth** - CA certificate authentication
+1. **BasicAuth** - HTTP Basic authentication (used only on `POST /token/authenticate`)
+2. **AnaplanAuth** - Anaplan custom token header (`Authorization: AnaplanAuthToken {token}`)
+3. **CACertAuth** - CA certificate authentication (`Authorization: CACertificate {cert}`)
 
-Each endpoint specifies which schemes it supports.
+Live testing confirmed that `Bearer {token}` is **rejected** on `/token/validate`, `/token/refresh`, and `/token/logout`:
+- `/token/validate` and `/token/refresh` return **400** for a Bearer header
+- `/token/logout` returns **401** for a Bearer header
+
+`BearerAuth` was removed from the spec. Tokens issued by this API (via Basic or CA Certificate auth) must always be sent as `AnaplanAuthToken {token}`, not `Bearer {token}`.
+
+Note: OAuth Bearer tokens (issued by the OAuth 2.0 API) have not been tested against these endpoints. They are expected to be incompatible since these endpoints manage AnaplanAuthTokens specifically.
 
 ## Known Discrepancies
 

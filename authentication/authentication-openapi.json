@@ -187,9 +187,6 @@
         ],
         "security": [
           {
-            "BearerAuth": []
-          },
-          {
             "AnaplanAuth": []
           }
         ],
@@ -286,9 +283,6 @@
         ],
         "security": [
           {
-            "BearerAuth": []
-          },
-          {
             "AnaplanAuth": []
           }
         ],
@@ -319,9 +313,6 @@
         ],
         "security": [
           {
-            "BearerAuth": []
-          },
-          {
             "AnaplanAuth": []
           }
         ],
@@ -334,11 +325,6 @@
       "BasicAuth": {
         "type": "http",
         "scheme": "basic"
-      },
-      "BearerAuth": {
-        "type": "http",
-        "scheme": "bearer",
-        "description": "Enter your valid application authentication token."
       },
       "AnaplanAuth": {
         "type": "apiKey",
