@@ -85,16 +85,17 @@ None of the OAuth service endpoints require an `Authorization` request header. A
 |----------|-----------|-------------|----------------------|
 | `GET /auth/authorize` | Not automatable | Partial | Requires browser redirect; only error paths testable in CI |
 | `POST /oauth/device/code` | ✓ | ✓ | Device approval step requires browser |
-| `POST /oauth/token` (device grant) | Not automatable end-to-end | ✓ | Requires user to approve at `verification_uri` |
-| `POST /oauth/token` (auth code grant) | Not automatable | ✓ | Requires browser redirect to obtain code |
-| `POST /oauth/token` (refresh) | Not automatable end-to-end | ✓ | Requires a live refresh token from a prior non-automated flow |
+| `POST /oauth/token` (device grant) | ✓ | ✓ | Requires user to approve at `verification_uri` |
+| `POST /oauth/token` (auth code grant) | ✓ | ✓ | Requires browser redirect to obtain code; tested via `oauth_authcode_step1.py` / `oauth_authcode_step2.py` |
+| `POST /oauth/token` (refresh) | ✓ | ✓ | Tested via `oauth_authcode_step3.py` using a live refresh token from the auth code flow |
 
 ## Discrepancies and Notes
 
 - **Server URL differs from Apiary docs**: Apiary lists `https://auth.anaplan.com` as the production URL, but live testing confirmed the OAuth endpoints are served at `{region}.app.anaplan.com` (e.g. `us1a.app.anaplan.com`). The `auth.anaplan.com` domain hosts only the Authentication Service API. See the Servers table above for all regional URLs.
 - **`/auth/prelogin` vs `/auth/authorize`**: The Apiary docs document `/auth/authorize` as the Authorization Code Grant entry point (returns 302 redirect to the login page). The `anaplan-sdk` library uses `GET /auth/prelogin` instead, which returns the login page HTML directly (200). The spec documents `/auth/authorize` as the canonical Apiary-defined endpoint; `/auth/prelogin` is noted in its description as an equivalent alternative used by some clients.
-- **`expires_in`**: Live testing confirmed `expires_in` is 2100 seconds (35 minutes) for both device flow and refresh token grants. The spec example has been updated accordingly. The `expiresAt` field inside `anaplan_token.tokenInfo` is a separate concept — an absolute milliseconds-since-epoch timestamp — not to be confused with `expires_in`.
-- **`anaplan_token` not observed in live testing**: Apiary documents `anaplan_token` as present only on `refresh_token` grant responses. Live testing of both the device flow initial grant and the refresh token grant returned no `anaplan_token` field. It may be specific to the Authorization Code grant or may no longer be returned by the API. The field is retained in the spec as optional with a note. The `status_message` casing question (snake_case vs camelCase) cannot be confirmed until `anaplan_token` is observed in a live response.
+- **`expires_in`**: Live testing confirmed `expires_in` is 2100 seconds (35 minutes) across all three grant types. The spec example has been updated accordingly.
+- **`anaplan_token` not returned**: Apiary documents `anaplan_token` as present on token responses. Live testing of all three grant types (device grant, authorization code grant, and refresh token grant) returned no `anaplan_token` field in any response. The field has been removed from the spec.
+- **`profile` scope silently dropped**: Requesting `scope: openid profile email offline_access` in `GET /auth/authorize` results in a granted scope of `openid email offline_access` — the server drops `profile` without error. The `profile` scope is listed in Anaplan's documentation but does not appear to be honoured. The spec scope example has been updated to reflect what the server actually returns.
 - **Refresh tokens are rotatable**: Live testing confirmed the API issues a new `refresh_token` on each refresh call, consistent with the spec note about rotatable tokens.
 - **`audience` parameter**: Documented in the Apiary docs as optional on `POST /oauth/device/code`. Not mentioned for other endpoints.
 - **Device flow error codes**: Standard RFC 8628 codes (`authorization_pending`, `slow_down`, `expired_token`) are expected during polling but not explicitly documented in Apiary.

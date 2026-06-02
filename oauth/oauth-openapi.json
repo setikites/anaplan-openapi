@@ -397,8 +397,8 @@
           },
           "scope": {
             "type": "string",
-            "example": "openid profile email offline_access",
-            "description": "Space-separated list of granted scopes."
+            "example": "openid email offline_access",
+            "description": "Space-separated list of granted scopes. Note: the `profile` scope is dropped by the server even when requested."
           },
           "expires_in": {
             "type": "integer",
@@ -409,58 +409,6 @@
             "type": "string",
             "enum": ["Bearer"],
             "description": "Token type. Always `Bearer`."
-          },
-          "anaplan_token": {
-            "type": "object",
-            "description": "Anaplan-specific token details, documented by Apiary as present only on `refresh_token` grant responses. Not observed in live testing of the device flow or refresh token grants — may be specific to the Authorization Code grant or may no longer be returned. Treat as optional.",
-            "properties": {
-              "status": {
-                "type": "string",
-                "enum": ["SUCCESS"]
-              },
-              "status_message": {
-                "type": "string",
-                "example": "Successful Assertion"
-              },
-              "meta": {
-                "type": "object",
-                "properties": {
-                  "validationUrl": {
-                    "type": "string",
-                    "format": "uri",
-                    "example": "https://iam.anaplan.com/token/validate"
-                  }
-                }
-              },
-              "tokenInfo": {
-                "$ref": "#/components/schemas/TokenInfo"
-              }
-            }
-          }
-        }
-      },
-      "TokenInfo": {
-        "type": "object",
-        "properties": {
-          "expiresAt": {
-            "type": "integer",
-            "description": "Token expiry time as milliseconds since Unix epoch.",
-            "example": 1493036651173
-          },
-          "refreshTokenId": {
-            "type": "string",
-            "format": "uuid",
-            "example": "3ab11111-2222-33e4-a111-01a1b222cd3a"
-          },
-          "tokenId": {
-            "type": "string",
-            "format": "uuid",
-            "example": "9aa99999-1111-11a2-b333-abc11223ab12"
-          },
-          "tokenValue": {
-            "type": "string",
-            "description": "Bearer token for subsequent requests.",
-            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.example.token"
           }
         }
       },
