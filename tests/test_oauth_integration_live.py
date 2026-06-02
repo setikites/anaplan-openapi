@@ -13,19 +13,19 @@ client ID cannot be used for both flows.
 
 Automation limitations
 ----------------------
-The following flows cannot be fully automated and are not covered by these tests:
+The following steps cannot be fully automated:
 
 - Device Authorization Grant (end-to-end): After POST /oauth/device/code, the user
   must visit verification_uri and approve access in a browser before the client can
   exchange the device_code for tokens. Tests here cover only the initiation request
   and polling error cases.
 
-- Authorization Code Grant: GET /auth/prelogin displays the Anaplan login page and
-  delivers the resulting code via a browser callback (redirect_uri). Tests here cover
-  only error-path behavior for invalid or missing parameters.
+- Authorization Code Grant (login step): GET /auth/authorize returns a 302 redirect
+  to the Anaplan login page — the 302 response itself is tested here. The subsequent
+  user login and browser callback to redirect_uri cannot be automated.
 
 - Token refresh (happy path): Requires a live refresh_token from a completed OAuth flow.
-  Since neither flow above can be fully automated, only invalid-token error cases are tested.
+  Only invalid-token error cases are tested here.
 """
 
 import json
@@ -267,6 +267,57 @@ def test_token_missing_grant_type():
         # API returns 401 (not 400) for missing grant_type
         assert_response_code(response, [400, 401], discrepancies)
         assert_oauth_error_body(response, "POST /oauth/token (missing grant_type)", discrepancies)
+
+    if discrepancies:
+        warnings.warn("\n".join(f"  - {d}" for d in discrepancies), UserWarning, stacklevel=2)
+
+
+# ---------------------------------------------------------------------------
+# GET /auth/authorize — 302 redirect verified; login step requires browser
+# ---------------------------------------------------------------------------
+
+@pytest.mark.live
+def test_authorize_happy_path(oauth_client_id):
+    """GET /auth/authorize with valid params returns 302 with a Location header."""
+    discrepancies = []
+
+    with httpx.Client(follow_redirects=False) as client:
+        response = client.get(
+            f"{API_URL}/auth/authorize",
+            params={
+                "response_type": "code",
+                "client_id": oauth_client_id,
+                "redirect_uri": "https://www.anaplan.com",
+                "scope": "openid profile email offline_access",
+                "state": "test-state-value",
+            },
+        )
+
+        assert_response_code(response, [302], discrepancies)
+
+        if response.status_code == 302 and "Location" not in response.headers:
+            discrepancies.append("GET /auth/authorize: 302 response missing Location header")
+
+    if discrepancies:
+        warnings.warn("\n".join(f"  - {d}" for d in discrepancies), UserWarning, stacklevel=2)
+
+
+@pytest.mark.live
+def test_authorize_missing_client_id():
+    """GET /auth/authorize without client_id returns 4xx or redirect to error page."""
+    discrepancies = []
+
+    with httpx.Client(follow_redirects=False) as client:
+        response = client.get(
+            f"{API_URL}/auth/authorize",
+            params={
+                "response_type": "code",
+                "redirect_uri": "https://www.anaplan.com",
+                "scope": "openid profile email offline_access",
+            },
+        )
+
+        assert_response_code(response, [302, 400, 401], discrepancies)
 
     if discrepancies:
         warnings.warn("\n".join(f"  - {d}" for d in discrepancies), UserWarning, stacklevel=2)

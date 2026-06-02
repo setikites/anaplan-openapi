@@ -83,7 +83,7 @@ None of the OAuth service endpoints require an `Authorization` request header. A
 
 | Endpoint | Happy Path | Error Cases | Automation Limitation |
 |----------|-----------|-------------|----------------------|
-| `GET /auth/authorize` | Not automatable | Partial | Requires browser redirect; only error paths testable in CI |
+| `GET /auth/authorize` | Partial (302 verified) | Partial | 302 + Location header confirmed; login step and code callback require browser |
 | `POST /oauth/device/code` | ✓ | ✓ | Device approval step requires browser |
 | `POST /oauth/token` (device grant) | ✓ | ✓ | Requires user to approve at `verification_uri` |
 | `POST /oauth/token` (auth code grant) | ✓ | ✓ | Requires browser redirect to obtain code; tested via `oauth_authcode_step1.py` / `oauth_authcode_step2.py` |
