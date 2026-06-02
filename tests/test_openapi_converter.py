@@ -2,7 +2,62 @@ import json
 import yaml
 import pytest
 from openapi_spec_validator import validate
-from converter import convert_openapi_spec
+from converter import convert_openapi_spec, fetch_apiary, apiary_to_openapi_skeleton
+
+
+# ─── Apiary fixtures ──────────────────────────────────────────────────────────
+
+_MINIMAL_REFRACT = {"element": "parseResult", "content": []}
+
+_FULL_REFRACT = {
+    "element": "parseResult",
+    "content": [{
+        "element": "category",
+        "meta": {"title": {"element": "string", "content": "Test API"}},
+        "content": [{
+            "element": "category",
+            "meta": {
+                "classes": {"element": "array", "content": [
+                    {"element": "string", "content": "resourceGroup"}
+                ]},
+                "title": {"element": "string", "content": "Tokens"},
+            },
+            "content": [{
+                "element": "resource",
+                "attributes": {
+                    "href": {"element": "string", "content": "/token/authenticate"}
+                },
+                "content": [{
+                    "element": "transition",
+                    "meta": {
+                        "title": {"element": "string", "content": "Create Token"},
+                        "description": {"element": "string", "content": "Generates a token."},
+                    },
+                    "content": [{
+                        "element": "httpTransaction",
+                        "content": [
+                            {
+                                "element": "httpRequest",
+                                "attributes": {"method": {"element": "string", "content": "POST"}},
+                                "content": [],
+                            },
+                            {
+                                "element": "httpResponse",
+                                "attributes": {"statusCode": {"element": "string", "content": "201"}},
+                                "content": [],
+                            },
+                            {
+                                "element": "httpResponse",
+                                "attributes": {"statusCode": {"element": "string", "content": "401"}},
+                                "content": [],
+                            },
+                        ],
+                    }],
+                }],
+            }],
+        }],
+    }],
+}
 
 
 def test_convert_dict_returns_dict():
@@ -216,6 +271,73 @@ def test_no_duplicate_inline_schemas(spec_name):
 
     duplicates = {schema: count for schema, count in schema_counts.items() if count > 1}
     assert not duplicates, f"Found duplicate complex inline schemas that should be in components/schemas: {len(duplicates)}"
+
+
+# ─── apiary_to_openapi_skeleton ──────────────────────────────────────────────
+
+def test_apiary_skeleton_returns_openapi_dict():
+    """Tracer bullet: produces a dict with the three required OpenAPI 3.0.0 top-level fields."""
+    result = apiary_to_openapi_skeleton(_MINIMAL_REFRACT)
+    assert result["openapi"] == "3.0.0"
+    assert "info" in result
+    assert "paths" in result
+
+
+def test_apiary_skeleton_extracts_api_title():
+    """API title comes from the top-level category's meta.title in the Refract tree."""
+    result = apiary_to_openapi_skeleton(_FULL_REFRACT)
+    assert result["info"]["title"] == "Test API"
+
+
+def test_apiary_skeleton_extracts_path_and_method():
+    """Resource href and httpRequest method map to an OpenAPI path operation."""
+    result = apiary_to_openapi_skeleton(_FULL_REFRACT)
+    assert "/token/authenticate" in result["paths"]
+    assert "post" in result["paths"]["/token/authenticate"]
+
+
+def test_apiary_skeleton_captures_operation_summary():
+    """Transition meta.title becomes the OpenAPI operation summary."""
+    result = apiary_to_openapi_skeleton(_FULL_REFRACT)
+    operation = result["paths"]["/token/authenticate"]["post"]
+    assert operation["summary"] == "Create Token"
+
+
+def test_apiary_skeleton_captures_response_status_codes():
+    """All httpResponse status codes from the transaction appear as documented responses."""
+    result = apiary_to_openapi_skeleton(_FULL_REFRACT)
+    responses = result["paths"]["/token/authenticate"]["post"]["responses"]
+    assert "201" in responses
+    assert "401" in responses
+
+
+def test_apiary_skeleton_piped_through_converter():
+    """Skeleton from apiary_to_openapi_skeleton is accepted by convert_openapi_spec without error."""
+    skeleton = apiary_to_openapi_skeleton(
+        _FULL_REFRACT,
+        servers=[{"url": "https://auth.anaplan.com"}],
+    )
+    result = convert_openapi_spec(skeleton)
+    assert result["openapi"] == "3.0.0"
+    assert "/token/authenticate" in result["paths"]
+
+
+def test_apiary_skeleton_passes_through_servers():
+    """Provided servers list appears verbatim in the skeleton output."""
+    servers = [
+        {"url": "https://auth.anaplan.com", "description": "Default"},
+        {"url": "https://eu3.auth.anaplan.com", "description": "EU3"},
+    ]
+    result = apiary_to_openapi_skeleton(_MINIMAL_REFRACT, servers=servers)
+    assert result["servers"] == servers
+
+
+@pytest.mark.live
+def test_fetch_apiary_returns_dict_for_known_identifier():
+    """fetch_apiary hits the Apiary JSON endpoint and returns a parsed dict."""
+    result = fetch_apiary("anaplanoauth2service")
+    assert isinstance(result, dict), "expected a JSON object from Apiary"
+    assert result, "expected a non-empty response"
 
 
 def _is_complex_schema(obj):
