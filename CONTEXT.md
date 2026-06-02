@@ -25,10 +25,15 @@ Anaplan has 9 publicly documented REST APIs, each with different characteristics
 #### 2. OAuth API
 - **Purpose**: OAuth 2.0 token generation
 - **Auth**: OAuth 2.0 flow
-- **Source of Truth**: Apiary docs + Postman collection
-- **Testing**: High (Postman available, heavily used)
-- **Status**: Not yet started
-- **Key Points**: Alternative to basic auth; modern OAuth 2.0 standard
+- **Source of Truth**: Apiary docs only (no Postman collection available for OAuth)
+- **Testing**: Partial — device flow initiation and error cases automated; end-to-end device approval and Authorization Code Grant login require browser interaction and cannot be automated
+- **Status**: complete
+- **Key Points**:
+  - Alternative to basic auth; modern OAuth 2.0 standard
+  - Supports Authorization Code Grant (`/auth/authorize`) and Device Authorization Grant (`/oauth/device/code`)
+  - `/auth/prelogin` endpoint discovered via live testing (not in Apiary docs)
+  - Token refresh happy path requires a live refresh_token from a completed flow; only invalid-token error cases are CI-testable
+  - No Postman collection exists for this API; spec is sourced from Apiary only
 
 #### 3. Integration API
 - **Purpose**: Core API for managing models, dimensions, modules, versions
@@ -218,7 +223,7 @@ Legacy regions (us1–us7, eu1, eu2, eu4, ap1) share the older non-prefixed `api
 | API | Apiary | Postman | Extracted Schemas | Live Testing | Confidence |
 |-----|--------|---------|-------------------|--------------|-----------|
 | Authentication | ✓ | ✓ | — | High | High |
-| OAuth | ✓ | ✓ | — | High | High |
+| OAuth | ✓ | — | — | Partial (device flow happy path + error cases; auth code flow not automatable) | High |
 | Integration | ✓ | ✓ | ✓ | High | High |
 | CloudWorks | ✓ | — | — | Medium | Medium |
 | SCIM | ✓ | — | ✓ | Medium | Medium |
