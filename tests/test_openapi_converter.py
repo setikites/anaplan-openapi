@@ -2,7 +2,7 @@ import json
 import yaml
 import pytest
 from openapi_spec_validator import validate
-from converter import convert_openapi_spec, fetch_apiary, apiary_to_openapi_skeleton
+from converter import convert_openapi_spec, fetch_apiary, apiary_to_openapi_skeleton, extract_op_response_details
 
 
 # ─── Apiary fixtures (real jsapi.apiary.io format) ───────────────────────────
@@ -350,3 +350,114 @@ def _is_complex_schema(obj):
     if "$ref" in obj and len(obj) == 1:
         return False
     return "properties" in obj or "oneOf" in obj or "allOf" in obj
+
+
+# ─── extract_op_response_details ─────────────────────────────────────────────
+
+def test_extract_response_body_from_application_json_heading():
+    """### Response 200 (application/json) + fenced JSON → responses.200.content example, section stripped."""
+    operation = {
+        "responses": {},
+        "description": 'Narrative.\n\n### Response 200 (application/json)\n\n```\n{"status": "ok"}\n```\n',
+    }
+    result = extract_op_response_details(operation)
+    assert result["responses"]["200"]["content"]["application/json"]["example"] == {"status": "ok"}
+    assert "### Response 200" not in result.get("description", "")
+    assert "Narrative" in result["description"]
+
+
+def test_extract_response_body_from_body_heading():
+    """### Response 200 body variant promotes to the same responses.200.content target."""
+    operation = {
+        "responses": {},
+        "description": 'Prose.\n\n### Response 200 body\n\n```\n{"items": []}\n```\n',
+    }
+    result = extract_op_response_details(operation)
+    assert result["responses"]["200"]["content"]["application/json"]["example"] == {"items": []}
+    assert "### Response 200 body" not in result.get("description", "")
+
+
+def test_extract_multiple_response_codes():
+    """Different ### Response N sections each land in the correct responses slot."""
+    operation = {
+        "responses": {},
+        "description": (
+            "Intro.\n\n"
+            '### Response 200 (application/json)\n\n```\n{"ok": true}\n```\n\n'
+            '### Response 404 body\n\n```\n{"error": "not found"}\n```\n'
+        ),
+    }
+    result = extract_op_response_details(operation)
+    assert result["responses"]["200"]["content"]["application/json"]["example"] == {"ok": True}
+    assert result["responses"]["404"]["content"]["application/json"]["example"] == {"error": "not found"}
+    assert "### Response" not in result.get("description", "")
+
+
+def test_extract_response_headers():
+    """### Response headers + `Header: Value` → responses.200.headers[Header], section stripped."""
+    operation = {
+        "responses": {},
+        "description": "Prose.\n\n### Response headers\n\n`Content-Type: application/json`\n",
+    }
+    result = extract_op_response_details(operation)
+    headers = result["responses"]["200"]["headers"]
+    assert "Content-Type" in headers
+    assert headers["Content-Type"]["example"] == "application/json"
+    assert "### Response headers" not in result.get("description", "")
+
+
+def test_extract_prose_status_code_callout():
+    """Backtick-quoted HTTP status code in prose → responses.{code} with generic description."""
+    operation = {
+        "responses": {},
+        "description": "Returns a `404` if workspace does not exist.",
+    }
+    result = extract_op_response_details(operation)
+    assert "404" in result["responses"]
+    assert result["responses"]["404"]["description"] == "more detail in path description"
+    assert "404" in result.get("description", "")
+
+
+def test_prose_callout_does_not_overwrite_existing_response():
+    """Prose `404` callout is skipped when responses.404 is already documented."""
+    operation = {
+        "responses": {"404": {"description": "Not Found"}},
+        "description": "Returns a `404` if workspace does not exist.",
+    }
+    result = extract_op_response_details(operation)
+    assert result["responses"]["404"]["description"] == "Not Found"
+
+
+def test_extract_response_details_is_idempotent():
+    """Calling extract_op_response_details twice returns an identical result."""
+    operation = {
+        "responses": {},
+        "description": (
+            "Intro.\n\n"
+            '### Response 200 (application/json)\n\n```\n{"id": 1}\n```\n\n'
+            "Returns `404` if not found."
+        ),
+    }
+    once = extract_op_response_details(operation)
+    twice = extract_op_response_details(once)
+    assert once == twice
+
+
+def test_convert_openapi_spec_promotes_response_descriptions():
+    """convert_openapi_spec runs extraction so ### Response sections appear in responses object."""
+    spec = {
+        "openapi": "3.0.0",
+        "info": {"title": "Test", "version": "1.0.0"},
+        "paths": {
+            "/items": {
+                "get": {
+                    "responses": {},
+                    "description": 'List items.\n\n### Response 200 (application/json)\n\n```\n{"items": []}\n```\n',
+                }
+            }
+        },
+    }
+    result = convert_openapi_spec(spec)
+    operation = result["paths"]["/items"]["get"]
+    assert operation["responses"]["200"]["content"]["application/json"]["example"] == {"items": []}
+    assert "### Response 200" not in operation.get("description", "")

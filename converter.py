@@ -19,6 +19,7 @@ def convert_openapi_spec(input_spec):
         dict: Valid OpenAPI 3.0.0 spec with enhancements
     """
     spec = _parse_input(input_spec)
+    spec = _promote_response_descriptions(spec)
     spec = _enhance_endpoints(spec)
     spec = _extract_reused_schemas(spec)
     spec = clean_descriptions(spec)
@@ -168,9 +169,80 @@ def _replace_schemas_with_refs(spec, schema_obj, schema_name, locations):
     replace_in_object(spec)
 
 
-# ─── Description cleaning ────────────────────────────────────────────────────
+# ─── Response detail extraction ──────────────────────────────────────────────
 
 import re as _re
+
+_RESP_BODY_HEADING_RE = _re.compile(r"###\s+Response\s+(\d{3})\b", _re.IGNORECASE)
+_RESP_HEADERS_HEADING_RE = _re.compile(r"###\s+Response\s+headers\b", _re.IGNORECASE)
+_FENCED_BLOCK_RE = _re.compile(r"```[^\n]*\n(.*?)```", _re.DOTALL)
+_BACKTICK_HEADER_RE = _re.compile(r"`([A-Za-z][^:`\n]*):\s*([^`\n]+)`")
+_PROSE_HTTP_CODE_RE = _re.compile(r"`([2-5]\d{2})`")
+
+
+def extract_op_response_details(operation: dict) -> dict:
+    """Parse ### Response N sections from description; promote to responses, strip from description."""
+    description = operation.get("description", "")
+    if not description:
+        return operation
+
+    responses = {k: dict(v) if isinstance(v, dict) else v for k, v in operation.get("responses", {}).items()}
+    kept = []
+
+    for section in _re.split(r"(?=###\s)", description):
+        body_m = _RESP_BODY_HEADING_RE.match(section)
+        if body_m:
+            code = body_m.group(1)
+            fence_m = _FENCED_BLOCK_RE.search(section)
+            if fence_m:
+                raw = fence_m.group(1).strip().replace("\xa0", " ").replace("\\_", " ")
+                try:
+                    example = json.loads(raw)
+                    resp = responses.setdefault(code, {"description": f"Response {code}"})
+                    resp.setdefault("content", {}).setdefault("application/json", {}).setdefault("example", example)
+                except json.JSONDecodeError:
+                    kept.append(section)
+                    continue
+            continue  # remove section whether or not we extracted a body
+
+        if _RESP_HEADERS_HEADING_RE.match(section):
+            resp = responses.setdefault("200", {"description": "Response 200"})
+            hdrs = resp.setdefault("headers", {})
+            for hm in _BACKTICK_HEADER_RE.finditer(section):
+                name, value = hm.group(1).strip(), hm.group(2).strip()
+                hdrs.setdefault(name, {"schema": {"type": "string"}, "example": value})
+            continue  # remove section
+
+        kept.append(section)
+
+    remaining = "".join(kept)
+    for cm in _PROSE_HTTP_CODE_RE.finditer(remaining):
+        code = cm.group(1)
+        if code not in responses:
+            responses[code] = {"description": "more detail in path description"}
+
+    new_op = dict(operation)
+    new_description = remaining.strip()
+    if new_description:
+        new_op["description"] = new_description
+    elif "description" in new_op:
+        del new_op["description"]
+    if responses:
+        new_op["responses"] = responses
+    return new_op
+
+
+def _promote_response_descriptions(spec: dict) -> dict:
+    """Walk all operations and promote ### Response sections into the responses object."""
+    _methods = {"get", "post", "put", "delete", "patch", "options", "head"}
+    for path_item in spec.get("paths", {}).values():
+        for method, operation in path_item.items():
+            if isinstance(operation, dict) and method in _methods:
+                path_item[method] = extract_op_response_details(operation)
+    return spec
+
+
+# ─── Description cleaning ────────────────────────────────────────────────────
 
 _BARE_JSON_LINE = _re.compile(r"^\s*[{\[]")
 
