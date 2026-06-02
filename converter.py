@@ -190,121 +190,61 @@ def apiary_to_openapi_skeleton(
     version: str = "1.0.0",
 ) -> dict:
     """
-    Build an OpenAPI 3.0.0 skeleton from Apiary Refract JSON.
+    Build an OpenAPI 3.0.0 skeleton from Apiary JSON (jsapi.apiary.io format).
 
-    Extracts paths, HTTP methods, summaries, and response status codes.
-    Response schemas are left as TODO placeholders — refine manually or via
-    live testing. Pipe the result through convert_openapi_spec() for standard
-    enhancements (summary injection, schema extraction).
+    Extracts paths, HTTP methods, summaries, and response status codes from
+    the resourceGroups → resources → actions → examples hierarchy. Response
+    schemas are left as TODO placeholders — refine manually or via live testing.
+    Pipe the result through convert_openapi_spec() for standard enhancements.
     """
-    title = _refract_api_title(apiary_json)
-    paths = _refract_extract_paths(apiary_json)
+    title = str(apiary_json.get("name", "")) or "Untitled API"
+    paths = _extract_apiary_paths(apiary_json)
     return {
         "openapi": "3.0.0",
-        "info": {"title": title or "Untitled API", "version": version},
+        "info": {"title": title, "version": version},
         "servers": servers or [],
         "paths": paths,
     }
 
 
-def _refract_string_value(element) -> str:
-    """Extract a plain string from a Refract element or bare value."""
-    if element is None:
-        return ""
-    if isinstance(element, str):
-        return element
-    if isinstance(element, dict):
-        content = element.get("content", "")
-        if isinstance(content, str):
-            return content
-        if isinstance(content, list) and content:
-            return _refract_string_value(content[0])
-    return ""
-
-
-def _refract_walk(node, element_type: str):
-    """Recursively yield all Refract elements with the given element name."""
-    if isinstance(node, dict):
-        if node.get("element") == element_type:
-            yield node
-        for child in node.get("content", []) or []:
-            yield from _refract_walk(child, element_type)
-    elif isinstance(node, list):
-        for item in node:
-            yield from _refract_walk(item, element_type)
-
-
-def _refract_api_title(apiary_json: dict) -> str:
-    """Return the API title from a Refract document."""
-    if "name" in apiary_json:
-        return str(apiary_json["name"])
-    for category in _refract_walk(apiary_json, "category"):
-        title = _refract_string_value(category.get("meta", {}).get("title"))
-        if title:
-            return title
-    return ""
-
-
-def _refract_extract_paths(apiary_json: dict) -> dict:
+def _extract_apiary_paths(apiary_json: dict) -> dict:
     """
-    Extract OpenAPI-style paths from a Refract document.
+    Walk resourceGroups → resources → actions → examples to build OpenAPI paths.
 
-    Each resource → path; each transition → operation. Only the first
-    httpTransaction per (path, method) pair is used — duplicates in Apiary
-    typically represent request/response examples, not distinct operations.
+    Only the first action per (uri, method) pair is kept — Apiary sometimes
+    lists the same action multiple times with different example bodies.
     """
     paths: dict = {}
 
-    for resource in _refract_walk(apiary_json, "resource"):
-        href = _refract_string_value(
-            resource.get("attributes", {}).get("href")
-        ) or "/"
+    for group in apiary_json.get("resourceGroups", []):
+        for resource in group.get("resources", []):
+            uri = resource.get("uriTemplate", "/")
+            for action in resource.get("actions", []):
+                method = action.get("method", "GET").lower()
+                if uri not in paths:
+                    paths[uri] = {}
+                if method in paths[uri]:
+                    continue  # first action wins
 
-        for transition in _refract_walk(resource, "transition"):
-            meta = transition.get("meta", {})
-            summary = _refract_string_value(meta.get("title"))
-            description = _refract_string_value(meta.get("description"))
-
-            for transaction in _refract_walk(transition, "httpTransaction"):
-                content = transaction.get("content") or []
-
-                request = next(
-                    (c for c in content if isinstance(c, dict) and c.get("element") == "httpRequest"),
-                    None,
-                )
-                if request is None:
-                    continue
-
-                method = _refract_string_value(
-                    request.get("attributes", {}).get("method")
-                ).lower() or "get"
-
-                if href not in paths:
-                    paths[href] = {}
-                if method in paths[href]:
-                    continue  # first transaction wins
-
-                responses_raw = [
-                    c for c in content
-                    if isinstance(c, dict) and c.get("element") == "httpResponse"
-                ]
                 responses: dict = {}
-                for resp in responses_raw:
-                    code = _refract_string_value(
-                        resp.get("attributes", {}).get("statusCode")
-                    ) or "200"
-                    if code not in responses:
-                        responses[code] = {"description": "TODO: document response"}
+                for example in action.get("examples", []):
+                    for resp in example.get("responses", []):
+                        code = str(resp.get("status", "200"))
+                        if code not in responses:
+                            desc = resp.get("description") or "TODO: document response"
+                            responses[code] = {"description": desc}
 
                 if not responses:
                     responses["200"] = {"description": "TODO: document response"}
 
                 operation: dict = {"responses": responses}
-                if summary:
-                    operation["summary"] = summary
-                if description:
-                    operation["description"] = description
+                if action.get("name"):
+                    operation["summary"] = action["name"]
+                if action.get("description"):
+                    operation["description"] = action["description"]
 
-                paths[href][method] = operation
+                paths[uri][method] = operation
 
     return paths
+
+

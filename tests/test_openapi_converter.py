@@ -5,58 +5,40 @@ from openapi_spec_validator import validate
 from converter import convert_openapi_spec, fetch_apiary, apiary_to_openapi_skeleton
 
 
-# ─── Apiary fixtures ──────────────────────────────────────────────────────────
+# ─── Apiary fixtures (real jsapi.apiary.io format) ───────────────────────────
 
-_MINIMAL_REFRACT = {"element": "parseResult", "content": []}
+_MINIMAL_APIARY = {"name": "Test API", "resourceGroups": []}
 
-_FULL_REFRACT = {
-    "element": "parseResult",
-    "content": [{
-        "element": "category",
-        "meta": {"title": {"element": "string", "content": "Test API"}},
-        "content": [{
-            "element": "category",
-            "meta": {
-                "classes": {"element": "array", "content": [
-                    {"element": "string", "content": "resourceGroup"}
-                ]},
-                "title": {"element": "string", "content": "Tokens"},
-            },
-            "content": [{
-                "element": "resource",
-                "attributes": {
-                    "href": {"element": "string", "content": "/token/authenticate"}
-                },
-                "content": [{
-                    "element": "transition",
-                    "meta": {
-                        "title": {"element": "string", "content": "Create Token"},
-                        "description": {"element": "string", "content": "Generates a token."},
-                    },
-                    "content": [{
-                        "element": "httpTransaction",
-                        "content": [
-                            {
-                                "element": "httpRequest",
-                                "attributes": {"method": {"element": "string", "content": "POST"}},
-                                "content": [],
-                            },
-                            {
-                                "element": "httpResponse",
-                                "attributes": {"statusCode": {"element": "string", "content": "201"}},
-                                "content": [],
-                            },
-                            {
-                                "element": "httpResponse",
-                                "attributes": {"statusCode": {"element": "string", "content": "401"}},
-                                "content": [],
-                            },
-                        ],
-                    }],
-                }],
-            }],
-        }],
-    }],
+_APIARY_DOC = {
+    "name": "Test API",
+    "resourceGroups": [
+        {
+            "name": "Tokens",
+            "description": "",
+            "resources": [
+                {
+                    "name": "Token Collection",
+                    "uriTemplate": "/token/authenticate",
+                    "actions": [
+                        {
+                            "name": "Create Token",
+                            "method": "POST",
+                            "description": "Generates a token.",
+                            "examples": [
+                                {
+                                    "requests": [],
+                                    "responses": [
+                                        {"status": "201", "body": "", "schema": "", "description": "Created"},
+                                        {"status": "401", "body": "", "schema": "", "description": "Unauthorized"},
+                                    ],
+                                }
+                            ],
+                        }
+                    ],
+                }
+            ],
+        }
+    ],
 }
 
 
@@ -277,7 +259,7 @@ def test_no_duplicate_inline_schemas(spec_name):
 
 def test_apiary_skeleton_returns_openapi_dict():
     """Tracer bullet: produces a dict with the three required OpenAPI 3.0.0 top-level fields."""
-    result = apiary_to_openapi_skeleton(_MINIMAL_REFRACT)
+    result = apiary_to_openapi_skeleton(_MINIMAL_APIARY)
     assert result["openapi"] == "3.0.0"
     assert "info" in result
     assert "paths" in result
@@ -285,27 +267,27 @@ def test_apiary_skeleton_returns_openapi_dict():
 
 def test_apiary_skeleton_extracts_api_title():
     """API title comes from the top-level category's meta.title in the Refract tree."""
-    result = apiary_to_openapi_skeleton(_FULL_REFRACT)
+    result = apiary_to_openapi_skeleton(_APIARY_DOC)
     assert result["info"]["title"] == "Test API"
 
 
 def test_apiary_skeleton_extracts_path_and_method():
     """Resource href and httpRequest method map to an OpenAPI path operation."""
-    result = apiary_to_openapi_skeleton(_FULL_REFRACT)
+    result = apiary_to_openapi_skeleton(_APIARY_DOC)
     assert "/token/authenticate" in result["paths"]
     assert "post" in result["paths"]["/token/authenticate"]
 
 
 def test_apiary_skeleton_captures_operation_summary():
     """Transition meta.title becomes the OpenAPI operation summary."""
-    result = apiary_to_openapi_skeleton(_FULL_REFRACT)
+    result = apiary_to_openapi_skeleton(_APIARY_DOC)
     operation = result["paths"]["/token/authenticate"]["post"]
     assert operation["summary"] == "Create Token"
 
 
 def test_apiary_skeleton_captures_response_status_codes():
     """All httpResponse status codes from the transaction appear as documented responses."""
-    result = apiary_to_openapi_skeleton(_FULL_REFRACT)
+    result = apiary_to_openapi_skeleton(_APIARY_DOC)
     responses = result["paths"]["/token/authenticate"]["post"]["responses"]
     assert "201" in responses
     assert "401" in responses
@@ -314,7 +296,7 @@ def test_apiary_skeleton_captures_response_status_codes():
 def test_apiary_skeleton_piped_through_converter():
     """Skeleton from apiary_to_openapi_skeleton is accepted by convert_openapi_spec without error."""
     skeleton = apiary_to_openapi_skeleton(
-        _FULL_REFRACT,
+        _APIARY_DOC,
         servers=[{"url": "https://auth.anaplan.com"}],
     )
     result = convert_openapi_spec(skeleton)
@@ -328,7 +310,7 @@ def test_apiary_skeleton_passes_through_servers():
         {"url": "https://auth.anaplan.com", "description": "Default"},
         {"url": "https://eu3.auth.anaplan.com", "description": "EU3"},
     ]
-    result = apiary_to_openapi_skeleton(_MINIMAL_REFRACT, servers=servers)
+    result = apiary_to_openapi_skeleton(_MINIMAL_APIARY, servers=servers)
     assert result["servers"] == servers
 
 
