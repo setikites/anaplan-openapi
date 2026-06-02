@@ -130,7 +130,30 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              example: application/json
+          content:
+            application/json:
+              example:
+                meta:
+                  schema: https://api.anaplan.com/2/0/objects/workspace
+                  paging:
+                    currentPageSize: 1
+                    totalSize: 1
+                    offset: 0
+                status:
+                  code: 200
+                  message: Success
+                workspaces:
+                - id: 8a8b8c8d8e8f8g8i
+                  name: Financial Planning
+                  active: true
+                  sizeAllowance: 1073741824
+                  currentSize: 873741824
       tags:
       - General Workspace & Model Metadata
       description: "## List user workspaces\n\n`/workspaces`  \n\nRetrieves all workspaces a user has access to within the\
@@ -141,11 +164,7 @@ paths:
         \ --- |\n| `tenantDetails` | <br><br>*   Optional<br>*   Type: Boolean<br>*   Description: When set to true, this\
         \ call returns an estimate of the current size of the workspace from all the models it contains. When set to false,\
         \ or not defined, this call does not return an estimated current size of the workspace.<br>*   Example: true<br><br>\
-        \ |\n\n### Response headers\n\n`Content-Type: application/json`\n\n### Response 200 body\n\n```\n{\n  \"meta\": {\n\
-        \    \"schema\": \"https://api.anaplan.com/2/0/objects/workspace\",\n    \"paging\": {\n      \"currentPageSize\"\
-        : 1,\n      \"totalSize\": 1,\n      \"offset\": 0\n    }\n  },\n  \"status\": {\n    \"code\": 200,\n    \"message\"\
-        : \"Success\"\n  },\n  \"workspaces\": [\n    {\n    \"id\": \"8a8b8c8d8e8f8g8i\",\n    \"name\": \"Financial Planning\"\
-        ,\n    \"active\": true,\n    \"sizeAllowance\": 1073741824,\n    \"currentSize\": 873741824\n    }\n  ]\n}\n\n```"
+        \ |"
   /2/0/workspaces/{workspaceId}:
     get:
       summary: Get single workspace metadata
@@ -209,7 +228,26 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          content:
+            application/json:
+              example:
+                meta:
+                  schema: https://api.anaplan.com/2/0/objects/dimension
+                status:
+                  code: 200
+                  message: Success
+                items:
+                - name: South
+                  id: '208000000001'
+                  code: S
+                - name: West
+                  id: '208000000004'
+                  code: W
+        '404':
+          description: more detail in path description
+        '400':
+          description: more detail in path description
       tags:
       - Model Metadata
       - List Metadata
@@ -235,11 +273,7 @@ paths:
         \ strings that match the name of a returned item. |\n| `codes` | The case-insensitive strings that match the code\
         \ of a returned item. |\n\nExample:\n\n```\n{\n    \"names\": [\"South\", \"East\"],\n    \"codes\": [\"N\", \"W\"\
         ]\n}\n\n```\n\nNote that the `names`, `codes`, or both fields in the request body must contain a non-empty value.\
-        \ If the request body does not include at least one of these fields, the response returns an error.\n\n### Response\
-        \ 200 Body\n\n```\n{\n  \"meta\" : {\n      \"schema\":\"https://api.anaplan.com/2/0/objects/dimension\"\n  },\n \
-        \ \"status\" : {\n    \"code\":200,\n    \"message\":\"Success\"\n  },\n  \"items\":[\n    {\n      \"name\":\"South\"\
-        ,\n      \"id\":\"208000000001\",\n      \"code\":\"S\"\n    },\n    {\n      \"name\":\"West\",\n      \"id\":\"\
-        208000000004\",\n      \"code\":\"W\"\n    }\n  ]\n}\n```"
+        \ If the request body does not include at least one of these fields, the response returns an error."
       requestBody:
         content:
           application/json:
@@ -289,7 +323,39 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              example: application/json
+          content:
+            application/json:
+              example:
+                meta:
+                  schema: https://api.anaplan.com/2/0/objects/dimension
+                status:
+                  code: 200
+                  message: Success
+                items:
+                - code: N
+                  id: '200000000001'
+                  name: North
+                - code: E
+                  id: '200000000002'
+                  name: East
+                - code: S
+                  id: '200000000003'
+                  name: South
+                - code: W
+                  id: '200000000004'
+                  name: West
+                - id: '200000000000'
+                  name: Total Company
+        '400':
+          description: more detail in path description
+        '429':
+          description: more detail in path description
       tags:
       - Model Metadata
       - List Metadata
@@ -312,14 +378,7 @@ paths:
         ### Request parameters\n\n| **Parameter** | **Details** |\n| --- | --- |\n| `{modelId}` | <br><br>*   Required<br>*\
         \   Type: String<br>*   Description: the ID for the model<br>*   Example: `75A40874E6B64FA3AE074327899685`<br><br>\
         \ |\n| `{dimensionId}` | <br><br>*   Required<br>*   Type: Number<br>*   Description: the ID for the dimension<br>*\
-        \   Example: `101000000028`<br><br> |\n\n### Response headers\n\n`Content-Type: application/json`\n\n### Response\
-        \ 200 Body\n\n```\n{\n  \"meta\" : {\n    \"schema\" : \"https://api.anaplan.com/2/0/objects/dimension\"\n  },\n \
-        \ \"status\" : {\n    \"code\" : 200,\n    \"message\" : \"Success\"\n  },\n  \"items\" : [\n    {\n      \"code\"\
-        \ : \"N\",\n      \"id\" : \"200000000001\",\n      \"name\" : \"North\"\n    },\n    {\n      \"code\" : \"E\",\n\
-        \      \"id\" : \"200000000002\",\n      \"name\" : \"East\"\n    },\n    {\n      \"code\" : \"S\",\n      \"id\"\
-        \ : \"200000000003\",\n      \"name\" : \"South\"\n    },\n    {\n      \"code\" : \"W\",\n      \"id\" : \"200000000004\"\
-        ,\n      \"name\" : \"West\"\n    },\n    {\n      \"id\" : \"200000000000\",\n      \"name\" : \"Total Company\"\n\
-        \    }\n  ]\n}\n```"
+        \   Example: `101000000028`<br><br> |"
   /2/0/models/{modelId}/views/{viewId}/dimensions/{dimensionId}/items:
     get:
       summary: Retrieve selected items in a dimension
@@ -331,7 +390,22 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          content:
+            application/json:
+              example:
+                meta:
+                  schema: https://api.anaplan.com/2/0/objects/dimension
+                status:
+                  code: 200
+                  message: Success
+                items:
+                - id: '220000000001'
+                  name: England
+                - id: '220000000002'
+                  name: Wales
+        '429':
+          description: more detail in path description
       tags:
       - Model Metadata
       - List Metadata
@@ -360,11 +434,7 @@ paths:
         \   Type: String<br>*   Description: the ID for the model<br>*   Example: `75A40874E6B64FA3AE074327899685`<br><br>\
         \ |\n| `{viewId}` | <br><br>*   Required<br>*   Type: Number<br>*   Description: the ID for the view<br>*   Example:\
         \ `102000000000`<br><br> |\n| `{dimensionId}` | <br><br>*   Required<br>*   Type: Number<br>*   Description: the ID\
-        \ for the dimension<br>*   Example: `101000000028`<br><br> |\n\n### Response header\n\n`Content-Type: application/json`\n\
-        \n### Response 200 Body\n\n```\n{\n  \"meta\": {\n    \"schema\": \"https://api.anaplan.com/2/0/objects/dimension\"\
-        \n  },\n  \"status\": {\n    \"code\": 200,\n    \"message\": \"Success\"\n  },\n  \"items\": [{\n      \"id\": \"\
-        220000000001\",\n      \"name\": \"England\"\n    },\n    {\n      \"id\": \"220000000002\",\n      \"name\": \"Wales\"\
-        \n    }]\n}\n\n```"
+        \ for the dimension<br>*   Example: `101000000028`<br><br> |\n\n### Response header\n\n`Content-Type: application/json`"
     parameters:
     - name: modelId
       in: path
@@ -395,28 +465,82 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          content:
+            application/json:
+              example:
+                meta:
+                  paging:
+                    currentPageSize: 5
+                    offset: 0
+                    totalSize: 5
+                  schema: https://api.anaplan.com/2/0/models/75A40874E6B64FA3AE0743278996850F/objects/list
+                status:
+                  code: 200
+                  message: Success
+                lists:
+                - id: '101000000000'
+                  name: Organization
+                - id: '101000000001'
+                  name: opportunities
+                - id: '101000000002'
+                  name: sales rep
+                - id: '101000000003'
+                  name: Bakery
+                - id: '101000000004'
+                  name: List2
       tags:
       - Model Metadata
       - List Metadata
-      description: "## Retrieve lists\n\n`/workspaces/{workspaceId}/models/{modelId}/lists`\n\nUse this call to retrieve lists\
-        \ for a specified workspace and model.\n\n### Request\n\n```\ncurl -X GET 'https://api.anaplan.com/2/0/workspaces/{workspaceId}/models/{modelId}/lists'\
-        \ \\\n-H 'Accept: application/json' \\\n-H 'Authorization: AnaplanAuthToken {anaplan_auth_token}'\n```\n\n### Request\
-        \ headers\n\n| **Header** | **Details** |\n| --- | --- |\n| `Authorization: AnaplanAuthToken {anaplan_auth_token}`\
-        \ | <br><br>*   Required<br>*   Description: the Anaplan authentication token<br><br> |\n| `Accept: application/json`\
-        \ | <br><br>*   Required<br>*   Description: This indicates the preferred response is `application/json` format.<br><br>\
-        \ |\n\n### Request parameters\n\n| **Parameter** | **Details** |\n| --- | --- |\n| `{workspaceId}` | <br><br>*   Required<br>*\
-        \   Type: String<br>*   Description: The workspace ID<br>*   Example: `8a8196b15b7dbae6015b8694411d13fe`<br><br> |\n\
-        | `{modelId}` | <br><br>*   Required<br>*   Type: String<br>*   Description: the ID for the model<br>*   Example:\
-        \ `75A40874E6B64FA3AE074327899685`<br><br> |\n\n### Response 200 Body\n\n```\n{\n    \"meta\": {\n        \"paging\"\
-        : {\n            \"currentPageSize\": 5,\n            \"offset\": 0,\n            \"totalSize\": 5\n        },\n \
-        \       \"schema\": \"https://api.anaplan.com/2/0/models/75A40874E6B64FA3AE0743278996850F/objects/list\"\n    },\n\
-        \    \"status\": {\n        \"code\": 200,\n        \"message\": \"Success\"\n    },\n    \"lists\": [\n        {\n\
-        \            \"id\": \"101000000000\",\n            \"name\": \"Organization\"\n        },\n        {\n          \
-        \  \"id\": \"101000000001\",\n            \"name\": \"opportunities\"\n        },\n        {\n            \"id\":\
-        \ \"101000000002\",\n            \"name\": \"sales rep\"\n        },\n        {\n            \"id\": \"101000000003\"\
-        ,\n            \"name\": \"Bakery\"\n        },\n        {\n            \"id\": \"101000000004\",\n            \"\
-        name\": \"List2\"\n        }\n    ]\n}\n```"
+      description: '## Retrieve lists
+
+
+        `/workspaces/{workspaceId}/models/{modelId}/lists`
+
+
+        Use this call to retrieve lists for a specified workspace and model.
+
+
+        ### Request
+
+
+        ```
+
+        curl -X GET ''https://api.anaplan.com/2/0/workspaces/{workspaceId}/models/{modelId}/lists'' \
+
+        -H ''Accept: application/json'' \
+
+        -H ''Authorization: AnaplanAuthToken {anaplan_auth_token}''
+
+        ```
+
+
+        ### Request headers
+
+
+        | **Header** | **Details** |
+
+        | --- | --- |
+
+        | `Authorization: AnaplanAuthToken {anaplan_auth_token}` | <br><br>*   Required<br>*   Description: the Anaplan authentication
+        token<br><br> |
+
+        | `Accept: application/json` | <br><br>*   Required<br>*   Description: This indicates the preferred response is `application/json`
+        format.<br><br> |
+
+
+        ### Request parameters
+
+
+        | **Parameter** | **Details** |
+
+        | --- | --- |
+
+        | `{workspaceId}` | <br><br>*   Required<br>*   Type: String<br>*   Description: The workspace ID<br>*   Example:
+        `8a8196b15b7dbae6015b8694411d13fe`<br><br> |
+
+        | `{modelId}` | <br><br>*   Required<br>*   Type: String<br>*   Description: the ID for the model<br>*   Example:
+        `75A40874E6B64FA3AE074327899685`<br><br> |'
     parameters:
     - name: workspaceId
       in: path
@@ -441,7 +565,44 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              example: application/json
+          content:
+            application/json:
+              example:
+                meta:
+                  schema: https://api.anaplan.com/2/0/models/102B/objects/list
+                status:
+                  code: 200
+                  message: Success
+                metadata:
+                  id: '101000000001'
+                  name: Sales Reps
+                  properties:
+                  - name: Salesforce
+                    format: TEXT
+                    notes: ''
+                    referencedBy: ''
+                  - name: Mail
+                    format: TEXT
+                    notes: ''
+                    referencedBy: ''
+                  hasSelectiveAccess: false
+                  parent:
+                    id: '101000000000'
+                    name: Organization
+                  managedBy: ''
+                  numberedList: false
+                  useTopLevelAsPageDefault: false
+                  itemCount: 1
+                  workflowEnabled: false
+                  productionData: false
+        '429':
+          description: more detail in path description
       tags:
       - Model Metadata
       - List Metadata
@@ -476,17 +637,7 @@ paths:
         \ workspace ID<br>*   Example: `8a8196b15b7dbae6015b8694411d13fe`<br><br> |\n| `{modelId}` | <br><br>*   Required<br>*\
         \   Type: String<br>*   Description: the ID for the model<br>*   Example: `75A40874E6B64FA3AE074327899685`<br><br>\
         \ |\n| `{listId}` | <br><br>*   Required<br>*   Type: string<br>*   Description: The list ID.<br>*   Example: `101000000001`<br><br>\
-        \ |\n\n### Response headers\n\n`Content-Type: application/json`\n\n### Response 200 Body\n\n```\n{\n    \"meta\":\
-        \ {\n        \"schema\": \"https://api.anaplan.com/2/0/models/102B/objects/list\"\n    },\n    \"status\": {\n   \
-        \     \"code\": 200,\n        \"message\": \"Success\"\n    },\n    \"metadata\": {\n        \"id\": \"101000000001\"\
-        ,\n        \"name\": \"Sales Reps\",\n        \"properties\": [\n            {\n                \"name\": \"Salesforce\"\
-        ,\n                \"format\": \"TEXT\",\n                \"notes\": \"\",\n                \"referencedBy\": \"\"\
-        \n            },\n            {\n                \"name\": \"Mail\",\n                \"format\": \"TEXT\",\n    \
-        \            \"notes\": \"\",\n                \"referencedBy\": \"\"\n            }\n        ],\n        \"hasSelectiveAccess\"\
-        : false,\n        \"parent\": {\n            \"id\": \"101000000000\",\n            \"name\": \"Organization\"\n \
-        \       },\n        \"managedBy\": \"\",\n        \"numberedList\": false,\n        \"useTopLevelAsPageDefault\":\
-        \ false,\n        \"itemCount\": 1,\n        \"workflowEnabled\": false,\n        \"productionData\": false\n    }\n\
-        }\n```"
+        \ |"
     parameters:
     - name: workspaceId
       in: path
@@ -517,7 +668,31 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              example: application/json
+          content:
+            application/json:
+              example:
+                meta:
+                  paging:
+                    currentPageSize: 1
+                    offset: 0
+                    totalSize: 1
+                  schema: https://api.anaplan.com/2/0/objects/module
+                status:
+                  code: 200
+                  message: Success
+                modules:
+                - id: '102000000125'
+                  name: REV01 Price Book
+                - id: '102000000121'
+                  name: REV02 Volume Inputs
+        '429':
+          description: more detail in path description
       tags:
       - Model Metadata
       - Module & Saved View Metadata
@@ -531,12 +706,7 @@ paths:
         \ the Anaplan authentication token<br><br> |\n| `Accept: application/json` | <br><br>*   Required<br>*   Description:\
         \ This indicates the preferred response is `application/json` format.<br><br> |\n\n### Request parameters\n\n| **Parameter**\
         \ | **Details** |\n| --- | --- |\n| `{modelId}` | <br><br>*   Required<br>*   Type: String<br>*   Description: the\
-        \ ID for the model<br>*   Example: `75A40874E6B64FA3AE074327899685`<br><br> |\n\n### Response headers\n\n`Content-Type:\
-        \ application/json`\n\n### Response 200 Body\n\n```\n{\n  \"meta\": {\n    \"paging\": {\n      \"currentPageSize\"\
-        : 1,\n      \"offset\": 0,\n      \"totalSize\": 1\n    },\n    \"schema\": \"https://api.anaplan.com/2/0/objects/module\"\
-        \n  },\n  \"status\": {\n    \"code\": 200,\n    \"message\": \"Success\"\n  },\n  \"modules\": [{\n      \"id\":\
-        \ \"102000000125\",\n      \"name\": \"REV01 Price Book\"\n    },\n    {\n      \"id\": \"102000000121\",\n      \"\
-        name\": \"REV02 Volume Inputs\"\n    }]\n}\n```"
+        \ ID for the model<br>*   Example: `75A40874E6B64FA3AE074327899685`<br><br> |"
     parameters:
     - name: modelId
       in: path
@@ -560,7 +730,73 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          content:
+            application/json:
+              example:
+                meta:
+                  schema: https://api.anaplan.com/2/0/objects/lineItem
+                status:
+                  code: 200
+                  message: Success
+                items:
+                - moduleId: '102000000001'
+                  moduleName: module2
+                  id: '206000000006'
+                  name: lineitem-child
+                  isSummary: false
+                  startOfSection: false
+                  broughtForward: false
+                  useSwitchover: true
+                  breakback: false
+                  cellCount: 51
+                  version:
+                    name: All
+                    id: '16000000000'
+                  appliesTo:
+                  - name: org-sub1
+                    id: '109000000001'
+                  - name: linesubset1
+                    id: '114000000001'
+                  dataTags:
+                  - name: tag1
+                    id: '127000000002'
+                  - name: tag2
+                    id: '127000000001'
+                  - name: tag3
+                    id: '127000000000'
+                  referencedBy:
+                  - name: lineitem5
+                    id: '206000000005'
+                  parent:
+                    name: lineitem5
+                    id: '206000000005'
+                  readAccessDriver:
+                    name: lineitem2
+                    id: '206000000003'
+                  writeAccessDriver:
+                    name: lineitem2
+                    id: '206000000003'
+                  formula: 3 + 9
+                  format: NUMBER
+                  formatMetadata:
+                    dataType: NUMBER
+                    minimumSignificantDigits: 4
+                    decimalPlaces: -1
+                    negativeNumberNotation: MINUS_SIGN
+                    unitsType: NONE
+                    unitsDisplayType: NONE
+                    zeroFormat: ZERO
+                    comparisonIncrease: GOOD
+                    groupingSeparator: COMMA
+                    decimalSeparator: FULL_STOP
+                  summary: Sum
+                  timeScale: Month
+                  timeRange: timeRange1
+                  formulaScope: All Versions
+                  style: Normal
+                  code: code7
+                  notes: note1
       tags:
       - Model Metadata
       - Module & Saved View Metadata
@@ -575,33 +811,7 @@ paths:
         \   Type: String<br>*   Description: the model ID<br>*   Example: `75A40874E6B64FA3AE0743278996850F`<br><br> |\n|\
         \ `{moduleId}` | <br><br>*   Required<br>*   Type: String<br>*   Description: the model ID<br>*   Example: `89AA40874E6B64FA3AE07432789967048`<br><br>\
         \ |\n| includeAll | <br><br>*   Required<br>*   Type: boolean<br>*   Description: true or false<br>*   Example: `includeAll=true`<br><br><br><br>\
-        \ |\n\n### Response header\n\n`Content-Type: application/json`\n\n### Response 200 body\n\n```\n{\n  \"meta\": {\n\
-        \    \"schema\": \"https://api.anaplan.com/2/0/objects/lineItem\"\n  },\n  \"status\": {\n    \"code\": 200,\n   \
-        \ \"message\": \"Success\"\n  },\n  \"items\": [{\n            \"moduleId\": \"102000000001\",\n            \"moduleName\"\
-        : \"module2\",\n            \"id\": \"206000000006\",\n            \"name\": \"lineitem-child\",\n            \n \
-        \           \"isSummary\": false,\n            \"startOfSection\": false,\n            \"broughtForward\": false,\n\
-        \            \"useSwitchover\": true,\n            \"breakback\": false,\n            \n            \"cellCount\"\
-        : 51,\n            \n            \"version\": {\n                \"name\": \"All\",\n                \"id\": \"16000000000\"\
-        \n            },\n            \"appliesTo\": [\n                {\n                    \"name\": \"org-sub1\",\n \
-        \                   \"id\": \"109000000001\"\n                },\n                {\n                    \"name\"\
-        : \"linesubset1\",\n                    \"id\": \"114000000001\"\n                }\n            ],\n            \"\
-        dataTags\": [\n                {\n                    \"name\": \"tag1\",\n                    \"id\": \"127000000002\"\
-        \n                },\n                {\n                    \"name\": \"tag2\",\n                    \"id\": \"127000000001\"\
-        \n                },\n                {\n                    \"name\": \"tag3\",\n                    \"id\": \"127000000000\"\
-        \n                }\n            ],\n            \"referencedBy\": [\n                {\n                    \"name\"\
-        : \"lineitem5\",\n                    \"id\": \"206000000005\"\n                }\n            ],\n\n            \"\
-        parent\": {\n                \"name\": \"lineitem5\",\n                \"id\": \"206000000005\"\n            },\n\
-        \            \"readAccessDriver\": {\n                \"name\": \"lineitem2\",\n                \"id\": \"206000000003\"\
-        \n            },\n            \"writeAccessDriver\": {\n                \"name\": \"lineitem2\",\n               \
-        \ \"id\": \"206000000003\"\n            },\n            \n            \"formula\": \"3 + 9\",\n            \"format\"\
-        : \"NUMBER\",\n            \"formatMetadata\": {\n                \"dataType\": \"NUMBER\",\n                \"minimumSignificantDigits\"\
-        : 4,\n                \"decimalPlaces\": -1,\n                \"negativeNumberNotation\": \"MINUS_SIGN\",\n      \
-        \          \"unitsType\": \"NONE\",\n                \"unitsDisplayType\": \"NONE\",\n                \"zeroFormat\"\
-        : \"ZERO\",\n                \"comparisonIncrease\": \"GOOD\",\n                \"groupingSeparator\": \"COMMA\",\n\
-        \                \"decimalSeparator\": \"FULL_STOP\"\n            },\n            \n            \"summary\": \"Sum\"\
-        ,\n            \"timeScale\": \"Month\",\n            \"timeRange\": \"timeRange1\",            \n            \"formulaScope\"\
-        : \"All Versions\",\n            \"style\": \"Normal\",\n            \"code\": \"code7\",\n            \"notes\":\
-        \ \"note1\"\n  }   \n  ]\n}\n```"
+        \ |\n\n### Response header\n\n`Content-Type: application/json`"
     parameters:
     - name: modelId
       in: path
@@ -626,7 +836,42 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          content:
+            application/json:
+              example:
+                meta:
+                  paging:
+                    currentPageSize: 1
+                    offset: 0
+                    totalSize: 1
+                  schema: https://api.anaplan.com/2/0/objects/view
+                status:
+                  code: 200
+                  message: Success
+                views:
+                - code: ''
+                  id: '102000000000'
+                  name: StrategicPlanning
+                  moduleId: '102000000000'
+                - code: ''
+                  id: '207000000000'
+                  name: StrategicPlanning.UK Financial forecast
+                  moduleId: '102000000000'
+                - code: ''
+                  id: '207000000001'
+                  name: StrategicPlanning.EMEAforecastreport
+                  moduleId: '102000000000'
+                - code: ''
+                  id: '207000000002'
+                  name: StrategicPlanning.'accountSummary&overview/US$'
+                  moduleId: '102000000000'
+                - code: ''
+                  id: '237000000001'
+                  name: '''StrategicPlanning/2020''.''accountSummary&overview/US$'''
+                  moduleId: '102000000001'
+        '429':
+          description: more detail in path description
       tags:
       - Model Metadata
       - Module & Saved View Metadata
@@ -651,17 +896,7 @@ paths:
         | --- | --- |\n| `{includesubsidiaryviews}` | <br><br>*   Optional (default false)<br>*   Type: String<br>*   Description:\
         \ Whether the response should include unsaved subsidiary views. The field is interpreted as false if anything other\
         \ than `true` is specified<br>*   Example: `?includesubsidiaryviews=true`<br><br> |\n\n### Response header\n\n`Content-Type:\
-        \ application/json`\n\n### Response 200 Body\n\n```\n{\n  \"meta\": {\n    \"paging\": {\n      \"currentPageSize\"\
-        : 1,\n      \"offset\": 0,\n      \"totalSize\": 1\n    },\n    \"schema\": \"https://api.anaplan.com/2/0/objects/view\"\
-        \n  },\n  \"status\": {\n    \"code\": 200,\n    \"message\": \"Success\"\n  },\n  \"views\": [\n    {\n      \"code\"\
-        : \"\",\n      \"id\": \"102000000000\",\n      \"name\": \"StrategicPlanning\",\n      \"moduleId\": \"102000000000\"\
-        \n    },\n    {\n      \"code\": \"\",\n      \"id\": \"207000000000\",\n      \"name\": \"StrategicPlanning.UK Financial\
-        \ forecast\",\n      \"moduleId\": \"102000000000\"\n    },\n    {\n      \"code\": \"\",\n      \"id\": \"207000000001\"\
-        ,\n      \"name\": \"StrategicPlanning.EMEAforecastreport\",\n      \"moduleId\": \"102000000000\"\n    },\n    {\n\
-        \      \"code\": \"\",\n      \"id\": \"207000000002\",\n      \"name\": \"StrategicPlanning.'accountSummary&overview/US$'\"\
-        ,\n      \"moduleId\": \"102000000000\"\n    },\n    {\n      \"code\": \"\",\n      \"id\": \"237000000001\",\n \
-        \     \"name\": \"'StrategicPlanning/2020'.'accountSummary&overview/US$'\",\n      \"moduleId\": \"102000000001\"\n\
-        \    }\n  ]\n}\n\n```"
+        \ application/json`"
     parameters:
     - name: workspaceId
       in: path
@@ -686,7 +921,14 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              example: application/json
+        '429':
+          description: more detail in path description
       tags:
       - Model Metadata
       - Module & Saved View Metadata
@@ -708,13 +950,12 @@ paths:
         \n| **Parameter** | **Details** |\n| --- | --- |\n| `{modelId}` | <br><br>*   Required<br>*   Type: String<br>*  \
         \ Description: the ID for the model<br>*   Example: `75A40874E6B64FA3AE074327899685`<br><br> |\n| `{viewId}` | <br><br>*\
         \   Required<br>*   Type: Number<br>*   Description: the ID for the view<br>*   Example: `102000000000`<br><br> |\n\
-        \n### Response headers\n\n`Content-Type: application/json`\n\n### Response 200 Body\n\n```\n{\n  \"meta\": {\n   \
-        \ \"schema\": \"https://api.anaplan.com/2/0/objects/view\"\n  },\n  \"status\": {\n    \"code\": 200,\n    \"message\"\
-        : \"Success\"\n  },\n  \"viewName\": \"REV01 Price Book\",\n  \"viewId\" : \"102000000000\"\n  \"rows\": [\n    {\n\
-        \      \"id\": \"101000000000\",\n      \"name\": \"Products\"\n    },\n    {\n      \"id\": \"101000000003\",\n \
-        \     \"name\": \"Regions\"\n    }\n  ],\n  \"columns\": [\n    {\n      \"id\": \"101999999999\",\n      \"name\"\
-        : \"Line items\"\n    }\n  ],\n  \"pages\": [\n    {\n      \"id\": \"101000000001\",\n      \"name\": \"Versions\"\
-        \n    }\n  ],\n}\n\n```"
+        \n### Response 200 Body\n\n```\n{\n  \"meta\": {\n    \"schema\": \"https://api.anaplan.com/2/0/objects/view\"\n \
+        \ },\n  \"status\": {\n    \"code\": 200,\n    \"message\": \"Success\"\n  },\n  \"viewName\": \"REV01 Price Book\"\
+        ,\n  \"viewId\" : \"102000000000\"\n  \"rows\": [\n    {\n      \"id\": \"101000000000\",\n      \"name\": \"Products\"\
+        \n    },\n    {\n      \"id\": \"101000000003\",\n      \"name\": \"Regions\"\n    }\n  ],\n  \"columns\": [\n   \
+        \ {\n      \"id\": \"101999999999\",\n      \"name\": \"Line items\"\n    }\n  ],\n  \"pages\": [\n    {\n      \"\
+        id\": \"101000000001\",\n      \"name\": \"Versions\"\n    }\n  ],\n}\n\n```"
     parameters:
     - name: modelId
       in: path
@@ -744,7 +985,30 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          content:
+            application/json:
+              example:
+                meta:
+                  paging:
+                    currentPageSize: 1
+                    offset: 0
+                    totalSize: 1
+                  schema: https://api.anaplan.com/2/0/objects/view
+                status:
+                  code: 200
+                  message: Success
+                views:
+                - code: ''
+                  id: '102000000000'
+                  name: default
+                  moduleId: '102000000000'
+                - code: ''
+                  id: '203000000000'
+                  name: SavedView
+                  moduleId: '102000000000'
+        '429':
+          description: more detail in path description
       tags:
       - Model Metadata
       - Module & Saved View Metadata
@@ -766,12 +1030,7 @@ paths:
         \ `102000000028`<br><br> |\n| `{includesubsidiaryviews}` | <br><br>*   Optional (default false)<br>*   Type: String<br>*\
         \   Description: Whether the response should include unsaved subsidiary views. The field is interpreted as false if\
         \ anything other than `true` is specified<br>*   Example: `?includesubsidiaryviews=true`<br><br> |\n\n### Response\
-        \ header\n\n`Content-Type: application/json`\n\n### Response 200 Body\n\n```\n{\n  \"meta\": {\n    \"paging\": {\n\
-        \      \"currentPageSize\": 1,\n      \"offset\": 0,\n      \"totalSize\": 1\n    },\n    \"schema\": \"https://api.anaplan.com/2/0/objects/view\"\
-        \n  },\n  \"status\": {\n    \"code\": 200,\n    \"message\": \"Success\"\n  },\n  \"views\": [\n    {\n      \"code\"\
-        : \"\",\n      \"id\": \"102000000000\",\n      \"name\": \"default\",\n      \"moduleId\": \"102000000000\"\n   \
-        \ },\n    {\n      \"code\": \"\",\n      \"id\": \"203000000000\",\n      \"name\": \"SavedView\",\n      \"moduleId\"\
-        : \"102000000000\"\n    }\n  ]\n}\n\n```"
+        \ header\n\n`Content-Type: application/json`"
     parameters:
     - name: modelId
       in: path
@@ -796,7 +1055,47 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              example: application/json
+          content:
+            application/json:
+              example:
+                meta:
+                  schema: https://api.anaplan.com/2/0/objects/lineItem
+                status:
+                  code: 200
+                  message: Success
+                items:
+                - moduleId: '102000000000'
+                  moduleName: Sales Entry
+                  id: '206000000000'
+                  name: Quantity Sold
+                - moduleId: '102000000000'
+                  moduleName: Sales Entry
+                  id: '206000000001'
+                  name: Price
+                - moduleId: '102000000000'
+                  moduleName: Sales Entry
+                  id: '206000000002'
+                  name: Revenue
+                - moduleId: '102000000001'
+                  moduleName: Profit
+                  id: '208000000000'
+                  name: Commission
+                - moduleId: '102000000001'
+                  moduleName: Profit
+                  id: '208000000001'
+                  name: Cost
+                - moduleId: '102000000001'
+                  moduleName: Profit
+                  id: '208000000002'
+                  name: Profit
+        '429':
+          description: more detail in path description
       tags:
       - Model Metadata
       - Line Item Metadata
@@ -814,19 +1113,7 @@ paths:
         \ This indicates the preferred response is either `application/json` format. Note that this call only outputs in `application/json`\
         \ format.<br><br> |\n\n### Request parameters\n\n| **Parameter** | **Details** |\n| --- | --- |\n| `{modelId}` | <br><br>*\
         \   Required<br>*   Type: String<br>*   Description: the ID for the model<br>*   Example: `75A40874E6B64FA3AE0743278996850F`<br><br>\
-        \ |\n\n### Response headers\n\n`Content-Type: application/json`\n\n### Response 200 Body\n\n```\n{\n    \"meta\":\
-        \ {\n        \"schema\": \"https://api.anaplan.com/2/0/objects/lineItem\"\n    },\n    \"status\": {\n        \"code\"\
-        : 200,\n        \"message\": \"Success\"\n    },\n    \"items\": [\n        {\n            \"moduleId\": \"102000000000\"\
-        ,\n            \"moduleName\": \"Sales Entry\",\n            \"id\": \"206000000000\",\n            \"name\": \"Quantity\
-        \ Sold\"\n        },\n        {\n            \"moduleId\": \"102000000000\",\n            \"moduleName\": \"Sales\
-        \ Entry\",\n            \"id\": \"206000000001\",\n            \"name\": \"Price\"\n        },\n        {\n      \
-        \      \"moduleId\": \"102000000000\",\n            \"moduleName\": \"Sales Entry\",\n            \"id\": \"206000000002\"\
-        ,\n            \"name\": \"Revenue\"\n        },\n        {\n            \"moduleId\": \"102000000001\",\n       \
-        \     \"moduleName\": \"Profit\",\n            \"id\": \"208000000000\",\n            \"name\": \"Commission\"\n \
-        \       },\n        {\n            \"moduleId\": \"102000000001\",\n            \"moduleName\": \"Profit\",\n    \
-        \        \"id\": \"208000000001\",\n            \"name\": \"Cost\"\n        },\n        {\n            \"moduleId\"\
-        : \"102000000001\",\n            \"moduleName\": \"Profit\",\n            \"id\": \"208000000002\",\n            \"\
-        name\": \"Profit\"\n        }\n    ]\n}\n\n```"
+        \ |"
     parameters:
     - name: modelId
       in: path
@@ -884,7 +1171,25 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              example: application/json
+          content:
+            application/json:
+              example:
+                meta:
+                  schema: https://api.anaplan.com/2/0/objects/dimension
+                status:
+                  code: 200
+                  message: Success
+                items:
+                - id: '220000000001'
+                  name: England
+                - id: '220000000002'
+                  name: Wales
       tags:
       - Model Metadata
       - Line Item Metadata
@@ -912,10 +1217,7 @@ paths:
         \ ID for the model<br>*   Example: `75A40874E6B64FA3AE0743278996850F`<br><br> |\n| `{lineItemId}` | <br><br>*   Required<br>*\
         \   Type: `Number`<br>*   Description: the line item ID<br>*   Example: `208000000000`<br><br> |\n| `{dimensionId}`\
         \ | <br><br>*   Required<br>*   Type: `Number`<br>*   Description: the dimension ID<br>*   Example: `101000000028`<br><br>\
-        \ |\n\n### Response headers\n\n`Content-Type: application/json`\n\n### Response 200 Body\n\n```\n{\n  \"meta\": {\n\
-        \    \"schema\": \"https://api.anaplan.com/2/0/objects/dimension\"\n  },\n  \"status\": {\n    \"code\": 200,\n  \
-        \  \"message\": \"Success\"\n  },\n  \"items\": [\n    {\n      \"id\": \"220000000001\",\n      \"name\": \"England\"\
-        \n    },\n    {\n      \"id\": \"220000000002\",\n      \"name\": \"Wales\"\n    }\n  ]\n}\n```"
+        \ |"
     parameters:
     - name: modelId
       in: path
@@ -946,7 +1248,41 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          content:
+            application/json:
+              example:
+                meta:
+                  schema: https://api.anaplan.com/2/0/objects/version
+                status:
+                  code: 200
+                  message: Success
+                versionMetadata:
+                - id: '107000000001'
+                  name: Actual
+                  isCurrent: false
+                  isActual: true
+                  editFrom:
+                    periodText: Start of Timescale
+                    date: '1900-01-01'
+                  editTo:
+                    periodText: End of Timescale
+                    date: '2399-12-31'
+                  notes: This version data is updated every Monday
+                - id: '107000000002'
+                  name: Variance
+                  isCurrent: false
+                  isActual: false
+                  switchover:
+                    periodText: Mar 20
+                    date: '2020-03-01'
+                  formula: Actual - 20
+                  editFrom:
+                    periodText: Jan 20
+                    date: '2020-01-01'
+                  editTo:
+                    periodText: Dec 20
+                    date: '2020-12-31'
       tags:
       - Model Metadata
       - Model Setting Metadata
@@ -961,20 +1297,7 @@ paths:
         \ | <br><br>*   Required<br>*   Description: This indicates the preferred response is either `application/json` format.\
         \ Note that this call only outputs in `application/json` format.<br><br> |\n\n### Request parameters\n\n| **Parameter**\
         \ | **Details** |\n| --- | --- |\n| `{modelId}` | <br><br>*   Required<br>*   Type: String<br>*   Description: the\
-        \ model ID<br>*   Example: `75A40874E6B64FA3AE074327899685`<br><br> |\n\n### Response header\n\n`Content-Type: application/json`\n\
-        \n### Response 200 body\n\nThe date format for `editFrom` and `editTo` depends on the model calendar setting.\n\n\
-        ```\n{\n    \"meta\": {\n        \"schema\": \"https://api.anaplan.com/2/0/objects/version\"\n    },\n    \"status\"\
-        : {\n        \"code\": 200,\n        \"message\": \"Success\"\n    },\n    \"versionMetadata\": [\n        {\n   \
-        \         \"id\": \"107000000001\",\n            \"name\": \"Actual\",\n            \"isCurrent\": false,\n      \
-        \      \"isActual\": true,\n            \"editFrom\": {\n                \"periodText\": \"Start of Timescale\",\n\
-        \                \"date\": \"1900-01-01\"\n            },\n            \"editTo\": {\n                \"periodText\"\
-        : \"End of Timescale\",\n                \"date\": \"2399-12-31\"\n            },\n            \"notes\": \"This version\
-        \ data is updated every Monday\"\n        },\n        {\n            \"id\": \"107000000002\",\n            \"name\"\
-        : \"Variance\",\n            \"isCurrent\": false,\n            \"isActual\": false,\n            \"switchover\":\
-        \ {\n                \"periodText\": \"Mar 20\",\n                \"date\": \"2020-03-01\"\n            },\n     \
-        \       \"formula\": \"Actual - 20\",\n            \"editFrom\": {\n                \"periodText\": \"Jan 20\",\n\
-        \                \"date\": \"2020-01-01\"\n            },\n            \"editTo\": {\n                \"periodText\"\
-        : \"Dec 20\",\n                \"date\": \"2020-12-31\"\n            }\n        }\n    ]\n}\n```"
+        \ model ID<br>*   Example: `75A40874E6B64FA3AE074327899685`<br><br> |\n\n### Response header\n\n`Content-Type: application/json`"
     parameters:
     - name: modelId
       in: path
@@ -993,7 +1316,26 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              example: application/json
+          content:
+            application/json:
+              example:
+                meta:
+                  schema: https://api.anaplan.com/2/0/objects/currentPeriod
+                status:
+                  code: 200
+                  message: Success
+                currentPeriod:
+                  periodText: May 20
+                  lastDay: '2020-05-31'
+                  calendarType: Calendar Months/Quarters/Years
+        '429':
+          description: more detail in path description
       tags:
       - Model Metadata
       - Model Setting Metadata
@@ -1010,11 +1352,7 @@ paths:
         \ |\n\n### Request parameters\n\n| **Parameter** | **Details** |\n| --- | --- |\n| `{workspaceId}` | <br><br>*   Required<br>*\
         \   Type: String<br>*   Description: The workspace ID<br>*   Example: `8a8196b15b7dbae6015b8694411d13fe`<br><br> |\n\
         | `{modelId}` | <br><br>*   Required<br>*   Type: String<br>*   Description: the ID for the model<br>*   Example:\
-        \ `75A40874E6B64FA3AE074327899685`<br><br> |\n\n### Response headers\n\n`Content-Type: application/json`\n\n### Response\
-        \ 200 Body\n\n```\n{\n  \"meta\" : {\n    \"schema\" : \"https://api.anaplan.com/2/0/objects/currentPeriod\"\n  },\n\
-        \  \"status\" : {\n    \"code\" : 200,\n    \"message\" : \"Success\"\n  },\n  \"currentPeriod\" : {\n    \"periodText\"\
-        \ : \"May 20\",\n    \"lastDay\" : \"2020-05-31\",\n    \"calendarType\" : \"Calendar Months/Quarters/Years\"\n  }\n\
-        }\n```"
+        \ `75A40874E6B64FA3AE074327899685`<br><br> |"
     parameters:
     - name: workspaceId
       in: path
@@ -1039,7 +1377,25 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              example: application/json
+          content:
+            application/json:
+              example:
+                meta:
+                  schema: https://api.anaplan.com/2/0/objects/modelCalendar
+                status:
+                  code: 200
+                  message: Success
+                modelCalendar:
+                  fiscalYear:
+                    year: FY21
+                    startDate: '2021-01-01'
+                    endDate: '2021-12-31'
       tags:
       - Model Metadata
       - Model Setting Metadata
@@ -1054,11 +1410,7 @@ paths:
         \ | <br><br>*   Optional<br><br> |\n\n### Request parameters\n\n| **Parameter** | **Details** |\n| --- | --- |\n|\
         \ `{workspaceId}` | <br><br>*   Required<br>*   Type: String<br>*   Description: The workspace ID<br>*   Example:\
         \ `8a8196b15b7dbae6015b8694411d13fe`<br><br> |\n| `{modelId}` | <br><br>*   Required<br>*   Type: String<br>*   Description:\
-        \ the model ID<br>*   Example: `75A40874E6B64FA3AE074327899685`<br><br> |\n\n### Response headers\n\n`Content-Type:\
-        \ application/json`\n\n### Response 200 Body\n\n```\n{\n    \"meta\": {\n        \"schema\": \"https://api.anaplan.com/2/0/objects/modelCalendar\"\
-        \n    },\n    \"status\": {\n        \"code\": 200,\n        \"message\": \"Success\"\n    },\n    \"modelCalendar\"\
-        : {\n        \"fiscalYear\": {\n            \"year\": \"FY21\",\n            \"startDate\": \"2021-01-01\",\n    \
-        \        \"endDate\": \"2021-12-31\"\n        }\n    }\n}\n\n```\n\n### Example 1: Calendar Type: weeks 4-4-5,4-5-4\
+        \ the model ID<br>*   Example: `75A40874E6B64FA3AE074327899685`<br><br> |\n\n### Example 1: Calendar Type: weeks 4-4-5,4-5-4\
         \ or 5-4-4\n\n#### Model Calendar\n\nIn Anaplan, the **Current Fiscal Year** in the **Model Calendar** is set to *FY21:\
         \ 29 Mar 2020 - 27 Mar 2021*.\n\n#### Response\n\n```\n{\n    \"meta\": {\n        \"schema\": \"https://api.anaplan.com/2/0/objects/modelCalendar\"\
         \n    },\n    \"status\": {\n        \"code\": 200,\n        \"message\": \"Success\"\n    },\n    \"modelCalendar\"\
@@ -1092,7 +1444,17 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          content:
+            application/json:
+              example:
+                actions:
+                - id: '117000000019'
+                  name: Delete From Org 2
+                - id: '117000000018'
+                  name: Open Other Buttons
+                - id: '117000000017'
+                  name: Delete Branch
       tags:
       - Model Metadata
       - Action Metadata
@@ -1106,10 +1468,7 @@ paths:
         \ {anaplan_auth_token}`\n*   `Content-Type:application/json`\n    \n\n#### Parameters\n\n| **Parameter** | **Description**\
         \ |\n| --- | --- |\n| `workspaceId` | <br><br>*   Required<br>*   Type: string<br>*   Description: The workspace ID<br>*\
         \   Example: `8a8b8c8d8e8f8g8i`<br><br> |\n| `modelId` | <br><br>*   Required<br>*   Type: string<br>*   Description:\
-        \ The model ID<br>*   Example: `75A40874E6B64FA3AE0743278996850F`<br><br> |\n\n#### Response 200 (application/json)\n\
-        \n```\n{\n   \"actions\":[\n      {\n         \"id\":\"117000000019\",\n         \"name\":\"Delete From Org 2\"\n\
-        \      },\n      {\n         \"id\":\"117000000018\",\n         \"name\":\"Open Other Buttons\"\n      },\n      {\n\
-        \         \"id\":\"117000000017\",\n         \"name\":\"Delete Branch\"\n      }\n   ]\n}\n\n```"
+        \ The model ID<br>*   Example: `75A40874E6B64FA3AE0743278996850F`<br><br> |\n\n#"
     parameters:
     - name: workspaceId
       in: path
@@ -1134,7 +1493,14 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          content:
+            application/json:
+              example:
+              - id: '118000000001'
+                name: Process1
+              - id: '118000000002'
+                name: Process2
       tags:
       - Model Metadata
       - Action Metadata
@@ -1147,9 +1513,7 @@ paths:
         \ {anaplan_auth_token}`\n*   `Content-Type:application/json`\n    \n\n#### Parameters\n\n| **Parameter** | **Description**\
         \ |\n| --- | --- |\n| `workspaceId` | <br><br>*   Required<br>*   Type: string<br>*   Description: The workspace ID<br>*\
         \   Example: `8a8b8c8d8e8f8g8i`<br><br> |\n| `modelId` | <br><br>*   Required<br>*   Type: string<br>*   Description:\
-        \ The model ID<br>*   Example: `75A40874E6B64FA3AE0743278996850F`<br><br> |\n\n#### Response 200 (application/json)\n\
-        \n```\n[\n   {\n      \"id\":\"118000000001\",\n      \"name\":\"Process1\"\n   },\n   {\n      \"id\":\"118000000002\"\
-        ,\n      \"name\":\"Process2\"\n   }\n]\n```"
+        \ The model ID<br>*   Example: `75A40874E6B64FA3AE0743278996850F`<br><br> |\n\n#"
     parameters:
     - name: workspaceId
       in: path
@@ -1174,7 +1538,24 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          content:
+            application/json:
+              example:
+                meta:
+                  paging:
+                    currentPageSize: 8
+                    offset: 0
+                    totalSize: 8
+                  schema: https://api.anaplan.com//2/0/models/75A40874E6B64FA3AE0743278996850F/objects/import
+                status:
+                  code: 200
+                  message: Success
+                imports:
+                - id: '112000000007'
+                  name: ORG2Test from Organization.txt
+                  importDataSourceId: '113000000006'
+                  importType: HIERARCHY_DATA
       tags:
       - Model Metadata
       - Action Metadata
@@ -1185,12 +1566,7 @@ paths:
         \ {anaplan_auth_token}`\n*   `Content-Type:application/json`\n    \n\n#### Parameters\n\n| **Parameter** | **Description**\
         \ |\n| --- | --- |\n| `workspaceId` | <br><br>*   Required<br>*   Type: string<br>*   Description: The workspace ID<br>*\
         \   Example: `8a8b8c8d8e8f8g8i`<br><br> |\n| `modelId` | <br><br>*   Required<br>*   Type: string<br>*   Description:\
-        \ The model ID<br>*   Example: `75A40874E6B64FA3AE0743278996850F`<br><br> |\n\n#### Response 200 (application/json)\n\
-        \n```\n{\n  \"meta\": {\n    \"paging\": {\n      \"currentPageSize\": 8,\n      \"offset\": 0,\n      \"totalSize\"\
-        : 8\n    },\n    \"schema\": \"https://api.anaplan.com//2/0/models/75A40874E6B64FA3AE0743278996850F/objects/import\"\
-        \n  },\n  \"status\": {\n    \"code\": 200,\n    \"message\": \"Success\"\n  },\n  \"imports\": [\n    {\n    \"id\"\
-        : \"112000000007\",\n    \"name\": \"ORG2Test from Organization.txt\",\n    \"importDataSourceId\": \"113000000006\"\
-        ,\n    \"importType\": \"HIERARCHY_DATA\"\n    }\n  ]\n}\n\n```"
+        \ The model ID<br>*   Example: `75A40874E6B64FA3AE0743278996850F`<br><br> |\n\n#"
     parameters:
     - name: workspaceId
       in: path
@@ -1215,7 +1591,19 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          content:
+            application/json:
+              example:
+                meta:
+                  schema: https://api.anaplan.com/2/0/models/F1111111C11111111B11111F1111E11F/objects/task
+                status:
+                  code: 200
+                  message: Success
+                task:
+                  taskId: 9530E1C5CAEB440DAC4E669178787160
+                  taskState: COMPLETE
+                  creationTime: 1535145471641
       tags:
       - Model Metadata
       - Action Metadata
@@ -1226,11 +1614,7 @@ paths:
         \   Type: string<br>*   Description: The workspace ID<br>*   Example: `8a8b8c8d8e8f8g8i`<br><br> |\n| `modelId` |\
         \ <br><br>*   Required<br>*   Type: string<br>*   Description: The model ID<br>*   Example: `75A40874E6B64FA3AE0743278996850F`<br><br>\
         \ |\n| `importId` | <br><br>*   Required<br>*   Type: number<br>*   Description: The model ID<br>*   Example: `112000000007`<br><br>\
-        \ |\n\n#### Response 200 (application/json)\n\n  \nThe IDs are sorted in ascending order of creation, identified by\
-        \ the `creationTime` value.\n\n```\n{\n  \"meta\": {\n    \"schema\": \"https://api.anaplan.com/2/0/models/F1111111C11111111B11111F1111E11F/objects/task\"\
-        \n  },\n  \"status\": {\n    \"code\": 200,\n    \"message\": \"Success\"\n  },\n  \"task\": {\n    \"taskId\": \"\
-        9530E1C5CAEB440DAC4E669178787160\",\n    \"taskState\": \"COMPLETE\",\n    \"creationTime\": 1535145471641\n  }\n\
-        }\n\n```"
+        \ |\n\n#"
     parameters:
     - name: workspaceId
       in: path
@@ -1260,7 +1644,11 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          content:
+            application/json:
+              example:
+                taskId: 5E6331685CC648A29B725923B8FAEA1C
       tags:
       - Bulk Write
       description: "## Start the import\n\n`/workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/`  \n\nYou\
@@ -1280,8 +1668,7 @@ paths:
         \ |\n| `importId` | <br><br>*   Required<br>*   Type: number<br>*   Description: The model ID<br>*   Example: `112000000007`<br><br>\
         \ |\n\n#### Request Body\n\n| **Body** | **Description** |\n| --- | --- |\n| `{\"localeName\": \"en_US\"}` | <br><br>*\
         \   Required<br>*   Description: Specifies the language to use for task status and error messages. `en_US` is the\
-        \ only supported language type.<br><br> |\n\n#### Response 200 (application/json)\n\n```\n            {\n        \
-        \     \"taskId\" : \"5E6331685CC648A29B725923B8FAEA1C\"\n            }\n\n```"
+        \ only supported language type.<br><br> |\n\n#"
   /2/0/workspaces/{workspaceId}/models/{modelId}/exports:
     get:
       summary: List the available export definitions as a JSON array
@@ -1293,7 +1680,26 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          content:
+            application/json:
+              example:
+                meta:
+                  paging:
+                    currentPageSize: 2
+                    offset: 0
+                    totalSize: 2
+                  schema: https://api.anaplan.com//2/0/models/75A40874E6B64FA3AE0743278996850F/objects/export
+                status:
+                  code: 200
+                  message: Success
+                exports:
+                - id: '116000000000'
+                  name: Deployed quota - Deployed quota.txt
+                  exportType: TABULAR_MULTI_COLUMN
+                - id: '116000000001'
+                  name: ExportGrid - ORG2Test.xls
+                  exportType: GRID_CURRENT_PAGE
       tags:
       - Model Metadata
       - Action Metadata
@@ -1307,12 +1713,7 @@ paths:
         \    \n\n#### Parameters\n\n| **Parameter** | **Description** |\n| --- | --- |\n| `workspaceId` |   <br>  <br>* Required\
         \  <br>* Type: string  <br>* Description: The workspace ID  <br>* Example: `8a8b8c8d8e8f8g8i`  <br>  <br> |\n| `modelId`\
         \ |   <br>  <br>* Required  <br>* Type: string  <br>* Description: The model ID  <br>* Example: `75A40874E6B64FA3AE0743278996850F`\
-        \  <br>  <br> |\n\n#### Response 200 (application/json)\n\n```\n{\n   \"meta\":{\n      \"paging\":{\n         \"\
-        currentPageSize\":2,\n         \"offset\":0,\n         \"totalSize\":2\n      },\n      \"schema\":\"https://api.anaplan.com//2/0/models/75A40874E6B64FA3AE0743278996850F/objects/export\"\
-        \n   },\n   \"status\":{\n      \"code\":200,\n      \"message\":\"Success\"\n   },\n   \"exports\":[\n      {\n \
-        \        \"id\":\"116000000000\",\n         \"name\":\"Deployed quota - Deployed quota.txt\",\n         \"exportType\"\
-        :\"TABULAR_MULTI_COLUMN\"\n      },\n      {\n         \"id\":\"116000000001\",\n         \"name\":\"ExportGrid -\
-        \ ORG2Test.xls\",\n         \"exportType\":\"GRID_CURRENT_PAGE\"\n      }\n   ]\n}\n\n```\n\n* * *"
+        \  <br>  <br> |\n\n#"
     parameters:
     - name: workspaceId
       in: path
@@ -1337,7 +1738,40 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              example: application/json
+          content:
+            application/json:
+              example:
+                meta:
+                  schema: https://api.anaplan.com/2/0/objects/process
+                status:
+                  code: 200
+                  message: Success
+                processMetadata:
+                  name: ProcessWithActions
+                  actions:
+                  - id: '112000000000'
+                    name: Sales from import-sales.csv
+                    actionType: IMPORT
+                    importDataSourceId: '113000000000'
+                    importType: MODULE_DATA
+                    importDataSource:
+                      importDataSourceId: '113000000000'
+                      type: FILE
+                  - id: '116000000000'
+                    name: Sales - Revenue.xls
+                    actionType: EXPORT
+                    exportType: GRID_CURRENT_PAGE
+                    exportFormat: application/vnd.ms-excel
+                    layout: GRID_CURRENT_PAGE
+                  - id: '117000000000'
+                    name: Delete from Products
+                    actionType: DELETE_BY_SELECTION
       tags:
       - Model Metadata
       - Action Metadata
@@ -1365,16 +1799,7 @@ paths:
         \ from the list of process for a model API<br><br> |\n| `{showImportDataSource}` | <br><br>*   Optional<br>*   Type:\
         \ Boolean<br>*   Description: defines whether the response should include additional information regarding the import\
         \ data source. The field is interpreted as `false` if anything other than `true` is specified.<br>*   Example: `?showImportDataSource=true`<br><br>\
-        \ |\n\n### Response headers\n\n`Content-Type: application/json`\n\n### Response 200 Body\n\n```\n{\n  \"meta\": {\n\
-        \    \"schema\": \"https://api.anaplan.com/2/0/objects/process\"\n  },\n  \"status\": {\n    \"code\": 200,\n    \"\
-        message\": \"Success\"\n  },\n  \"processMetadata\": {\n    \"name\": \"ProcessWithActions\",\n    \"actions\": [\n\
-        \      {\n        \"id\": \"112000000000\",\n        \"name\": \"Sales from import-sales.csv\",\n        \"actionType\"\
-        : \"IMPORT\",\n        \"importDataSourceId\": \"113000000000\",\n        \"importType\": \"MODULE_DATA\",\n     \
-        \   \"importDataSource\": {\n          \"importDataSourceId\": \"113000000000\",\n          \"type\": \"FILE\"\n \
-        \       }\n      },\n      {\n        \"id\": \"116000000000\",\n        \"name\": \"Sales - Revenue.xls\",\n    \
-        \    \"actionType\": \"EXPORT\",\n        \"exportType\": \"GRID_CURRENT_PAGE\",\n        \"exportFormat\": \"application/vnd.ms-excel\"\
-        ,\n        \"layout\": \"GRID_CURRENT_PAGE\"\n      },\n      {\n        \"id\": \"117000000000\",\n        \"name\"\
-        : \"Delete from Products\",\n        \"actionType\": \"DELETE_BY_SELECTION\"\n      }\n    ]\n  }\n}\n\n```"
+        \ |"
     parameters:
     - name: modelId
       in: path
@@ -1399,7 +1824,44 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          content:
+            application/json:
+              example:
+                meta:
+                  schema: https://api-stg.anaplan.com/2/0/models/28D168FB7385407A8AC0026487733564/objects/exportMetadata
+                status:
+                  code: 200
+                  message: Success
+                exportMetadata:
+                  columnCount: 16
+                  dataTypes:
+                  - ENTITY
+                  - MIXED
+                  - MIXED
+                  - MIXED
+                  - MIXED
+                  delimiter: '"'
+                  encoding: UTF-8
+                  exportFormat: text/csv
+                  headerNames:
+                  - ListWithSemiColonAsSeparator
+                  - Parent
+                  - Code
+                  - DepProjects
+                  - col1
+                  - col2
+                  - col3
+                  - col4
+                  - data
+                  - delete
+                  listNames:
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  rowCount: 20432
+                  separator: ','
       tags:
       - Model Metadata
       - Action Metadata
@@ -1414,16 +1876,7 @@ paths:
         \ |\n| --- | --- |\n| `workspaceId` | <br><br>*   Required<br>*   Type: string<br>*   Description: The workspace ID<br>*\
         \   Example: `8a8b8c8d8e8f8g8i`<br><br> |\n| `modelId` | <br><br>*   Required<br>*   Type: string<br>*   Description:\
         \ The model ID<br>*   Example: `75A40874E6B64FA3AE0743278996850F`<br><br> |\n| `exportId` | <br><br>*   Required<br>*\
-        \   Type: number<br>*   Description: The export definition ID<br>*   Example: `116000000001`<br><br> |\n\n#### Response\
-        \ 200 (application/json)\n\n```\n{\n   \"meta\":{\n      \"schema\":\"https://api-stg.anaplan.com/2/0/models/28D168FB7385407A8AC0026487733564/objects/exportMetadata\"\
-        \n   },\n   \"status\":{\n      \"code\":200,\n      \"message\":\"Success\"\n   },\n   \"exportMetadata\":{\n   \
-        \   \"columnCount\":16,\n      \"dataTypes\":[\n         \"ENTITY\",\n         \"MIXED\",\n         \"MIXED\",\n \
-        \        \"MIXED\",\n         \"MIXED\"\n      ],\n      \"delimiter\":\"\\\"\",\n      \"encoding\":\"UTF-8\",\n\
-        \      \"exportFormat\":\"text/csv\",\n      \"headerNames\":[\n         \"ListWithSemiColonAsSeparator\",\n     \
-        \    \"Parent\",\n         \"Code\",\n         \"DepProjects\",\n         \"col1\",\n         \"col2\",\n        \
-        \ \"col3\",\n         \"col4\",\n         \"data\",\n         \"delete\"\n      ],\n      \"listNames\":[\n      \
-        \   \"\",\n         \"\",\n         \"\",\n         \"\"\n      ],\n      \"rowCount\":20432,\n      \"separator\"\
-        :\",\"\n   }\n}\n```"
+        \   Type: number<br>*   Description: The export definition ID<br>*   Example: `116000000001`<br><br> |\n\n#"
     parameters:
     - name: workspaceId
       in: path
@@ -1454,7 +1907,41 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          content:
+            application/json:
+              example:
+                meta:
+                  schema: https://api.anaplan.com/2/0/models/75A40874E6B64FA3AE0743278996850F/objects/importMetadata
+                status:
+                  code: 200
+                  message: Success
+                importMetadata:
+                  name: Employees from Employees.txt
+                  type: FILE
+                  source:
+                    textEncoding: ISO-8859-1
+                    columnSeparator: "\t"
+                    textDelimiter: '"'
+                    headerRow: 1
+                    firstDataRow: 2
+                    decimalSeparator: .
+                    headerNames:
+                    - Name
+                    - Sales Region
+                    - Parent
+                    - Code
+                    - Sales Team
+                    - Start Date
+                    - Leave Date
+                    - Salary
+                    - Address
+                    - Quota
+                    - Bonus %
+                    - Sales Rep
+                    - Staff
+                    - Exec
+                    columnCount: 14
       tags:
       - Model Metadata
       - Action Metadata
@@ -1469,15 +1956,7 @@ paths:
         \   Type: string<br>*   Description: The workspace ID<br>*   Example: `8a8b8c8d8e8f8g8i`<br><br> |\n| `modelId` |\
         \ <br><br>*   Required<br>*   Type: string<br>*   Description: The model ID<br>*   Example: `75A40874E6B64FA3AE0743278996850F`<br><br>\
         \ |\n| `importId` | <br><br>*   Required<br>*   Type: number<br>*   Description: The model ID<br>*   Example: `112000000059`<br><br>\
-        \ |\n\n#### Response 200 (application/json)\n\n```\n{\n   \"meta\":{\n      \"schema\":\"https://api.anaplan.com/2/0/models/75A40874E6B64FA3AE0743278996850F/objects/importMetadata\"\
-        \n   },\n   \"status\":{\n      \"code\":200,\n      \"message\":\"Success\"\n   },\n   \"importMetadata\":{\n   \
-        \   \"name\":\"Employees from Employees.txt\",\n      \"type\":\"FILE\",\n      \"source\":{\n         \"textEncoding\"\
-        :\"ISO-8859-1\",\n         \"columnSeparator\":\"\\t\",\n         \"textDelimiter\":\"\\\"\",\n         \"headerRow\"\
-        :1,\n         \"firstDataRow\":2,\n         \"decimalSeparator\":\".\",\n         \"headerNames\":[\n            \"\
-        Name\",\n            \"Sales Region\",\n            \"Parent\",\n            \"Code\",\n            \"Sales Team\"\
-        ,\n            \"Start Date\",\n            \"Leave Date\",\n            \"Salary\",\n            \"Address\",\n \
-        \           \"Quota\",\n            \"Bonus %\",\n            \"Sales Rep\",\n            \"Staff\",\n           \
-        \ \"Exec\"\n         ],\n         \"columnCount\":14\n      }\n   }\n}\n```"
+        \ |\n\n#"
     parameters:
     - name: workspaceId
       in: path
@@ -1508,7 +1987,52 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          content:
+            application/json:
+              example:
+                meta:
+                  paging:
+                    currentPageSize: 9
+                    offset: 0
+                    totalSize: 9
+                  schema: https://api.anaplan.com//2/0/models/75A40874E6B64FA3AE0743278996850F/objects/file
+                status:
+                  code: 200
+                  message: Success
+                files:
+                - id: '113000000000'
+                  name: '#T & #R.csv'
+                  chunkCount: 0
+                  delimiter: '"'
+                  encoding: ISO-8859-1
+                  firstDataRow: 2
+                  format: txt
+                  headerRow: 1
+                  separator: ','
+                - id: '113000000001'
+                  name: '#T & #R-1.csv'
+                  chunkCount: 0
+                  delimiter: '"'
+                  encoding: ISO-8859-1
+                  firstDataRow: 2
+                  format: txt
+                  headerRow: 1
+                  separator: ','
+                - id: '113000000002'
+                  name: Sales metrics (1) - POC load.csv
+                  chunkCount: 0
+                  delimiter: '"'
+                  encoding: UTF-8
+                  firstDataRow: 2
+                  format: txt
+                  headerRow: 1
+                  separator: ','
+                - id: '116000000001'
+                  name: ExportGrid - ORG2Test.xls
+                  chunkCount: 1
+                  firstDataRow: 0
+                  headerRow: 0
       tags:
       - Model Metadata
       - File Metadata
@@ -1526,20 +2050,7 @@ paths:
         \   `Authorization:AnaplanAuthToken {anaplan_auth_token}`\n*   `Accept:application/json`\n    \n\n### Parameters\n\
         \n| **Parameter** | **Description** |\n| --- | --- |\n| `workspaceId` | <br><br>*   Required<br>*   Type: string<br>*\
         \   Description: The workspace ID<br>*   Example: `8a8b8c8d8e8f8g8i`<br><br> |\n| `modelId` | <br><br>*   Required<br>*\
-        \   Type: string<br>*   Description: The model ID<br>*   Example: `FC12345678912343455667`<br><br> |\n\n### Response\
-        \ 200 (application/json)\n\n```\n{\n  \"meta\": {\n    \"paging\": {\n      \"currentPageSize\": 9,\n      \"offset\"\
-        : 0,\n      \"totalSize\": 9\n    },\n      \"schema\": \"https://api.anaplan.com//2/0/models/75A40874E6B64FA3AE0743278996850F/objects/file\"\
-        \n    },\n    \"status\": {\n      \"code\": 200,\n      \"message\": \"Success\"\n    },\n  \"files\": [\n    {\n\
-        \      \"id\": \"113000000000\",\n      \"name\": \"#T & #R.csv\",\n      \"chunkCount\": 0,\n      \"delimiter\"\
-        : \"\\\"\",\n      \"encoding\": \"ISO-8859-1\",\n      \"firstDataRow\": 2,\n      \"format\": \"txt\",\n      \"\
-        headerRow\": 1,\n      \"separator\": \",\"\n    },\n    {\n      \"id\": \"113000000001\",\n      \"name\": \"#T\
-        \ & #R-1.csv\",\n      \"chunkCount\": 0,\n      \"delimiter\": \"\\\"\",\n      \"encoding\": \"ISO-8859-1\",\n \
-        \     \"firstDataRow\": 2,\n      \"format\": \"txt\",\n      \"headerRow\": 1,\n      \"separator\": \",\"\n    },\n\
-        \    {\n      \"id\": \"113000000002\",\n      \"name\": \"Sales metrics (1) - POC load.csv\",\n      \"chunkCount\"\
-        : 0,\n      \"delimiter\": \"\\\"\",\n      \"encoding\": \"UTF-8\",\n      \"firstDataRow\": 2,\n      \"format\"\
-        : \"txt\",\n      \"headerRow\": 1,\n      \"separator\": \",\"\n    },\n    {\n      \"id\": \"116000000001\",\n\
-        \      \"name\": \"ExportGrid - ORG2Test.xls\",\n      \"chunkCount\": 1,\n      \"firstDataRow\": 0,\n      \"headerRow\"\
-        : 0\n    }\n  ]\n}\n```"
+        \   Type: string<br>*   Description: The model ID<br>*   Example: `FC12345678912343455667`<br><br> |"
     parameters:
     - name: modelId
       in: path
@@ -1571,18 +2082,7 @@ paths:
         \ |\n| --- | --- |\n| `workspaceId` | <br><br>*   Required<br>*   Type: string<br>*   Description: The workspace ID<br>*\
         \   Example: `8a8b8c8d8e8f8g8i`<br><br> |\n| `modelId` | <br><br>*   Required<br>*   Type: string<br>*   Description:\
         \ The model ID<br>*   Example: `75A40874E6B64FA3AE0743278996850F`<br><br> |\n| `fileId` | <br><br>*   Required<br>*\
-        \   Type: number<br>*   Description: The file ID<br>*   Example: `113000000002`<br><br> |\n\n#### Response 204\n\n\
-        * * *\n\n## Delete Actions\n\n* * *\n\nView the following endpoints for further details on delete actions APIs:\n\n\
-        *   [List the actions in the model as a JSON array](https://anaplanbulkapi20.docs.apiary.io/#ListActionsInAModel)\n\
-        *   [Start deletion](https://anaplanbulkapi20.docs.apiary.io/#StartDeletion)\n*   [Monitor the deletion tasks](https://anaplanbulkapi20.docs.apiary.io/#MonitorDeletionTasks)\n\
-        \n* * *\n\nYou can use this API to automate the the removal of specific items from a list using the 'Delete from List\
-        \ Using Selection' functionality in Anaplan.\n\n**Tip:** To use this functionality, an appropriate 'Delete from list\
-        \ Using Selection' action must exist in the model that you want to delete from a list. You can create a control module\
-        \ to select the items to be deleted from the list and then create a 'Delete from List using Selection' action. See\
-        \ [Delete from List using Selection](https://help.anaplan.com/anapedia/default.htm#cshid=1196) for further information.\n\
-        \nTo carry out a delete operation using the API:\n\n1.  [Verify that the delete action is available](https://anaplanbulkapi20.docs.apiary.io/#list-available-operations).\n\
-        2.  [Run the delete action](https://anaplanbulkapi20.docs.apiary.io/#Start-deletion).\n3.  [Get a list of deletion\
-        \ tasks](https://anaplanbulkapi20.docs.apiary.io/#Get-deletion-tasks) and [monitor each deletion task](https://anaplanbulkapi20.docs.apiary.io/#Monitor-deletion-task)."
+        \   Type: number<br>*   Description: The file ID<br>*   Example: `113000000002`<br><br> |\n\n#"
     parameters:
     - name: workspaceId
       in: path
@@ -1612,7 +2112,25 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          content:
+            application/json:
+              example:
+                meta:
+                  schema: https://api.anaplan.com/2/0/models/75A40874E6B64FA3AE0743278996850F/objects/file
+                status:
+                  code: 200
+                  message: Success
+                file:
+                  id: '113000000008'
+                  name: Tests.txt
+                  chunkCount: 1
+                  delimiter: '"'
+                  encoding: ISO-8859-1
+                  firstDataRow: 2
+                  format: txt
+                  headerRow: 1
+                  separator: "\t"
       tags:
       - Bulk Write
       description: "## Set the Chunk Count\n\n`/workspaces/{workspaceId}/models/{modelId}/files/{fileId}`  \n\nTo upload a\
@@ -1638,11 +2156,7 @@ paths:
         \   Type: string<br>*   Description: The workspace ID<br>*   Example: `8a8b8c8d8e8f8g8i`<br><br> |\n| `modelId` |\
         \ <br><br>*   Required<br>*   Type: string<br>*   Description: The model ID<br>*   Example: `FC12345678912343455667`<br><br>\
         \ |\n| `fileId` | <br><br>*   Required<br>*   Type: number<br>*   Description: The file ID<br>*   Example: `113000000008`<br><br>\
-        \ |\n\n#### Response 200 (application/json)\n\n```\n{\n  \"meta\": {\n    \"schema\": \"https://api.anaplan.com/2/0/models/75A40874E6B64FA3AE0743278996850F/objects/file\"\
-        \n  },\n  \"status\": {\n    \"code\": 200,\n    \"message\": \"Success\"\n  },\n  \"file\": {\n    \"id\": \"113000000008\"\
-        ,\n    \"name\": \"Tests.txt\",\n    \"chunkCount\": 1,\n    \"delimiter\": \"\\\"\",\n    \"encoding\": \"ISO-8859-1\"\
-        ,\n    \"firstDataRow\": 2,\n    \"format\": \"txt\",\n    \"headerRow\": 1,\n    \"separator\": \"\\t\"\n  }\n}\n\
-        \n```"
+        \ |\n\n#"
       requestBody:
         content:
           application/json:
@@ -1676,7 +2190,7 @@ paths:
         \   Type: string<br>*   Description: The workspace ID<br>*   Example: `8a8b8c8d8e8f8g8i`<br><br> |\n| `modelId` |\
         \ <br><br>*   Required<br>*   Type: string<br>*   Description: The model ID<br>*   Example: `FC12345678912343455667`<br><br>\
         \ |\n| `fileId` | <br><br>*   Required<br>*   Type: number<br>*   Description: The file ID<br>*   Example: `113000000008`<br><br>\
-        \ |\n\n#### Response 204"
+        \ |\n\n#"
   /2/0/models/{modelId}/versions/{versionId}/switchover:
     put:
       summary: Set version switchover date
@@ -1688,7 +2202,19 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          content:
+            application/json:
+              example:
+                meta:
+                  schema: https://api.anaplan.com/2/0/objects/switchover
+                status:
+                  code: 200
+                  message: Success
+                versionSwitchover:
+                  periodText: May 13
+                  date: '2013-05-01'
+                  calendarType: Calendar Months/Quarters/Years
       tags:
       - Transactional Write
       description: "## Set version switchover date\n\n`/models/{modelId}/versions/{versionId}/switchover`  \n\nUse this call\
@@ -1713,10 +2239,7 @@ paths:
         \   Required<br>*   Type: String<br>*   Description: the model ID<br>*   Example: `75A40874E6B64FA3AE074327899685`<br><br>\
         \ |\n| `{versionId}` | <br><br>*   Required<br>*   Type: String<br>*   Description: the version ID. The ID of the\
         \ actual version returns a `400 Bad Request` response<br>*   Example: `107000000002`<br><br> |\n\n### Response header\n\
-        \n`Content-Type: application/json`\n\n### Response 200 Body\n\n```\n{\n    \"meta\": {\n        \"schema\": \"https://api.anaplan.com/2/0/objects/switchover\"\
-        \n    },\n    \"status\": {\n        \"code\": 200,\n        \"message\": \"Success\"\n    },\n    \"versionSwitchover\"\
-        : {\n        \"periodText\": \"May 13\",\n        \"date\": \"2013-05-01\",\n        \"calendarType\": \"Calendar\
-        \ Months/Quarters/Years\"\n    }\n}\n```"
+        \n`Content-Type: application/json`"
       requestBody:
         content:
           application/json:
@@ -1748,7 +2271,26 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              example: application/json
+          content:
+            application/json:
+              example:
+                meta:
+                  schema: https://api.anaplan.com/2/0/objects/currentPeriod
+                status:
+                  code: 200
+                  message: Success
+                currentPeriod:
+                  periodText: May 20
+                  lastDay: '2020-05-31'
+                  calendarType: Calendar Months/Quarters/Years
+        '429':
+          description: more detail in path description
       tags:
       - Transactional Write
       description: "## Set current period\n\n`/workspaces/{workspaceId}/models/{modelId}/currentPeriod`  \n\nUse this call\
@@ -1776,11 +2318,7 @@ paths:
         \ this message: `Invalid ISO date format '{date}'. Date should match format YYYY-MM-DD`  <br>    If this value falls\
         \ outside of a valid range, the call returns a `400 Bad Request` response with this message: `Specified date '{date}'\
         \ is out of timescale range {start of timescale} - {end of timescale}`.<br>*   Example: 2010-05-20<br><br> |\n\n###\
-        \ Example of request body\n\n```\n{\n       \"date\":\"2020-05-20\"\n    }\n\n```\n\n### Response headers\n\n`Content-Type:\
-        \ application/json`\n\n### Response 200 Body\n\n```\n{\n   \"meta\":{\n      \"schema\":\"https://api.anaplan.com/2/0/objects/currentPeriod\"\
-        \n   },\n   \"status\":{\n      \"code\":200,\n      \"message\":\"Success\"\n   },\n   \"currentPeriod\":{\n    \
-        \  \"periodText\":\"May 20\",\n      \"lastDay\":\"2020-05-31\",\n      \"calendarType\":\"Calendar Months/Quarters/Years\"\
-        \n   }\n}\n\n```"
+        \ Example of request body\n\n```\n{\n       \"date\":\"2020-05-20\"\n    }\n\n```"
       requestBody:
         content:
           application/json:
@@ -1806,7 +2344,25 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              example: application/json
+          content:
+            application/json:
+              example:
+                meta:
+                  schema: https://api.anaplan.com/2/0/objects/modelCalendar
+                status:
+                  code: 200
+                  message: Success
+                modelCalendar:
+                  fiscalYear:
+                    year: FY21
+                    startDate: '2021-01-01'
+                    endDate: '2021-12-31'
       tags:
       - Transactional Write
       description: "## Update current fiscal year\n\n`/workspaces/{workspaceId}/models/{modelId}/modelCalendar/fiscalYear`\n\
@@ -1823,13 +2379,9 @@ paths:
         \ | **Details** |\n| --- | --- |\n| `{workspaceId}` | <br><br>*   Required<br>*   Type: String<br>*   Description:\
         \ The workspace ID<br>*   Example: `8a8196b15b7dbae6015b8694411d13fe`<br><br> |\n| `{modelId}` | <br><br>*   Required<br>*\
         \   Type: String<br>*   Description: the model ID<br>*   Example: `75A40874E6B64FA3AE074327899685`<br><br> |\n\n###\
-        \ Response headers\n\n`Content-Type: application/json`\n\n### Response 200 Body\n\n```\n{\n    \"meta\": {\n     \
-        \   \"schema\": \"https://api.anaplan.com/2/0/objects/modelCalendar\"\n    },\n    \"status\": {\n        \"code\"\
-        : 200,\n        \"message\": \"Success\"\n    },\n    \"modelCalendar\": {\n        \"fiscalYear\": {\n          \
-        \  \"year\": \"FY21\",\n            \"startDate\": \"2021-01-01\",\n            \"endDate\": \"2021-12-31\"\n    \
-        \    }\n    }\n}\n\n```\n\n### Example: Out of range error\n\nInput value for `year`\n\n```\n{\n    \"year\": \"FY40\"\
-        \n}\n\n```\n\nResponse\n\n```\n{\n    \"status\": {\n        \"code\": 400,\n        \"message\": \"Specified year\
-        \ is out of range: 2040\"\n    }\n}\n\n```"
+        \ Example: Out of range error\n\nInput value for `year`\n\n```\n{\n    \"year\": \"FY40\"\n}\n\n```\n\nResponse\n\n\
+        ```\n{\n    \"status\": {\n        \"code\": 400,\n        \"message\": \"Specified year is out of range: 2040\"\n\
+        \    }\n}\n\n```"
       requestBody:
         content:
           application/json:
@@ -1937,7 +2489,22 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          content:
+            application/json:
+              example:
+                meta:
+                  schema: https://anaplan.api.com/2/0/objects/item
+                status:
+                  code: 200
+                  message: Success
+                added: 1
+                ignored: 1
+                total: 2
+                failures:
+                - requestIndex: 1
+                  failureType: INCORRECT_FORMAT
+                  failureMessageDetails: incorrect format -- column name:p-number, value:wrong value for number
       tags:
       - Transactional Write
       description: "## Add list items\n\n`/workspaces/{workspaceId}/models/{modelId}/lists/{listId}/items?action=add'`\n\n\
@@ -1982,15 +2549,7 @@ paths:
         \ items | name=n1  <br>code=c1 | A name is not a valid input. A new list item is not added. | An error message returns.\
         \ |\n| Add a new list item | There are no existing items | code=c1 | Success.  <br>A new item is added. | success\
         \ code=c1 |\n| Add a list item with a conflicting code | code=c1 | code=c1 | There is a duplicate code. A new list\
-        \ item is not added. | An error message returns. |\n\n### Response 200 Body\n\nThe response body contains a JSON object\
-        \ that contains `total` (total number of items in request), `ignored` (number of items ignored), `added` (number of\
-        \ items added), and `failures` (a description of the reason of each failure) fields. In the `failures` response, each\
-        \ field contains failures information about any errors encountered while performing the add action. `requestIndex`\
-        \ is the index in input items array.\n\n```\n{\n    \"meta\": {\n        \"schema\": \"https://anaplan.api.com/2/0/objects/item\"\
-        \n    },\n    \"status\": {\n        \"code\": 200,\n        \"message\": \"Success\"\n    },\n    \"added\": 1,\n\
-        \    \"ignored\": 1,\n    \"total\": 2,\n    \"failures\": [\n        {\n            \"requestIndex\": 1,\n      \
-        \      \"failureType\": \"INCORRECT_FORMAT\",\n            \"failureMessageDetails\": \"incorrect format -- column\
-        \ name:p-number, value:wrong value for number\"\n        }\n    ]\n}\n```"
+        \ item is not added. | An error message returns. |"
     parameters:
     - name: workspaceId
       in: path
@@ -2093,8 +2652,8 @@ paths:
           type: string
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
-        '200':
-          description: 'TODO: document response'
+        '429':
+          description: more detail in path description
       tags:
       - Transactional Read
       description: "## Retrieve list data\n\n`/workspaces/{workspaceId}/models/{modelId}/lists/{listId}/items`\n\nUse this\
@@ -2131,23 +2690,23 @@ paths:
         \    When false, the endpoint does not include the optional data fields in the response for the specified list ID.<br>*\
         \   Example: `101000000001`<br><br> |\n\n### Query parameters\n\n| **Parameter** | **Details** |\n| --- | --- |\n\
         | `{includeAll}` | <br><br>*   Required<br>*   Type: Boolean<br>*   Description: The workspace ID<br>*   Example:\
-        \ `true`<br><br> |\n\n### Response 200 Body\n\n#### Example with application/json and includeAll=false\n\n```\n{\n\
-        \    \"meta\": {\n        \"schema\": \"https://api.anaplan.com/2/0/objects/list\"\n    },\n    \"status\": {\n  \
-        \      \"code\": 200,\n        \"message\": \"Success\"\n    },\n    \"listItems\": [\n      {\n        \"id\": \"\
-        206000000001\",\n        \"name\": \"cake\",\n        \"code\": \"c1\"\n      },\n      {\n        \"id\": \"206000000002\"\
-        ,\n        \"name\": \"bread\",\n        \"code\": \"b2\"\n      },\n      {\n        \"id\": \"206000000003\",\n\
-        \        \"name\": \"pastry\",\n        \"code\": \"p3\"\n      }\n    ]\n  }\n\n```\n\n#### Example with text/csv\
-        \ and includeAll=false\n\n```\nid,name,code,parent,parentId,listId,listName\n206000000001,cake,c1,,,,\n206000000002,bread,b2,,,,\n\
-        206000000003,pastry,p3,,,,\n\n```\n\n#### Example with application/json and includeAll=true\n\n```\n{\n    \"meta\"\
-        : {\n        \"schema\": \"https://api.anaplan.com/2/0/objects/list\"\n    },\n    \"status\": {\n        \"code\"\
-        : 200,\n        \"message\": \"Success\"\n    },\n    \"listItems\": [\n      {\n        \"id\": \"206000000001\"\
-        ,\n        \"name\": \"cake\",\n        \"code\": \"c1\",\n        \"subsets\": {\n          \"favourite\": true\n\
-        \        },\n        \"properties\": {\n          \"count\": \"1.0\"\n        }\n      },\n      {\n        \"id\"\
-        : \"206000000002\",\n        \"name\": \"bread\",\n        \"code\": \"b2\",\n        \"subsets\": {\n          \"\
-        favourite\": false\n        },\n        \"properties\": {\n          \"count\": \"4.0\"\n        }\n      },\n   \
-        \   {\n        \"id\": \"206000000003\",\n        \"name\": \"pastry\",\n        \"code\": \"p3\",\n        \"subsets\"\
-        : {\n          \"favourite\": true\n        },\n        \"properties\": {\n          \"count\": \"5.0\"\n        }\n\
-        \      }\n    ]\n  }\n\n```\n\n#### Example with text/csv and includeAll=true\n\n```\nid,name,code,parent,parentId,listId,listName,favourite,count\n\
+        \ `true`<br><br> |\n\n### Example with application/json and includeAll=false\n\n```\n{\n    \"meta\": {\n        \"\
+        schema\": \"https://api.anaplan.com/2/0/objects/list\"\n    },\n    \"status\": {\n        \"code\": 200,\n      \
+        \  \"message\": \"Success\"\n    },\n    \"listItems\": [\n      {\n        \"id\": \"206000000001\",\n        \"\
+        name\": \"cake\",\n        \"code\": \"c1\"\n      },\n      {\n        \"id\": \"206000000002\",\n        \"name\"\
+        : \"bread\",\n        \"code\": \"b2\"\n      },\n      {\n        \"id\": \"206000000003\",\n        \"name\": \"\
+        pastry\",\n        \"code\": \"p3\"\n      }\n    ]\n  }\n\n```\n\n#### Example with text/csv and includeAll=false\n\
+        \n```\nid,name,code,parent,parentId,listId,listName\n206000000001,cake,c1,,,,\n206000000002,bread,b2,,,,\n206000000003,pastry,p3,,,,\n\
+        \n```\n\n#### Example with application/json and includeAll=true\n\n```\n{\n    \"meta\": {\n        \"schema\": \"\
+        https://api.anaplan.com/2/0/objects/list\"\n    },\n    \"status\": {\n        \"code\": 200,\n        \"message\"\
+        : \"Success\"\n    },\n    \"listItems\": [\n      {\n        \"id\": \"206000000001\",\n        \"name\": \"cake\"\
+        ,\n        \"code\": \"c1\",\n        \"subsets\": {\n          \"favourite\": true\n        },\n        \"properties\"\
+        : {\n          \"count\": \"1.0\"\n        }\n      },\n      {\n        \"id\": \"206000000002\",\n        \"name\"\
+        : \"bread\",\n        \"code\": \"b2\",\n        \"subsets\": {\n          \"favourite\": false\n        },\n    \
+        \    \"properties\": {\n          \"count\": \"4.0\"\n        }\n      },\n      {\n        \"id\": \"206000000003\"\
+        ,\n        \"name\": \"pastry\",\n        \"code\": \"p3\",\n        \"subsets\": {\n          \"favourite\": true\n\
+        \        },\n        \"properties\": {\n          \"count\": \"5.0\"\n        }\n      }\n    ]\n  }\n\n```\n\n####\
+        \ Example with text/csv and includeAll=true\n\n```\nid,name,code,parent,parentId,listId,listName,favourite,count\n\
         206000000001,cake,c1,,,,true,1.0206000000002,bread,b2,,,,false,4.0206000000003,pastry,p3,,,,true,5.0\n```"
   /2/0/workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests:
     post:
@@ -2160,7 +2719,19 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          content:
+            application/json:
+              example:
+                meta:
+                  schema: https://api.anaplan.com/2/0/objects/viewReadRequest
+                status:
+                  code: 200
+                  message: Success
+                viewReadRequest:
+                  requestId: 0A06B0739F0E47BB92E2326C603D86EC
+                  requestState: IN_PROGRESS
+                  url: https://api.anaplan.com/2/0/workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests/{requestId}
       tags:
       - Transactional Read
       description: "## Initiate large read request\n\nUse this call to initiate a large volume read request of view data.\
@@ -2189,15 +2760,7 @@ paths:
         \ feature)<br>*   Type: `String`<br>*   Description: The workspace ID<br>*   Example: `8a8196b15b7dbae6015b8694411d13fe`<br><br>\
         \ |\n| `{modelId}` | <br><br>*   Required<br>*   Type: `String`<br>*   Description: The model ID<br>*   Example: `75A40874E6B64FA3AE0743278996850F`<br><br>\
         \ |\n| `{viewId}` | <br><br>*   Required<br>*   Type: `Number`<br>*   Description: The view ID.<br>*   Example: `101000000001`<br><br>\
-        \ |\n\n### Response 200 body\n\n* * *\n\n```\n{\n    \"meta\": {\n        \"schema\": \"https://api.anaplan.com/2/0/objects/viewReadRequest\"\
-        \n    },\n    \"status\": {\n        \"code\": 200,\n        \"message\": \"Success\"\n    },\n    \"viewReadRequest\"\
-        : {\n        \"requestId\": \"0A06B0739F0E47BB92E2326C603D86EC\",\n        \"requestState\": \"IN_PROGRESS\",\n  \
-        \      \"url\": \"https://api.anaplan.com/2/0/workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests/{requestId}\"\
-        \n    }\n}\n\n\n```\n\nIf the request is just submitted and not started the response resembles:\n\n```\n{\n    \"\
-        meta\": {\n        \"schema\": \"https://api.anaplan.com/2/0/objects/viewReadRequest\"\n    },\n    \"status\": {\n\
-        \        \"code\": 200,\n        \"message\": \"Success\"\n    },\n    \"viewReadRequest\": {\n        \"requestId\"\
-        : \"0A06B0739F0E47BB92E2326C603D86EC\",\n        \"requestState\": \"NOT_STARTED\",\n        \"url\": \"https://api.anaplan.com/2/0/workspaces/{workspaceId}/models/{modelId}/view/{viewId}/readRequests/{requestId}\"\
-        \n    }\n}\n```"
+        \ |"
     parameters:
     - name: workspaceId
       in: path
@@ -2228,7 +2791,22 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          content:
+            application/json:
+              example:
+                meta:
+                  schema: https://api.anaplan.com/2/0/objects/viewReadRequest
+                status:
+                  code: 200
+                  message: Success
+                viewReadRequest:
+                  requestId: 0A06B0739F0E47BB92E2326C603D86EC
+                  viewId: 101000000014
+                  requestState: COMPLETE
+                  url: https://api.anaplan.com/2/0/workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests/{requestId}
+                  availablePages: 100
+                  successful: true
       tags:
       - Transactional Read
       description: "## Retrieve status of large read request\n\nUse this call to check the status of an export action after\
@@ -2251,16 +2829,7 @@ paths:
         \ is `false`, this means the export failed. Retry and initiate a new export.\n*   When 'requestState' is 'NOT_STARTED'\
         \ then simply check the status again.\n*   When requestState' is 'CANCELLED' then this request is completed by a 'DELETE'\
         \ call.\n    \n\nWe recommend you delete the last failed export before initiating a new export, using the delete export\
-        \ endpoint.\n\n### Response 200 body\n\n* * *\n\n```\n{\n    \"meta\": {\n        \"schema\": \"https://api.anaplan.com/2/0/objects/viewReadRequest\"\
-        \n    },\n    \"status\": {\n        \"code\": 200,\n        \"message\": \"Success\"\n    },\n    \"viewReadRequest\"\
-        : {\n        \"requestId\": \"0A06B0739F0E47BB92E2326C603D86EC\",\n        \"viewId\": 101000000014,\n        \"requestState\"\
-        : \"COMPLETE\",\n        \"url\": \"https://api.anaplan.com/2/0/workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests/{requestId}\"\
-        ,\n        \"availablePages\": 100,\n        \"successful\": true\n    }\n}\n\n\n```\n\nFollowing is the response\
-        \ when the large read request is in progress\n\n```\n{\n    \"meta\": {\n        \"schema\": \"https://api.anaplan.com/2/0/objects/viewReadRequest\"\
-        \n    },\n    \"status\": {\n        \"code\": 200,\n        \"message\": \"Success\"\n    },\n    \"viewReadRequest\"\
-        : {\n        \"requestId\": \"0A06B0739F0E47BB92E2326C603D86EC\",\n        \"viewId\": 101000000014,\n        \"requestState\"\
-        : \"IN_PROGRESS\",\n        \"url\": \"https://api.anaplan.com/2/0/workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests/{requestId}\"\
-        ,\n        \"availablePages\": 50,\n        \"successful\": true\n    }\n}\n\n```"
+        \ endpoint."
     parameters:
     - name: workspaceId
       in: path
@@ -2423,8 +2992,8 @@ paths:
           type: string
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
-        '200':
-          description: 'TODO: document response'
+        '429':
+          description: more detail in path description
       tags:
       - Transactional Read
       description: "## Retrieve cell data for a view\n\nUse this call to retrieve the cell data for a view. You can either\
@@ -2532,7 +3101,7 @@ paths:
         \ <br><br>*   Required<br>*   Type: string<br>*   Description: The model ID<br>*   Example: `FC12345678912343455667`<br><br>\
         \ |\n| `fileId` | <br><br>*   Required<br>*   Type: number<br>*   Description: The file ID<br>*   Example: `113000000008`<br><br>\
         \ |\n| `chunkId` | <br><br>*   Required<br>*   Type: string<br>*   Description: The chunk ID of the file.  In this\
-        \ case, the first chunk.<br>*   Example: `0`<br><br> |\n\n#### Response 204"
+        \ case, the first chunk.<br>*   Example: `0`<br><br> |\n\n#"
     parameters:
     - name: workspaceId
       in: path
@@ -2576,7 +3145,25 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          content:
+            application/json:
+              example:
+                meta:
+                  schema: https://api.anaplan.com/2/0/models/75A40874E6B64FA3AE0743278996850F/objects/file
+                status:
+                  code: 200
+                  message: Success
+                file:
+                  id: '113000000008'
+                  name: achunky-aa
+                  chunkCount: 1
+                  delimiter: '"'
+                  encoding: ISO-8859-1
+                  firstDataRow: 2
+                  format: txt
+                  headerRow: 1
+                  separator: "\t"
       tags:
       - Bulk Write
       description: "## Complete the upload\n\n`/workspaces/{workspaceId}/models/{modelId}/files/{fileId}/complete`  \n\nAfter\
@@ -2589,11 +3176,7 @@ paths:
         \   Description: The workspace ID<br>*   Example: `8a8b8c8d8e8f8g8i`<br><br> |\n| `modelId` | <br><br>*   Required<br>*\
         \   Type: string<br>*   Description: The model ID<br>*   Example: `FC12345678912343455667`<br><br> |\n| `fileId` |\
         \ <br><br>*   Required<br>*   Type: number<br>*   Description: The file ID<br>*   Example: `113000000008`<br><br>\
-        \ |\n\n#### Response 200 (application/json)\n\n```\n{\n  \"meta\": {\n    \"schema\": \"https://api.anaplan.com/2/0/models/75A40874E6B64FA3AE0743278996850F/objects/file\"\
-        \n  },\n  \"status\": {\n    \"code\": 200,\n    \"message\": \"Success\"\n  },\n  \"file\": {\n    \"id\": \"113000000008\"\
-        ,\n    \"name\": \"achunky-aa\",\n    \"chunkCount\": 1,\n    \"delimiter\": \"\\\"\",\n    \"encoding\": \"ISO-8859-1\"\
-        ,\n    \"firstDataRow\": 2,\n    \"format\": \"txt\",\n    \"headerRow\": 1,\n    \"separator\": \"\\t\"\n  }\n}\n\
-        \n```"
+        \ |\n\n#"
     parameters:
     - name: workspaceId
       in: path
@@ -2624,7 +3207,62 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          content:
+            application/json:
+              example:
+                meta:
+                  schema: https://api.anaplan.com/2/0/models/F1111111C11111111B11111F1111E11F/objects/task
+                status:
+                  code: 200
+                  message: Success
+                task:
+                  taskId: 1B1D84DDD53847BAA621810B593C3FC1
+                  currentStep: Complete.
+                  progress: 1.0
+                  result:
+                    details:
+                    - localMessageText: 'Employees: 90 (0/90) rows successful, 5 ignored '
+                      occurrences: 0
+                      type: hierarchyRowsProcessed
+                      values:
+                      - hierarchyName
+                      - Employees
+                      - successRowCount
+                      - '90'
+                      - successCreateCount
+                      - '0'
+                      - successUpdateCount
+                      - '90'
+                      - warningsRowCount
+                      - '0'
+                      - warningsCreateCount
+                      - '0'
+                      - warningsUpdateCount
+                      - '0'
+                      - failedCount
+                      - '0'
+                      - ignoredCount
+                      - '5'
+                      - totalRowCount
+                      - '95'
+                      - totalCreateCount
+                      - '0'
+                      - totalUpdateCount
+                      - '90'
+                      - invalidCount
+                      - '0'
+                      - updatedCount
+                      - '90'
+                      - renamedCount
+                      - '90'
+                      - createdCount
+                      - '0'
+                    failureDumpAvailable: false
+                    objectId: '112000000009'
+                    successful: true
+                  taskState: COMPLETE
+                  creationTime: 1571258347545
       tags:
       - Bulk Write
       description: "## Monitor the import tasks\n\n`/workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}`\n\
@@ -2647,20 +3285,7 @@ paths:
         \ <br><br>*   Required<br>*   Type: string<br>*   Description: The model ID<br>*   Example: `75A40874E6B64FA3AE0743278996850F`<br><br>\
         \ |\n| `importId` | <br><br>*   Required<br>*   Type: number<br>*   Description: The model ID<br>*   Example: `112000000007`<br><br>\
         \ |\n| `taskID` | <br><br>*   Required<br>*   Type: string<br>*   Description: The task ID<br>*   Example: `88E90CC3E2B545C99A262284317F92EB`<br><br>\
-        \ |\n\n#### Response 200 (application/json)\n\n```\n{\n  \"meta\": {\n    \"schema\": \"https://api.anaplan.com/2/0/models/F1111111C11111111B11111F1111E11F/objects/task\"\
-        \n  },\n  \"status\": {\n    \"code\": 200,\n    \"message\": \"Success\"\n  },\n  \"task\": {\n    \"taskId\": \"\
-        1B1D84DDD53847BAA621810B593C3FC1\",\n    \"currentStep\": \"Complete.\",\n    \"progress\": 1.0,\n    \"result\":\
-        \ {\n      \"details\": [\n        {\n        \"localMessageText\": \"Employees: 90 (0/90) rows successful, 5 ignored\
-        \ \",\n        \"occurrences\": 0,\n        \"type\": \"hierarchyRowsProcessed\",\n        \"values\": [\n       \
-        \   \"hierarchyName\",\n          \"Employees\",\n          \"successRowCount\",\n          \"90\",\n          \"\
-        successCreateCount\",\n          \"0\",\n          \"successUpdateCount\",\n          \"90\",\n          \"warningsRowCount\"\
-        ,\n          \"0\",\n          \"warningsCreateCount\",\n          \"0\",\n          \"warningsUpdateCount\",\n  \
-        \        \"0\",\n          \"failedCount\",\n          \"0\",\n          \"ignoredCount\",\n          \"5\",\n   \
-        \       \"totalRowCount\",\n          \"95\",\n          \"totalCreateCount\",\n          \"0\",\n          \"totalUpdateCount\"\
-        ,\n          \"90\",\n          \"invalidCount\",\n          \"0\",\n          \"updatedCount\",\n          \"90\"\
-        ,\n          \"renamedCount\",\n          \"90\",\n          \"createdCount\",\n          \"0\"\n          ]\n   \
-        \     }\n      ],\n    \"failureDumpAvailable\": false,\n    \"objectId\": \"112000000009\",\n    \"successful\":\
-        \ true\n    },\n  \"taskState\": \"COMPLETE\",\n  \"creationTime\": 1571258347545\n  }\n}\n\n```"
+        \ |\n\n#"
     parameters:
     - name: workspaceId
       in: path
@@ -2866,7 +3491,17 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          content:
+            application/json:
+              example:
+                meta:
+                  schema: https://api.anaplan.com//2/0/models/736367E9DB484E3AB3A50C3704FD33ED/objects/task
+                status:
+                  code: 200
+                  message: Success
+                task:
+                  taskId: F362B99442C54425970E200037D48A91
       tags:
       - Bulk Read
       description: "## Start the export\n\n`/workspaces/{workspaceId}/models/{modelId}/exports/{exportId}/tasks`  \nYou can\
@@ -2881,9 +3516,7 @@ paths:
         \   Description: The workspace ID<br>*   Example: `8a8b8c8d8e8f8g8i`<br><br> |\n| `modelId` | <br><br>*   Required<br>*\
         \   Type: string<br>*   Description: The model ID<br>*   Example: `75A40874E6B64FA3AE0743278996850F`<br><br> |\n|\
         \ `exportId` | <br><br>*   Required<br>*   Type: number<br>*   Description: The export definition ID<br>*   Example:\
-        \ `116000000001`<br><br> |\n\n#### Response 200 (application/json)\n\n```\n{\n   \"meta\":{\n      \"schema\":\"https://api.anaplan.com//2/0/models/736367E9DB484E3AB3A50C3704FD33ED/objects/task\"\
-        \n   },\n   \"status\":{\n      \"code\":200,\n      \"message\":\"Success\"\n   },\n   \"task\":{\n      \"taskId\"\
-        :\"F362B99442C54425970E200037D48A91\"\n   }\n}\n```"
+        \ `116000000001`<br><br> |\n\n#"
       requestBody:
         content:
           application/json:
@@ -2921,7 +3554,25 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          content:
+            application/json:
+              example:
+                meta:
+                  schema: https://api.anaplan.com//2/0/models/736367E9DB484E3AB3A50C3704FD33ED/objects/task
+                status:
+                  code: 200
+                  message: Success
+                task:
+                  type: taskInformation
+                  taskId: BFEC582EBD4146068FE4061831C8F0F0
+                  currentStep: Complete.
+                  progress: 1
+                  result:
+                    failureDumpAvailable: false
+                    objectId: '116000000002'
+                    successful: true
+                  taskState: COMPLETE
       tags:
       - Bulk Read
       description: "## Monitor the export tasks\n\n`/workspaces/{workspaceId}/models/{modelId}/exports/{exportId}/tasks/{taskId}`\n\
@@ -2942,12 +3593,7 @@ paths:
         \ <br><br>*   Required<br>*   Type: string<br>*   Description: The model ID<br>*   Example: `75A40874E6B64FA3AE0743278996850F`<br><br>\
         \ |\n| `exportId` | <br><br>*   Required<br>*   Type: number<br>*   Description: The export definition ID<br>*   Example:\
         \ `116000000001`<br><br> |\n| `taskId` | <br><br>*   Required<br>*   Type: string<br>*   Description: The task ID<br>*\
-        \   Example: `81374848BFED4C52A9927048FA77AA05`<br><br> |\n\n#### Response 200 (application/json)\n\n```\n{\n   \"\
-        meta\":{\n      \"schema\":\"https://api.anaplan.com//2/0/models/736367E9DB484E3AB3A50C3704FD33ED/objects/task\"\n\
-        \   },\n   \"status\":{\n      \"code\":200,\n      \"message\":\"Success\"\n   },\n   \"task\":{\n      \"type\"\
-        :\"taskInformation\",\n      \"taskId\":\"BFEC582EBD4146068FE4061831C8F0F0\",\n      \"currentStep\":\"Complete.\"\
-        ,\n      \"progress\":1,\n      \"result\":{\n         \"failureDumpAvailable\":false,\n         \"objectId\":\"116000000002\"\
-        ,\n         \"successful\":true\n      },\n      \"taskState\":\"COMPLETE\"\n   }\n}\n```"
+        \   Example: `81374848BFED4C52A9927048FA77AA05`<br><br> |\n\n#"
       requestBody:
         content:
           application/json:
@@ -2991,7 +3637,28 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          content:
+            application/json:
+              example:
+                meta:
+                  paging:
+                    currentPageSize: 4
+                    offset: 0
+                    totalSize: 4
+                  schema: https://api.anaplan.com//2/0/models/75A40874E6B64FA3AE0743278996850F/objects/chunk
+                status:
+                  code: 200
+                  message: Success
+                chunks:
+                - id: '0'
+                  name: Chunk 0
+                - id: '1'
+                  name: Chunk 1
+                - id: '2'
+                  name: Chunk 2
+                - id: '3'
+                  name: Chunk 3
       tags:
       - Bulk Read
       description: "### Get each chunk ID and name\n\n#### Request\n\n```\ncurl -X GET \\\nhttps://api.anaplan.com/2/0/workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks\
@@ -3001,12 +3668,7 @@ paths:
         \   Type: string<br>*   Description: The workspace ID<br>*   Example: `8a8b8c8d8e8f8g8i`<br><br> |\n| `modelId` |\
         \ <br><br>*   Required<br>*   Type: string<br>*   Description: The model ID<br>*   Example: `75A40874E6B64FA3AE0743278996850F`<br><br>\
         \ |\n| `fileId` | <br><br>*   Required<br>*   Type: number<br>*   Description: The file ID<br>*   Example: `116000000005`<br><br>\
-        \ |\n\n#### Response 200 (application/json)\n\n```\n{\n   \"meta\":{\n      \"paging\":{\n         \"currentPageSize\"\
-        :4,\n         \"offset\":0,\n         \"totalSize\":4\n      },\n      \"schema\":\"https://api.anaplan.com//2/0/models/75A40874E6B64FA3AE0743278996850F/objects/chunk\"\
-        \n   },\n   \"status\":{\n      \"code\":200,\n      \"message\":\"Success\"\n   },\n   \"chunks\":[\n      {\n  \
-        \       \"id\":\"0\",\n         \"name\":\"Chunk 0\"\n      },\n      {\n         \"id\":\"1\",\n         \"name\"\
-        :\"Chunk 1\"\n      },\n      {\n         \"id\":\"2\",\n         \"name\":\"Chunk 2\"\n      },\n      {\n      \
-        \   \"id\":\"3\",\n         \"name\":\"Chunk 3\"\n      }\n   ]\n}\n\n```"
+        \ |\n\n#"
     parameters:
     - name: workspaceId
       in: path
@@ -3037,7 +3699,11 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          content:
+            application/json:
+              example:
+                taskId: E1F648F527AF4297B09E06C278B99F4C
       tags:
       - Bulk Other
       description: "## Start the process\n\n`/workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks`  \n\n\
@@ -3050,8 +3716,7 @@ paths:
         \ |\n| --- | --- |\n| `workspaceId` | <br><br>*   Required<br>*   Type: string<br>*   Description: The workspace ID<br>*\
         \   Example: `8a8b8c8d8e8f8g8i`<br><br> |\n| `modelId` | <br><br>*   Required<br>*   Type: string<br>*   Description:\
         \ The model ID<br>*   Example: `75A40874E6B64FA3AE0743278996850F`<br><br> |\n| `processId` | <br><br>*   Required<br>*\
-        \   Type: number<br>*   Description: The process ID<br>*   Example: `118000000002`<br><br> |\n\n#### Response 200\
-        \ (application/json)\n\n```\n{\n  \"taskId\" : \"E1F648F527AF4297B09E06C278B99F4C\"\n}\n\n\n\n```"
+        \   Type: number<br>*   Description: The process ID<br>*   Example: `118000000002`<br><br> |\n\n#"
     parameters:
     - name: workspaceId
       in: path
@@ -3081,7 +3746,13 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          content:
+            application/json:
+              example:
+                taskId: BAB7819744034F25BF73EA1B41804478
+                taskState: IN_PROGRESS
+                creationTime: 1535145539157
       tags:
       - Bulk Other
       description: "### Get the list of tasks for the process\n\nThis lists the tasks in the process for the given processID.\
@@ -3093,9 +3764,7 @@ paths:
         \ |\n| `workspaceId` | <br><br>*   Required<br>*   Type: string<br>*   Description: The workspace ID<br>*   Example:\
         \ `8a8b8c8d8e8f8g8i`<br><br> |\n| `modelId` | <br><br>*   Required<br>*   Type: string<br>*   Description: The model\
         \ ID<br>*   Example: `75A40874E6B64FA3AE0743278996850F`<br><br> |\n| `processId` | <br><br>*   Required<br>*   Type:\
-        \ number<br>*   Description: The process ID<br>*   Example: `118000000002`<br><br> |\n\n#### Response 200 (application/json)\n\
-        \n```\n{\n   \"taskId\":\"BAB7819744034F25BF73EA1B41804478\",\n   \"taskState\":\"IN_PROGRESS\",\n   \"creationTime\"\
-        :1535145539157\n}\n\n```"
+        \ number<br>*   Description: The process ID<br>*   Example: `118000000002`<br><br> |\n\n#"
   /2/0/workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks:
     post:
       summary: Start Other Action
@@ -3107,7 +3776,12 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          content:
+            application/json:
+              example:
+                task:
+                  taskId: 0690AA1C761F48549C3442A02F91D962
       tags:
       - Bulk Other
       description: "## Start deletion\n\n`/workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks`  \n\nYou can\
@@ -3121,8 +3795,7 @@ paths:
         \   Description: The workspace ID<br>*   Example: `8a8b8c8d8e8f8g8i`<br><br> |\n| `modelId` | <br><br>*   Required<br>*\
         \   Type: string<br>*   Description: The model ID<br>*   Example: `75A40874E6B64FA3AE0743278996850F`<br><br> |\n|\
         \ `actionId` | <br><br>*   Required<br>*   Type: number<br>*   Description: The ID for the Delete action.<br>*   Example:\
-        \ `117000000019`<br><br> |\n\n#### Response 200 (application/json)\n\n```\n{\n   \"task\":{\n      \"taskId\":\"0690AA1C761F48549C3442A02F91D962\"\
-        \n   }\n}\n\n```"
+        \ `117000000019`<br><br> |\n\n#"
     parameters:
     - name: workspaceId
       in: path
@@ -3152,7 +3825,14 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          content:
+            application/json:
+              example:
+                tasks:
+                - taskId: F37EA1512BC448D3B223431C33B844B6
+                  taskState: COMPLETE
+                  creationTime: 1535145589808
       tags:
       - Bulk Other
       description: "### Get a list of deletion tasks\n\n#### Request\n\n```\ncurl -X GET \\\nhttps://api.anaplan.com/2/0/workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks\
@@ -3162,9 +3842,7 @@ paths:
         \   Type: string<br>*   Description: The workspace ID<br>*   Example: `8a8b8c8d8e8f8g8i`<br><br> |\n| `modelId` |\
         \ <br><br>*   Required<br>*   Type: string<br>*   Description: The model ID<br>*   Example: `75A40874E6B64FA3AE0743278996850F`<br><br>\
         \ |\n| `actionId` | <br><br>*   Required<br>*   Type: number<br>*   Description: The ID for the Delete action.<br>*\
-        \   Example: `117000000019`<br><br> |\n\n#### Response 200 (application/json)\n\n```\n{\n   \"tasks\":[\n      {\n\
-        \         \"taskId\":\"F37EA1512BC448D3B223431C33B844B6\",\n         \"taskState\":\"COMPLETE\",\n         \"creationTime\"\
-        :1535145589808\n      }\n   ]\n}\n```"
+        \   Example: `117000000019`<br><br> |\n\n#"
   /2/0/workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks/{taskId}:
     get:
       summary: Monitor the process tasks
@@ -3176,7 +3854,29 @@ paths:
         example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Response 200
+          content:
+            application/json:
+              example:
+                meta:
+                  schema: https://api.anaplan.com//2/0/models/75A40874E6B64FA3AE0743278996850F/objects/task
+                status:
+                  code: 200
+                  message: Success
+                task:
+                  type: taskInformation
+                  taskId: 2846F8E2FD624F7FA91EC6E2F6E318C0
+                  currentStep: Complete.
+                  progress: 1
+                  result:
+                    failureDumpAvailable: false
+                    nestedResults:
+                    - failureDumpAvailable: false
+                      objectId: '117000000015'
+                      successful: true
+                    objectId: '118000000002'
+                    successful: true
+                  taskState: COMPLETE
       tags:
       - Bulk Other
       description: "## Monitor the process tasks\n\n`/workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks/{taskId}`\
@@ -3202,13 +3902,7 @@ paths:
         \ <br><br>*   Required<br>*   Type: string<br>*   Description: The model ID<br>*   Example: `75A40874E6B64FA3AE0743278996850F`<br><br>\
         \ |\n| `processId` | <br><br>*   Required<br>*   Type: number<br>*   Description: The process ID<br>*   Example: `118000000002`<br><br>\
         \ |\n| `taskId` | <br><br>*   Required<br>*   Type: string<br>*   Description: The task ID<br>*   Example: `5B882A63354A4B45A21C16F3644C9C1B`<br><br>\
-        \ |\n\n#### Response 200 (application/json)\n\n```\n\n\n{\n   \"meta\":{\n      \"schema\":\"https://api.anaplan.com//2/0/models/75A40874E6B64FA3AE0743278996850F/objects/task\"\
-        \n   },\n   \"status\":{\n      \"code\":200,\n      \"message\":\"Success\"\n   },\n   \"task\":{\n      \"type\"\
-        :\"taskInformation\",\n      \"taskId\":\"2846F8E2FD624F7FA91EC6E2F6E318C0\",\n      \"currentStep\":\"Complete.\"\
-        ,\n      \"progress\":1,\n      \"result\":{\n         \"failureDumpAvailable\":false,\n         \"nestedResults\"\
-        :[\n            {\n               \"failureDumpAvailable\":false,\n               \"objectId\":\"117000000015\",\n\
-        \               \"successful\":true\n            }\n         ],\n         \"objectId\":\"118000000002\",\n       \
-        \  \"successful\":true\n      },\n      \"taskState\":\"COMPLETE\"\n   }\n}\n```"
+        \ |\n\n#"
     parameters:
     - name: workspaceId
       in: path
