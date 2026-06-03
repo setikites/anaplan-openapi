@@ -825,6 +825,168 @@ def test_get_list(integration_token, list_id):
     assert "name" in metadata, "List metadata must have a name"
 
 
+# ─── pages and sort query parameter probes (issue #31) ─────────────────────────
+
+
+@pytest.fixture(scope="module")
+def view_with_page_selector(integration_token):
+    """(view_id, page_selector) — first view that has a page-axis dimension with items.
+
+    Page-axis dimensions are those NOT on the rows or columns axes of the view.
+    Items are fetched from GET /workspaces/{wid}/models/{mid}/dimensions/{did}/items.
+    Dimensions are discovered via the module → lineItems → dimensions path.
+    """
+    h = _auth_headers(integration_token)
+    with httpx.Client() as client:
+        # Collect model dimensions via module/lineItem path
+        model_dim_ids = set()
+        mods_r = client.get(f"{API_URL}/2/0/models/{MODEL_ID}/modules", headers=h)
+        if mods_r.status_code != 200:
+            pytest.skip("Could not list modules for page selector discovery")
+        for mod in mods_r.json().get("modules", [])[:5]:
+            li_r = client.get(
+                f"{API_URL}/2/0/models/{MODEL_ID}/modules/{mod['id']}/lineItems",
+                headers=h,
+            )
+            if li_r.status_code != 200:
+                continue
+            for li in li_r.json().get("items", [])[:3]:
+                dim_r = client.get(
+                    f"{API_URL}/2/0/models/{MODEL_ID}/lineItems/{li['id']}/dimensions",
+                    headers=h,
+                )
+                if dim_r.status_code == 200:
+                    for dim in dim_r.json().get("dimensions", []):
+                        model_dim_ids.add(dim["id"])
+
+        # Find a view where at least one model dimension is on the pages axis
+        views = client.get(
+            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/views",
+            headers=h,
+        ).json().get("views", [])
+        for v in views:
+            vid = v["id"]
+            detail = client.get(f"{API_URL}/2/0/models/{MODEL_ID}/views/{vid}", headers=h)
+            if detail.status_code != 200:
+                continue
+            d = detail.json()
+            axis_dims = (
+                {r["id"] for r in d.get("rows", [])}
+                | {c["id"] for c in d.get("columns", [])}
+            )
+            for did in model_dim_ids - axis_dims:
+                items_r = client.get(
+                    f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+                    f"/dimensions/{did}/items",
+                    headers=h,
+                )
+                if items_r.status_code != 200 or not items_r.json().get("items"):
+                    continue
+                item_id = items_r.json()["items"][0]["id"]
+                selector = f"{did}:{item_id}"
+                # Validate the selector actually works on this view before returning
+                probe = client.get(
+                    f"{API_URL}/2/0/models/{MODEL_ID}/views/{vid}/data",
+                    headers=h,
+                    params={"pages": selector, "format": "v1"},
+                )
+                if probe.status_code == 200:
+                    return vid, selector
+
+    pytest.skip("No view with a page-axis dimension found in test model")
+
+
+@pytest.mark.live
+def test_view_data_pages_single_value(integration_token, view_with_page_selector):
+    """GET /models/{modelId}/views/{viewId}/data?pages=dimId:itemId returns 200 (CSV).
+
+    Confirms the pages parameter is accepted. Response is text/csv with format=v1.
+    """
+    vid, page_selector = view_with_page_selector
+    with httpx.Client() as client:
+        response = client.get(
+            f"{API_URL}/2/0/models/{MODEL_ID}/views/{vid}/data",
+            headers=_auth_headers(integration_token),
+            params={"pages": page_selector, "format": "v1"},
+        )
+
+    assert response.status_code == 200, (
+        f"Expected 200 for pages param, got {response.status_code}: {response.text[:300]}"
+    )
+    assert "text/csv" in response.headers.get("content-type", ""), (
+        f"Expected CSV response with format=v1, got: {response.headers.get('content-type')}"
+    )
+
+
+@pytest.mark.live
+def test_view_data_pages_repeated_key(integration_token, view_with_page_selector):
+    """GET view data with pages= as a repeated key also returns 200.
+
+    Both pages=a:b,c:d (comma-separated) and pages=a:b&pages=c:d (repeated)
+    are accepted. This test confirms the repeated-key form.
+    """
+    vid, page_selector = view_with_page_selector
+    with httpx.Client() as client:
+        response = client.get(
+            f"{API_URL}/2/0/models/{MODEL_ID}/views/{vid}/data",
+            headers=_auth_headers(integration_token),
+            params=[("pages", page_selector), ("format", "v1")],
+        )
+
+    assert response.status_code == 200, (
+        f"Expected 200 for repeated pages key, got {response.status_code}: "
+        f"{response.text[:300]}"
+    )
+
+
+@pytest.mark.live
+def test_tasks_sort_param(integration_token):
+    """Task list endpoints accept sort parameter with documented field names and prefixes.
+
+    Probes creationDate, taskId, taskState, progress with -, +, and no prefix.
+    All combinations return 200. The API does not validate sort field names
+    server-side — invalid fields also return 200 (silently ignored or default order).
+    Actual ordering cannot be verified when the task list is empty.
+    """
+    h = _auth_headers(integration_token)
+    sort_values = [
+        "creationDate", "-creationDate", "+creationDate",
+        "taskId", "-taskId", "+taskId",
+        "taskState", "-taskState", "+taskState",
+        "progress", "-progress", "+progress",
+    ]
+    action_types = ["imports", "exports", "processes", "actions"]
+    findings = []
+    with httpx.Client() as client:
+        for action_type in action_types:
+            list_url = (
+                f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/{action_type}"
+            )
+            r = client.get(list_url, headers=h)
+            if r.status_code != 200:
+                findings.append(f"{action_type}: could not list ({r.status_code})")
+                continue
+            resources = r.json().get(action_type, [])
+            if not resources:
+                findings.append(f"{action_type}: no resources, skipping")
+                continue
+            rid = resources[0]["id"]
+            tasks_url = (
+                f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+                f"/{action_type}/{rid}/tasks"
+            )
+            for sv in sort_values:
+                r_sort = client.get(tasks_url, headers=h, params={"sort": sv})
+                findings.append(f"{action_type} sort={sv!r} -> {r_sort.status_code}")
+                assert r_sort.status_code == 200, (
+                    f"sort={sv!r} rejected on {action_type} tasks: {r_sort.status_code}"
+                )
+
+    print("\nSort probe results:")
+    for f in findings:
+        print(f"  {f}")
+
+
 # ─── PUT /currentPeriod interface probe ────────────────────────────────────────
 # Non-destructive: all requests use invalid inputs so the API rejects them
 # before making any change.

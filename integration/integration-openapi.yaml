@@ -1828,7 +1828,17 @@ paths:
   /2/0/workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks:
     get:
       summary: Get a list of the import tasks
-      parameters: []
+      parameters:
+      - name: sort
+        in: query
+        required: false
+        schema:
+          type: string
+        description: 'Sort order for the task list. Format: [prefix]field where prefix is - (descending), + (ascending), or
+          omitted (ascending). Documented sortable fields: creationDate, taskId, taskState, progress. Example: -creationDate
+          (newest first), +taskId, taskState. The API does not validate the field name — unknown fields are silently accepted
+          and appear to fall back to default ordering.'
+        example: -creationDate
       responses:
         '200':
           description: Response 200
@@ -3309,6 +3319,19 @@ paths:
         schema:
           type: string
         example: v1
+      - name: pages
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+        description: Page selector values, each in the form dimensionId:itemId. Selects which item to display for each page-axis
+          dimension. Both repeated-key form (pages=a:b&pages=c:d) and comma-separated form (pages=a:b,c:d) are accepted. Dimension
+          items can be retrieved from GET /workspaces/{workspaceId}/models/{modelId}/dimensions/{dimensionId}/items.
+        example: 101000000026:330000000028
       responses:
         '429':
           description: more detail in path description
@@ -3878,6 +3901,22 @@ paths:
       schema:
         type: string
       example: '{{exportId}}'
+    get:
+      parameters:
+      - name: sort
+        in: query
+        required: false
+        schema:
+          type: string
+        description: 'Sort order for the task list. Format: [prefix]field where prefix is - (descending), + (ascending), or
+          omitted (ascending). Documented sortable fields: creationDate, taskId, taskState, progress. Example: -creationDate
+          (newest first), +taskId, taskState. The API does not validate the field name — unknown fields are silently accepted
+          and appear to fall back to default ordering.'
+        example: -creationDate
+      responses:
+        '200':
+          description: List of export tasks
+      summary: Get a list of export tasks
   /2/0/workspaces/{workspaceId}/models/{modelId}/exports/{exportId}/tasks/{taskId}:
     get:
       summary: Monitor the export tasks
@@ -4090,7 +4129,17 @@ paths:
       example: '{{processId}}'
     get:
       summary: Get the list of tasks for the process
-      parameters: []
+      parameters:
+      - name: sort
+        in: query
+        required: false
+        schema:
+          type: string
+        description: 'Sort order for the task list. Format: [prefix]field where prefix is - (descending), + (ascending), or
+          omitted (ascending). Documented sortable fields: creationDate, taskId, taskState, progress. Example: -creationDate
+          (newest first), +taskId, taskState. The API does not validate the field name — unknown fields are silently accepted
+          and appear to fall back to default ordering.'
+        example: -creationDate
       responses:
         '200':
           description: Response 200
@@ -4163,7 +4212,17 @@ paths:
       example: '{{processId}}'
     get:
       summary: Get a list of action tasks
-      parameters: []
+      parameters:
+      - name: sort
+        in: query
+        required: false
+        schema:
+          type: string
+        description: 'Sort order for the task list. Format: [prefix]field where prefix is - (descending), + (ascending), or
+          omitted (ascending). Documented sortable fields: creationDate, taskId, taskState, progress. Example: -creationDate
+          (newest first), +taskId, taskState. The API does not validate the field name — unknown fields are silently accepted
+          and appear to fall back to default ordering.'
+        example: -creationDate
       responses:
         '200':
           description: Response 200

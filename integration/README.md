@@ -88,6 +88,34 @@ _Document differences between Apiary docs, Postman collection, and live API beha
 
 Live testing shows this endpoint returns `404 Resource not found` even when the workspace appears in `GET /workspaces`. The endpoint likely requires **Workspace Administrator** role. The spec documents both 200 and 404 responses; the live test accepts 404 with a warning rather than failing.
 
+### `pages` and `sort` query parameters (issue #31)
+
+**`pages` on `GET /2/0/models/{modelId}/views/{viewId}/data`**
+
+Live testing confirmed the `pages` parameter is accepted and returns 200 with a `text/csv` response (when `format=v1` is used). Both multi-value forms work:
+- Repeated-key form: `?pages=dimId:itemId&pages=dimId2:itemId2`
+- Comma-separated form: `?pages=dimId:itemId,dimId2:itemId2`
+
+Key findings:
+- Valid page selectors must correspond to dimensions on the *pages axis* of the view (not rows or columns). Use `GET /2/0/models/{modelId}/views/{viewId}` to identify row/column axes; any model dimension not on those axes may be a page dimension.
+- Dimension items must be fetched from `GET /2/0/workspaces/{workspaceId}/models/{modelId}/dimensions/{dimensionId}/items`, not from the view-scoped `GET /models/{modelId}/views/{viewId}/dimensions/{dimensionId}/items` endpoint (the latter returns items usable for row/column navigation, not page selectors).
+- Supplying a dimension ID that is not a page-axis dimension for the given view returns `400: "Invalid page selector [{dimensionId}]"`.
+- Spec models `pages` as `style: form, explode: true` (repeated-key canonical form; comma-separated also accepted).
+
+**`sort` on task list endpoints**
+
+Live testing confirmed the following on all four task list endpoints (imports, exports, processes, actions):
+
+| Sort value | Status |
+|-----------|--------|
+| `creationDate`, `-creationDate`, `+creationDate` | 200 |
+| `taskId`, `-taskId`, `+taskId` | 200 |
+| `taskState`, `-taskState`, `+taskState` | 200 |
+| `progress`, `-progress`, `+progress` | 200 |
+| `invalid_field`, `-invalid_field` | 200 |
+
+Format: `[prefix]field` where prefix is `-` (descending), `+` (ascending), or omitted (ascending). The API does not validate the field name — unknown fields also return 200 and appear to fall back to default ordering. Actual sort ordering could not be verified because the test model's task lists were empty at the time of testing.
+
 ### `PUT /2/0/models/{modelId}/currentPeriod` — date parameter interface (issue #30)
 
 Live testing confirmed `date` is accepted as **either** a query parameter (`?date=YYYY-MM-DD`) **or** a request body field (`{"date": "YYYY-MM-DD"}`), but not both simultaneously. Sending both returns:

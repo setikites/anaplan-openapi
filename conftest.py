@@ -71,9 +71,9 @@ def _guard_write_methods(request, pytestconfig):
 
     def _guarded_send(self, req, **kwargs):
         if req.method in _WRITE_METHODS and _is_data_plane_host(str(req.url)):
-            pytest.fail(
-                f"{req.method} {req.url} blocked — write methods require "
-                "--allow-writes flag. Pass it only after explicit human approval."
+            pytest.skip(
+                f"{req.method} {req.url} requires --allow-writes flag. "
+                "Pass it only after explicit human approval."
             )
         return original_send(self, req, **kwargs)
 

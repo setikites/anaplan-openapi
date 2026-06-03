@@ -486,6 +486,39 @@ def test_integration_current_period_put_declares_400_response():
 
 
 @_skip_integration
+def test_integration_view_data_declares_pages_param():
+    """GET /2/0/models/{modelId}/views/{viewId}/data must declare the pages query parameter."""
+    spec = _load(_INTEGRATION_SPEC)
+    params = _all_params(spec, "/2/0/models/{modelId}/views/{viewId}/data", "get")
+    names = {p["name"] for p in params if "name" in p}
+    assert "pages" in names, (
+        "GET /2/0/models/{modelId}/views/{viewId}/data is missing pages query parameter"
+    )
+    p = next(p for p in params if p.get("name") == "pages")
+    assert p.get("in") == "query"
+
+
+_TASKS_PATHS = [
+    "/2/0/workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks",
+    "/2/0/workspaces/{workspaceId}/models/{modelId}/exports/{exportId}/tasks",
+    "/2/0/workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks",
+    "/2/0/workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks",
+]
+
+
+@_skip_integration
+@pytest.mark.parametrize("path", _TASKS_PATHS, ids=lambda p: p.split("/")[-3])
+def test_integration_tasks_list_declares_sort_param(path):
+    """Every task list endpoint must declare the sort query parameter."""
+    spec = _load(_INTEGRATION_SPEC)
+    params = _all_params(spec, path, "get")
+    names = {p["name"] for p in params if "name" in p}
+    assert "sort" in names, f"{path} is missing sort query parameter"
+    p = next(p for p in params if p.get("name") == "sort")
+    assert p.get("in") == "query"
+
+
+@_skip_integration
 def test_integration_models_list_declares_model_details():
     """GET /2/0/models must declare the modelDetails query parameter."""
     spec = _load(_INTEGRATION_SPEC)
