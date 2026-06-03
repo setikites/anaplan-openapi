@@ -1007,6 +1007,31 @@ paths:
               schema:
                 type: string
               example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                  status:
+                    type: object
+                  viewId:
+                    type: string
+                  viewName:
+                    type: string
+                  rows:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Dimension'
+                  columns:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Dimension'
+                  pages:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Dimension'
         '429':
           description: more detail in path description
       tags:
@@ -1219,7 +1244,20 @@ paths:
       parameters: []
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Dimensions that define the line item
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                  status:
+                    type: object
+                  dimensions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Dimension'
       tags:
       - Model Metadata
       - Line Item Metadata

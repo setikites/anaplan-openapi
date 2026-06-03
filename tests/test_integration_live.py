@@ -352,6 +352,371 @@ def test_auth_scheme_probe(integration_token):
         print(f"  {finding}")
 
 
+# ─── Model structure metadata ──────────────────────────────────────────────────
+# Fixed test IDs; non-destructive read-only endpoints only.
+
+WORKSPACE_ID = "8a868cd885f53bd201860f5a4fea1ff1"
+MODEL_ID = "09F86E3942A84353892853BE3BE82280"
+
+
+def _auth_headers(token):
+    return {"Authorization": f"AnaplanAuthToken {token}"}
+
+
+@pytest.fixture(scope="module")
+def module_id_with_line_items(integration_token):
+    """First module ID that has at least one line item."""
+    h = _auth_headers(integration_token)
+    with httpx.Client() as client:
+        r = client.get(f"{API_URL}/2/0/models/{MODEL_ID}/modules", headers=h)
+        if r.status_code != 200:
+            pytest.skip(f"Could not list modules: {r.status_code}")
+        for m in r.json().get("modules", []):
+            r2 = client.get(
+                f"{API_URL}/2/0/models/{MODEL_ID}/modules/{m['id']}/lineItems",
+                headers=h,
+            )
+            if r2.status_code == 200 and r2.json().get("items"):
+                return m["id"]
+    pytest.skip("No module with line items found in test model")
+
+
+@pytest.fixture(scope="module")
+def module_id_with_views(integration_token):
+    """First module ID that has at least one view."""
+    h = _auth_headers(integration_token)
+    with httpx.Client() as client:
+        r = client.get(f"{API_URL}/2/0/models/{MODEL_ID}/modules", headers=h)
+        if r.status_code != 200:
+            pytest.skip(f"Could not list modules: {r.status_code}")
+        for m in r.json().get("modules", []):
+            r2 = client.get(
+                f"{API_URL}/2/0/models/{MODEL_ID}/modules/{m['id']}/views",
+                headers=h,
+            )
+            if r2.status_code == 200 and r2.json().get("views"):
+                return m["id"]
+    pytest.skip("No module with views found in test model")
+
+
+@pytest.fixture(scope="module")
+def view_id(integration_token):
+    """First view ID from the model-level view list."""
+    h = _auth_headers(integration_token)
+    with httpx.Client() as client:
+        r = client.get(
+            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/views",
+            headers=h,
+        )
+    if r.status_code != 200:
+        pytest.skip(f"Could not list views: {r.status_code}")
+    views = r.json().get("views", [])
+    if not views:
+        pytest.skip("No views in test model")
+    return views[0]["id"]
+
+
+@pytest.fixture(scope="module")
+def line_item_and_dimension_ids(integration_token):
+    """(line_item_id, dimension_id) — first line item that has at least one dimension."""
+    h = _auth_headers(integration_token)
+    with httpx.Client() as client:
+        r = client.get(f"{API_URL}/2/0/models/{MODEL_ID}/lineItems", headers=h)
+        if r.status_code != 200:
+            pytest.skip(f"Could not list line items: {r.status_code}")
+        for item in r.json().get("items", []):
+            lid = item["id"]
+            r2 = client.get(
+                f"{API_URL}/2/0/models/{MODEL_ID}/lineItems/{lid}/dimensions",
+                headers=h,
+            )
+            if r2.status_code == 200 and r2.json().get("dimensions"):
+                return lid, r2.json()["dimensions"][0]["id"]
+    pytest.skip("No line item with dimensions found in test model")
+
+
+@pytest.fixture(scope="module")
+def line_item_id(line_item_and_dimension_ids):
+    return line_item_and_dimension_ids[0]
+
+
+@pytest.fixture(scope="module")
+def dimension_id(line_item_and_dimension_ids):
+    return line_item_and_dimension_ids[1]
+
+
+@pytest.fixture(scope="module")
+def view_and_dimension_for_items(integration_token):
+    """(view_id, dimension_id) — first view+dimension pair with at least one item."""
+    h = _auth_headers(integration_token)
+    with httpx.Client() as client:
+        r = client.get(
+            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/views", headers=h
+        )
+        if r.status_code != 200:
+            pytest.skip(f"Could not list views: {r.status_code}")
+        for v in r.json().get("views", []):
+            vid = v["id"]
+            r2 = client.get(f"{API_URL}/2/0/models/{MODEL_ID}/views/{vid}", headers=h)
+            if r2.status_code != 200:
+                continue
+            for row in r2.json().get("rows", []):
+                did = row["id"]
+                r3 = client.get(
+                    f"{API_URL}/2/0/models/{MODEL_ID}/views/{vid}/dimensions/{did}/items",
+                    headers=h,
+                )
+                if r3.status_code == 200 and r3.json().get("items"):
+                    return vid, did
+    pytest.skip("No view+dimension with items found in test model")
+
+
+@pytest.fixture(scope="module")
+def list_id(integration_token):
+    """First list ID from the workspace/model list endpoint."""
+    h = _auth_headers(integration_token)
+    with httpx.Client() as client:
+        r = client.get(
+            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/lists",
+            headers=h,
+        )
+    if r.status_code != 200:
+        pytest.skip(f"Could not list lists: {r.status_code}")
+    lists = r.json().get("lists", [])
+    if not lists:
+        pytest.skip("No lists in test model")
+    return lists[0]["id"]
+
+
+@pytest.mark.live
+def test_list_modules(integration_token):
+    """GET /2/0/models/{modelId}/modules returns list of modules."""
+    with httpx.Client() as client:
+        response = client.get(
+            f"{API_URL}/2/0/models/{MODEL_ID}/modules",
+            headers={"Authorization": f"AnaplanAuthToken {integration_token}"},
+        )
+
+    assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
+    body = response.json()
+    assert body.get("status", {}).get("code") == 200
+    modules = body.get("modules")
+    assert isinstance(modules, list), f"Expected 'modules' list; keys: {list(body.keys())}"
+    if modules:
+        assert modules[0].get("id"), "Module must have an id"
+        assert "name" in modules[0], "Module must have a name"
+
+
+@pytest.mark.live
+def test_list_module_line_items(integration_token, module_id_with_line_items):
+    """GET /2/0/models/{modelId}/modules/{moduleId}/lineItems returns line items."""
+    with httpx.Client() as client:
+        response = client.get(
+            f"{API_URL}/2/0/models/{MODEL_ID}/modules/{module_id_with_line_items}/lineItems",
+            headers={"Authorization": f"AnaplanAuthToken {integration_token}"},
+        )
+
+    assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
+    body = response.json()
+    assert body.get("status", {}).get("code") == 200
+    items = body.get("items")
+    assert isinstance(items, list), f"Expected 'items' list; keys: {list(body.keys())}"
+    if items:
+        assert items[0].get("id"), "Line item must have an id"
+        assert "name" in items[0], "Line item must have a name"
+
+
+@pytest.mark.live
+def test_list_module_views(integration_token, module_id_with_views):
+    """GET /2/0/models/{modelId}/modules/{moduleId}/views returns views for a module."""
+    with httpx.Client() as client:
+        response = client.get(
+            f"{API_URL}/2/0/models/{MODEL_ID}/modules/{module_id_with_views}/views",
+            headers={"Authorization": f"AnaplanAuthToken {integration_token}"},
+        )
+
+    assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
+    body = response.json()
+    assert body.get("status", {}).get("code") == 200
+    views = body.get("views")
+    assert isinstance(views, list), f"Expected 'views' list; keys: {list(body.keys())}"
+    if views:
+        assert views[0].get("id"), "View must have an id"
+        assert "name" in views[0], "View must have a name"
+
+
+@pytest.mark.live
+def test_list_model_views(integration_token):
+    """GET /2/0/workspaces/{workspaceId}/models/{modelId}/views returns all views."""
+    with httpx.Client() as client:
+        response = client.get(
+            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/views",
+            headers={"Authorization": f"AnaplanAuthToken {integration_token}"},
+        )
+
+    assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
+    body = response.json()
+    assert body.get("status", {}).get("code") == 200
+    views = body.get("views")
+    assert isinstance(views, list), f"Expected 'views' list; keys: {list(body.keys())}"
+    if views:
+        assert views[0].get("id"), "View must have an id"
+        assert "name" in views[0], "View must have a name"
+
+
+@pytest.mark.live
+def test_get_view(integration_token, view_id):
+    """GET /2/0/models/{modelId}/views/{viewId} returns view metadata including dimensions."""
+    with httpx.Client() as client:
+        response = client.get(
+            f"{API_URL}/2/0/models/{MODEL_ID}/views/{view_id}",
+            headers=_auth_headers(integration_token),
+        )
+
+    assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
+    body = response.json()
+    assert body.get("status", {}).get("code") == 200
+    # API returns flat viewName/viewId/rows, not a nested view object
+    assert body.get("viewId") == view_id, (
+        f"Returned viewId must match requested ID; keys: {list(body.keys())}"
+    )
+    assert "viewName" in body, "Response must have viewName"
+    assert isinstance(body.get("rows"), list), "Response must have rows list"
+
+
+@pytest.mark.live
+def test_list_model_line_items(integration_token):
+    """GET /2/0/models/{modelId}/lineItems returns all line items in the model."""
+    with httpx.Client() as client:
+        response = client.get(
+            f"{API_URL}/2/0/models/{MODEL_ID}/lineItems",
+            headers=_auth_headers(integration_token),
+        )
+
+    assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
+    body = response.json()
+    assert body.get("status", {}).get("code") == 200
+    items = body.get("items")
+    assert isinstance(items, list), f"Expected 'items' list; keys: {list(body.keys())}"
+    if items:
+        assert items[0].get("id"), "Line item must have an id"
+        assert "name" in items[0], "Line item must have a name"
+
+
+@pytest.mark.live
+def test_list_line_item_dimensions(integration_token, line_item_id):
+    """GET /2/0/models/{modelId}/lineItems/{lineItemId}/dimensions returns dimensions."""
+    with httpx.Client() as client:
+        response = client.get(
+            f"{API_URL}/2/0/models/{MODEL_ID}/lineItems/{line_item_id}/dimensions",
+            headers=_auth_headers(integration_token),
+        )
+
+    assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
+    body = response.json()
+    assert body.get("status", {}).get("code") == 200
+    dims = body.get("dimensions")
+    assert isinstance(dims, list), f"Expected 'dimensions' list; keys: {list(body.keys())}"
+    if dims:
+        assert dims[0].get("id"), "Dimension must have an id"
+        assert "name" in dims[0], "Dimension must have a name"
+
+
+@pytest.mark.live
+def test_list_line_item_dimension_items(integration_token, line_item_id, dimension_id):
+    """GET /2/0/models/{modelId}/lineItems/{lineItemId}/dimensions/{dimensionId}/items."""
+    with httpx.Client() as client:
+        response = client.get(
+            f"{API_URL}/2/0/models/{MODEL_ID}/lineItems/{line_item_id}/dimensions/{dimension_id}/items",
+            headers=_auth_headers(integration_token),
+        )
+
+    assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
+    body = response.json()
+    assert body.get("status", {}).get("code") == 200
+    items = body.get("items")
+    assert isinstance(items, list), f"Expected 'items' list; keys: {list(body.keys())}"
+    if items:
+        assert items[0].get("id"), "Dimension item must have an id"
+        assert "name" in items[0], "Dimension item must have a name"
+
+
+@pytest.mark.live
+def test_list_view_dimension_items(integration_token, view_and_dimension_for_items):
+    """GET /2/0/models/{modelId}/views/{viewId}/dimensions/{dimensionId}/items."""
+    vid, did = view_and_dimension_for_items
+    with httpx.Client() as client:
+        response = client.get(
+            f"{API_URL}/2/0/models/{MODEL_ID}/views/{vid}/dimensions/{did}/items",
+            headers=_auth_headers(integration_token),
+        )
+
+    assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
+    body = response.json()
+    assert body.get("status", {}).get("code") == 200
+    items = body.get("items")
+    assert isinstance(items, list), f"Expected 'items' list; keys: {list(body.keys())}"
+    if items:
+        assert items[0].get("id"), "Dimension item must have an id"
+        assert "name" in items[0], "Dimension item must have a name"
+
+
+@pytest.mark.live
+def test_list_workspace_dimension_items(integration_token, dimension_id):
+    """GET /2/0/workspaces/{workspaceId}/models/{modelId}/dimensions/{dimensionId}/items."""
+    with httpx.Client() as client:
+        response = client.get(
+            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/dimensions/{dimension_id}/items",
+            headers=_auth_headers(integration_token),
+        )
+
+    assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
+    body = response.json()
+    assert body.get("status", {}).get("code") == 200
+    items = body.get("items")
+    assert isinstance(items, list), f"Expected 'items' list; keys: {list(body.keys())}"
+    if items:
+        assert items[0].get("id"), "Dimension item must have an id"
+        assert "name" in items[0], "Dimension item must have a name"
+
+
+@pytest.mark.live
+def test_list_lists(integration_token):
+    """GET /2/0/workspaces/{workspaceId}/models/{modelId}/lists returns list of lists."""
+    with httpx.Client() as client:
+        response = client.get(
+            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/lists",
+            headers=_auth_headers(integration_token),
+        )
+
+    assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
+    body = response.json()
+    assert body.get("status", {}).get("code") == 200
+    lists = body.get("lists")
+    assert isinstance(lists, list), f"Expected 'lists' list; keys: {list(body.keys())}"
+    if lists:
+        assert lists[0].get("id"), "List must have an id"
+        assert "name" in lists[0], "List must have a name"
+
+
+@pytest.mark.live
+def test_get_list(integration_token, list_id):
+    """GET /2/0/workspaces/{workspaceId}/models/{modelId}/lists/{listId} returns list metadata."""
+    with httpx.Client() as client:
+        response = client.get(
+            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/lists/{list_id}",
+            headers=_auth_headers(integration_token),
+        )
+
+    assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
+    body = response.json()
+    assert body.get("status", {}).get("code") == 200
+    metadata = body.get("metadata")
+    assert metadata is not None, f"Expected 'metadata' key; keys: {list(body.keys())}"
+    assert metadata.get("id") == list_id, "Returned list ID must match requested ID"
+    assert "name" in metadata, "List metadata must have a name"
+
+
 # ─── Helpers ────────────────────────────────────────────────────────────────────
 
 def assert_response_code(response, expected_codes, discrepancies):
