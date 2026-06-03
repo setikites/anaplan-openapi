@@ -136,7 +136,17 @@
     "/2/0/models": {
       "get": {
         "summary": "List user models",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "modelDetails",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "example": true,
+            "description": "When true, includes available model memory usage in bytes in the response."
+          }
+        ],
         "responses": {
           "200": {
             "description": "Response 200",
@@ -1167,7 +1177,17 @@
     "/2/0/workspaces/{workspaceId}/models/{modelId}/views": {
       "get": {
         "summary": "Retrieve IDs and names for all views in a model",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "includesubsidiaryviews",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "true",
+            "description": "When set to \"true\", includes unsaved subsidiary views in the results. Any value other than \"true\" is interpreted as false."
+          }
+        ],
         "responses": {
           "200": {
             "description": "Response 200",
@@ -2371,7 +2391,17 @@
     "/2/0/models/{modelId}/processes/{processId}": {
       "get": {
         "summary": "Retrieve metadata for a process",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "showImportDataSource",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "example": "true",
+            "description": "When set to \"true\", includes additional information about the import data source. Any value other than \"true\" is interpreted as false."
+          }
+        ],
         "responses": {
           "200": {
             "description": "Response 200",

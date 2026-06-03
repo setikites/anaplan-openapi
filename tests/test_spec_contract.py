@@ -446,6 +446,61 @@ def test_integration_response_examples_match_schemas():
     )
 
 
+# ─── Integration query parameter declarations ─────────────────────────────
+
+
+def _all_params(spec, path_str, method):
+    """Return combined path-level + operation-level parameters for an operation."""
+    path_item = spec.get("paths", {}).get(path_str, {})
+    return path_item.get("parameters", []) + path_item.get(method, {}).get("parameters", [])
+
+
+@_skip_integration
+def test_integration_models_list_declares_model_details():
+    """GET /2/0/models must declare the modelDetails query parameter."""
+    spec = _load(_INTEGRATION_SPEC)
+    params = _all_params(spec, "/2/0/models", "get")
+    names = {p["name"] for p in params if "name" in p}
+    assert "modelDetails" in names, (
+        "GET /2/0/models is missing modelDetails query parameter"
+    )
+    md = next(p for p in params if p.get("name") == "modelDetails")
+    assert md.get("in") == "query"
+    assert md.get("schema", {}).get("type") == "boolean"
+
+
+@_skip_integration
+def test_integration_workspace_views_declares_include_subsidiary_views():
+    """GET /2/0/workspaces/{workspaceId}/models/{modelId}/views must declare includesubsidiaryviews."""
+    spec = _load(_INTEGRATION_SPEC)
+    params = _all_params(
+        spec, "/2/0/workspaces/{workspaceId}/models/{modelId}/views", "get"
+    )
+    names = {p["name"] for p in params if "name" in p}
+    assert "includesubsidiaryviews" in names, (
+        "GET /2/0/workspaces/{workspaceId}/models/{modelId}/views is missing "
+        "includesubsidiaryviews query parameter"
+    )
+    p = next(p for p in params if p.get("name") == "includesubsidiaryviews")
+    assert p.get("in") == "query"
+
+
+@_skip_integration
+def test_integration_processes_declares_show_import_data_source():
+    """GET /2/0/models/{modelId}/processes/{processId} must declare showImportDataSource."""
+    spec = _load(_INTEGRATION_SPEC)
+    params = _all_params(
+        spec, "/2/0/models/{modelId}/processes/{processId}", "get"
+    )
+    names = {p["name"] for p in params if "name" in p}
+    assert "showImportDataSource" in names, (
+        "GET /2/0/models/{modelId}/processes/{processId} is missing "
+        "showImportDataSource query parameter"
+    )
+    p = next(p for p in params if p.get("name") == "showImportDataSource")
+    assert p.get("in") == "query"
+
+
 # ─── Description cleanliness ──────────────────────────────────────────────
 
 
