@@ -42,13 +42,7 @@ paths:
   /2/0/users/me:
     get:
       summary: Retrieve your user
-      parameters:
-      - name: Authorization
-        in: header
-        required: false
-        deprecated: false
-        schema: {}
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: Response 200
@@ -75,12 +69,7 @@ paths:
   /2/0/users/{userId}:
     get:
       summary: Retrieve user information
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: Response 200
@@ -113,12 +102,7 @@ paths:
   /2/0/models:
     get:
       summary: List user models
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: Response 200
@@ -158,11 +142,6 @@ paths:
         schema:
           type: boolean
         example: true
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
           description: Response 200
@@ -220,11 +199,6 @@ paths:
         schema:
           type: boolean
         example: true
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
           description: Response 200
@@ -259,11 +233,6 @@ paths:
         schema:
           type: boolean
         example: true
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
           description: Response 200
@@ -290,12 +259,7 @@ paths:
   /2/0/workspaces/{workspaceId}/models/{modelId}/dimensions/{dimensionId}/items:
     post:
       summary: Lookup dimension items by name or code
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: Response 200
@@ -396,12 +360,7 @@ paths:
       example: '{{dimensionId}}'
     get:
       summary: Retrieve all items in a dimension
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: Response 200
@@ -474,12 +433,7 @@ paths:
   /2/0/models/{modelId}/views/{viewId}/dimensions/{dimensionId}/items:
     get:
       summary: Retrieve selected items in a dimension
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: Response 200
@@ -560,12 +514,7 @@ paths:
   /2/0/workspaces/{workspaceId}/models/{modelId}/lists:
     get:
       summary: Retrieve Lists
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: Response 200
@@ -671,12 +620,7 @@ paths:
   /2/0/workspaces/{workspaceId}/models/{modelId}/lists/{listId}:
     get:
       summary: Retrieve list metadata
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: Response 200
@@ -783,12 +727,7 @@ paths:
   /2/0/models/{modelId}/modules:
     get:
       summary: Retrieve IDs and names for all modules in a model
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: Response 200
@@ -857,11 +796,6 @@ paths:
         schema:
           type: boolean
         example: true
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
           description: Response 200
@@ -973,12 +907,7 @@ paths:
   /2/0/workspaces/{workspaceId}/models/{modelId}/views:
     get:
       summary: Retrieve IDs and names for all views in a model
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: Response 200
@@ -1069,12 +998,7 @@ paths:
   /2/0/models/{modelId}/views/{viewId}:
     get:
       summary: Retrieve metadata for dimensions on a view
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: Response 200
@@ -1134,11 +1058,6 @@ paths:
         schema:
           type: boolean
         example: true
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
           description: Response 200
@@ -1214,12 +1133,7 @@ paths:
   /2/0/models/{modelId}/lineItems:
     get:
       summary: Retrieve all line items in a model
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: Response 200
@@ -1302,12 +1216,7 @@ paths:
   /2/0/models/{modelId}/lineItems/{lineItemId}/dimensions:
     get:
       summary: Retrieve dimensions IDs for a line item
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: 'TODO: document response'
@@ -1341,12 +1250,7 @@ paths:
   /2/0/models/{modelId}/lineItems/{lineItemId}/dimensions/{dimensionId}/items:
     get:
       summary: Retrieve dimension items for a line item
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: Response 200
@@ -1429,12 +1333,7 @@ paths:
   /2/0/models/{modelId}/versions:
     get:
       summary: Retrieve version metadata
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: Response 200
@@ -1508,12 +1407,7 @@ paths:
   /2/0/workspaces/{workspaceId}/models/{modelId}/currentPeriod:
     get:
       summary: Retrieve current period
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: Response 200
@@ -1578,12 +1472,7 @@ paths:
   /2/0/workspaces/{workspaceId}/models/{modelId}/modelCalendar:
     get:
       summary: Get current fiscal year
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: Response 200
@@ -1654,12 +1543,7 @@ paths:
   /2/0/workspaces/{workspaceId}/models/{modelId}/actions:
     get:
       summary: List the actions in the model as a JSON array
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: Response 200
@@ -1703,12 +1587,7 @@ paths:
   /2/0/workspaces/{workspaceId}/models/{modelId}/processes:
     get:
       summary: List the process definitions available in a model as a JSON array
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: Response 200
@@ -1748,12 +1627,7 @@ paths:
   /2/0/workspaces/{workspaceId}/models/{modelId}/imports/:
     get:
       summary: Get a list of import actions
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: Response 200
@@ -1812,12 +1686,7 @@ paths:
   /2/0/workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks:
     get:
       summary: Get a list of the import tasks
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: Response 200
@@ -1874,12 +1743,7 @@ paths:
       example: '{{importId}}'
     post:
       summary: Start the import
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: Response 200
@@ -1910,12 +1774,7 @@ paths:
   /2/0/workspaces/{workspaceId}/models/{modelId}/exports:
     get:
       summary: List the available export definitions as a JSON array
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: Response 200
@@ -1979,12 +1838,7 @@ paths:
   /2/0/models/{modelId}/processes/{processId}:
     get:
       summary: Retrieve metadata for a process
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: Response 200
@@ -2074,12 +1928,7 @@ paths:
   /2/0/workspaces/{workspaceId}/models/{modelId}/exports/{exportId}:
     get:
       summary: Get the metadata for an export definition
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: Response 200
@@ -2166,12 +2015,7 @@ paths:
   /2/0/workspaces/{workspaceId}/models/{modelId}/imports/{importId}:
     get:
       summary: Get the metadata for an import definition
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: Response 200
@@ -2255,12 +2099,7 @@ paths:
   /2/0/models/{modelId}/files:
     get:
       summary: Get a list of files
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: Response 200
@@ -2348,12 +2187,7 @@ paths:
   /2/0/workspaces/{workspaceId}/models/{modelId}/files/{fileId}:
     delete:
       summary: Delete files
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: 'TODO: document response'
@@ -2391,12 +2225,7 @@ paths:
       example: '{{fileId}}'
     post:
       summary: Set the chunk count
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: Response 200
@@ -2465,12 +2294,7 @@ paths:
               chunkCount: -1
     put:
       summary: Upload file as a single chunk
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: 'TODO: document response'
@@ -2490,12 +2314,7 @@ paths:
   /2/0/models/{modelId}/versions/{versionId}/switchover:
     put:
       summary: Set version switchover date
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: Response 200
@@ -2568,12 +2387,7 @@ paths:
   /2/0/models/{modelId}/currentPeriod:
     put:
       summary: Set current period
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: Response 200
@@ -2650,12 +2464,7 @@ paths:
   /2/0/models/{modelId}/modelCalendar/fiscalYear:
     put:
       summary: Update current fiscal year
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: Response 200
@@ -2726,12 +2535,7 @@ paths:
   /2/0/models/{modelId}/modules/{moduleId}/data:
     post:
       summary: Write cell data by coordinate to module
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: 'TODO: document response'
@@ -2805,11 +2609,6 @@ paths:
         schema:
           type: string
         example: add
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '200':
           description: Response 200
@@ -2894,12 +2693,7 @@ paths:
       example: '{{listId}}'
     put:
       summary: Update list items
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: 'TODO: document response'
@@ -2969,11 +2763,6 @@ paths:
         schema:
           type: boolean
         example: true
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '429':
           description: more detail in path description
@@ -3034,12 +2823,7 @@ paths:
   /2/0/workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests:
     post:
       summary: Initiate long read request
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: Response 200
@@ -3115,12 +2899,7 @@ paths:
   /2/0/workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests/{requestId}:
     get:
       summary: Retrieve status of large read request
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: Response 200
@@ -3198,12 +2977,7 @@ paths:
       example: ''
     delete:
       summary: Delete Read Request
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: 'TODO: document response'
@@ -3242,11 +3016,6 @@ paths:
     get:
       summary: Download Pages
       parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
       - name: Accept-Encoding
         in: header
         schema:
@@ -3327,11 +3096,6 @@ paths:
         schema:
           type: string
         example: v1
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
       responses:
         '429':
           description: more detail in path description
@@ -3423,12 +3187,7 @@ paths:
   /2/0/workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks/0:
     put:
       summary: Upload a file in chunks
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: 'TODO: document response'
@@ -3464,12 +3223,7 @@ paths:
       example: '{{fileId}}'
     get:
       summary: Get the data in a chunk
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: 'TODO: document response'
@@ -3478,12 +3232,7 @@ paths:
   /2/0/workspaces/{workspaceId}/models/{modelId}/files/{fileId}/complete:
     post:
       summary: Complete the upload
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: Response 200
@@ -3549,12 +3298,7 @@ paths:
   /2/0/workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}:
     get:
       summary: Monitor the import task
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: Response 200
@@ -3673,12 +3417,7 @@ paths:
   /2/0/workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/dump/chunks:
     get:
       summary: Query the number of chunks in a dump file
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: 'TODO: document response'
@@ -3733,12 +3472,7 @@ paths:
   /2/0/workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/dump/chunks/0:
     get:
       summary: Download dump file chunks
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: 'TODO: document response'
@@ -3788,12 +3522,7 @@ paths:
   /2/0/workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/dump:
     get:
       summary: Check dump file for failures
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: 'TODO: document response'
@@ -3842,12 +3571,7 @@ paths:
   /2/0/workspaces/{workspaceId}/models/{modelId}/exports/{exportId}/tasks:
     post:
       summary: Start the export
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: Response 200
@@ -3914,12 +3638,7 @@ paths:
   /2/0/workspaces/{workspaceId}/models/{modelId}/exports/{exportId}/tasks/{taskId}:
     get:
       summary: Monitor the export tasks
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: Response 200
@@ -4006,12 +3725,7 @@ paths:
   /2/0/workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks:
     get:
       summary: Get Chunks Details
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: Response 200
@@ -4079,12 +3793,7 @@ paths:
   /2/0/workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks:
     post:
       summary: Start the process
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: Response 200
@@ -4126,12 +3835,7 @@ paths:
       example: '{{processId}}'
     get:
       summary: Get the list of tasks for the process
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: Response 200
@@ -4156,12 +3860,7 @@ paths:
   /2/0/workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks:
     post:
       summary: Start Other Action
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: Response 200
@@ -4205,12 +3904,7 @@ paths:
       example: '{{processId}}'
     get:
       summary: Get a list of action tasks
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: Response 200
@@ -4234,12 +3928,7 @@ paths:
   /2/0/workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks/{taskId}:
     get:
       summary: Monitor the process tasks
-      parameters:
-      - name: Authorization
-        in: header
-        schema:
-          type: string
-        example: AnaplanAuthToken {{anaplan_auth_token}}
+      parameters: []
       responses:
         '200':
           description: Response 200
@@ -4327,9 +4016,6 @@ paths:
       example: '{{taskId}}'
 components:
   securitySchemes:
-    BasicAuth:
-      type: http
-      scheme: basic
     AnaplanAuthToken:
       type: apiKey
       in: header

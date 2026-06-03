@@ -3,7 +3,7 @@
   "info": {
     "title": "Anaplan Authentication Service API",
     "version": "1.0.0",
-    "description": "Generates and manages authentication tokens for use with Anaplan REST APIs. Supports three authentication methods: HTTP Basic (username/password), CA Certificate (X.509 certificate with SHA512withRSA signature), and token refresh. Tokens expire after 35 minutes. The correct server URL depends on your Anaplan region — see the servers list below."
+    "description": "Generates and manages authentication tokens for use with Anaplan REST APIs. Supports three authentication methods: HTTP Basic (username/password), CA Certificate (X.509 certificate with SHA512withRSA signature), and token refresh. Tokens expire after 35 minutes. The correct server URL depends on your Anaplan region \u2014 see the servers list below."
   },
   "servers": [
     {
@@ -89,11 +89,15 @@
                     },
                     "status": {
                       "type": "string",
-                      "enum": ["SUCCESS"]
+                      "enum": [
+                        "SUCCESS"
+                      ]
                     },
                     "statusMessage": {
                       "type": "string",
-                      "enum": ["Login successful"]
+                      "enum": [
+                        "Login successful"
+                      ]
                     },
                     "meta": {
                       "$ref": "#/components/schemas/ValidationUrl"
@@ -146,11 +150,15 @@
                     },
                     "status": {
                       "type": "string",
-                      "enum": ["SUCCESS"]
+                      "enum": [
+                        "SUCCESS"
+                      ]
                     },
                     "statusMessage": {
                       "type": "string",
-                      "enum": ["Token refreshed"]
+                      "enum": [
+                        "Token refreshed"
+                      ]
                     },
                     "meta": {
                       "$ref": "#/components/schemas/ValidationUrl"
@@ -185,12 +193,7 @@
           "Authentication",
           "Other Authentication Actions"
         ],
-        "security": [
-          {
-            "AnaplanAuth": []
-          }
-        ],
-        "description": "Extends the session for an existing AnaplanAuthToken. Tokens expire after 35 minutes; call this endpoint before expiry to maintain a session without re-authenticating.\n\n**Note:** Live testing shows the response returns the same `tokenValue` — the token string itself does not change, but its internal expiration is reset."
+        "description": "Extends the session for an existing AnaplanAuthToken. Tokens expire after 35 minutes; call this endpoint before expiry to maintain a session without re-authenticating.\n\n**Note:** Live testing shows the response returns the same `tokenValue` \u2014 the token string itself does not change, but its internal expiration is reset."
       }
     },
     "/token/validate": {
@@ -242,11 +245,15 @@
                     },
                     "status": {
                       "type": "string",
-                      "enum": ["SUCCESS"]
+                      "enum": [
+                        "SUCCESS"
+                      ]
                     },
                     "statusMessage": {
                       "type": "string",
-                      "enum": ["Token validated"]
+                      "enum": [
+                        "Token validated"
+                      ]
                     },
                     "meta": {
                       "$ref": "#/components/schemas/ValidationUrl"
@@ -281,11 +288,6 @@
           "Authentication",
           "Other Authentication Actions"
         ],
-        "security": [
-          {
-            "AnaplanAuth": []
-          }
-        ],
         "description": "Returns details for a valid AnaplanAuthToken, including expiry timestamp, token ID, and user/customer identifiers. Returns 401 if the token is invalid, expired, or has been revoked by logout.\n\n**Note:** `userGuid` and `customerGuid` are 32-character hexadecimal strings (no hyphens), not standard UUIDs."
       }
     },
@@ -311,12 +313,7 @@
           "Authentication",
           "Other Authentication Actions"
         ],
-        "security": [
-          {
-            "AnaplanAuth": []
-          }
-        ],
-        "description": "Immediately invalidates an AnaplanAuthToken. Returns 204 with no body on success. Any subsequent use of the token — including validation or refresh — returns 401."
+        "description": "Immediately invalidates an AnaplanAuthToken. Returns 204 with no body on success. Any subsequent use of the token \u2014 including validation or refresh \u2014 returns 401."
       }
     }
   },
@@ -392,7 +389,10 @@
         "properties": {
           "status": {
             "type": "string",
-            "enum": ["FAILURE_BAD_HEADER", "FAILURE_BAD_CREDENTIAL"]
+            "enum": [
+              "FAILURE_BAD_HEADER",
+              "FAILURE_BAD_CREDENTIAL"
+            ]
           },
           "statusMessage": {
             "type": "string",
@@ -403,12 +403,19 @@
       "ValidationUrl": {
         "properties": {
           "validationUrl": {
-            "enum": ["https://auth.anaplan.com/token/validate"],
+            "enum": [
+              "https://auth.anaplan.com/token/validate"
+            ],
             "type": "string"
           }
         },
         "type": "object"
       }
     }
-  }
+  },
+  "security": [
+    {
+      "AnaplanAuth": []
+    }
+  ]
 }
