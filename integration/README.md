@@ -76,6 +76,8 @@ Endpoints covered:
 | `test_get_workspace` | `GET /2/0/workspaces/{workspaceId}` |
 | `test_list_models` | `GET /2/0/models` |
 | `test_get_model` | `GET /2/0/models/{modelId}` |
+| `test_list_workspace_models` | `GET /2/0/workspaces/{workspaceId}/models` |
+| `test_get_workspace_model` | `GET /2/0/workspaces/{workspaceId}/models/{modelId}` (skipped — 405) |
 | `test_auth_scheme_probe` | Probes Bearer vs AnaplanAuthToken on 3 endpoints |
 
 ## Discovered Discrepancies
@@ -86,10 +88,24 @@ _Document differences between Apiary docs, Postman collection, and live API beha
 
 Live testing shows this endpoint returns `404 Resource not found` even when the workspace appears in `GET /workspaces`. The endpoint likely requires **Workspace Administrator** role. The spec documents both 200 and 404 responses; the live test accepts 404 with a warning rather than failing.
 
+### Workspace-scoped model paths (issue #25)
+
+Two paths absent from the original spec were probed via live testing:
+
+| Path | Status | Finding |
+|------|--------|---------|
+| `GET /2/0/workspaces/{workspaceId}/models` | **200 OK** | Valid — workspace-filtered model list |
+| `GET /2/0/workspaces/{workspaceId}/models/{modelId}` | **405 Method Not Allowed** | Endpoint does not support GET |
+
+**`GET /workspaces/{workspaceId}/models`** is a working endpoint. Its response shape is **identical** to `GET /models` (top-level keys: `meta`, `status`, `models`; model object fields: `id`, `name`, `activeState`, `currentWorkspaceId`, `currentWorkspaceName`, `modelUrl`, `categoryValues`). The only behavioral difference is that results are scoped to the specified workspace. This path has been added to the spec.
+
+**`GET /workspaces/{workspaceId}/models/{modelId}`** returns `405 Method Not Allowed` with body `{"status": {"code": 405, "message": "Method Not Allowed"}, "path": "...", "timestamp": "..."}`. This is not a permissions issue (unlike the 404 on `GET /workspaces/{workspaceId}`) — the method simply does not exist on this path. Use `GET /2/0/models/{modelId}` for model detail lookups. This path is not added to the spec.
+
 ### Response key naming (confirmed via live tests)
 
 - `GET /users/me` and `GET /users/{userId}`: response key is `user` (singular object) ✓
 - `GET /workspaces`: response key is `workspaces` (array) ✓
 - `GET /models`: response key is `models` (array) ✓
 - `GET /models/{modelId}`: response key is `model` (singular object) ✓
+- `GET /workspaces/{workspaceId}/models`: response key is `models` (array), identical shape to `GET /models` ✓
 - `GET /workspaces/{workspaceId}`: not confirmed (returns 404 — see above)

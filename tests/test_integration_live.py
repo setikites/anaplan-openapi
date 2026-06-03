@@ -312,6 +312,114 @@ def test_get_model(integration_token):
     assert model.get("id") == model_id, "Returned model ID must match requested ID"
 
 
+# ─── Workspace-scoped model paths ──────────────────────────────────────────────
+# Uses WORKSPACE_ID / MODEL_ID / _auth_headers defined in "Model structure metadata" below.
+
+
+@pytest.mark.live
+def test_list_workspace_models(integration_token):
+    """GET /2/0/workspaces/{workspaceId}/models returns workspace-scoped model list.
+
+    Compares response shape to GET /2/0/models. Documents any structural differences.
+    """
+    ws_id = "8a868cd885f53bd201860f5a4fea1ff1"
+    h = {"Authorization": f"AnaplanAuthToken {integration_token}"}
+    with httpx.Client() as client:
+        baseline = client.get(f"{API_URL}/2/0/models", headers=h)
+        response = client.get(f"{API_URL}/2/0/workspaces/{ws_id}/models", headers=h)
+
+    if response.status_code in (404, 405):
+        pytest.skip(
+            f"GET /workspaces/{{workspaceId}}/models returned {response.status_code} — "
+            "endpoint not available for this account/region"
+        )
+
+    assert response.status_code == 200, (
+        f"Expected 200, got {response.status_code}: {response.text[:200]}"
+    )
+    body = response.json()
+    assert body.get("status", {}).get("code") == 200
+    models = body.get("models")
+    assert isinstance(models, list), (
+        f"Response must contain 'models' array; keys: {list(body.keys())}"
+    )
+    if models:
+        assert models[0].get("id"), "Model must have an id"
+        assert "name" in models[0], "Model must have a name"
+
+    if baseline.status_code == 200:
+        baseline_models = baseline.json().get("models") or []
+        baseline_keys = set(baseline_models[0].keys()) if baseline_models else set()
+        workspace_keys = set(models[0].keys()) if models else set()
+        if workspace_keys - baseline_keys:
+            warnings.warn(
+                f"GET /workspaces/{{workspaceId}}/models has extra fields vs GET /models: "
+                f"{workspace_keys - baseline_keys}",
+                UserWarning,
+                stacklevel=2,
+            )
+        if baseline_keys - workspace_keys:
+            warnings.warn(
+                f"GET /workspaces/{{workspaceId}}/models missing fields vs GET /models: "
+                f"{baseline_keys - workspace_keys}",
+                UserWarning,
+                stacklevel=2,
+            )
+
+
+@pytest.mark.live
+def test_get_workspace_model(integration_token):
+    """GET /2/0/workspaces/{workspaceId}/models/{modelId} returns workspace-scoped model detail.
+
+    Compares response shape to GET /2/0/models/{modelId}. Documents any structural differences.
+    """
+    ws_id = "8a868cd885f53bd201860f5a4fea1ff1"
+    model_id = "09F86E3942A84353892853BE3BE82280"
+    h = {"Authorization": f"AnaplanAuthToken {integration_token}"}
+    with httpx.Client() as client:
+        baseline = client.get(f"{API_URL}/2/0/models/{model_id}", headers=h)
+        response = client.get(
+            f"{API_URL}/2/0/workspaces/{ws_id}/models/{model_id}", headers=h
+        )
+
+    if response.status_code in (404, 405):
+        pytest.skip(
+            f"GET /workspaces/{{workspaceId}}/models/{{modelId}} returned {response.status_code} — "
+            "endpoint not available for this account/region"
+        )
+
+    assert response.status_code == 200, (
+        f"Expected 200, got {response.status_code}: {response.text[:200]}"
+    )
+    body = response.json()
+    assert body.get("status", {}).get("code") == 200
+    model = body.get("model") or next(iter(body.get("models") or []), None)
+    assert model, f"Response must contain 'model'; keys: {list(body.keys())}"
+    assert model.get("id") == model_id, "Returned model ID must match requested ID"
+
+    if baseline.status_code == 200:
+        baseline_body = baseline.json()
+        baseline_model = baseline_body.get("model") or next(
+            iter(baseline_body.get("models") or []), {}
+        )
+        baseline_keys = set(baseline_model.keys()) if baseline_model else set()
+        workspace_keys = set(model.keys())
+        if workspace_keys - baseline_keys:
+            warnings.warn(
+                f"GET /workspaces/{{workspaceId}}/models/{{modelId}} has extra fields vs "
+                f"GET /models/{{modelId}}: {workspace_keys - baseline_keys}",
+                UserWarning,
+                stacklevel=2,
+            )
+        if baseline_keys - workspace_keys:
+            warnings.warn(
+                f"GET /workspaces/{{workspaceId}}/models/{{modelId}} missing fields vs "
+                f"GET /models/{{modelId}}: {baseline_keys - workspace_keys}",
+                UserWarning,
+                stacklevel=2,
+            )
+
+
 # ─── Auth scheme probe ──────────────────────────────────────────────────────────
 
 @pytest.mark.live

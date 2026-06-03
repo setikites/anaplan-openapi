@@ -352,6 +352,53 @@
         }
       ]
     },
+    "/2/0/workspaces/{workspaceId}/models": {
+      "get": {
+        "summary": "List workspace models",
+        "description": "Returns models accessible to the calling user within the specified workspace. The response shape is identical to `GET /2/0/models` but filtered to models within the given workspace. Confirmed via live testing (issue #25).",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Response 200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "meta": {
+                      "type": "object"
+                    },
+                    "status": {
+                      "type": "object"
+                    },
+                    "models": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Model"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "General Workspace & Model Metadata"
+        ]
+      },
+      "parameters": [
+        {
+          "name": "workspaceId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "example": "8a868cd885f53bd201860f5a4fea1ff1"
+        }
+      ]
+    },
     "/2/0/workspaces/{workspaceId}/models/{modelId}/dimensions/{dimensionId}/items": {
       "post": {
         "summary": "Lookup dimension items by name or code",
