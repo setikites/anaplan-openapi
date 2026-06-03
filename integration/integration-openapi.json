@@ -294,9 +294,11 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
           },
-          "example": "8a868cda7c8b28f5017c9a4b2d8341cd"
+          "example": "8a868cda7c8b28f5017c9a4b2d8341cd",
+          "description": "Workspace identifier (32-character lowercase hex string)."
         }
       ]
     },
@@ -346,9 +348,11 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
-          "example": "4261ECE4389B45E18915B5EB72F7510B"
+          "example": "4261ECE4389B45E18915B5EB72F7510B",
+          "description": "Model identifier (32-character uppercase hex string)."
         }
       ]
     },
@@ -393,9 +397,11 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
           },
-          "example": "8a868cd885f53bd201860f5a4fea1ff1"
+          "example": "8a868cd885f53bd201860f5a4fea1ff1",
+          "description": "Workspace identifier (32-character lowercase hex string)."
         }
       ]
     },
@@ -500,18 +506,22 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
           },
-          "example": "8a868cda7c8b28f5017c9a4b2d8341cd"
+          "example": "8a868cda7c8b28f5017c9a4b2d8341cd",
+          "description": "Workspace identifier (32-character lowercase hex string)."
         },
         {
           "name": "modelId",
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
-          "example": "4261ECE4389B45E18915B5EB72F7510B"
+          "example": "4261ECE4389B45E18915B5EB72F7510B",
+          "description": "Model identifier (32-character uppercase hex string)."
         },
         {
           "name": "dimensionId",
@@ -672,9 +682,11 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
-          "example": "4261ECE4389B45E18915B5EB72F7510B"
+          "example": "4261ECE4389B45E18915B5EB72F7510B",
+          "description": "Model identifier (32-character uppercase hex string)."
         },
         {
           "name": "viewId",
@@ -774,18 +786,22 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
           },
-          "example": "8a868cda7c8b28f5017c9a4b2d8341cd"
+          "example": "8a868cda7c8b28f5017c9a4b2d8341cd",
+          "description": "Workspace identifier (32-character lowercase hex string)."
         },
         {
           "name": "modelId",
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
-          "example": "4261ECE4389B45E18915B5EB72F7510B"
+          "example": "4261ECE4389B45E18915B5EB72F7510B",
+          "description": "Model identifier (32-character uppercase hex string)."
         }
       ]
     },
@@ -877,18 +893,22 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
           },
-          "example": "8a868cda7c8b28f5017c9a4b2d8341cd"
+          "example": "8a868cda7c8b28f5017c9a4b2d8341cd",
+          "description": "Workspace identifier (32-character lowercase hex string)."
         },
         {
           "name": "modelId",
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
-          "example": "4261ECE4389B45E18915B5EB72F7510B"
+          "example": "4261ECE4389B45E18915B5EB72F7510B",
+          "description": "Model identifier (32-character uppercase hex string)."
         },
         {
           "name": "listId",
@@ -978,9 +998,11 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
-          "example": "4261ECE4389B45E18915B5EB72F7510B"
+          "example": "4261ECE4389B45E18915B5EB72F7510B",
+          "description": "Model identifier (32-character uppercase hex string)."
         }
       ]
     },
@@ -1125,9 +1147,11 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
-          "example": "4261ECE4389B45E18915B5EB72F7510B"
+          "example": "4261ECE4389B45E18915B5EB72F7510B",
+          "description": "Model identifier (32-character uppercase hex string)."
         },
         {
           "name": "moduleId",
@@ -1231,18 +1255,22 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
           },
-          "example": "8a868cda7c8b28f5017c9a4b2d8341cd"
+          "example": "8a868cda7c8b28f5017c9a4b2d8341cd",
+          "description": "Workspace identifier (32-character lowercase hex string)."
         },
         {
           "name": "modelId",
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
-          "example": "4261ECE4389B45E18915B5EB72F7510B"
+          "example": "4261ECE4389B45E18915B5EB72F7510B",
+          "description": "Model identifier (32-character uppercase hex string)."
         }
       ]
     },
@@ -1317,9 +1345,11 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
-          "example": "4261ECE4389B45E18915B5EB72F7510B"
+          "example": "4261ECE4389B45E18915B5EB72F7510B",
+          "description": "Model identifier (32-character uppercase hex string)."
         },
         {
           "name": "viewId",
@@ -1414,9 +1444,11 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
-          "example": "4261ECE4389B45E18915B5EB72F7510B"
+          "example": "4261ECE4389B45E18915B5EB72F7510B",
+          "description": "Model identifier (32-character uppercase hex string)."
         },
         {
           "name": "moduleId",
@@ -1529,9 +1561,11 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
-          "example": "4261ECE4389B45E18915B5EB72F7510B"
+          "example": "4261ECE4389B45E18915B5EB72F7510B",
+          "description": "Model identifier (32-character uppercase hex string)."
         }
       ]
     },
@@ -1577,9 +1611,11 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
-          "example": "4261ECE4389B45E18915B5EB72F7510B"
+          "example": "4261ECE4389B45E18915B5EB72F7510B",
+          "description": "Model identifier (32-character uppercase hex string)."
         },
         {
           "name": "lineItemId",
@@ -1661,9 +1697,11 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
-          "example": "4261ECE4389B45E18915B5EB72F7510B"
+          "example": "4261ECE4389B45E18915B5EB72F7510B",
+          "description": "Model identifier (32-character uppercase hex string)."
         },
         {
           "name": "lineItemId",
@@ -1772,9 +1810,11 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
-          "example": "4261ECE4389B45E18915B5EB72F7510B"
+          "example": "4261ECE4389B45E18915B5EB72F7510B",
+          "description": "Model identifier (32-character uppercase hex string)."
         }
       ]
     },
@@ -1842,18 +1882,22 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
           },
-          "example": "8a868cda7c8b28f5017c9a4b2d8341cd"
+          "example": "8a868cda7c8b28f5017c9a4b2d8341cd",
+          "description": "Workspace identifier (32-character lowercase hex string)."
         },
         {
           "name": "modelId",
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
-          "example": "4261ECE4389B45E18915B5EB72F7510B"
+          "example": "4261ECE4389B45E18915B5EB72F7510B",
+          "description": "Model identifier (32-character uppercase hex string)."
         }
       ]
     },
@@ -1920,18 +1964,22 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
           },
-          "example": "8a868cda7c8b28f5017c9a4b2d8341cd"
+          "example": "8a868cda7c8b28f5017c9a4b2d8341cd",
+          "description": "Workspace identifier (32-character lowercase hex string)."
         },
         {
           "name": "modelId",
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
-          "example": "4261ECE4389B45E18915B5EB72F7510B"
+          "example": "4261ECE4389B45E18915B5EB72F7510B",
+          "description": "Model identifier (32-character uppercase hex string)."
         }
       ]
     },
@@ -1976,18 +2024,22 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
           },
-          "example": "8a868cda7c8b28f5017c9a4b2d8341cd"
+          "example": "8a868cda7c8b28f5017c9a4b2d8341cd",
+          "description": "Workspace identifier (32-character lowercase hex string)."
         },
         {
           "name": "modelId",
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
-          "example": "4261ECE4389B45E18915B5EB72F7510B"
+          "example": "4261ECE4389B45E18915B5EB72F7510B",
+          "description": "Model identifier (32-character uppercase hex string)."
         }
       ]
     },
@@ -2026,18 +2078,22 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
           },
-          "example": "8a868cda7c8b28f5017c9a4b2d8341cd"
+          "example": "8a868cda7c8b28f5017c9a4b2d8341cd",
+          "description": "Workspace identifier (32-character lowercase hex string)."
         },
         {
           "name": "modelId",
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
-          "example": "4261ECE4389B45E18915B5EB72F7510B"
+          "example": "4261ECE4389B45E18915B5EB72F7510B",
+          "description": "Model identifier (32-character uppercase hex string)."
         }
       ]
     },
@@ -2105,18 +2161,22 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
           },
-          "example": "8a868cda7c8b28f5017c9a4b2d8341cd"
+          "example": "8a868cda7c8b28f5017c9a4b2d8341cd",
+          "description": "Workspace identifier (32-character lowercase hex string)."
         },
         {
           "name": "modelId",
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
-          "example": "4261ECE4389B45E18915B5EB72F7510B"
+          "example": "4261ECE4389B45E18915B5EB72F7510B",
+          "description": "Model identifier (32-character uppercase hex string)."
         }
       ]
     },
@@ -2173,18 +2233,22 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
           },
-          "example": "8a868cda7c8b28f5017c9a4b2d8341cd"
+          "example": "8a868cda7c8b28f5017c9a4b2d8341cd",
+          "description": "Workspace identifier (32-character lowercase hex string)."
         },
         {
           "name": "modelId",
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
-          "example": "4261ECE4389B45E18915B5EB72F7510B"
+          "example": "4261ECE4389B45E18915B5EB72F7510B",
+          "description": "Model identifier (32-character uppercase hex string)."
         },
         {
           "name": "importId",
@@ -2285,18 +2349,22 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
           },
-          "example": "8a868cda7c8b28f5017c9a4b2d8341cd"
+          "example": "8a868cda7c8b28f5017c9a4b2d8341cd",
+          "description": "Workspace identifier (32-character lowercase hex string)."
         },
         {
           "name": "modelId",
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
-          "example": "4261ECE4389B45E18915B5EB72F7510B"
+          "example": "4261ECE4389B45E18915B5EB72F7510B",
+          "description": "Model identifier (32-character uppercase hex string)."
         }
       ]
     },
@@ -2385,9 +2453,11 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
-          "example": "4261ECE4389B45E18915B5EB72F7510B"
+          "example": "4261ECE4389B45E18915B5EB72F7510B",
+          "description": "Model identifier (32-character uppercase hex string)."
         },
         {
           "name": "processId",
@@ -2481,18 +2551,22 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
           },
-          "example": "8a868cda7c8b28f5017c9a4b2d8341cd"
+          "example": "8a868cda7c8b28f5017c9a4b2d8341cd",
+          "description": "Workspace identifier (32-character lowercase hex string)."
         },
         {
           "name": "modelId",
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
-          "example": "4261ECE4389B45E18915B5EB72F7510B"
+          "example": "4261ECE4389B45E18915B5EB72F7510B",
+          "description": "Model identifier (32-character uppercase hex string)."
         },
         {
           "name": "exportId",
@@ -2582,18 +2656,22 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
           },
-          "example": "8a868cda7c8b28f5017c9a4b2d8341cd"
+          "example": "8a868cda7c8b28f5017c9a4b2d8341cd",
+          "description": "Workspace identifier (32-character lowercase hex string)."
         },
         {
           "name": "modelId",
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
-          "example": "4261ECE4389B45E18915B5EB72F7510B"
+          "example": "4261ECE4389B45E18915B5EB72F7510B",
+          "description": "Model identifier (32-character uppercase hex string)."
         },
         {
           "name": "importId",
@@ -2704,9 +2782,11 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
-          "example": "4261ECE4389B45E18915B5EB72F7510B"
+          "example": "4261ECE4389B45E18915B5EB72F7510B",
+          "description": "Model identifier (32-character uppercase hex string)."
         }
       ]
     },
@@ -2731,18 +2811,22 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
           },
-          "example": "8a868cda7c8b28f5017c9a4b2d8341cd"
+          "example": "8a868cda7c8b28f5017c9a4b2d8341cd",
+          "description": "Workspace identifier (32-character lowercase hex string)."
         },
         {
           "name": "modelId",
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
-          "example": "4261ECE4389B45E18915B5EB72F7510B"
+          "example": "4261ECE4389B45E18915B5EB72F7510B",
+          "description": "Model identifier (32-character uppercase hex string)."
         },
         {
           "name": "fileId",
@@ -2900,9 +2984,11 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
-          "example": "4261ECE4389B45E18915B5EB72F7510B"
+          "example": "4261ECE4389B45E18915B5EB72F7510B",
+          "description": "Model identifier (32-character uppercase hex string)."
         },
         {
           "name": "versionId",
@@ -2990,9 +3076,11 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
-          "example": "4261ECE4389B45E18915B5EB72F7510B"
+          "example": "4261ECE4389B45E18915B5EB72F7510B",
+          "description": "Model identifier (32-character uppercase hex string)."
         }
       ]
     },
@@ -3076,9 +3164,11 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
-          "example": "4261ECE4389B45E18915B5EB72F7510B"
+          "example": "4261ECE4389B45E18915B5EB72F7510B",
+          "description": "Model identifier (32-character uppercase hex string)."
         }
       ]
     },
@@ -3102,9 +3192,11 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
-          "example": "4261ECE4389B45E18915B5EB72F7510B"
+          "example": "4261ECE4389B45E18915B5EB72F7510B",
+          "description": "Model identifier (32-character uppercase hex string)."
         },
         {
           "name": "moduleId",
@@ -3169,18 +3261,22 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
           },
-          "example": "8a868cda7c8b28f5017c9a4b2d8341cd"
+          "example": "8a868cda7c8b28f5017c9a4b2d8341cd",
+          "description": "Workspace identifier (32-character lowercase hex string)."
         },
         {
           "name": "modelId",
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
-          "example": "4261ECE4389B45E18915B5EB72F7510B"
+          "example": "4261ECE4389B45E18915B5EB72F7510B",
+          "description": "Model identifier (32-character uppercase hex string)."
         },
         {
           "name": "listId",
@@ -3280,18 +3376,22 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
           },
-          "example": "8a868cda7c8b28f5017c9a4b2d8341cd"
+          "example": "8a868cda7c8b28f5017c9a4b2d8341cd",
+          "description": "Workspace identifier (32-character lowercase hex string)."
         },
         {
           "name": "modelId",
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
-          "example": "4261ECE4389B45E18915B5EB72F7510B"
+          "example": "4261ECE4389B45E18915B5EB72F7510B",
+          "description": "Model identifier (32-character uppercase hex string)."
         },
         {
           "name": "viewId",
@@ -3359,18 +3459,22 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
           },
-          "example": "8a868cda7c8b28f5017c9a4b2d8341cd"
+          "example": "8a868cda7c8b28f5017c9a4b2d8341cd",
+          "description": "Workspace identifier (32-character lowercase hex string)."
         },
         {
           "name": "modelId",
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
-          "example": "4261ECE4389B45E18915B5EB72F7510B"
+          "example": "4261ECE4389B45E18915B5EB72F7510B",
+          "description": "Model identifier (32-character uppercase hex string)."
         },
         {
           "name": "viewId",
@@ -3434,18 +3538,22 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
           },
-          "example": "8a868cda7c8b28f5017c9a4b2d8341cd"
+          "example": "8a868cda7c8b28f5017c9a4b2d8341cd",
+          "description": "Workspace identifier (32-character lowercase hex string)."
         },
         {
           "name": "modelId",
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
-          "example": "4261ECE4389B45E18915B5EB72F7510B"
+          "example": "4261ECE4389B45E18915B5EB72F7510B",
+          "description": "Model identifier (32-character uppercase hex string)."
         },
         {
           "name": "viewId",
@@ -3505,9 +3613,11 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
-          "example": "4261ECE4389B45E18915B5EB72F7510B"
+          "example": "4261ECE4389B45E18915B5EB72F7510B",
+          "description": "Model identifier (32-character uppercase hex string)."
         },
         {
           "name": "viewId",
@@ -3540,18 +3650,22 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
           },
-          "example": "8a868cda7c8b28f5017c9a4b2d8341cd"
+          "example": "8a868cda7c8b28f5017c9a4b2d8341cd",
+          "description": "Workspace identifier (32-character lowercase hex string)."
         },
         {
           "name": "modelId",
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
-          "example": "4261ECE4389B45E18915B5EB72F7510B"
+          "example": "4261ECE4389B45E18915B5EB72F7510B",
+          "description": "Model identifier (32-character uppercase hex string)."
         },
         {
           "name": "fileId",
@@ -3634,18 +3748,22 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
           },
-          "example": "8a868cda7c8b28f5017c9a4b2d8341cd"
+          "example": "8a868cda7c8b28f5017c9a4b2d8341cd",
+          "description": "Workspace identifier (32-character lowercase hex string)."
         },
         {
           "name": "modelId",
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
-          "example": "4261ECE4389B45E18915B5EB72F7510B"
+          "example": "4261ECE4389B45E18915B5EB72F7510B",
+          "description": "Model identifier (32-character uppercase hex string)."
         },
         {
           "name": "fileId",
@@ -3758,18 +3876,22 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
           },
-          "example": "8a868cda7c8b28f5017c9a4b2d8341cd"
+          "example": "8a868cda7c8b28f5017c9a4b2d8341cd",
+          "description": "Workspace identifier (32-character lowercase hex string)."
         },
         {
           "name": "modelId",
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
-          "example": "4261ECE4389B45E18915B5EB72F7510B"
+          "example": "4261ECE4389B45E18915B5EB72F7510B",
+          "description": "Model identifier (32-character uppercase hex string)."
         },
         {
           "name": "importId",
@@ -3811,18 +3933,22 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
           },
-          "example": "8a868cda7c8b28f5017c9a4b2d8341cd"
+          "example": "8a868cda7c8b28f5017c9a4b2d8341cd",
+          "description": "Workspace identifier (32-character lowercase hex string)."
         },
         {
           "name": "modelId",
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
-          "example": "4261ECE4389B45E18915B5EB72F7510B"
+          "example": "4261ECE4389B45E18915B5EB72F7510B",
+          "description": "Model identifier (32-character uppercase hex string)."
         },
         {
           "name": "importId",
@@ -3864,18 +3990,22 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
           },
-          "example": "8a868cda7c8b28f5017c9a4b2d8341cd"
+          "example": "8a868cda7c8b28f5017c9a4b2d8341cd",
+          "description": "Workspace identifier (32-character lowercase hex string)."
         },
         {
           "name": "modelId",
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
-          "example": "4261ECE4389B45E18915B5EB72F7510B"
+          "example": "4261ECE4389B45E18915B5EB72F7510B",
+          "description": "Model identifier (32-character uppercase hex string)."
         },
         {
           "name": "importId",
@@ -3917,18 +4047,22 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
           },
-          "example": "8a868cda7c8b28f5017c9a4b2d8341cd"
+          "example": "8a868cda7c8b28f5017c9a4b2d8341cd",
+          "description": "Workspace identifier (32-character lowercase hex string)."
         },
         {
           "name": "modelId",
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
-          "example": "4261ECE4389B45E18915B5EB72F7510B"
+          "example": "4261ECE4389B45E18915B5EB72F7510B",
+          "description": "Model identifier (32-character uppercase hex string)."
         },
         {
           "name": "importId",
@@ -4012,18 +4146,22 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
           },
-          "example": "8a868cda7c8b28f5017c9a4b2d8341cd"
+          "example": "8a868cda7c8b28f5017c9a4b2d8341cd",
+          "description": "Workspace identifier (32-character lowercase hex string)."
         },
         {
           "name": "modelId",
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
-          "example": "4261ECE4389B45E18915B5EB72F7510B"
+          "example": "4261ECE4389B45E18915B5EB72F7510B",
+          "description": "Model identifier (32-character uppercase hex string)."
         },
         {
           "name": "exportId",
@@ -4107,18 +4245,22 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
           },
-          "example": "8a868cda7c8b28f5017c9a4b2d8341cd"
+          "example": "8a868cda7c8b28f5017c9a4b2d8341cd",
+          "description": "Workspace identifier (32-character lowercase hex string)."
         },
         {
           "name": "modelId",
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
-          "example": "4261ECE4389B45E18915B5EB72F7510B"
+          "example": "4261ECE4389B45E18915B5EB72F7510B",
+          "description": "Model identifier (32-character uppercase hex string)."
         },
         {
           "name": "exportId",
@@ -4213,18 +4355,22 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
           },
-          "example": "8a868cda7c8b28f5017c9a4b2d8341cd"
+          "example": "8a868cda7c8b28f5017c9a4b2d8341cd",
+          "description": "Workspace identifier (32-character lowercase hex string)."
         },
         {
           "name": "modelId",
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
-          "example": "4261ECE4389B45E18915B5EB72F7510B"
+          "example": "4261ECE4389B45E18915B5EB72F7510B",
+          "description": "Model identifier (32-character uppercase hex string)."
         },
         {
           "name": "fileId",
@@ -4264,18 +4410,22 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
           },
-          "example": "8a868cda7c8b28f5017c9a4b2d8341cd"
+          "example": "8a868cda7c8b28f5017c9a4b2d8341cd",
+          "description": "Workspace identifier (32-character lowercase hex string)."
         },
         {
           "name": "modelId",
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
-          "example": "4261ECE4389B45E18915B5EB72F7510B"
+          "example": "4261ECE4389B45E18915B5EB72F7510B",
+          "description": "Model identifier (32-character uppercase hex string)."
         },
         {
           "name": "processId",
@@ -4339,18 +4489,22 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
           },
-          "example": "8a868cda7c8b28f5017c9a4b2d8341cd"
+          "example": "8a868cda7c8b28f5017c9a4b2d8341cd",
+          "description": "Workspace identifier (32-character lowercase hex string)."
         },
         {
           "name": "modelId",
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
-          "example": "4261ECE4389B45E18915B5EB72F7510B"
+          "example": "4261ECE4389B45E18915B5EB72F7510B",
+          "description": "Model identifier (32-character uppercase hex string)."
         },
         {
           "name": "actionId",
@@ -4455,18 +4609,22 @@
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
           },
-          "example": "8a868cda7c8b28f5017c9a4b2d8341cd"
+          "example": "8a868cda7c8b28f5017c9a4b2d8341cd",
+          "description": "Workspace identifier (32-character lowercase hex string)."
         },
         {
           "name": "modelId",
           "in": "path",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
-          "example": "4261ECE4389B45E18915B5EB72F7510B"
+          "example": "4261ECE4389B45E18915B5EB72F7510B",
+          "description": "Model identifier (32-character uppercase hex string)."
         },
         {
           "name": "processId",

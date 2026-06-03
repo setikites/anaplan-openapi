@@ -223,7 +223,9 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9a-f]{32}$
       example: 8a868cda7c8b28f5017c9a4b2d8341cd
+      description: Workspace identifier (32-character lowercase hex string).
   /2/0/models/{modelId}:
     get:
       summary: Get single model metadata
@@ -255,7 +257,9 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
   /2/0/workspaces/{workspaceId}/models:
     get:
       summary: List workspace models
@@ -286,7 +290,9 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9a-f]{32}$
       example: 8a868cd885f53bd201860f5a4fea1ff1
+      description: Workspace identifier (32-character lowercase hex string).
   /2/0/workspaces/{workspaceId}/models/{modelId}/dimensions/{dimensionId}/items:
     post:
       summary: Lookup dimension items by name or code
@@ -376,13 +382,17 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9a-f]{32}$
       example: 8a868cda7c8b28f5017c9a4b2d8341cd
+      description: Workspace identifier (32-character lowercase hex string).
     - name: modelId
       in: path
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
     - name: dimensionId
       in: path
       required: true
@@ -529,7 +539,9 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
     - name: viewId
       in: path
       required: true
@@ -641,13 +653,17 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9a-f]{32}$
       example: 8a868cda7c8b28f5017c9a4b2d8341cd
+      description: Workspace identifier (32-character lowercase hex string).
     - name: modelId
       in: path
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
   /2/0/workspaces/{workspaceId}/models/{modelId}/lists/{listId}:
     get:
       summary: Retrieve list metadata
@@ -742,13 +758,17 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9a-f]{32}$
       example: 8a868cda7c8b28f5017c9a4b2d8341cd
+      description: Workspace identifier (32-character lowercase hex string).
     - name: modelId
       in: path
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
     - name: listId
       in: path
       required: true
@@ -817,7 +837,9 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
   /2/0/models/{modelId}/modules/{moduleId}/lineItems:
     get:
       summary: Retrieve all line item metadata in a module
@@ -928,7 +950,9 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
     - name: moduleId
       in: path
       required: true
@@ -1019,13 +1043,17 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9a-f]{32}$
       example: 8a868cda7c8b28f5017c9a4b2d8341cd
+      description: Workspace identifier (32-character lowercase hex string).
     - name: modelId
       in: path
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
   /2/0/models/{modelId}/views/{viewId}:
     get:
       summary: Retrieve metadata for dimensions on a view
@@ -1098,7 +1126,9 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
     - name: viewId
       in: path
       required: true
@@ -1179,7 +1209,9 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
     - name: moduleId
       in: path
       required: true
@@ -1268,7 +1300,9 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
   /2/0/models/{modelId}/lineItems/{lineItemId}/dimensions:
     get:
       summary: Retrieve dimensions IDs for a line item
@@ -1309,7 +1343,9 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
     - name: lineItemId
       in: path
       required: true
@@ -1386,7 +1422,9 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
     - name: lineItemId
       in: path
       required: true
@@ -1472,7 +1510,9 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
   /2/0/workspaces/{workspaceId}/models/{modelId}/currentPeriod:
     get:
       summary: Retrieve current period
@@ -1531,13 +1571,17 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9a-f]{32}$
       example: 8a868cda7c8b28f5017c9a4b2d8341cd
+      description: Workspace identifier (32-character lowercase hex string).
     - name: modelId
       in: path
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
   /2/0/workspaces/{workspaceId}/models/{modelId}/modelCalendar:
     get:
       summary: Get current fiscal year
@@ -1602,13 +1646,17 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9a-f]{32}$
       example: 8a868cda7c8b28f5017c9a4b2d8341cd
+      description: Workspace identifier (32-character lowercase hex string).
     - name: modelId
       in: path
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
   /2/0/workspaces/{workspaceId}/models/{modelId}/actions:
     get:
       summary: List the actions in the model as a JSON array
@@ -1646,13 +1694,17 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9a-f]{32}$
       example: 8a868cda7c8b28f5017c9a4b2d8341cd
+      description: Workspace identifier (32-character lowercase hex string).
     - name: modelId
       in: path
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
   /2/0/workspaces/{workspaceId}/models/{modelId}/processes:
     get:
       summary: List the process definitions available in a model as a JSON array
@@ -1686,13 +1738,17 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9a-f]{32}$
       example: 8a868cda7c8b28f5017c9a4b2d8341cd
+      description: Workspace identifier (32-character lowercase hex string).
     - name: modelId
       in: path
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
   /2/0/workspaces/{workspaceId}/models/{modelId}/imports/:
     get:
       summary: Get a list of import actions
@@ -1745,13 +1801,17 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9a-f]{32}$
       example: 8a868cda7c8b28f5017c9a4b2d8341cd
+      description: Workspace identifier (32-character lowercase hex string).
     - name: modelId
       in: path
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
   /2/0/workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks:
     get:
       summary: Get a list of the import tasks
@@ -1797,13 +1857,17 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9a-f]{32}$
       example: 8a868cda7c8b28f5017c9a4b2d8341cd
+      description: Workspace identifier (32-character lowercase hex string).
     - name: modelId
       in: path
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
     - name: importId
       in: path
       required: true
@@ -1897,13 +1961,17 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9a-f]{32}$
       example: 8a868cda7c8b28f5017c9a4b2d8341cd
+      description: Workspace identifier (32-character lowercase hex string).
     - name: modelId
       in: path
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
   /2/0/models/{modelId}/processes/{processId}:
     get:
       summary: Retrieve metadata for a process
@@ -1987,7 +2055,9 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
     - name: processId
       in: path
       required: true
@@ -2068,13 +2138,17 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9a-f]{32}$
       example: 8a868cda7c8b28f5017c9a4b2d8341cd
+      description: Workspace identifier (32-character lowercase hex string).
     - name: modelId
       in: path
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
     - name: exportId
       in: path
       required: true
@@ -2152,13 +2226,17 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9a-f]{32}$
       example: 8a868cda7c8b28f5017c9a4b2d8341cd
+      description: Workspace identifier (32-character lowercase hex string).
     - name: modelId
       in: path
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
     - name: importId
       in: path
       required: true
@@ -2252,7 +2330,9 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
   /2/0/workspaces/{workspaceId}/models/{modelId}/files/{fileId}:
     delete:
       summary: Delete files
@@ -2279,13 +2359,17 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9a-f]{32}$
       example: 8a868cda7c8b28f5017c9a4b2d8341cd
+      description: Workspace identifier (32-character lowercase hex string).
     - name: modelId
       in: path
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
     - name: fileId
       in: path
       required: true
@@ -2446,7 +2530,9 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
     - name: versionId
       in: path
       required: true
@@ -2529,7 +2615,9 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
   /2/0/models/{modelId}/modelCalendar/fiscalYear:
     put:
       summary: Update current fiscal year
@@ -2600,7 +2688,9 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
   /2/0/models/{modelId}/modules/{moduleId}/data:
     post:
       summary: Write cell data by coordinate to module
@@ -2662,7 +2752,9 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
     - name: moduleId
       in: path
       required: true
@@ -2747,13 +2839,17 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9a-f]{32}$
       example: 8a868cda7c8b28f5017c9a4b2d8341cd
+      description: Workspace identifier (32-character lowercase hex string).
     - name: modelId
       in: path
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
     - name: listId
       in: path
       required: true
@@ -2952,13 +3048,17 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9a-f]{32}$
       example: 8a868cda7c8b28f5017c9a4b2d8341cd
+      description: Workspace identifier (32-character lowercase hex string).
     - name: modelId
       in: path
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
     - name: viewId
       in: path
       required: true
@@ -3025,13 +3125,17 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9a-f]{32}$
       example: 8a868cda7c8b28f5017c9a4b2d8341cd
+      description: Workspace identifier (32-character lowercase hex string).
     - name: modelId
       in: path
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
     - name: viewId
       in: path
       required: true
@@ -3131,13 +3235,17 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9a-f]{32}$
       example: 8a868cda7c8b28f5017c9a4b2d8341cd
+      description: Workspace identifier (32-character lowercase hex string).
     - name: modelId
       in: path
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
     - name: viewId
       in: path
       required: true
@@ -3246,7 +3354,9 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
     - name: viewId
       in: path
       required: true
@@ -3277,13 +3387,17 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9a-f]{32}$
       example: 8a868cda7c8b28f5017c9a4b2d8341cd
+      description: Workspace identifier (32-character lowercase hex string).
     - name: modelId
       in: path
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
     - name: fileId
       in: path
       required: true
@@ -3351,13 +3465,17 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9a-f]{32}$
       example: 8a868cda7c8b28f5017c9a4b2d8341cd
+      description: Workspace identifier (32-character lowercase hex string).
     - name: modelId
       in: path
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
     - name: fileId
       in: path
       required: true
@@ -3464,13 +3582,17 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9a-f]{32}$
       example: 8a868cda7c8b28f5017c9a4b2d8341cd
+      description: Workspace identifier (32-character lowercase hex string).
     - name: modelId
       in: path
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
     - name: importId
       in: path
       required: true
@@ -3519,13 +3641,17 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9a-f]{32}$
       example: 8a868cda7c8b28f5017c9a4b2d8341cd
+      description: Workspace identifier (32-character lowercase hex string).
     - name: modelId
       in: path
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
     - name: importId
       in: path
       required: true
@@ -3569,13 +3695,17 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9a-f]{32}$
       example: 8a868cda7c8b28f5017c9a4b2d8341cd
+      description: Workspace identifier (32-character lowercase hex string).
     - name: modelId
       in: path
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
     - name: importId
       in: path
       required: true
@@ -3618,13 +3748,17 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9a-f]{32}$
       example: 8a868cda7c8b28f5017c9a4b2d8341cd
+      description: Workspace identifier (32-character lowercase hex string).
     - name: modelId
       in: path
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
     - name: importId
       in: path
       required: true
@@ -3691,13 +3825,17 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9a-f]{32}$
       example: 8a868cda7c8b28f5017c9a4b2d8341cd
+      description: Workspace identifier (32-character lowercase hex string).
     - name: modelId
       in: path
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
     - name: exportId
       in: path
       required: true
@@ -3772,13 +3910,17 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9a-f]{32}$
       example: 8a868cda7c8b28f5017c9a4b2d8341cd
+      description: Workspace identifier (32-character lowercase hex string).
     - name: modelId
       in: path
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
     - name: exportId
       in: path
       required: true
@@ -3846,13 +3988,17 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9a-f]{32}$
       example: 8a868cda7c8b28f5017c9a4b2d8341cd
+      description: Workspace identifier (32-character lowercase hex string).
     - name: modelId
       in: path
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
     - name: fileId
       in: path
       required: true
@@ -3889,13 +4035,17 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9a-f]{32}$
       example: 8a868cda7c8b28f5017c9a4b2d8341cd
+      description: Workspace identifier (32-character lowercase hex string).
     - name: modelId
       in: path
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
     - name: processId
       in: path
       required: true
@@ -3958,13 +4108,17 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9a-f]{32}$
       example: 8a868cda7c8b28f5017c9a4b2d8341cd
+      description: Workspace identifier (32-character lowercase hex string).
     - name: modelId
       in: path
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
     - name: actionId
       in: path
       required: true
@@ -4064,13 +4218,17 @@ paths:
       required: true
       schema:
         type: string
+        pattern: ^[0-9a-f]{32}$
       example: 8a868cda7c8b28f5017c9a4b2d8341cd
+      description: Workspace identifier (32-character lowercase hex string).
     - name: modelId
       in: path
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
     - name: processId
       in: path
       required: true
