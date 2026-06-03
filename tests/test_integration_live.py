@@ -825,6 +825,55 @@ def test_get_list(integration_token, list_id):
     assert "name" in metadata, "List metadata must have a name"
 
 
+# ─── PUT /currentPeriod interface probe ────────────────────────────────────────
+# Non-destructive: all requests use invalid inputs so the API rejects them
+# before making any change.
+
+
+@pytest.mark.live
+def test_current_period_invalid_date_in_body_returns_400(integration_token):
+    """PUT /2/0/models/{modelId}/currentPeriod with invalid date in body returns 400."""
+    h = {**_auth_headers(integration_token), "Content-Type": "application/json"}
+    with httpx.Client() as client:
+        response = client.put(
+            f"{API_URL}/2/0/models/{MODEL_ID}/currentPeriod",
+            headers=h,
+            json={"date": "not-a-date"},
+        )
+
+    assert response.status_code == 400, (
+        f"Expected 400 for invalid date in body, got {response.status_code}: "
+        f"{response.text[:300]}"
+    )
+    body = response.json()
+    print(f"\nbody form 400 response: {body}")
+
+
+@pytest.mark.live
+def test_current_period_invalid_date_as_query_param_returns_400(integration_token):
+    """PUT /2/0/models/{modelId}/currentPeriod?date=invalid returns 400.
+
+    Confirms date is accepted as a query parameter (no body sent).
+    Live probe also confirmed: sending both query param and body returns
+    400 'use query parameter or body to set date, not both'.
+    """
+    with httpx.Client() as client:
+        response = client.put(
+            f"{API_URL}/2/0/models/{MODEL_ID}/currentPeriod",
+            headers=_auth_headers(integration_token),
+            params={"date": "not-a-date"},
+        )
+
+    assert response.status_code == 400, (
+        f"Expected 400 for invalid date as query param, got {response.status_code}: "
+        f"{response.text[:300]}"
+    )
+    body = response.json()
+    assert "Invalid ISO date format" in body.get("status", {}).get("message", ""), (
+        f"Expected format-error message, got: {body}"
+    )
+
+
 # ─── Helpers ────────────────────────────────────────────────────────────────────
 
 def assert_response_code(response, expected_codes, discrepancies):

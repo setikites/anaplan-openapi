@@ -2562,7 +2562,18 @@ paths:
   /2/0/models/{modelId}/currentPeriod:
     put:
       summary: Set current period
-      parameters: []
+      parameters:
+      - name: date
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date
+          pattern: ^\d{4}-\d{2}-\d{2}$
+        example: '2020-05-20'
+        description: The date used to set the current period (YYYY-MM-DD). Leave blank (?date=) to reset the current period.
+          Accepted as either a query parameter or a request body field, but not both simultaneously. Returns 400 if the format
+          is invalid or the date falls outside the model timescale.
       responses:
         '200':
           description: Response 200
@@ -2594,6 +2605,11 @@ paths:
                     $ref: '#/components/schemas/CurrentPeriod'
         '429':
           description: more detail in path description
+        '400':
+          description: 'Bad request. Occurs when: (1) the date is not in YYYY-MM-DD format — "Invalid ISO date format ''{date}''.
+            Date should match format YYYY-MM-DD"; (2) the date falls outside the model timescale — "Specified date ''{date}''
+            is out of timescale range {start} - {end}"; (3) date is supplied as both a query parameter and a request body
+            field simultaneously.'
       tags:
       - Transactional Write
       description: "## Set current period\n\n`/workspaces/{workspaceId}/models/{modelId}/currentPeriod`  \n\nUse this call\

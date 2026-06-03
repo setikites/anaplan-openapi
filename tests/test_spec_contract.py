@@ -456,6 +456,36 @@ def _all_params(spec, path_str, method):
 
 
 @_skip_integration
+def test_integration_current_period_put_declares_date_query_param():
+    """PUT /2/0/models/{modelId}/currentPeriod must declare date as a query parameter.
+
+    Live testing confirmed the API accepts date as either a query param or
+    a request body field (but not both simultaneously).
+    """
+    spec = _load(_INTEGRATION_SPEC)
+    params = _all_params(spec, "/2/0/models/{modelId}/currentPeriod", "put")
+    names = {p["name"] for p in params if "name" in p}
+    assert "date" in names, (
+        "PUT /2/0/models/{modelId}/currentPeriod is missing date query parameter"
+    )
+    p = next(p for p in params if p.get("name") == "date")
+    assert p.get("in") == "query"
+    assert p.get("schema", {}).get("type") == "string"
+
+
+@_skip_integration
+def test_integration_current_period_put_declares_400_response():
+    """PUT /2/0/models/{modelId}/currentPeriod must declare a 400 response."""
+    spec = _load(_INTEGRATION_SPEC)
+    responses = spec["paths"]["/2/0/models/{modelId}/currentPeriod"]["put"].get(
+        "responses", {}
+    )
+    assert "400" in responses, (
+        "PUT /2/0/models/{modelId}/currentPeriod is missing 400 response"
+    )
+
+
+@_skip_integration
 def test_integration_models_list_declares_model_details():
     """GET /2/0/models must declare the modelDetails query parameter."""
     spec = _load(_INTEGRATION_SPEC)

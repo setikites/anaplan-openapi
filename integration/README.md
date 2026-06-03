@@ -88,6 +88,20 @@ _Document differences between Apiary docs, Postman collection, and live API beha
 
 Live testing shows this endpoint returns `404 Resource not found` even when the workspace appears in `GET /workspaces`. The endpoint likely requires **Workspace Administrator** role. The spec documents both 200 and 404 responses; the live test accepts 404 with a warning rather than failing.
 
+### `PUT /2/0/models/{modelId}/currentPeriod` — date parameter interface (issue #30)
+
+Live testing confirmed `date` is accepted as **either** a query parameter (`?date=YYYY-MM-DD`) **or** a request body field (`{"date": "YYYY-MM-DD"}`), but not both simultaneously. Sending both returns:
+
+```
+400: "use query parameter or body to set date, not both"
+```
+
+Confirmed 400 error cases:
+- Invalid format: `"Invalid ISO date format '{date}'. Date should match format YYYY-MM-DD"`
+- Out of range: `"Specified date '{date}' is out of timescale range {start} - {end}"`
+
+The spec declares `date` as a query parameter and documents the 400 response. The request body (`Schema2`) already declared `date` as a body field.
+
 ### Workspace-scoped model paths (issue #25)
 
 Two paths absent from the original spec were probed via live testing:
