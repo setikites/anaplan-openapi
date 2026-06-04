@@ -2766,36 +2766,6 @@ paths:
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
       description: Model identifier (32-character uppercase hex string).
-    get:
-      summary: Get current fiscal year (model-scoped)
-      parameters: []
-      responses:
-        '200':
-          description: Response 200
-          content:
-            application/json:
-              example:
-                meta:
-                  schema: https://api.anaplan.com/2/0/objects/modelCalendar
-                status:
-                  code: 200
-                  message: Success
-                modelCalendar:
-                  fiscalYear:
-                    year: FY21
-                    startDate: '2021-01-01'
-                    endDate: '2021-12-31'
-              schema:
-                type: object
-                properties:
-                  meta:
-                    type: object
-                  status:
-                    type: object
-                  modelCalendar:
-                    $ref: '#/components/schemas/ModelCalendar'
-      tags:
-      - Model Settings
   /2/0/models/{modelId}/modules/{moduleId}/data:
     post:
       summary: Write cell data by coordinate to module

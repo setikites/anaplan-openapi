@@ -151,6 +151,10 @@ Confirmed 400 error cases:
 
 The spec declares `date` as a query parameter and documents the 400 response. The request body (`Schema2`) already declared `date` as a body field.
 
+### `GET /2/0/models/{modelId}/modelCalendar/fiscalYear` returns 405
+
+Live testing confirmed this path only supports `PUT` (update fiscal year). `GET` returns `405 Method Not Allowed`. Fiscal year data is available via `GET /2/0/workspaces/{workspaceId}/models/{modelId}/modelCalendar`, which returns the full `modelCalendar` object including `fiscalYear`. The spec retains only `PUT` on this path.
+
 ### Workspace-scoped model paths (issue #25)
 
 Two paths absent from the original spec were probed via live testing:

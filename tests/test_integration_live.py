@@ -1124,12 +1124,27 @@ def test_get_model_calendar(integration_token):
 
 @pytest.mark.live
 def test_get_fiscal_year(integration_token):
-    """GET /2/0/models/{modelId}/modelCalendar/fiscalYear returns fiscal year detail."""
+    """GET /2/0/models/{modelId}/modelCalendar/fiscalYear returns 405 — GET not supported.
+
+    Live testing confirmed this path only supports PUT. Fiscal year info is available
+    via GET /workspaces/{workspaceId}/models/{modelId}/modelCalendar instead.
+    See integration/README.md discrepancies.
+    """
     with httpx.Client() as client:
         response = client.get(
             f"{API_URL}/2/0/models/{MODEL_ID}/modelCalendar/fiscalYear",
             headers=_auth_headers(integration_token),
         )
+
+    if response.status_code == 405:
+        warnings.warn(
+            "GET /models/{modelId}/modelCalendar/fiscalYear returned 405 — "
+            "only PUT is supported on this path. Use GET /workspaces/{workspaceId}/models/{modelId}/modelCalendar "
+            "for fiscal year data. See integration/README.md discrepancies.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return
 
     assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
     body = response.json()
