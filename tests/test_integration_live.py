@@ -1034,6 +1034,136 @@ def test_current_period_invalid_date_as_query_param_returns_400(integration_toke
     )
 
 
+# ─── Model settings (versions, current period, model calendar) ─────────────────
+
+
+@pytest.fixture(scope="module")
+def version_id(integration_token):
+    """First version ID from the model versions list."""
+    h = _auth_headers(integration_token)
+    with httpx.Client() as client:
+        r = client.get(f"{API_URL}/2/0/models/{MODEL_ID}/versions", headers=h)
+    if r.status_code != 200:
+        pytest.skip(f"Could not list versions: {r.status_code}")
+    versions = r.json().get("versionMetadata", [])
+    if not versions:
+        pytest.skip("No versions in test model")
+    return versions[0]["id"]
+
+
+@pytest.mark.live
+def test_list_versions(integration_token):
+    """GET /2/0/models/{modelId}/versions returns list of version metadata."""
+    with httpx.Client() as client:
+        response = client.get(
+            f"{API_URL}/2/0/models/{MODEL_ID}/versions",
+            headers=_auth_headers(integration_token),
+        )
+
+    assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
+    body = response.json()
+    assert body.get("status", {}).get("code") == 200
+    versions = body.get("versionMetadata")
+    assert isinstance(versions, list), f"Expected 'versionMetadata' list; keys: {list(body.keys())}"
+    if versions:
+        assert versions[0].get("id"), "Version must have an id"
+        assert "name" in versions[0], "Version must have a name"
+
+
+@pytest.mark.live
+def test_get_workspace_current_period(integration_token):
+    """GET /2/0/workspaces/{workspaceId}/models/{modelId}/currentPeriod returns current period."""
+    with httpx.Client() as client:
+        response = client.get(
+            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/currentPeriod",
+            headers=_auth_headers(integration_token),
+        )
+
+    assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
+    body = response.json()
+    assert body.get("status", {}).get("code") == 200
+    period = body.get("currentPeriod")
+    assert period is not None, f"Expected 'currentPeriod'; keys: {list(body.keys())}"
+    assert "periodText" in period, "currentPeriod must have periodText"
+    assert "lastDay" in period, "currentPeriod must have lastDay"
+
+
+@pytest.mark.live
+def test_get_model_current_period(integration_token):
+    """GET /2/0/models/{modelId}/currentPeriod returns current period (model-scoped)."""
+    with httpx.Client() as client:
+        response = client.get(
+            f"{API_URL}/2/0/models/{MODEL_ID}/currentPeriod",
+            headers=_auth_headers(integration_token),
+        )
+
+    assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
+    body = response.json()
+    assert body.get("status", {}).get("code") == 200
+    period = body.get("currentPeriod")
+    assert period is not None, f"Expected 'currentPeriod'; keys: {list(body.keys())}"
+    assert "periodText" in period, "currentPeriod must have periodText"
+    assert "lastDay" in period, "currentPeriod must have lastDay"
+
+
+@pytest.mark.live
+def test_get_model_calendar(integration_token):
+    """GET /2/0/workspaces/{workspaceId}/models/{modelId}/modelCalendar returns model calendar."""
+    with httpx.Client() as client:
+        response = client.get(
+            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/modelCalendar",
+            headers=_auth_headers(integration_token),
+        )
+
+    assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
+    body = response.json()
+    assert body.get("status", {}).get("code") == 200
+    calendar = body.get("modelCalendar")
+    assert calendar is not None, f"Expected 'modelCalendar'; keys: {list(body.keys())}"
+
+
+@pytest.mark.live
+def test_get_fiscal_year(integration_token):
+    """GET /2/0/models/{modelId}/modelCalendar/fiscalYear returns fiscal year detail."""
+    with httpx.Client() as client:
+        response = client.get(
+            f"{API_URL}/2/0/models/{MODEL_ID}/modelCalendar/fiscalYear",
+            headers=_auth_headers(integration_token),
+        )
+
+    assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
+    body = response.json()
+    assert body.get("status", {}).get("code") == 200
+    calendar = body.get("modelCalendar")
+    assert calendar is not None, f"Expected 'modelCalendar'; keys: {list(body.keys())}"
+    fiscal_year = calendar.get("fiscalYear")
+    assert fiscal_year is not None, (
+        f"modelCalendar must have fiscalYear; calendar keys: {list(calendar.keys())}"
+    )
+    assert "year" in fiscal_year, "fiscalYear must have year"
+
+
+@pytest.mark.live
+def test_switchover_invalid_date_returns_400(integration_token, version_id):
+    """PUT /2/0/models/{modelId}/versions/{versionId}/switchover with invalid date returns 400.
+
+    Non-destructive guard: invalid date format is rejected before any state change.
+    Auto-skipped without --allow-writes (conftest guard intercepts the PUT).
+    """
+    h = {**_auth_headers(integration_token), "Content-Type": "application/json"}
+    with httpx.Client() as client:
+        response = client.put(
+            f"{API_URL}/2/0/models/{MODEL_ID}/versions/{version_id}/switchover",
+            headers=h,
+            json={"date": "not-a-date"},
+        )
+
+    assert response.status_code == 400, (
+        f"Expected 400 for invalid switchover date, got {response.status_code}: "
+        f"{response.text[:300]}"
+    )
+
+
 # ─── Helpers ────────────────────────────────────────────────────────────────────
 
 def assert_response_code(response, expected_codes, discrepancies):
