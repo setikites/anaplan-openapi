@@ -31,6 +31,10 @@ Both schemes are declared in `securitySchemes` and applied globally. Individual 
 
 The Integration API uses `api.anaplan.com` endpoints. Legacy regions (US1, US2, US5, US7, EU1, EU2, EU4, AP1) share the unqualified `api.anaplan.com` base URL. Newer cloud regions have region-prefixed URLs (e.g., `us9.api.anaplan.com`). See the `servers[]` array in the spec for the full list.
 
+### Legacy Endpoint Retirement
+
+Anaplan previously served the Integration API at `https://us1a.app.anaplan.com/2` (and equivalent region-prefixed `app.anaplan.com/2` URLs). **These endpoints have been retired.** The modern `https://api.anaplan.com` endpoint (and its regional variants) is the sole supported base URL. The spec's `servers[]` array contains only modern `api.anaplan.com` entries.
+
 ## Extracted Schema Files
 
 - **`objectSchema.json`** — Schema extracted from live `/objects/` API response. Documents the structure of Anaplan model objects.
@@ -79,6 +83,23 @@ Endpoints covered:
 | `test_list_workspace_models` | `GET /2/0/workspaces/{workspaceId}/models` |
 | `test_get_workspace_model` | `GET /2/0/workspaces/{workspaceId}/models/{modelId}` (skipped — 405) |
 | `test_auth_scheme_probe` | Probes Bearer vs AnaplanAuthToken on 3 endpoints |
+
+## Modern Endpoint Validation (post-legacy retirement)
+
+Live test suite run against `https://api.anaplan.com` on 2026-06-04, confirming the modern endpoint is fully operational after retirement of the legacy `app.anaplan.com/2` URLs.
+
+| Result | Count |
+|--------|-------|
+| Passed | 23 |
+| Skipped (expected) | 3 |
+| Failed | 0 |
+
+Skips (all expected):
+- `test_get_workspace_model` — `GET /workspaces/{workspaceId}/models/{modelId}` returns 405; endpoint is not implemented (documented below)
+- `test_current_period_invalid_date_in_body_returns_400` — PUT blocked by write-guard (`--allow-writes` not passed; non-destructive by design)
+- `test_current_period_invalid_date_as_query_param_returns_400` — same write-guard skip
+
+No regressions detected. All previously-passing endpoints continue to respond correctly on the modern endpoint.
 
 ## Discovered Discrepancies
 

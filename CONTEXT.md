@@ -218,6 +218,8 @@ Full regional URL table (19 regions):
 
 Legacy regions (us1–us7, eu1, eu2, eu4, ap1) share the older non-prefixed `api.anaplan.com` / `auth.anaplan.com` / `us1a.app.anaplan.com` endpoints. Newer cloud regions have fully independent regional endpoints.
 
+> **Legacy Integration API endpoint retired**: The Integration API (and related APIs: ALM, SCIM, Audit, Exception Users, CloudWorks) was historically also accessible via `https://us1a.app.anaplan.com/2` and equivalent region-prefixed `app.anaplan.com/2` URLs. Anaplan has retired these legacy endpoints. The modern `api.anaplan.com` endpoints listed above are the sole supported base URLs. All specs use the modern endpoints.
+
 ### Confidence table
 
 `build_spec.py` is a one-time bootstrap per API. Once live tests exist the spec is hand-maintained — do not run `build_spec.py` against it again (see `CLAUDE.md`).
