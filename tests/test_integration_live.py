@@ -17,6 +17,8 @@ Basic authentication (fallback):
 
 Optional:
     ANAPLAN_API_BASE_URL      - API base URL (default: https://api.anaplan.com)
+    ANAPLAN_WORKSPACE_ID      - workspace ID for model-scoped tests (default: see below)
+    ANAPLAN_MODEL_ID          - model ID for model-scoped tests (default: see below)
 """
 
 import base64
@@ -33,6 +35,8 @@ from cryptography.hazmat.primitives.asymmetric import padding
 
 AUTH_URL = "https://auth.anaplan.com"
 API_URL = os.getenv("ANAPLAN_API_BASE_URL", "https://api.anaplan.com")
+WORKSPACE_ID = os.getenv("ANAPLAN_WORKSPACE_ID", "8a868cd885f53bd201860f5a4fea1ff1")  # EBP Commercial Budget Z-PREPROD
+MODEL_ID = os.getenv("ANAPLAN_MODEL_ID", "09F86E3942A84353892853BE3BE82280")  # Commercial Flash | PS [PREPROD]
 
 
 def _sign_data(data: bytes, key_path: str, key_password: str | None = None) -> str:
@@ -322,11 +326,10 @@ def test_list_workspace_models(integration_token):
 
     Compares response shape to GET /2/0/models. Documents any structural differences.
     """
-    ws_id = "8a868cd885f53bd201860f5a4fea1ff1"
     h = {"Authorization": f"AnaplanAuthToken {integration_token}"}
     with httpx.Client() as client:
         baseline = client.get(f"{API_URL}/2/0/models", headers=h)
-        response = client.get(f"{API_URL}/2/0/workspaces/{ws_id}/models", headers=h)
+        response = client.get(f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models", headers=h)
 
     if response.status_code in (404, 405):
         pytest.skip(
@@ -373,13 +376,11 @@ def test_get_workspace_model(integration_token):
 
     Compares response shape to GET /2/0/models/{modelId}. Documents any structural differences.
     """
-    ws_id = "8a868cd885f53bd201860f5a4fea1ff1"
-    model_id = "09F86E3942A84353892853BE3BE82280"
     h = {"Authorization": f"AnaplanAuthToken {integration_token}"}
     with httpx.Client() as client:
-        baseline = client.get(f"{API_URL}/2/0/models/{model_id}", headers=h)
+        baseline = client.get(f"{API_URL}/2/0/models/{MODEL_ID}", headers=h)
         response = client.get(
-            f"{API_URL}/2/0/workspaces/{ws_id}/models/{model_id}", headers=h
+            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}", headers=h
         )
 
     if response.status_code in (404, 405):
@@ -395,7 +396,7 @@ def test_get_workspace_model(integration_token):
     assert body.get("status", {}).get("code") == 200
     model = body.get("model") or next(iter(body.get("models") or []), None)
     assert model, f"Response must contain 'model'; keys: {list(body.keys())}"
-    assert model.get("id") == model_id, "Returned model ID must match requested ID"
+    assert model.get("id") == MODEL_ID, "Returned model ID must match requested ID"
 
     if baseline.status_code == 200:
         baseline_body = baseline.json()
@@ -462,9 +463,6 @@ def test_auth_scheme_probe(integration_token):
 
 # ─── Model structure metadata ──────────────────────────────────────────────────
 # Fixed test IDs; non-destructive read-only endpoints only.
-
-WORKSPACE_ID = "8a868cd885f53bd201860f5a4fea1ff1"
-MODEL_ID = "09F86E3942A84353892853BE3BE82280"
 
 
 def _auth_headers(token):
