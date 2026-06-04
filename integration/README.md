@@ -83,6 +83,12 @@ Endpoints covered:
 | `test_list_workspace_models` | `GET /2/0/workspaces/{workspaceId}/models` |
 | `test_get_workspace_model` | `GET /2/0/workspaces/{workspaceId}/models/{modelId}` (skipped — 405) |
 | `test_auth_scheme_probe` | Probes Bearer vs AnaplanAuthToken on 3 endpoints |
+| `test_list_versions` | `GET /2/0/models/{modelId}/versions` |
+| `test_get_workspace_current_period` | `GET /2/0/workspaces/{workspaceId}/models/{modelId}/currentPeriod` |
+| `test_get_model_current_period` | `GET /2/0/models/{modelId}/currentPeriod` |
+| `test_get_model_calendar` | `GET /2/0/workspaces/{workspaceId}/models/{modelId}/modelCalendar` |
+| `test_get_fiscal_year` | `GET /2/0/models/{modelId}/modelCalendar/fiscalYear` (warns — 405) |
+| `test_switchover_invalid_date_returns_400` | `PUT /2/0/models/{modelId}/versions/{versionId}/switchover` (guarded — requires `--allow-writes`) |
 
 ## Modern Endpoint Validation (post-legacy retirement)
 
