@@ -2494,6 +2494,33 @@ paths:
         \ <br><br>*   Required<br>*   Type: string<br>*   Description: The model ID<br>*   Example: `FC12345678912343455667`<br><br>\
         \ |\n| `fileId` | <br><br>*   Required<br>*   Type: number<br>*   Description: The file ID<br>*   Example: `113000000008`<br><br>\
         \ |\n\n#"
+    get:
+      summary: Get file metadata
+      description: 'Returns metadata for a specific file in the model.
+
+
+        **Note:** Live testing shows this endpoint returns 404 for standard Integration API users. Individual file metadata
+        is only available via  (the full list). See integration/README.md discrepancies.'
+      parameters: []
+      responses:
+        '200':
+          description: File metadata retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                  status:
+                    type: object
+                  file:
+                    $ref: '#/components/schemas/File'
+        '404':
+          description: File not found or endpoint not available for this account role.
+      tags:
+      - Model Metadata
+      - File Metadata
   /2/0/models/{modelId}/versions/{versionId}/switchover:
     put:
       summary: Set version switchover date
@@ -3456,8 +3483,10 @@ paths:
       summary: Upload a file in chunks
       parameters: []
       responses:
+        '204':
+          description: Chunk uploaded successfully. No response body.
         '200':
-          description: 'TODO: document response'
+          description: Chunk uploaded successfully (some regions may return 200).
       tags:
       - Bulk Write
       description: "### Upload a file chunk as an octet stream\n\n#### Request\n\n```\ncurl -X PUT \\\nhttps://api.anaplan.com/2/0/workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks/0\
@@ -3469,6 +3498,14 @@ paths:
         \ |\n| `fileId` | <br><br>*   Required<br>*   Type: number<br>*   Description: The file ID<br>*   Example: `113000000008`<br><br>\
         \ |\n| `chunkId` | <br><br>*   Required<br>*   Type: string<br>*   Description: The chunk ID of the file.  In this\
         \ case, the first chunk.<br>*   Example: `0`<br><br> |\n\n#"
+      requestBody:
+        description: Raw binary content of the chunk.
+        required: true
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
     parameters:
     - name: workspaceId
       in: path

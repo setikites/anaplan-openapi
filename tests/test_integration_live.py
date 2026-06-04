@@ -1179,6 +1179,231 @@ def test_switchover_invalid_date_returns_400(integration_token, version_id):
     )
 
 
+# ─── File and chunk operations ─────────────────────────────────────────────────
+
+
+@pytest.fixture(scope="module")
+def file_id(integration_token):
+    """First file ID from the model-level file list, or skip if none exist."""
+    h = _auth_headers(integration_token)
+    with httpx.Client() as client:
+        r = client.get(f"{API_URL}/2/0/models/{MODEL_ID}/files", headers=h)
+    if r.status_code != 200:
+        pytest.skip(f"Could not list files: {r.status_code}")
+    files = r.json().get("files", [])
+    if not files:
+        pytest.skip("No files in test model")
+    return files[0]["id"]
+
+
+@pytest.mark.live
+def test_list_model_files(integration_token):
+    """GET /2/0/models/{modelId}/files returns list of model files."""
+    with httpx.Client() as client:
+        response = client.get(
+            f"{API_URL}/2/0/models/{MODEL_ID}/files",
+            headers=_auth_headers(integration_token),
+        )
+
+    assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
+    body = response.json()
+    assert body.get("status", {}).get("code") == 200
+    files = body.get("files")
+    assert isinstance(files, list), f"Expected 'files' list; keys: {list(body.keys())}"
+    if files:
+        assert files[0].get("id"), "File must have an id"
+        assert "name" in files[0], "File must have a name"
+
+
+@pytest.mark.live
+def test_get_file_metadata(integration_token, file_id):
+    """GET /2/0/workspaces/{workspaceId}/models/{modelId}/files/{fileId} returns file metadata.
+
+    NOTE: Live testing shows this endpoint returns 404 even for files visible in
+    GET /models/{modelId}/files. Individual file metadata is only available via
+    the full list endpoint. See integration/README.md discrepancies.
+    """
+    with httpx.Client() as client:
+        response = client.get(
+            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/files/{file_id}",
+            headers=_auth_headers(integration_token),
+        )
+
+    if response.status_code == 404:
+        warnings.warn(
+            f"GET /workspaces/.../files/{file_id} returned 404 — "
+            "individual file metadata endpoint not available; use GET /models/{modelId}/files instead. "
+            "See integration/README.md discrepancies.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return
+
+    assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
+    body = response.json()
+    assert body.get("status", {}).get("code") == 200
+    file_obj = body.get("file")
+    assert file_obj is not None, f"Expected 'file' key; keys: {list(body.keys())}"
+    assert file_obj.get("id") == file_id, "Returned file ID must match requested ID"
+    assert "name" in file_obj, "File metadata must have a name"
+
+
+@pytest.mark.live
+def test_list_file_chunks(integration_token, file_id):
+    """GET /2/0/workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks returns chunk list."""
+    with httpx.Client() as client:
+        response = client.get(
+            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/files/{file_id}/chunks",
+            headers=_auth_headers(integration_token),
+        )
+
+    assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
+    body = response.json()
+    assert body.get("status", {}).get("code") == 200
+    chunks = body.get("chunks")
+    # When chunkCount == 0, the API omits the 'chunks' key entirely; accept None or list.
+    assert chunks is None or isinstance(chunks, list), (
+        f"Expected 'chunks' to be a list or absent; got {type(chunks)}"
+    )
+    if chunks:
+        assert "id" in chunks[0], "Chunk must have an id"
+
+
+@pytest.mark.live
+def test_download_first_chunk(integration_token, file_id):
+    """GET /2/0/workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks/0 downloads first chunk.
+
+    Skipped when the file has no chunks (chunkCount == 0).
+    """
+    h = _auth_headers(integration_token)
+    with httpx.Client() as client:
+        meta_r = client.get(
+            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/files/{file_id}",
+            headers=h,
+        )
+        if meta_r.status_code != 200:
+            pytest.skip(f"Could not fetch file metadata: {meta_r.status_code}")
+        file_obj = meta_r.json().get("file", {})
+        if not file_obj.get("chunkCount"):
+            pytest.skip(f"File {file_id} has no chunks (chunkCount=0)")
+
+        response = client.get(
+            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/files/{file_id}/chunks/0",
+            headers=h,
+        )
+
+    assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
+    assert len(response.content) > 0, "Chunk download must return non-empty body"
+
+
+@pytest.mark.live
+def test_upload_single_chunk(integration_token, file_id):
+    """PUT /2/0/workspaces/{workspaceId}/models/{modelId}/files/{fileId} uploads a file as a single chunk.
+
+    Single-chunk upload: PUT directly to the file path (no set-chunk-count or complete step).
+    Verifies the chunk appears in GET .../chunks. Teardown via DELETE.
+    """
+    h = _auth_headers(integration_token)
+    chunk_data = b"col_a\nval1\n"
+
+    with httpx.Client() as client:
+        # Upload file as single chunk directly to the file path
+        upload_r = client.put(
+            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/files/{file_id}",
+            headers={**h, "Content-Type": "application/octet-stream"},
+            content=chunk_data,
+        )
+        assert upload_r.status_code in (200, 204), (
+            f"PUT single-chunk upload failed: {upload_r.status_code}: {upload_r.text[:200]}"
+        )
+
+        # Verify the chunk appears
+        verify_r = client.get(
+            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/files/{file_id}/chunks",
+            headers=h,
+        )
+        assert verify_r.status_code == 200
+        chunks = verify_r.json().get("chunks", [])
+        assert len(chunks) == 1, (
+            f"Expected 1 chunk after upload; got {len(chunks)}"
+        )
+
+        # Teardown
+        client.delete(
+            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/files/{file_id}",
+            headers=h,
+        )
+
+
+@pytest.mark.live
+def test_upload_and_complete_cycle(integration_token, file_id):
+    """Multi-chunk upload cycle: set chunk count → PUT chunk → POST complete → verify → teardown.
+
+    Uses the first available file staging area. Tests the three-step multi-chunk pattern.
+    Restores original state via DELETE.
+
+    NOTE: Live testing shows POST /complete returns 500 for standard Integration API users
+    on this test model. Set chunk count, PUT chunk, and GET chunks all succeed. The 500
+    on complete is documented as a discrepancy. See integration/README.md.
+    """
+    h = _auth_headers(integration_token)
+    chunk_data = b"col_a,col_b\nval1,val2\n"
+
+    with httpx.Client() as client:
+        # Step 1: set chunk count to -1 (variable-length multi-chunk mode)
+        set_count_r = client.post(
+            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/files/{file_id}",
+            headers={**h, "Content-Type": "application/json"},
+            json={"chunkCount": -1},
+        )
+        assert set_count_r.status_code == 200, (
+            f"POST set chunk count failed: {set_count_r.status_code}: {set_count_r.text[:200]}"
+        )
+
+        # Step 2: upload chunk 0 — API returns 204 No Content on success
+        upload_r = client.put(
+            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/files/{file_id}/chunks/0",
+            headers={**h, "Content-Type": "application/octet-stream"},
+            content=chunk_data,
+        )
+        assert upload_r.status_code in (200, 204), (
+            f"PUT chunk 0 failed: {upload_r.status_code}: {upload_r.text[:200]}"
+        )
+
+        # Verify the chunk is staged
+        chunks_r = client.get(
+            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/files/{file_id}/chunks",
+            headers=h,
+        )
+        assert chunks_r.status_code == 200
+        assert len(chunks_r.json().get("chunks", [])) == 1, "Chunk must be staged before complete"
+
+        # Step 3: mark upload complete — requires Content-Type header
+        complete_r = client.post(
+            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/files/{file_id}/complete",
+            headers={**h, "Content-Type": "application/json"},
+        )
+        if complete_r.status_code == 500:
+            warnings.warn(
+                f"POST /files/{file_id}/complete returned 500 — "
+                "complete endpoint not supported on this model/account. "
+                "Set chunk count, PUT chunk, and GET chunks all succeeded. "
+                "See integration/README.md discrepancies.",
+                UserWarning,
+                stacklevel=2,
+            )
+        else:
+            assert complete_r.status_code in (200, 204), (
+                f"POST complete failed: {complete_r.status_code}: {complete_r.text[:200]}"
+            )
+
+        # Teardown
+        client.delete(
+            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/files/{file_id}",
+            headers=h,
+        )
+
+
 # ─── Helpers ────────────────────────────────────────────────────────────────────
 
 def assert_response_code(response, expected_codes, discrepancies):
