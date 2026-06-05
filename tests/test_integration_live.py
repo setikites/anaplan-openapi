@@ -35,7 +35,8 @@ from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding
 
 AUTH_URL = "https://auth.anaplan.com"
-API_URL = os.getenv("ANAPLAN_API_BASE_URL", "https://api.anaplan.com")
+_api_base = os.getenv("ANAPLAN_API_BASE_URL", "https://api.anaplan.com").rstrip("/")
+API_URL = _api_base if _api_base.endswith("/2/0") else _api_base + "/2/0"
 WORKSPACE_ID = os.getenv("ANAPLAN_WORKSPACE_ID", "8a868cd885f53bd201860f5a4fea1ff1")  # EBP Commercial Budget Z-PREPROD
 MODEL_ID = os.getenv("ANAPLAN_MODEL_ID", "09F86E3942A84353892853BE3BE82280")  # Commercial Flash | PS [PREPROD]
 
@@ -148,7 +149,7 @@ def test_get_current_user(integration_token):
     """GET /2/0/users/me returns current user identity."""
     with httpx.Client() as client:
         response = client.get(
-            f"{API_URL}/2/0/users/me",
+            f"{API_URL}/users/me",
             headers={"Authorization": f"AnaplanAuthToken {integration_token}"},
         )
 
@@ -171,7 +172,7 @@ def test_get_user_by_id(integration_token):
     """GET /2/0/users/{userId} returns the same user as GET /users/me."""
     with httpx.Client() as client:
         me_response = client.get(
-            f"{API_URL}/2/0/users/me",
+            f"{API_URL}/users/me",
             headers={"Authorization": f"AnaplanAuthToken {integration_token}"},
         )
         assert me_response.status_code == 200
@@ -181,7 +182,7 @@ def test_get_user_by_id(integration_token):
         assert user_id, "Could not obtain userId from GET /users/me"
 
         response = client.get(
-            f"{API_URL}/2/0/users/{user_id}",
+            f"{API_URL}/users/{user_id}",
             headers={"Authorization": f"AnaplanAuthToken {integration_token}"},
         )
 
@@ -200,7 +201,7 @@ def test_list_workspaces(integration_token):
     """GET /2/0/workspaces returns list of accessible workspaces."""
     with httpx.Client() as client:
         response = client.get(
-            f"{API_URL}/2/0/workspaces",
+            f"{API_URL}/workspaces",
             headers={"Authorization": f"AnaplanAuthToken {integration_token}"},
         )
 
@@ -228,7 +229,7 @@ def test_get_workspace(integration_token):
     """
     with httpx.Client() as client:
         list_response = client.get(
-            f"{API_URL}/2/0/workspaces",
+            f"{API_URL}/workspaces",
             headers={"Authorization": f"AnaplanAuthToken {integration_token}"},
         )
         assert list_response.status_code == 200
@@ -238,7 +239,7 @@ def test_get_workspace(integration_token):
         workspace_id = workspaces[0]["id"]
 
         response = client.get(
-            f"{API_URL}/2/0/workspaces/{workspace_id}",
+            f"{API_URL}/workspaces/{workspace_id}",
             headers={"Authorization": f"AnaplanAuthToken {integration_token}"},
         )
 
@@ -268,7 +269,7 @@ def test_list_models(integration_token):
     """GET /2/0/models returns list of accessible models."""
     with httpx.Client() as client:
         response = client.get(
-            f"{API_URL}/2/0/models",
+            f"{API_URL}/models",
             headers={"Authorization": f"AnaplanAuthToken {integration_token}"},
         )
 
@@ -292,7 +293,7 @@ def test_get_model(integration_token):
     """GET /2/0/models/{modelId} returns model detail."""
     with httpx.Client() as client:
         list_response = client.get(
-            f"{API_URL}/2/0/models",
+            f"{API_URL}/models",
             headers={"Authorization": f"AnaplanAuthToken {integration_token}"},
         )
         assert list_response.status_code == 200
@@ -302,7 +303,7 @@ def test_get_model(integration_token):
         model_id = models[0]["id"]
 
         response = client.get(
-            f"{API_URL}/2/0/models/{model_id}",
+            f"{API_URL}/models/{model_id}",
             headers={"Authorization": f"AnaplanAuthToken {integration_token}"},
         )
 
@@ -433,8 +434,8 @@ def test_list_workspace_models(integration_token):
     """
     h = {"Authorization": f"AnaplanAuthToken {integration_token}"}
     with httpx.Client() as client:
-        baseline = client.get(f"{API_URL}/2/0/models", headers=h)
-        response = client.get(f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models", headers=h)
+        baseline = client.get(f"{API_URL}/models", headers=h)
+        response = client.get(f"{API_URL}/workspaces/{WORKSPACE_ID}/models", headers=h)
 
     if response.status_code in (404, 405):
         pytest.skip(
@@ -483,9 +484,9 @@ def test_get_workspace_model(integration_token):
     """
     h = {"Authorization": f"AnaplanAuthToken {integration_token}"}
     with httpx.Client() as client:
-        baseline = client.get(f"{API_URL}/2/0/models/{MODEL_ID}", headers=h)
+        baseline = client.get(f"{API_URL}/models/{MODEL_ID}", headers=h)
         response = client.get(
-            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}", headers=h
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}", headers=h
         )
 
     if response.status_code in (404, 405):
@@ -579,12 +580,12 @@ def module_id_with_line_items(integration_token):
     """First module ID that has at least one line item."""
     h = _auth_headers(integration_token)
     with httpx.Client() as client:
-        r = client.get(f"{API_URL}/2/0/models/{MODEL_ID}/modules", headers=h)
+        r = client.get(f"{API_URL}/models/{MODEL_ID}/modules", headers=h)
         if r.status_code != 200:
             pytest.skip(f"Could not list modules: {r.status_code}")
         for m in r.json().get("modules", []):
             r2 = client.get(
-                f"{API_URL}/2/0/models/{MODEL_ID}/modules/{m['id']}/lineItems",
+                f"{API_URL}/models/{MODEL_ID}/modules/{m['id']}/lineItems",
                 headers=h,
             )
             if r2.status_code == 200 and r2.json().get("items"):
@@ -597,12 +598,12 @@ def module_id_with_views(integration_token):
     """First module ID that has at least one view."""
     h = _auth_headers(integration_token)
     with httpx.Client() as client:
-        r = client.get(f"{API_URL}/2/0/models/{MODEL_ID}/modules", headers=h)
+        r = client.get(f"{API_URL}/models/{MODEL_ID}/modules", headers=h)
         if r.status_code != 200:
             pytest.skip(f"Could not list modules: {r.status_code}")
         for m in r.json().get("modules", []):
             r2 = client.get(
-                f"{API_URL}/2/0/models/{MODEL_ID}/modules/{m['id']}/views",
+                f"{API_URL}/models/{MODEL_ID}/modules/{m['id']}/views",
                 headers=h,
             )
             if r2.status_code == 200 and r2.json().get("views"):
@@ -616,7 +617,7 @@ def view_id(integration_token):
     h = _auth_headers(integration_token)
     with httpx.Client() as client:
         r = client.get(
-            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/views",
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/views",
             headers=h,
         )
     if r.status_code != 200:
@@ -632,13 +633,13 @@ def line_item_and_dimension_ids(integration_token):
     """(line_item_id, dimension_id) — first line item that has at least one dimension."""
     h = _auth_headers(integration_token)
     with httpx.Client() as client:
-        r = client.get(f"{API_URL}/2/0/models/{MODEL_ID}/lineItems", headers=h)
+        r = client.get(f"{API_URL}/models/{MODEL_ID}/lineItems", headers=h)
         if r.status_code != 200:
             pytest.skip(f"Could not list line items: {r.status_code}")
         for item in r.json().get("items", []):
             lid = item["id"]
             r2 = client.get(
-                f"{API_URL}/2/0/models/{MODEL_ID}/lineItems/{lid}/dimensions",
+                f"{API_URL}/models/{MODEL_ID}/lineItems/{lid}/dimensions",
                 headers=h,
             )
             if r2.status_code == 200 and r2.json().get("dimensions"):
@@ -662,19 +663,19 @@ def view_and_dimension_for_items(integration_token):
     h = _auth_headers(integration_token)
     with httpx.Client() as client:
         r = client.get(
-            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/views", headers=h
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/views", headers=h
         )
         if r.status_code != 200:
             pytest.skip(f"Could not list views: {r.status_code}")
         for v in r.json().get("views", []):
             vid = v["id"]
-            r2 = client.get(f"{API_URL}/2/0/models/{MODEL_ID}/views/{vid}", headers=h)
+            r2 = client.get(f"{API_URL}/models/{MODEL_ID}/views/{vid}", headers=h)
             if r2.status_code != 200:
                 continue
             for row in r2.json().get("rows", []):
                 did = row["id"]
                 r3 = client.get(
-                    f"{API_URL}/2/0/models/{MODEL_ID}/views/{vid}/dimensions/{did}/items",
+                    f"{API_URL}/models/{MODEL_ID}/views/{vid}/dimensions/{did}/items",
                     headers=h,
                 )
                 if r3.status_code == 200 and r3.json().get("items"):
@@ -688,7 +689,7 @@ def list_id(integration_token):
     h = _auth_headers(integration_token)
     with httpx.Client() as client:
         r = client.get(
-            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/lists",
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/lists",
             headers=h,
         )
     if r.status_code != 200:
@@ -704,7 +705,7 @@ def test_list_modules(integration_token):
     """GET /2/0/models/{modelId}/modules returns list of modules."""
     with httpx.Client() as client:
         response = client.get(
-            f"{API_URL}/2/0/models/{MODEL_ID}/modules",
+            f"{API_URL}/models/{MODEL_ID}/modules",
             headers={"Authorization": f"AnaplanAuthToken {integration_token}"},
         )
 
@@ -723,7 +724,7 @@ def test_list_module_line_items(integration_token, module_id_with_line_items):
     """GET /2/0/models/{modelId}/modules/{moduleId}/lineItems returns line items."""
     with httpx.Client() as client:
         response = client.get(
-            f"{API_URL}/2/0/models/{MODEL_ID}/modules/{module_id_with_line_items}/lineItems",
+            f"{API_URL}/models/{MODEL_ID}/modules/{module_id_with_line_items}/lineItems",
             headers={"Authorization": f"AnaplanAuthToken {integration_token}"},
         )
 
@@ -742,7 +743,7 @@ def test_list_module_views(integration_token, module_id_with_views):
     """GET /2/0/models/{modelId}/modules/{moduleId}/views returns views for a module."""
     with httpx.Client() as client:
         response = client.get(
-            f"{API_URL}/2/0/models/{MODEL_ID}/modules/{module_id_with_views}/views",
+            f"{API_URL}/models/{MODEL_ID}/modules/{module_id_with_views}/views",
             headers={"Authorization": f"AnaplanAuthToken {integration_token}"},
         )
 
@@ -761,7 +762,7 @@ def test_list_model_views(integration_token):
     """GET /2/0/workspaces/{workspaceId}/models/{modelId}/views returns all views."""
     with httpx.Client() as client:
         response = client.get(
-            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/views",
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/views",
             headers={"Authorization": f"AnaplanAuthToken {integration_token}"},
         )
 
@@ -780,7 +781,7 @@ def test_get_view(integration_token, view_id):
     """GET /2/0/models/{modelId}/views/{viewId} returns view metadata including dimensions."""
     with httpx.Client() as client:
         response = client.get(
-            f"{API_URL}/2/0/models/{MODEL_ID}/views/{view_id}",
+            f"{API_URL}/models/{MODEL_ID}/views/{view_id}",
             headers=_auth_headers(integration_token),
         )
 
@@ -800,7 +801,7 @@ def test_list_model_line_items(integration_token):
     """GET /2/0/models/{modelId}/lineItems returns all line items in the model."""
     with httpx.Client() as client:
         response = client.get(
-            f"{API_URL}/2/0/models/{MODEL_ID}/lineItems",
+            f"{API_URL}/models/{MODEL_ID}/lineItems",
             headers=_auth_headers(integration_token),
         )
 
@@ -819,7 +820,7 @@ def test_list_line_item_dimensions(integration_token, line_item_id):
     """GET /2/0/models/{modelId}/lineItems/{lineItemId}/dimensions returns dimensions."""
     with httpx.Client() as client:
         response = client.get(
-            f"{API_URL}/2/0/models/{MODEL_ID}/lineItems/{line_item_id}/dimensions",
+            f"{API_URL}/models/{MODEL_ID}/lineItems/{line_item_id}/dimensions",
             headers=_auth_headers(integration_token),
         )
 
@@ -838,7 +839,7 @@ def test_list_line_item_dimension_items(integration_token, line_item_id, dimensi
     """GET /2/0/models/{modelId}/lineItems/{lineItemId}/dimensions/{dimensionId}/items."""
     with httpx.Client() as client:
         response = client.get(
-            f"{API_URL}/2/0/models/{MODEL_ID}/lineItems/{line_item_id}/dimensions/{dimension_id}/items",
+            f"{API_URL}/models/{MODEL_ID}/lineItems/{line_item_id}/dimensions/{dimension_id}/items",
             headers=_auth_headers(integration_token),
         )
 
@@ -858,7 +859,7 @@ def test_list_view_dimension_items(integration_token, view_and_dimension_for_ite
     vid, did = view_and_dimension_for_items
     with httpx.Client() as client:
         response = client.get(
-            f"{API_URL}/2/0/models/{MODEL_ID}/views/{vid}/dimensions/{did}/items",
+            f"{API_URL}/models/{MODEL_ID}/views/{vid}/dimensions/{did}/items",
             headers=_auth_headers(integration_token),
         )
 
@@ -877,7 +878,7 @@ def test_list_workspace_dimension_items(integration_token, dimension_id):
     """GET /2/0/workspaces/{workspaceId}/models/{modelId}/dimensions/{dimensionId}/items."""
     with httpx.Client() as client:
         response = client.get(
-            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/dimensions/{dimension_id}/items",
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/dimensions/{dimension_id}/items",
             headers=_auth_headers(integration_token),
         )
 
@@ -896,7 +897,7 @@ def test_list_lists(integration_token):
     """GET /2/0/workspaces/{workspaceId}/models/{modelId}/lists returns list of lists."""
     with httpx.Client() as client:
         response = client.get(
-            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/lists",
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/lists",
             headers=_auth_headers(integration_token),
         )
 
@@ -915,7 +916,7 @@ def test_get_list(integration_token, list_id):
     """GET /2/0/workspaces/{workspaceId}/models/{modelId}/lists/{listId} returns list metadata."""
     with httpx.Client() as client:
         response = client.get(
-            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/lists/{list_id}",
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/lists/{list_id}",
             headers=_auth_headers(integration_token),
         )
 
@@ -1087,19 +1088,19 @@ def view_with_page_selector(integration_token):
     with httpx.Client() as client:
         # Collect model dimensions via module/lineItem path
         model_dim_ids = set()
-        mods_r = client.get(f"{API_URL}/2/0/models/{MODEL_ID}/modules", headers=h)
+        mods_r = client.get(f"{API_URL}/models/{MODEL_ID}/modules", headers=h)
         if mods_r.status_code != 200:
             pytest.skip("Could not list modules for page selector discovery")
         for mod in mods_r.json().get("modules", [])[:5]:
             li_r = client.get(
-                f"{API_URL}/2/0/models/{MODEL_ID}/modules/{mod['id']}/lineItems",
+                f"{API_URL}/models/{MODEL_ID}/modules/{mod['id']}/lineItems",
                 headers=h,
             )
             if li_r.status_code != 200:
                 continue
             for li in li_r.json().get("items", [])[:3]:
                 dim_r = client.get(
-                    f"{API_URL}/2/0/models/{MODEL_ID}/lineItems/{li['id']}/dimensions",
+                    f"{API_URL}/models/{MODEL_ID}/lineItems/{li['id']}/dimensions",
                     headers=h,
                 )
                 if dim_r.status_code == 200:
@@ -1108,12 +1109,12 @@ def view_with_page_selector(integration_token):
 
         # Find a view where at least one model dimension is on the pages axis
         views = client.get(
-            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/views",
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/views",
             headers=h,
         ).json().get("views", [])
         for v in views:
             vid = v["id"]
-            detail = client.get(f"{API_URL}/2/0/models/{MODEL_ID}/views/{vid}", headers=h)
+            detail = client.get(f"{API_URL}/models/{MODEL_ID}/views/{vid}", headers=h)
             if detail.status_code != 200:
                 continue
             d = detail.json()
@@ -1123,7 +1124,7 @@ def view_with_page_selector(integration_token):
             )
             for did in model_dim_ids - axis_dims:
                 items_r = client.get(
-                    f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+                    f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
                     f"/dimensions/{did}/items",
                     headers=h,
                 )
@@ -1133,7 +1134,7 @@ def view_with_page_selector(integration_token):
                 selector = f"{did}:{item_id}"
                 # Validate the selector actually works on this view before returning
                 probe = client.get(
-                    f"{API_URL}/2/0/models/{MODEL_ID}/views/{vid}/data",
+                    f"{API_URL}/models/{MODEL_ID}/views/{vid}/data",
                     headers=h,
                     params={"pages": selector, "format": "v1"},
                 )
@@ -1152,7 +1153,7 @@ def test_view_data_pages_single_value(integration_token, view_with_page_selector
     vid, page_selector = view_with_page_selector
     with httpx.Client() as client:
         response = client.get(
-            f"{API_URL}/2/0/models/{MODEL_ID}/views/{vid}/data",
+            f"{API_URL}/models/{MODEL_ID}/views/{vid}/data",
             headers=_auth_headers(integration_token),
             params={"pages": page_selector, "format": "v1"},
         )
@@ -1175,7 +1176,7 @@ def test_view_data_pages_repeated_key(integration_token, view_with_page_selector
     vid, page_selector = view_with_page_selector
     with httpx.Client() as client:
         response = client.get(
-            f"{API_URL}/2/0/models/{MODEL_ID}/views/{vid}/data",
+            f"{API_URL}/models/{MODEL_ID}/views/{vid}/data",
             headers=_auth_headers(integration_token),
             params=[("pages", page_selector), ("format", "v1")],
         )
@@ -1207,7 +1208,7 @@ def test_tasks_sort_param(integration_token):
     with httpx.Client() as client:
         for action_type in action_types:
             list_url = (
-                f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/{action_type}"
+                f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/{action_type}"
             )
             r = client.get(list_url, headers=h)
             if r.status_code != 200:
@@ -1219,7 +1220,7 @@ def test_tasks_sort_param(integration_token):
                 continue
             rid = resources[0]["id"]
             tasks_url = (
-                f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+                f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
                 f"/{action_type}/{rid}/tasks"
             )
             for sv in sort_values:
@@ -1245,7 +1246,7 @@ def test_current_period_invalid_date_in_body_returns_400(integration_token):
     h = {**_auth_headers(integration_token), "Content-Type": "application/json"}
     with httpx.Client() as client:
         response = client.put(
-            f"{API_URL}/2/0/models/{MODEL_ID}/currentPeriod",
+            f"{API_URL}/models/{MODEL_ID}/currentPeriod",
             headers=h,
             json={"date": "not-a-date"},
         )
@@ -1268,7 +1269,7 @@ def test_current_period_invalid_date_as_query_param_returns_400(integration_toke
     """
     with httpx.Client() as client:
         response = client.put(
-            f"{API_URL}/2/0/models/{MODEL_ID}/currentPeriod",
+            f"{API_URL}/models/{MODEL_ID}/currentPeriod",
             headers=_auth_headers(integration_token),
             params={"date": "not-a-date"},
         )
@@ -1291,7 +1292,7 @@ def version_id(integration_token):
     """First version ID from the model versions list."""
     h = _auth_headers(integration_token)
     with httpx.Client() as client:
-        r = client.get(f"{API_URL}/2/0/models/{MODEL_ID}/versions", headers=h)
+        r = client.get(f"{API_URL}/models/{MODEL_ID}/versions", headers=h)
     if r.status_code != 200:
         pytest.skip(f"Could not list versions: {r.status_code}")
     versions = r.json().get("versionMetadata", [])
@@ -1305,7 +1306,7 @@ def test_list_versions(integration_token):
     """GET /2/0/models/{modelId}/versions returns list of version metadata."""
     with httpx.Client() as client:
         response = client.get(
-            f"{API_URL}/2/0/models/{MODEL_ID}/versions",
+            f"{API_URL}/models/{MODEL_ID}/versions",
             headers=_auth_headers(integration_token),
         )
 
@@ -1324,7 +1325,7 @@ def test_get_workspace_current_period(integration_token):
     """GET /2/0/workspaces/{workspaceId}/models/{modelId}/currentPeriod returns current period."""
     with httpx.Client() as client:
         response = client.get(
-            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/currentPeriod",
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/currentPeriod",
             headers=_auth_headers(integration_token),
         )
 
@@ -1342,7 +1343,7 @@ def test_get_model_current_period(integration_token):
     """GET /2/0/models/{modelId}/currentPeriod returns current period (model-scoped)."""
     with httpx.Client() as client:
         response = client.get(
-            f"{API_URL}/2/0/models/{MODEL_ID}/currentPeriod",
+            f"{API_URL}/models/{MODEL_ID}/currentPeriod",
             headers=_auth_headers(integration_token),
         )
 
@@ -1360,7 +1361,7 @@ def test_get_model_calendar(integration_token):
     """GET /2/0/workspaces/{workspaceId}/models/{modelId}/modelCalendar returns model calendar."""
     with httpx.Client() as client:
         response = client.get(
-            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/modelCalendar",
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/modelCalendar",
             headers=_auth_headers(integration_token),
         )
 
@@ -1381,7 +1382,7 @@ def test_get_fiscal_year(integration_token):
     """
     with httpx.Client() as client:
         response = client.get(
-            f"{API_URL}/2/0/models/{MODEL_ID}/modelCalendar/fiscalYear",
+            f"{API_URL}/models/{MODEL_ID}/modelCalendar/fiscalYear",
             headers=_auth_headers(integration_token),
         )
 
@@ -1417,7 +1418,7 @@ def test_switchover_invalid_date_returns_400(integration_token, version_id):
     h = {**_auth_headers(integration_token), "Content-Type": "application/json"}
     with httpx.Client() as client:
         response = client.put(
-            f"{API_URL}/2/0/models/{MODEL_ID}/versions/{version_id}/switchover",
+            f"{API_URL}/models/{MODEL_ID}/versions/{version_id}/switchover",
             headers=h,
             json={"date": "not-a-date"},
         )
@@ -1436,7 +1437,7 @@ def file_id(integration_token):
     """First file ID from the model-level file list, or skip if none exist."""
     h = _auth_headers(integration_token)
     with httpx.Client() as client:
-        r = client.get(f"{API_URL}/2/0/models/{MODEL_ID}/files", headers=h)
+        r = client.get(f"{API_URL}/models/{MODEL_ID}/files", headers=h)
     if r.status_code != 200:
         pytest.skip(f"Could not list files: {r.status_code}")
     files = r.json().get("files", [])
@@ -1450,7 +1451,7 @@ def test_list_model_files(integration_token):
     """GET /2/0/models/{modelId}/files returns list of model files."""
     with httpx.Client() as client:
         response = client.get(
-            f"{API_URL}/2/0/models/{MODEL_ID}/files",
+            f"{API_URL}/models/{MODEL_ID}/files",
             headers=_auth_headers(integration_token),
         )
 
@@ -1474,7 +1475,7 @@ def test_get_file_metadata(integration_token, file_id):
     """
     with httpx.Client() as client:
         response = client.get(
-            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/files/{file_id}",
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/files/{file_id}",
             headers=_auth_headers(integration_token),
         )
 
@@ -1502,7 +1503,7 @@ def test_list_file_chunks(integration_token, file_id):
     """GET /2/0/workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks returns chunk list."""
     with httpx.Client() as client:
         response = client.get(
-            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/files/{file_id}/chunks",
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/files/{file_id}/chunks",
             headers=_auth_headers(integration_token),
         )
 
@@ -1527,7 +1528,7 @@ def test_download_first_chunk(integration_token, file_id):
     h = _auth_headers(integration_token)
     with httpx.Client() as client:
         meta_r = client.get(
-            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/files/{file_id}",
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/files/{file_id}",
             headers=h,
         )
         if meta_r.status_code != 200:
@@ -1537,7 +1538,7 @@ def test_download_first_chunk(integration_token, file_id):
             pytest.skip(f"File {file_id} has no chunks (chunkCount=0)")
 
         response = client.get(
-            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/files/{file_id}/chunks/0",
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/files/{file_id}/chunks/0",
             headers=h,
         )
 
@@ -1558,7 +1559,7 @@ def test_upload_single_chunk(integration_token, file_id):
     with httpx.Client() as client:
         # Upload file as single chunk directly to the file path
         upload_r = client.put(
-            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/files/{file_id}",
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/files/{file_id}",
             headers={**h, "Content-Type": "application/octet-stream"},
             content=chunk_data,
         )
@@ -1568,7 +1569,7 @@ def test_upload_single_chunk(integration_token, file_id):
 
         # Verify the chunk appears
         verify_r = client.get(
-            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/files/{file_id}/chunks",
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/files/{file_id}/chunks",
             headers=h,
         )
         assert verify_r.status_code == 200
@@ -1579,7 +1580,7 @@ def test_upload_single_chunk(integration_token, file_id):
 
         # Teardown
         client.delete(
-            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/files/{file_id}",
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/files/{file_id}",
             headers=h,
         )
 
@@ -1601,7 +1602,7 @@ def test_upload_and_complete_cycle(integration_token, file_id):
     with httpx.Client() as client:
         # Step 1: set chunk count to -1 (variable-length multi-chunk mode)
         set_count_r = client.post(
-            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/files/{file_id}",
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/files/{file_id}",
             headers={**h, "Content-Type": "application/json"},
             json={"chunkCount": -1},
         )
@@ -1611,7 +1612,7 @@ def test_upload_and_complete_cycle(integration_token, file_id):
 
         # Step 2: upload chunk 0 — API returns 204 No Content on success
         upload_r = client.put(
-            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/files/{file_id}/chunks/0",
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/files/{file_id}/chunks/0",
             headers={**h, "Content-Type": "application/octet-stream"},
             content=chunk_data,
         )
@@ -1621,7 +1622,7 @@ def test_upload_and_complete_cycle(integration_token, file_id):
 
         # Verify the chunk is staged
         chunks_r = client.get(
-            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/files/{file_id}/chunks",
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/files/{file_id}/chunks",
             headers=h,
         )
         assert chunks_r.status_code == 200
@@ -1629,7 +1630,7 @@ def test_upload_and_complete_cycle(integration_token, file_id):
 
         # Step 3: mark upload complete — requires Content-Type header
         complete_r = client.post(
-            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/files/{file_id}/complete",
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/files/{file_id}/complete",
             headers={**h, "Content-Type": "application/json"},
         )
         if complete_r.status_code == 500:
@@ -1648,7 +1649,7 @@ def test_upload_and_complete_cycle(integration_token, file_id):
 
         # Teardown
         client.delete(
-            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/files/{file_id}",
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/files/{file_id}",
             headers=h,
         )
 
@@ -1662,7 +1663,7 @@ def import_id(integration_token):
     h = _auth_headers(integration_token)
     with httpx.Client() as client:
         r = client.get(
-            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/imports/",
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/imports/",
             headers=h,
         )
     if r.status_code != 200:
@@ -1679,7 +1680,7 @@ def export_id(integration_token):
     h = _auth_headers(integration_token)
     with httpx.Client() as client:
         r = client.get(
-            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/exports",
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/exports",
             headers=h,
         )
     if r.status_code != 200:
@@ -1696,7 +1697,7 @@ def process_id(integration_token):
     h = _auth_headers(integration_token)
     with httpx.Client() as client:
         r = client.get(
-            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/processes",
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/processes",
             headers=h,
         )
     if r.status_code != 200:
@@ -1713,7 +1714,7 @@ def action_id(integration_token):
     h = _auth_headers(integration_token)
     with httpx.Client() as client:
         r = client.get(
-            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/actions",
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/actions",
             headers=h,
         )
     if r.status_code != 200:
@@ -1730,7 +1731,7 @@ def import_task_id(integration_token, import_id):
     h = _auth_headers(integration_token)
     with httpx.Client() as client:
         r = client.get(
-            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
             f"/imports/{import_id}/tasks",
             headers=h,
         )
@@ -1751,7 +1752,7 @@ def test_list_imports(integration_token):
     """GET /2/0/workspaces/{workspaceId}/models/{modelId}/imports/ returns import list."""
     with httpx.Client() as client:
         response = client.get(
-            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/imports/",
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/imports/",
             headers=_auth_headers(integration_token),
         )
 
@@ -1774,7 +1775,7 @@ def test_get_import_metadata(integration_token, import_id):
     """
     with httpx.Client() as client:
         response = client.get(
-            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/imports/{import_id}",
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/imports/{import_id}",
             headers=_auth_headers(integration_token),
         )
 
@@ -1795,7 +1796,7 @@ def test_list_import_tasks(integration_token, import_id):
     """
     with httpx.Client() as client:
         response = client.get(
-            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
             f"/imports/{import_id}/tasks",
             headers=_auth_headers(integration_token),
         )
@@ -1814,7 +1815,7 @@ def test_get_import_task(integration_token, import_id, import_task_id):
     """GET .../imports/{importId}/tasks/{taskId} returns task status with result."""
     with httpx.Client() as client:
         response = client.get(
-            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
             f"/imports/{import_id}/tasks/{import_task_id}",
             headers=_auth_headers(integration_token),
         )
@@ -1842,7 +1843,7 @@ def test_import_dump_chunks(integration_token, import_id, import_task_id):
     h = _auth_headers(integration_token)
     with httpx.Client() as client:
         task_r = client.get(
-            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
             f"/imports/{import_id}/tasks/{import_task_id}",
             headers=h,
         )
@@ -1852,7 +1853,7 @@ def test_import_dump_chunks(integration_token, import_id, import_task_id):
         result = task.get("result", {})
 
         response = client.get(
-            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
             f"/imports/{import_id}/tasks/{import_task_id}/dump/chunks",
             headers=h,
         )
@@ -1881,7 +1882,7 @@ def test_list_exports(integration_token):
     """GET /2/0/workspaces/{workspaceId}/models/{modelId}/exports returns export list."""
     with httpx.Client() as client:
         response = client.get(
-            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/exports",
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/exports",
             headers=_auth_headers(integration_token),
         )
 
@@ -1904,7 +1905,7 @@ def test_get_export_metadata(integration_token, export_id):
     """
     with httpx.Client() as client:
         response = client.get(
-            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/exports/{export_id}",
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/exports/{export_id}",
             headers=_auth_headers(integration_token),
         )
 
@@ -1922,7 +1923,7 @@ def test_list_export_tasks(integration_token, export_id):
     """GET /2/0/workspaces/{workspaceId}/models/{modelId}/exports/{exportId}/tasks lists tasks."""
     with httpx.Client() as client:
         response = client.get(
-            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
             f"/exports/{export_id}/tasks",
             headers=_auth_headers(integration_token),
         )
@@ -1948,7 +1949,7 @@ def test_run_export_and_poll_task(integration_token, export_id):
     h = _auth_headers(integration_token)
     with httpx.Client() as client:
         run_r = client.post(
-            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
             f"/exports/{export_id}/tasks",
             headers={**h, "Content-Type": "application/json"},
             json={"localeName": "en_US"},
@@ -1967,7 +1968,7 @@ def test_run_export_and_poll_task(integration_token, export_id):
     with httpx.Client() as client:
         while time.time() < deadline:
             poll_r = client.get(
-                f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+                f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
                 f"/exports/{export_id}/tasks/{task_id}",
                 headers=h,
             )
@@ -1998,7 +1999,7 @@ def test_list_actions(integration_token):
     """GET /2/0/workspaces/{workspaceId}/models/{modelId}/actions returns action list."""
     with httpx.Client() as client:
         response = client.get(
-            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/actions",
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/actions",
             headers=_auth_headers(integration_token),
         )
 
@@ -2017,7 +2018,7 @@ def test_list_action_tasks(integration_token, action_id):
     """GET /2/0/workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks lists tasks."""
     with httpx.Client() as client:
         response = client.get(
-            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
             f"/actions/{action_id}/tasks",
             headers=_auth_headers(integration_token),
         )
@@ -2040,7 +2041,7 @@ def test_list_processes(integration_token):
     """GET /2/0/workspaces/{workspaceId}/models/{modelId}/processes returns process list."""
     with httpx.Client() as client:
         response = client.get(
-            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/processes",
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/processes",
             headers=_auth_headers(integration_token),
         )
 
@@ -2059,7 +2060,7 @@ def test_get_process_detail(integration_token, process_id):
     """GET /2/0/models/{modelId}/processes/{processId} returns process detail."""
     with httpx.Client() as client:
         response = client.get(
-            f"{API_URL}/2/0/models/{MODEL_ID}/processes/{process_id}",
+            f"{API_URL}/models/{MODEL_ID}/processes/{process_id}",
             headers=_auth_headers(integration_token),
         )
 
@@ -2076,7 +2077,7 @@ def test_list_process_tasks(integration_token, process_id):
     """GET /2/0/workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks lists tasks."""
     with httpx.Client() as client:
         response = client.get(
-            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
             f"/processes/{process_id}/tasks",
             headers=_auth_headers(integration_token),
         )
