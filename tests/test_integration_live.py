@@ -1404,6 +1404,444 @@ def test_upload_and_complete_cycle(integration_token, file_id):
         )
 
 
+# ─── Action execution fixtures ────────────────────────────────────────────────
+
+
+@pytest.fixture(scope="module")
+def import_id(integration_token):
+    """First import ID from the workspace/model import list, or skip if none."""
+    h = _auth_headers(integration_token)
+    with httpx.Client() as client:
+        r = client.get(
+            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/imports/",
+            headers=h,
+        )
+    if r.status_code != 200:
+        pytest.skip(f"Could not list imports: {r.status_code}")
+    imports = r.json().get("imports", [])
+    if not imports:
+        pytest.skip("No imports in test model")
+    return imports[0]["id"]
+
+
+@pytest.fixture(scope="module")
+def export_id(integration_token):
+    """First export ID from the workspace/model export list, or skip if none."""
+    h = _auth_headers(integration_token)
+    with httpx.Client() as client:
+        r = client.get(
+            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/exports",
+            headers=h,
+        )
+    if r.status_code != 200:
+        pytest.skip(f"Could not list exports: {r.status_code}")
+    exports = r.json().get("exports", [])
+    if not exports:
+        pytest.skip("No exports in test model")
+    return exports[0]["id"]
+
+
+@pytest.fixture(scope="module")
+def process_id(integration_token):
+    """First process ID from the workspace/model process list, or skip if none."""
+    h = _auth_headers(integration_token)
+    with httpx.Client() as client:
+        r = client.get(
+            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/processes",
+            headers=h,
+        )
+    if r.status_code != 200:
+        pytest.skip(f"Could not list processes: {r.status_code}")
+    processes = r.json().get("processes", [])
+    if not processes:
+        pytest.skip("No processes in test model")
+    return processes[0]["id"]
+
+
+@pytest.fixture(scope="module")
+def action_id(integration_token):
+    """First action ID from the workspace/model action list, or skip if none."""
+    h = _auth_headers(integration_token)
+    with httpx.Client() as client:
+        r = client.get(
+            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/actions",
+            headers=h,
+        )
+    if r.status_code != 200:
+        pytest.skip(f"Could not list actions: {r.status_code}")
+    actions = r.json().get("actions", [])
+    if not actions:
+        pytest.skip("No actions in test model")
+    return actions[0]["id"]
+
+
+@pytest.fixture(scope="module")
+def import_task_id(integration_token, import_id):
+    """Most-recent task ID for the first import, or skip if task history is empty."""
+    h = _auth_headers(integration_token)
+    with httpx.Client() as client:
+        r = client.get(
+            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+            f"/imports/{import_id}/tasks",
+            headers=h,
+        )
+    if r.status_code != 200:
+        pytest.skip(f"Could not list import tasks: {r.status_code}")
+    body = r.json()
+    tasks = body.get("tasks") or ([body["task"]] if body.get("task") else [])
+    if not tasks:
+        pytest.skip("No import task history for this import")
+    return tasks[0].get("taskId")
+
+
+# ─── Imports ──────────────────────────────────────────────────────────────────
+
+
+@pytest.mark.live
+def test_list_imports(integration_token):
+    """GET /2/0/workspaces/{workspaceId}/models/{modelId}/imports/ returns import list."""
+    with httpx.Client() as client:
+        response = client.get(
+            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/imports/",
+            headers=_auth_headers(integration_token),
+        )
+
+    assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
+    body = response.json()
+    assert body.get("status", {}).get("code") == 200
+    imports = body.get("imports")
+    assert isinstance(imports, list), f"Expected 'imports' list; keys: {list(body.keys())}"
+    if imports:
+        assert imports[0].get("id"), "Import must have an id"
+        assert "name" in imports[0], "Import must have a name"
+
+
+@pytest.mark.live
+def test_get_import_metadata(integration_token, import_id):
+    """GET /2/0/workspaces/{workspaceId}/models/{modelId}/imports/{importId} returns metadata.
+
+    NOTE: Live testing shows the API returns {importMetadata: {name, type}} — no id field.
+    The id is only included in the list response, not the single-item metadata response.
+    """
+    with httpx.Client() as client:
+        response = client.get(
+            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/imports/{import_id}",
+            headers=_auth_headers(integration_token),
+        )
+
+    assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
+    body = response.json()
+    assert body.get("status", {}).get("code") == 200
+    import_obj = body.get("importMetadata")
+    assert import_obj is not None, f"Expected 'importMetadata' key; keys: {list(body.keys())}"
+    assert "name" in import_obj, "Import metadata must have a name"
+
+
+@pytest.mark.live
+def test_list_import_tasks(integration_token, import_id):
+    """GET /2/0/workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks lists tasks.
+
+    NOTE: When no tasks have ever run, the API returns {meta: {paging: {totalSize: 0}}, status}
+    with no 'tasks' or 'task' key. This is the correct empty-list representation.
+    """
+    with httpx.Client() as client:
+        response = client.get(
+            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+            f"/imports/{import_id}/tasks",
+            headers=_auth_headers(integration_token),
+        )
+
+    assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
+    body = response.json()
+    assert body.get("status", {}).get("code") == 200
+    tasks = body.get("tasks") or ([body["task"]] if body.get("task") else [])
+    for t in tasks:
+        assert t.get("taskId"), "Task must have a taskId"
+        assert "taskState" in t, "Task must have a taskState"
+
+
+@pytest.mark.live
+def test_get_import_task(integration_token, import_id, import_task_id):
+    """GET .../imports/{importId}/tasks/{taskId} returns task status with result."""
+    with httpx.Client() as client:
+        response = client.get(
+            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+            f"/imports/{import_id}/tasks/{import_task_id}",
+            headers=_auth_headers(integration_token),
+        )
+
+    assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
+    body = response.json()
+    assert body.get("status", {}).get("code") == 200
+    task = body.get("task")
+    assert task is not None, f"Expected 'task' key; keys: {list(body.keys())}"
+    assert task.get("taskId") == import_task_id, "Returned taskId must match requested ID"
+    assert "taskState" in task, "Task must have a taskState"
+    assert task["taskState"] in {"NOT_STARTED", "IN_PROGRESS", "COMPLETE", "CANCELLING", "CANCELLED"}, (
+        f"Unknown taskState: {task['taskState']}"
+    )
+
+
+@pytest.mark.live
+def test_import_dump_chunks(integration_token, import_id, import_task_id):
+    """GET .../imports/{importId}/tasks/{taskId}/dump/chunks returns chunk list.
+
+    Only meaningful when the task completed with failures (failureDumpAvailable=True).
+    Probes the endpoint and accepts 200 with any valid shape. Skips if the task
+    poll shows no dump is available.
+    """
+    h = _auth_headers(integration_token)
+    with httpx.Client() as client:
+        task_r = client.get(
+            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+            f"/imports/{import_id}/tasks/{import_task_id}",
+            headers=h,
+        )
+        if task_r.status_code != 200:
+            pytest.skip(f"Could not fetch task status: {task_r.status_code}")
+        task = task_r.json().get("task", {})
+        result = task.get("result", {})
+
+        response = client.get(
+            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+            f"/imports/{import_id}/tasks/{import_task_id}/dump/chunks",
+            headers=h,
+        )
+
+    if not result.get("failureDumpAvailable"):
+        if response.status_code in (404, 400):
+            return
+        if response.status_code == 200:
+            body = response.json()
+            chunks = body.get("chunks", [])
+            assert isinstance(chunks, list), f"Expected 'chunks' list; keys: {list(body.keys())}"
+            return
+
+    assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
+    body = response.json()
+    assert body.get("status", {}).get("code") == 200
+    chunks = body.get("chunks")
+    assert isinstance(chunks, list), f"Expected 'chunks' list; keys: {list(body.keys())}"
+
+
+# ─── Exports ──────────────────────────────────────────────────────────────────
+
+
+@pytest.mark.live
+def test_list_exports(integration_token):
+    """GET /2/0/workspaces/{workspaceId}/models/{modelId}/exports returns export list."""
+    with httpx.Client() as client:
+        response = client.get(
+            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/exports",
+            headers=_auth_headers(integration_token),
+        )
+
+    assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
+    body = response.json()
+    assert body.get("status", {}).get("code") == 200
+    exports = body.get("exports")
+    assert isinstance(exports, list), f"Expected 'exports' list; keys: {list(body.keys())}"
+    if exports:
+        assert exports[0].get("id"), "Export must have an id"
+        assert "name" in exports[0], "Export must have a name"
+
+
+@pytest.mark.live
+def test_get_export_metadata(integration_token, export_id):
+    """GET /2/0/workspaces/{workspaceId}/models/{modelId}/exports/{exportId} returns metadata.
+
+    NOTE: Live testing shows the API returns {exportMetadata: {...}} — no id field in the
+    metadata object. The id is only included in the list response.
+    """
+    with httpx.Client() as client:
+        response = client.get(
+            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/exports/{export_id}",
+            headers=_auth_headers(integration_token),
+        )
+
+    assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
+    body = response.json()
+    assert body.get("status", {}).get("code") == 200
+    export_obj = body.get("exportMetadata")
+    assert export_obj is not None, f"Expected 'exportMetadata' key; keys: {list(body.keys())}"
+    assert isinstance(export_obj, dict) and export_obj, "exportMetadata must be a non-empty object"
+    assert "encoding" in export_obj, f"exportMetadata must have 'encoding'; keys: {list(export_obj.keys())}"
+
+
+@pytest.mark.live
+def test_list_export_tasks(integration_token, export_id):
+    """GET /2/0/workspaces/{workspaceId}/models/{modelId}/exports/{exportId}/tasks lists tasks."""
+    with httpx.Client() as client:
+        response = client.get(
+            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+            f"/exports/{export_id}/tasks",
+            headers=_auth_headers(integration_token),
+        )
+
+    assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
+    body = response.json()
+    assert body.get("status", {}).get("code") == 200
+    tasks = body.get("tasks") or ([body["task"]] if body.get("task") else [])
+    assert isinstance(tasks, list), f"Expected 'tasks' list; keys: {list(body.keys())}"
+    if tasks:
+        assert tasks[0].get("taskId"), "Task must have a taskId"
+        assert "taskState" in tasks[0], "Task must have a taskState"
+
+
+@pytest.mark.live
+def test_run_export_and_poll_task(integration_token, export_id):
+    """POST export task + poll GET until terminal state (non-destructive run-and-poll cycle).
+
+    Requires --allow-writes. Without it the POST is auto-skipped by the write guard.
+    Times out after 30 s; fails if terminal state is not reached.
+    """
+    import time
+    h = _auth_headers(integration_token)
+    with httpx.Client() as client:
+        run_r = client.post(
+            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+            f"/exports/{export_id}/tasks",
+            headers={**h, "Content-Type": "application/json"},
+            json={"localeName": "en_US"},
+        )
+
+    assert run_r.status_code == 200, (
+        f"POST export task failed: {run_r.status_code}: {run_r.text[:200]}"
+    )
+    run_body = run_r.json()
+    task_id = run_body.get("task", {}).get("taskId") or run_body.get("taskId")
+    assert task_id, f"Expected taskId in POST response; keys: {list(run_body.keys())}"
+
+    terminal_states = {"COMPLETE", "CANCELLED", "CANCELLING"}
+    deadline = time.time() + 30
+    task = None
+    with httpx.Client() as client:
+        while time.time() < deadline:
+            poll_r = client.get(
+                f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+                f"/exports/{export_id}/tasks/{task_id}",
+                headers=h,
+            )
+            assert poll_r.status_code == 200, (
+                f"Poll failed: {poll_r.status_code}: {poll_r.text[:200]}"
+            )
+            task = poll_r.json().get("task", {})
+            if task.get("taskState") in terminal_states:
+                break
+            time.sleep(2)
+
+    assert task is not None, "No task response received during polling"
+    assert task.get("taskState") in terminal_states, (
+        f"Export task did not reach terminal state within 30s; "
+        f"last state: {task.get('taskState')}"
+    )
+    assert task.get("taskId") == task_id, "Polled taskId must match started taskId"
+    result = task.get("result")
+    assert result is not None, "Completed task must have a result"
+    assert "successful" in result, "Task result must have 'successful' field"
+
+
+# ─── Actions ──────────────────────────────────────────────────────────────────
+
+
+@pytest.mark.live
+def test_list_actions(integration_token):
+    """GET /2/0/workspaces/{workspaceId}/models/{modelId}/actions returns action list."""
+    with httpx.Client() as client:
+        response = client.get(
+            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/actions",
+            headers=_auth_headers(integration_token),
+        )
+
+    assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
+    body = response.json()
+    assert body.get("status", {}).get("code") == 200
+    actions = body.get("actions")
+    assert isinstance(actions, list), f"Expected 'actions' list; keys: {list(body.keys())}"
+    if actions:
+        assert actions[0].get("id"), "Action must have an id"
+        assert "name" in actions[0], "Action must have a name"
+
+
+@pytest.mark.live
+def test_list_action_tasks(integration_token, action_id):
+    """GET /2/0/workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks lists tasks."""
+    with httpx.Client() as client:
+        response = client.get(
+            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+            f"/actions/{action_id}/tasks",
+            headers=_auth_headers(integration_token),
+        )
+
+    assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
+    body = response.json()
+    assert body.get("status", {}).get("code") == 200
+    tasks = body.get("tasks") or ([body["task"]] if body.get("task") else [])
+    assert isinstance(tasks, list), f"Expected 'tasks' list; keys: {list(body.keys())}"
+    if tasks:
+        assert tasks[0].get("taskId"), "Task must have a taskId"
+        assert "taskState" in tasks[0], "Task must have a taskState"
+
+
+# ─── Processes ────────────────────────────────────────────────────────────────
+
+
+@pytest.mark.live
+def test_list_processes(integration_token):
+    """GET /2/0/workspaces/{workspaceId}/models/{modelId}/processes returns process list."""
+    with httpx.Client() as client:
+        response = client.get(
+            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/processes",
+            headers=_auth_headers(integration_token),
+        )
+
+    assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
+    body = response.json()
+    assert body.get("status", {}).get("code") == 200
+    processes = body.get("processes")
+    assert isinstance(processes, list), f"Expected 'processes' list; keys: {list(body.keys())}"
+    if processes:
+        assert processes[0].get("id"), "Process must have an id"
+        assert "name" in processes[0], "Process must have a name"
+
+
+@pytest.mark.live
+def test_get_process_detail(integration_token, process_id):
+    """GET /2/0/models/{modelId}/processes/{processId} returns process detail."""
+    with httpx.Client() as client:
+        response = client.get(
+            f"{API_URL}/2/0/models/{MODEL_ID}/processes/{process_id}",
+            headers=_auth_headers(integration_token),
+        )
+
+    assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
+    body = response.json()
+    assert body.get("status", {}).get("code") == 200
+    process = body.get("process") or body.get("processMetadata")
+    assert process is not None, f"Expected process detail key; keys: {list(body.keys())}"
+    assert "name" in process, "Process detail must have a name"
+
+
+@pytest.mark.live
+def test_list_process_tasks(integration_token, process_id):
+    """GET /2/0/workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks lists tasks."""
+    with httpx.Client() as client:
+        response = client.get(
+            f"{API_URL}/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+            f"/processes/{process_id}/tasks",
+            headers=_auth_headers(integration_token),
+        )
+
+    assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
+    body = response.json()
+    assert body.get("status", {}).get("code") == 200
+    tasks = body.get("tasks") or ([body["task"]] if body.get("task") else [])
+    assert isinstance(tasks, list), f"Expected 'tasks' list; keys: {list(body.keys())}"
+    if tasks:
+        assert tasks[0].get("taskId"), "Task must have a taskId"
+        assert "taskState" in tasks[0], "Task must have a taskState"
+
+
 # ─── Helpers ────────────────────────────────────────────────────────────────────
 
 def assert_response_code(response, expected_codes, discrepancies):

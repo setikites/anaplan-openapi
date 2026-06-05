@@ -3982,6 +3982,19 @@ paths:
       responses:
         '200':
           description: List of export tasks
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                  status:
+                    type: object
+                  tasks:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Task'
       summary: Get a list of export tasks
   /2/0/workspaces/{workspaceId}/models/{modelId}/exports/{exportId}/tasks/{taskId}:
     get:
@@ -4211,6 +4224,17 @@ paths:
           description: Response 200
           content:
             application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                  status:
+                    type: object
+                  tasks:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Task'
               example:
                 taskId: BAB7819744034F25BF73EA1B41804478
                 taskState: IN_PROGRESS
@@ -4780,19 +4804,25 @@ components:
         periodText:
           type: string
     TaskWithUrl:
-      description: A task tracking the execution of a long running action
+      description: Initial task reference returned by POST .../tasks. Contains the taskId and a URL for polling status.
       properties:
         creationTime:
           type: integer
+          description: Task creation time in milliseconds since epoch
         taskId:
           type: string
+          description: Unique identifier for the task; use this to poll GET .../tasks/{taskId}
         taskState:
+          description: Lifecycle state of the task
           enum:
           - NOT_STARTED
           - IN_PROGRESS
           - COMPLETE
           - CANCELLING
           - CANCELLED
+        taskUrl:
+          type: string
+          description: URL for polling task status via GET
     SyncTask:
       description: A task tracking the execution of an ALM Sync
       properties:
@@ -5113,8 +5143,36 @@ components:
         name:
           type: string
     ImportMetadata:
-      description: Metadata about an import
-      properties: {}
+      description: Metadata about an import definition
+      properties:
+        name:
+          type: string
+          description: Display name of the import definition
+        type:
+          type: string
+          description: Import type (e.g. FILE, MODEL, USERS, HIERARCHY_DATA, MODULE_DATA)
+        source:
+          type: object
+          description: Source file configuration for file-based imports
+          properties:
+            columnCount:
+              type: integer
+            columnSeparator:
+              type: string
+            decimalSeparator:
+              type: string
+            firstDataRow:
+              type: integer
+            headerNames:
+              type: array
+              items:
+                type: string
+            headerRow:
+              type: integer
+            textDelimiter:
+              type: string
+            textEncoding:
+              type: string
     LineItem:
       description: A line item in an Anaplan model
       properties:
@@ -5235,9 +5293,19 @@ components:
       properties:
         creationTime:
           type: integer
+          description: Task creation time in milliseconds since epoch
+        currentStep:
+          type: string
+          description: Human-readable description of the current execution step
+        progress:
+          type: number
+          description: Execution progress as a fraction (0.0–1.0); typically 1.0 on completion
+        result:
+          $ref: '#/components/schemas/TaskResult'
         taskId:
           type: string
         taskState:
+          description: Lifecycle state of the task
           enum:
           - NOT_STARTED
           - IN_PROGRESS
