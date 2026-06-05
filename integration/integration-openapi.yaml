@@ -109,6 +109,17 @@ paths:
           type: boolean
         example: true
         description: When true, includes available model memory usage in bytes in the response.
+      - name: s
+        in: query
+        description: Search string
+        schema:
+          type: string
+      - name: sort
+        in: query
+        description: Sort results by object properties. Prefix with `+` for ascending or `-` for descending order.
+        schema:
+          type: string
+        example: +name
       responses:
         '200':
           description: Response 200
@@ -148,6 +159,17 @@ paths:
         schema:
           type: boolean
         example: true
+      - name: s
+        in: query
+        description: Search string
+        schema:
+          type: string
+      - name: sort
+        in: query
+        description: Sort results by object properties. Prefix with `+` for ascending or `-` for descending order.
+        schema:
+          type: string
+        example: +name
       responses:
         '200':
           description: Response 200
