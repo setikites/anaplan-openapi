@@ -56,6 +56,60 @@
     }
   ],
   "paths": {
+    "/users": {
+      "get": {
+        "summary": "List users",
+        "description": "Retrieves all users within the tenant.",
+        "tags": [
+          "User Data"
+        ],
+        "parameters": [
+          {
+            "name": "s",
+            "in": "query",
+            "description": "Search string",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sort results by object properties. Prefix with `+` for ascending or `-` for descending order.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "+firstName"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response 200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    },
+                    "status": {
+                      "$ref": "#/components/schemas/Status"
+                    },
+                    "users": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/User"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/users/me": {
       "get": {
         "summary": "Retrieve your user",

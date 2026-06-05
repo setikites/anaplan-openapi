@@ -532,13 +532,23 @@ def test_integration_models_list_declares_model_details():
     assert md.get("schema", {}).get("type") == "boolean"
 
 
+# Add entries here to extend s/sort contract coverage to additional list endpoints.
+# sort_example must match the `example:` value declared in the spec for that path.
+_LIST_SEARCH_SORT = [
+    pytest.param("/workspaces", "+name",      id="workspaces"),
+    pytest.param("/models",     "+name",      id="models"),
+    pytest.param("/users",      "+firstName", id="users"),
+]
+
+
 @_skip_integration
-def test_integration_workspaces_list_declares_s_param():
-    """GET /workspaces must declare s (search string) as a query parameter."""
+@pytest.mark.parametrize("path,sort_example", _LIST_SEARCH_SORT)
+def test_integration_list_declares_s_param(path, sort_example):
+    """List endpoints with search support must declare s (type: string, description: 'Search string')."""
     spec = _load(_INTEGRATION_SPEC)
-    params = _all_params(spec, "/workspaces", "get")
+    params = _all_params(spec, path, "get")
     names = {p["name"] for p in params if "name" in p}
-    assert "s" in names, "GET /workspaces is missing s query parameter"
+    assert "s" in names, f"GET {path} is missing s query parameter"
     p = next(p for p in params if p.get("name") == "s")
     assert p.get("in") == "query"
     assert p.get("schema", {}).get("type") == "string"
@@ -546,43 +556,19 @@ def test_integration_workspaces_list_declares_s_param():
 
 
 @_skip_integration
-def test_integration_workspaces_list_declares_sort_param():
-    """GET /workspaces must declare sort (sort by property) as a query parameter."""
+@pytest.mark.parametrize("path,sort_example", _LIST_SEARCH_SORT)
+def test_integration_list_declares_sort_param(path, sort_example):
+    """List endpoints with sort support must declare sort with the correct example and description."""
     spec = _load(_INTEGRATION_SPEC)
-    params = _all_params(spec, "/workspaces", "get")
+    params = _all_params(spec, path, "get")
     names = {p["name"] for p in params if "name" in p}
-    assert "sort" in names, "GET /workspaces is missing sort query parameter"
+    assert "sort" in names, f"GET {path} is missing sort query parameter"
     p = next(p for p in params if p.get("name") == "sort")
     assert p.get("in") == "query"
     assert p.get("schema", {}).get("type") == "string"
-    assert p.get("example") == "+name"
-    assert "ascending" in p.get("description", "").lower()
-
-
-@_skip_integration
-def test_integration_models_list_declares_s_param():
-    """GET /models must declare s (search string) as a query parameter."""
-    spec = _load(_INTEGRATION_SPEC)
-    params = _all_params(spec, "/models", "get")
-    names = {p["name"] for p in params if "name" in p}
-    assert "s" in names, "GET /models is missing s query parameter"
-    p = next(p for p in params if p.get("name") == "s")
-    assert p.get("in") == "query"
-    assert p.get("schema", {}).get("type") == "string"
-    assert p.get("description") == "Search string"
-
-
-@_skip_integration
-def test_integration_models_list_declares_sort_param():
-    """GET /models must declare sort (sort by property) as a query parameter."""
-    spec = _load(_INTEGRATION_SPEC)
-    params = _all_params(spec, "/models", "get")
-    names = {p["name"] for p in params if "name" in p}
-    assert "sort" in names, "GET /models is missing sort query parameter"
-    p = next(p for p in params if p.get("name") == "sort")
-    assert p.get("in") == "query"
-    assert p.get("schema", {}).get("type") == "string"
-    assert p.get("example") == "+name"
+    assert p.get("example") == sort_example, (
+        f"GET {path} sort example: expected {sort_example!r}, got {p.get('example')!r}"
+    )
     assert "ascending" in p.get("description", "").lower()
 
 

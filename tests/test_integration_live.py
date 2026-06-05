@@ -316,22 +316,25 @@ def test_get_model(integration_token):
     assert model.get("id") == model_id, "Returned model ID must match requested ID"
 
 
-# ─── s / sort query parameter probes (issue #34) ──────────────────────────────
+# ─── s / sort query parameter probes ──────────────────────────────────────────
 # Add entries here to extend search/sort coverage to additional list endpoints.
+# search_key: item field used to derive the s= probe value and verify filter results.
+# sort_field: object property passed to sort=+{field} / sort=-{field}.
 
 _SEARCH_SORT_PATHS = [
-    pytest.param("/2/0/workspaces", "workspaces", id="workspaces"),
-    pytest.param("/2/0/models", "models", id="models"),
+    pytest.param("/2/0/workspaces", "workspaces", "name",      "name",        id="workspaces"),
+    pytest.param("/2/0/models",     "models",     "name",      "name",        id="models"),
+    pytest.param("/2/0/users",      "users",      "email",     "firstName",   id="users"),
 ]
 
 
 @pytest.mark.live
-@pytest.mark.parametrize("path,list_key", _SEARCH_SORT_PATHS)
-def test_s_param_filters(integration_token, path, list_key):
+@pytest.mark.parametrize("path,list_key,search_key,sort_field", _SEARCH_SORT_PATHS)
+def test_s_param_filters(integration_token, path, list_key, search_key, sort_field):
     """GET {path}?s=<prefix> returns 200 and a known item appears in the filtered results.
 
-    Derives a short prefix from the first item's name in the unfiltered list, then
-    confirms that same item is present after filtering. Skipped when the list is empty.
+    Derives a short prefix from the first item's search_key field in the unfiltered list,
+    then confirms that same item is present after filtering. Skipped when the list is empty.
     """
     h = {"Authorization": f"AnaplanAuthToken {integration_token}"}
     url = f"{API_URL}{path}"
@@ -342,8 +345,8 @@ def test_s_param_filters(integration_token, path, list_key):
         if not items:
             pytest.skip(f"No {list_key} available to probe s parameter")
 
-        known_name = items[0]["name"]
-        prefix = known_name[:4]
+        known_value = items[0][search_key]
+        prefix = known_value[:4]
 
         filtered_r = client.get(url, headers=h, params={"s": prefix})
 
@@ -356,16 +359,16 @@ def test_s_param_filters(integration_token, path, list_key):
     assert isinstance(filtered, list), (
         f"Expected {list_key!r} list in filtered response; keys: {list(filtered_body.keys())}"
     )
-    names = [item["name"] for item in filtered if "name" in item]
-    assert any(known_name == n for n in names), (
-        f"Known {list_key[:-1]} {known_name!r} not in results for s={prefix!r}; got: {names[:5]}"
+    values = [item[search_key] for item in filtered if search_key in item]
+    assert any(known_value == v for v in values), (
+        f"Known {search_key}={known_value!r} not in results for s={prefix!r}; got: {values[:5]}"
     )
 
 
 @pytest.mark.live
-@pytest.mark.parametrize("path,list_key", _SEARCH_SORT_PATHS)
-def test_sort_param(integration_token, path, list_key):
-    """GET {path}?sort=+name and ?sort=-name both return 200.
+@pytest.mark.parametrize("path,list_key,search_key,sort_field", _SEARCH_SORT_PATHS)
+def test_sort_param(integration_token, path, list_key, search_key, sort_field):
+    """GET {path}?sort=+{sort_field} and ?sort=-{sort_field} both return 200.
 
     When ≥2 items exist, verifies that ascending order has first ≤ last and
     descending has first ≥ last, and that the two orderings are opposite.
@@ -373,30 +376,30 @@ def test_sort_param(integration_token, path, list_key):
     h = {"Authorization": f"AnaplanAuthToken {integration_token}"}
     url = f"{API_URL}{path}"
     with httpx.Client() as client:
-        asc_r = client.get(url, headers=h, params={"sort": "+name"})
-        desc_r = client.get(url, headers=h, params={"sort": "-name"})
+        asc_r = client.get(url, headers=h, params={"sort": f"+{sort_field}"})
+        desc_r = client.get(url, headers=h, params={"sort": f"-{sort_field}"})
 
     assert asc_r.status_code == 200, (
-        f"GET {path}?sort=+name returned {asc_r.status_code}: {asc_r.text[:200]}"
+        f"GET {path}?sort=+{sort_field} returned {asc_r.status_code}: {asc_r.text[:200]}"
     )
     assert desc_r.status_code == 200, (
-        f"GET {path}?sort=-name returned {desc_r.status_code}: {desc_r.text[:200]}"
+        f"GET {path}?sort=-{sort_field} returned {desc_r.status_code}: {desc_r.text[:200]}"
     )
 
-    asc_names = [item["name"] for item in asc_r.json().get(list_key, []) if "name" in item]
-    desc_names = [item["name"] for item in desc_r.json().get(list_key, []) if "name" in item]
+    asc_vals = [item[sort_field] for item in asc_r.json().get(list_key, []) if sort_field in item]
+    desc_vals = [item[sort_field] for item in desc_r.json().get(list_key, []) if sort_field in item]
 
-    if len(asc_names) >= 2:
-        assert asc_names[0] <= asc_names[-1], (
-            f"sort=+name: expected ascending order; got {asc_names[0]!r} … {asc_names[-1]!r}"
+    if len(asc_vals) >= 2:
+        assert asc_vals[0] <= asc_vals[-1], (
+            f"sort=+{sort_field}: expected ascending; got {asc_vals[0]!r} … {asc_vals[-1]!r}"
         )
-    if len(desc_names) >= 2:
-        assert desc_names[0] >= desc_names[-1], (
-            f"sort=-name: expected descending order; got {desc_names[0]!r} … {desc_names[-1]!r}"
+    if len(desc_vals) >= 2:
+        assert desc_vals[0] >= desc_vals[-1], (
+            f"sort=-{sort_field}: expected descending; got {desc_vals[0]!r} … {desc_vals[-1]!r}"
         )
-    if len(asc_names) >= 2 and len(desc_names) >= 2:
-        assert asc_names[0] <= desc_names[0], (
-            f"sort=+name first={asc_names[0]!r} should be ≤ sort=-name first={desc_names[0]!r}"
+    if len(asc_vals) >= 2 and len(desc_vals) >= 2:
+        assert asc_vals[0] <= desc_vals[0], (
+            f"sort=+{sort_field} first={asc_vals[0]!r} should be ≤ sort=-{sort_field} first={desc_vals[0]!r}"
         )
 
 
