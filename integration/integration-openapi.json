@@ -7,56 +7,56 @@
   },
   "servers": [
     {
-      "url": "https://api.anaplan.com",
+      "url": "https://api.anaplan.com/2/0",
       "description": "US1, US2, US5, US7, EU1, EU2, EU4, AP1"
     },
     {
-      "url": "https://us9.api.anaplan.com",
+      "url": "https://us9.api.anaplan.com/2/0",
       "description": "US9"
     },
     {
-      "url": "https://eu3.api.anaplan.com",
+      "url": "https://eu3.api.anaplan.com/2/0",
       "description": "EU3"
     },
     {
-      "url": "https://eu5.api.anaplan.com",
+      "url": "https://eu5.api.anaplan.com/2/0",
       "description": "EU5"
     },
     {
-      "url": "https://gb1.api.anaplan.com",
+      "url": "https://gb1.api.anaplan.com/2/0",
       "description": "GB1"
     },
     {
-      "url": "https://ca1a.api.anaplan.com",
+      "url": "https://ca1a.api.anaplan.com/2/0",
       "description": "CA1"
     },
     {
-      "url": "https://sg1.api.anaplan.com",
+      "url": "https://sg1.api.anaplan.com/2/0",
       "description": "SG1"
     },
     {
-      "url": "https://ae1.api.anaplan.com",
+      "url": "https://ae1.api.anaplan.com/2/0",
       "description": "AE1"
     },
     {
-      "url": "https://in1.api.anaplan.com",
+      "url": "https://in1.api.anaplan.com/2/0",
       "description": "IN1"
     },
     {
-      "url": "https://id1.api.anaplan.com",
+      "url": "https://id1.api.anaplan.com/2/0",
       "description": "ID1"
     },
     {
-      "url": "https://me1.api.anaplan.com",
+      "url": "https://me1.api.anaplan.com/2/0",
       "description": "ME1"
     },
     {
-      "url": "https://au1a.api2.anaplan.com",
+      "url": "https://au1a.api2.anaplan.com/2/0",
       "description": "AU1"
     }
   ],
   "paths": {
-    "/2/0/users/me": {
+    "/users/me": {
       "get": {
         "summary": "Retrieve your user",
         "parameters": [],
@@ -89,7 +89,7 @@
         "description": "## Retrieve your user\n\n`/users/me`  \n\nRetrieves your user based on your Anaplan authentication token.\n\n### Request\n\n```\ncurl -X GET \\\nhttps://api.anaplan.com/2/0/users/me \\\n-H 'authorization: AnaplanAuthToken {anaplan_auth_token}' \\\n-H \"Content-Type:application/json\"\n```\n\n### Request headers\n\n| **Header** | **Details** |\n| --- | --- |\n| `Authorization: AnaplanAuthToken {anaplan_auth_token}` | <br><br>*   Required<br>*   Description: the Anaplan authentication token<br><br> |\n| `Accept: application/json` | <br><br>*   Required<br>*   Description: This indicates the preferred response is either `application/json` format. Note that this call only outputs in `application/json` format.<br><br> |"
       }
     },
-    "/2/0/users/{userId}": {
+    "/users/{userId}": {
       "get": {
         "summary": "Retrieve user information",
         "parameters": [],
@@ -133,7 +133,7 @@
         }
       ]
     },
-    "/2/0/models": {
+    "/models": {
       "get": {
         "summary": "List user models",
         "parameters": [
@@ -179,7 +179,7 @@
         "description": "## Retrieve models\n\n`/models`  \nRetrieves information about all models in the user's default tenant.\n\n### Request\n\n```\ncurl -X GET \\\nhttps://api.anaplan.com/2/0/models \\\n-H 'authorization: AnaplanAuthToken {anaplan_auth_token}'\n```\n\n### Request headers\n\n`Authorization:AnaplanAuthToken {anaplan_auth_token}`\n\n### Request parameters\n\n| **Parameter** | **Description** |\n| --- | --- |\n| `{modelDetails}` | <br><br>*   Optional<br>*   Type: Boolean<br>*   Description: When set to `true`, this call returns the available model memory usage in bytes. When set to `false`, or not defined, this call does not return the model memory usage.<br>*   Example: `?modelDetails=true`<br><br> |\n\n### Response 200 (application/json)\n\n```\n{\n  \"meta\": {\n    \"schema\": \"https://api.anaplan.com/2/0/objects/model\",\n    \"paging\": {\n      \"currentPageSize\": 1,\n      \"totalSize\": 1,\n      \"offset\": 0\n    }\n  },\n  \"status\": {\n    \"code\": 200,\n    \"message\": \"Success\"\n  },\n  \"models\": [{\n      id\": \"FC12345678912343455667\",\n      \"activeState\": \"UNLOCKED\",\n      \"name\": \"FP&A\",\n      \"currentWorkspaceId\": \"8a8b8c8d8e8f8g8i\",\n      \"currentWorkspaceName\": \"Financial Planning\",\n      \"modelUrl\": \"https://rt.anaplan.com/anaplan/rt?selectedWorkspaceId\\8a8b8c8d8e8f8g8i\\u0026selectedModelId\\FC12345678912343455667\",\n      \"categoryValues\": []\n   }]\n}\n```"
       }
     },
-    "/2/0/workspaces": {
+    "/workspaces": {
       "get": {
         "summary": "List user workspaces",
         "parameters": [
@@ -255,7 +255,7 @@
         "description": "## List user workspaces\n\n`/workspaces`  \n\nRetrieves all workspaces a user has access to within the user's default tenant\n\n### Request\n\n```\ncurl -X GET \\\nhttps://api.anaplan.com/2/0/workspaces?tenantDetails=true \\\n-H 'authorization: AnaplanAuthToken {anaplan_auth_token}'\n```\n\n### Request headers\n\n| **Header** | **Details** |\n| --- | --- |\n| `Authorization: AnaplanAuthToken {anaplan_auth_token}` | <br><br>*   Required<br>*   Description: the Anaplan authentication token<br><br> |\n\n### Request parameters\n\n| **Parameter** | **Details** |\n| --- | --- |\n| `tenantDetails` | <br><br>*   Optional<br>*   Type: Boolean<br>*   Description: When set to true, this call returns an estimate of the current size of the workspace from all the models it contains. When set to false, or not defined, this call does not return an estimated current size of the workspace.<br>*   Example: true<br><br> |"
       }
     },
-    "/2/0/workspaces/{workspaceId}": {
+    "/workspaces/{workspaceId}": {
       "get": {
         "summary": "Get single workspace metadata",
         "parameters": [
@@ -312,7 +312,7 @@
         }
       ]
     },
-    "/2/0/models/{modelId}": {
+    "/models/{modelId}": {
       "get": {
         "summary": "Get single model metadata",
         "parameters": [
@@ -366,7 +366,7 @@
         }
       ]
     },
-    "/2/0/workspaces/{workspaceId}/models": {
+    "/workspaces/{workspaceId}/models": {
       "get": {
         "summary": "List workspace models",
         "description": "Returns models accessible to the calling user within the specified workspace. The response shape is identical to `GET /2/0/models` but filtered to models within the given workspace. Confirmed via live testing (issue #25).",
@@ -415,7 +415,7 @@
         }
       ]
     },
-    "/2/0/workspaces/{workspaceId}/models/{modelId}/dimensions/{dimensionId}/items": {
+    "/workspaces/{workspaceId}/models/{modelId}/dimensions/{dimensionId}/items": {
       "post": {
         "summary": "Lookup dimension items by name or code",
         "parameters": [],
@@ -628,7 +628,7 @@
         "description": "## Retrieve all items in a dimension\n\n`/models/{modelGuid}/dimensions/{dimensionId}/items`\n\nUse this call to retrieve the IDs, codes, and names for items in a specified dimension. The dimension must be a list, a list subset, a line item subset, or the Users dimension.\n\nCalls at model-level do not support the Time dimension. The calls return a `400` response. To avoid this, use the view dimension instead.\n\n**Notes**:\n\n*   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html).\n*   This call is on the model-level. It returns all dimension items as it does not have view-level hiding, filtering, or [Selective Access](https://help.anaplan.com/anapedia/Content/Modeling/Users/Selective_Access.html). For the view-level endpoint, see [Retrieve selected items in a dimension](https://anaplanbulkapi20.docs.apiary.io/#RetrieveSelectedItemsDimension).\n*   If codes have not been set for an item, then the response excludes the `code` field.\n*   This call only supports the retrieval of dimensions and items from a dimension that contains a maximum of 1,000,000 items.  \n    The call returns a `400` response for any more than that number of items.\n*   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response.\n    \n\n### Request\n\n```\ncurl -X GET\n'https://api.anaplan.com/2/0/models/{modelGuid}/dimensions/{dimensionId}/items'\\\n-H 'Authorization: AnaplanAuthToken {anaplan_auth_token}'\\\n-H 'Accept: application/json'\n```\n\n### Request headers\n\n| **Header** | **Details** |\n| --- | --- |\n| `Authorization: AnaplanAuthToken {anaplan_auth_token}` | <br><br>*   Required<br>*   Description: the Anaplan authentication token<br><br> |\n| `Accept: application/json` | <br><br>*   Required<br>*   Description: This indicates the preferred response is `application/json` format.<br><br> |\n\n### Request parameters\n\n| **Parameter** | **Details** |\n| --- | --- |\n| `{modelId}` | <br><br>*   Required<br>*   Type: String<br>*   Description: the ID for the model<br>*   Example: `75A40874E6B64FA3AE074327899685`<br><br> |\n| `{dimensionId}` | <br><br>*   Required<br>*   Type: Number<br>*   Description: the ID for the dimension<br>*   Example: `101000000028`<br><br> |"
       }
     },
-    "/2/0/models/{modelId}/views/{viewId}/dimensions/{dimensionId}/items": {
+    "/models/{modelId}/views/{viewId}/dimensions/{dimensionId}/items": {
       "get": {
         "summary": "Retrieve selected items in a dimension",
         "parameters": [],
@@ -718,7 +718,7 @@
         }
       ]
     },
-    "/2/0/workspaces/{workspaceId}/models/{modelId}/lists": {
+    "/workspaces/{workspaceId}/models/{modelId}/lists": {
       "get": {
         "summary": "Retrieve Lists",
         "parameters": [],
@@ -815,7 +815,7 @@
         }
       ]
     },
-    "/2/0/workspaces/{workspaceId}/models/{modelId}/lists/{listId}": {
+    "/workspaces/{workspaceId}/models/{modelId}/lists/{listId}": {
       "get": {
         "summary": "Retrieve list metadata",
         "parameters": [],
@@ -931,7 +931,7 @@
         }
       ]
     },
-    "/2/0/models/{modelId}/modules": {
+    "/models/{modelId}/modules": {
       "get": {
         "summary": "Retrieve IDs and names for all modules in a model",
         "parameters": [],
@@ -1016,7 +1016,7 @@
         }
       ]
     },
-    "/2/0/models/{modelId}/modules/{moduleId}/lineItems": {
+    "/models/{modelId}/modules/{moduleId}/lineItems": {
       "get": {
         "summary": "Retrieve all line item metadata in a module",
         "parameters": [
@@ -1174,7 +1174,7 @@
         }
       ]
     },
-    "/2/0/workspaces/{workspaceId}/models/{modelId}/views": {
+    "/workspaces/{workspaceId}/models/{modelId}/views": {
       "get": {
         "summary": "Retrieve IDs and names for all views in a model",
         "parameters": [
@@ -1294,7 +1294,7 @@
         }
       ]
     },
-    "/2/0/models/{modelId}/views/{viewId}": {
+    "/models/{modelId}/views/{viewId}": {
       "get": {
         "summary": "Retrieve metadata for dimensions on a view",
         "parameters": [],
@@ -1382,7 +1382,7 @@
         }
       ]
     },
-    "/2/0/models/{modelId}/modules/{moduleId}/views": {
+    "/models/{modelId}/modules/{moduleId}/views": {
       "get": {
         "summary": "Retrieve IDs and names for views in a module",
         "parameters": [
@@ -1481,7 +1481,7 @@
         }
       ]
     },
-    "/2/0/models/{modelId}/lineItems": {
+    "/models/{modelId}/lineItems": {
       "get": {
         "summary": "Retrieve all line items in a model",
         "parameters": [],
@@ -1589,7 +1589,7 @@
         }
       ]
     },
-    "/2/0/models/{modelId}/lineItems/{lineItemId}/dimensions": {
+    "/models/{modelId}/lineItems/{lineItemId}/dimensions": {
       "get": {
         "summary": "Retrieve dimensions IDs for a line item",
         "parameters": [],
@@ -1648,7 +1648,7 @@
         }
       ]
     },
-    "/2/0/models/{modelId}/lineItems/{lineItemId}/dimensions/{dimensionId}/items": {
+    "/models/{modelId}/lineItems/{lineItemId}/dimensions/{dimensionId}/items": {
       "get": {
         "summary": "Retrieve dimension items for a line item",
         "parameters": [],
@@ -1743,7 +1743,7 @@
         }
       ]
     },
-    "/2/0/models/{modelId}/versions": {
+    "/models/{modelId}/versions": {
       "get": {
         "summary": "Retrieve version metadata",
         "parameters": [],
@@ -1838,7 +1838,7 @@
         }
       ]
     },
-    "/2/0/workspaces/{workspaceId}/models/{modelId}/currentPeriod": {
+    "/workspaces/{workspaceId}/models/{modelId}/currentPeriod": {
       "get": {
         "summary": "Retrieve current period",
         "parameters": [],
@@ -1921,7 +1921,7 @@
         }
       ]
     },
-    "/2/0/workspaces/{workspaceId}/models/{modelId}/modelCalendar": {
+    "/workspaces/{workspaceId}/models/{modelId}/modelCalendar": {
       "get": {
         "summary": "Get current fiscal year",
         "parameters": [],
@@ -2003,7 +2003,7 @@
         }
       ]
     },
-    "/2/0/workspaces/{workspaceId}/models/{modelId}/actions": {
+    "/workspaces/{workspaceId}/models/{modelId}/actions": {
       "get": {
         "summary": "List the actions in the model as a JSON array",
         "parameters": [],
@@ -2063,7 +2063,7 @@
         }
       ]
     },
-    "/2/0/workspaces/{workspaceId}/models/{modelId}/processes": {
+    "/workspaces/{workspaceId}/models/{modelId}/processes": {
       "get": {
         "summary": "List the process definitions available in a model as a JSON array",
         "parameters": [],
@@ -2117,7 +2117,7 @@
         }
       ]
     },
-    "/2/0/workspaces/{workspaceId}/models/{modelId}/imports/": {
+    "/workspaces/{workspaceId}/models/{modelId}/imports/": {
       "get": {
         "summary": "Get a list of import actions",
         "parameters": [],
@@ -2200,7 +2200,7 @@
         }
       ]
     },
-    "/2/0/workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks": {
+    "/workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks": {
       "get": {
         "summary": "Get a list of the import tasks",
         "parameters": [
@@ -2312,7 +2312,7 @@
         "description": "## Start the import\n\n`/workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/`  \n\nYou start the import using the POST command. This also receives the task ID value as a JSON object. Once you have started the import, you can use GET to receive a list of the import tasks as a JSON array. You can use this to monitor the status of the import tasks.\n\n**Note:** If GET does not return any tasks, the import is not running or might have completed. Tasks sort in ascending order of creation time, with the newest task at the top of the list. To sort in descending order, append `?sort =- creationTime` to the URL.\n\n### Run the import\n\n*   Request\n    \n\n```\ncurl -X POST \\\nhttps://api.anaplan.com/2/0/workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks \\\n-H 'authorization: AnaplanAuthToken {anaplan_auth_token}' \\\n-H \"Content-Type:application/json\" \\\n-d \"{\\\"localeName\\\": \\\"en_US\\\"}\"\n```\n\n#### Request headers\n\n| **Header** | **Details** |\n| --- | --- |\n| `Authorization:AnaplanAuthToken {anaplan_auth_token}` | <br><br>*   Required<br>*   Description: The Anaplan authentication token<br><br> |\n| `Content-Type:application/json` | <br><br>*   Required<br>*   Description: Specifies the content type as `application/json`<br><br> |\n\n#### Request Parameters\n\n| **Parameter** | **Description** |\n| --- | --- |\n| `workspaceId` | <br><br>*   Required<br>*   Type: string<br>*   Description: The workspace ID<br>*   Example: `8a8b8c8d8e8f8g8i`<br><br> |\n| `modelId` | <br><br>*   Required<br>*   Type: string<br>*   Description: The model ID<br>*   Example: `75A40874E6B64FA3AE0743278996850F`<br><br> |\n| `importId` | <br><br>*   Required<br>*   Type: number<br>*   Description: The model ID<br>*   Example: `112000000007`<br><br> |\n\n#### Request Body\n\n| **Body** | **Description** |\n| --- | --- |\n| `{\"localeName\": \"en_US\"}` | <br><br>*   Required<br>*   Description: Specifies the language to use for task status and error messages. `en_US` is the only supported language type.<br><br> |\n\n#"
       }
     },
-    "/2/0/workspaces/{workspaceId}/models/{modelId}/exports": {
+    "/workspaces/{workspaceId}/models/{modelId}/exports": {
       "get": {
         "summary": "List the available export definitions as a JSON array",
         "parameters": [],
@@ -2399,7 +2399,7 @@
         }
       ]
     },
-    "/2/0/models/{modelId}/processes/{processId}": {
+    "/models/{modelId}/processes/{processId}": {
       "get": {
         "summary": "Retrieve metadata for a process",
         "parameters": [
@@ -2511,7 +2511,7 @@
         }
       ]
     },
-    "/2/0/workspaces/{workspaceId}/models/{modelId}/exports/{exportId}": {
+    "/workspaces/{workspaceId}/models/{modelId}/exports/{exportId}": {
       "get": {
         "summary": "Get the metadata for an export definition",
         "parameters": [],
@@ -2620,7 +2620,7 @@
         }
       ]
     },
-    "/2/0/workspaces/{workspaceId}/models/{modelId}/imports/{importId}": {
+    "/workspaces/{workspaceId}/models/{modelId}/imports/{importId}": {
       "get": {
         "summary": "Get the metadata for an import definition",
         "parameters": [],
@@ -2725,7 +2725,7 @@
         }
       ]
     },
-    "/2/0/models/{modelId}/files": {
+    "/models/{modelId}/files": {
       "get": {
         "summary": "Get a list of files",
         "parameters": [],
@@ -2831,7 +2831,7 @@
         }
       ]
     },
-    "/2/0/workspaces/{workspaceId}/models/{modelId}/files/{fileId}": {
+    "/workspaces/{workspaceId}/models/{modelId}/files/{fileId}": {
       "delete": {
         "summary": "Delete files",
         "parameters": [],
@@ -2996,7 +2996,7 @@
         ]
       }
     },
-    "/2/0/models/{modelId}/versions/{versionId}/switchover": {
+    "/models/{modelId}/versions/{versionId}/switchover": {
       "put": {
         "summary": "Set version switchover date",
         "parameters": [],
@@ -3077,7 +3077,7 @@
         }
       ]
     },
-    "/2/0/models/{modelId}/currentPeriod": {
+    "/models/{modelId}/currentPeriod": {
       "put": {
         "summary": "Set current period",
         "parameters": [
@@ -3220,7 +3220,7 @@
         ]
       }
     },
-    "/2/0/models/{modelId}/modelCalendar/fiscalYear": {
+    "/models/{modelId}/modelCalendar/fiscalYear": {
       "put": {
         "summary": "Update current fiscal year",
         "parameters": [],
@@ -3308,7 +3308,7 @@
         }
       ]
     },
-    "/2/0/models/{modelId}/modules/{moduleId}/data": {
+    "/models/{modelId}/modules/{moduleId}/data": {
       "post": {
         "summary": "Write cell data by coordinate to module",
         "parameters": [],
@@ -3345,7 +3345,7 @@
         }
       ]
     },
-    "/2/0/workspaces/{workspaceId}/models/{modelId}/lists/{listId}/items": {
+    "/workspaces/{workspaceId}/models/{modelId}/lists/{listId}/items": {
       "post": {
         "summary": "Add list items",
         "parameters": [
@@ -3460,7 +3460,7 @@
         "description": "## Retrieve list data\n\n`/workspaces/{workspaceId}/models/{modelId}/lists/{listId}/items`\n\nUse this call to retrieve list data for the items in a specified list.\n\nYou can filter on optional fields by setting the `includeAll` query parameter.\n\n**Notes:**\n\n*   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html).\n*   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response.\n    \n\nThe following list data always displays in the query response:\n\n| **Default List Data** | **Description** |\n| --- | --- |\n| `id` | The Anaplan ID of the item in the list. |\n| `name` | The name of the item in the list. |\n| `code` | The code value for an item in the list (if specified) |\n| `parent` | The name of the parent item in the list. |\n| `parentId` | The Anaplan ID of the parent item in the list. |\n| `listId` | The Anaplan ID of the list to which the parent item belongs. This ID displays if the list has a **Parent Hierarchy** set under the **Configure** tab in Anaplan. |\n| `listName` | The name of list to which the parent item belongs. The name displays if the list has a **Parent Hierarchy** set under the **Configure** tab in Anaplan. |\n\nSet the `includeAll` query parameter to true to display the following optional list data fields in the response.\n\n| **Optional List Data** | **Description** |\n| --- | --- |\n| `write` | If [Selective Access](https://help.anaplan.com/anapedia/Content/Modeling/Users/Selective_Access.html) is enabled for the list, you can add individual users to provide `write` access. Users with `write` access can view and edit data associated with the list items. |\n| `read` | If [Selective Access](https://help.anaplan.com/anapedia/Content/Modeling/Users/Selective_Access.html) is enabled for the list, you can add individual users to provide `read` access. Users with `read` access can view the data associated with the list items but not edit it. |\n| `subsets` | If the value of the subset column is true, the associated item belongs to that subset.  You can view subsets under **Subsets** tab in Anaplan. |\n| `properties` | The value of each custom list property. |\n\n### Request\n\n```\ncurl -X GET 'https://api.anaplan.com/2/0/workspaces/{workspaceId}/models/{modelId}/lists/{listId}/items?includeAll=true' \\\n-H 'Accept: application/json' \\\n-H 'Authorization: AnaplanAuthToken {anaplan_auth_token}'\n\n```\n\nor\n\n```\ncurl -X GET 'https://api.anaplan.com/2/0/workspaces/{workspaceId}/models/{modelId}/lists/{listId}/items?includeAll=true' \\\n-H 'Accept: text/csv' \\\n-H 'Authorization: AnaplanAuthToken {anaplan_auth_token}'\n\n```\n\n### Request headers\n\n| **Header** | **Details** |\n| --- | --- |\n| `Authorization: AnaplanAuthToken {anaplan_auth_token}` | <br><br>*   Required<br>*   Description: the Anaplan authentication token<br><br> |\n| `Accept: application/json`  <br>or  <br>'Accept: text/csv' | <br><br>*   Optional<br>*   Description: This indicates the preferred response is either `application/json` or `text/csv` format.<br><br> |\n\n### Request parameters\n\n| **Parameter** | **Details** |\n| --- | --- |\n| `{workspaceId}` | <br><br>*   Required<br>*   Type: String<br>*   Description: The workspace ID<br>*   Example: `8a8196b15b7dbae6015b8694411d13fe`<br><br> |\n| `{modelId}` | <br><br>*   Required<br>*   Type: String<br>*   Description: the model ID<br>*   Example: `75A40874E6B64FA3AE074327899685`<br><br> |\n| `{listId}` | <br><br>*   Required<br>*   Type: string<br>*   Description: determines if optional query fields should display in the response.  <br>    When true, the endpoint returns all the data, including optional fields for the specified list ID.  <br>    When false, the endpoint does not include the optional data fields in the response for the specified list ID.<br>*   Example: `101000000001`<br><br> |\n\n### Query parameters\n\n| **Parameter** | **Details** |\n| --- | --- |\n| `{includeAll}` | <br><br>*   Required<br>*   Type: Boolean<br>*   Description: The workspace ID<br>*   Example: `true`<br><br> |\n\n### Example with application/json and includeAll=false\n\n```\n{\n    \"meta\": {\n        \"schema\": \"https://api.anaplan.com/2/0/objects/list\"\n    },\n    \"status\": {\n        \"code\": 200,\n        \"message\": \"Success\"\n    },\n    \"listItems\": [\n      {\n        \"id\": \"206000000001\",\n        \"name\": \"cake\",\n        \"code\": \"c1\"\n      },\n      {\n        \"id\": \"206000000002\",\n        \"name\": \"bread\",\n        \"code\": \"b2\"\n      },\n      {\n        \"id\": \"206000000003\",\n        \"name\": \"pastry\",\n        \"code\": \"p3\"\n      }\n    ]\n  }\n\n```\n\n#### Example with text/csv and includeAll=false\n\n```\nid,name,code,parent,parentId,listId,listName\n206000000001,cake,c1,,,,\n206000000002,bread,b2,,,,\n206000000003,pastry,p3,,,,\n\n```\n\n#### Example with application/json and includeAll=true\n\n```\n{\n    \"meta\": {\n        \"schema\": \"https://api.anaplan.com/2/0/objects/list\"\n    },\n    \"status\": {\n        \"code\": 200,\n        \"message\": \"Success\"\n    },\n    \"listItems\": [\n      {\n        \"id\": \"206000000001\",\n        \"name\": \"cake\",\n        \"code\": \"c1\",\n        \"subsets\": {\n          \"favourite\": true\n        },\n        \"properties\": {\n          \"count\": \"1.0\"\n        }\n      },\n      {\n        \"id\": \"206000000002\",\n        \"name\": \"bread\",\n        \"code\": \"b2\",\n        \"subsets\": {\n          \"favourite\": false\n        },\n        \"properties\": {\n          \"count\": \"4.0\"\n        }\n      },\n      {\n        \"id\": \"206000000003\",\n        \"name\": \"pastry\",\n        \"code\": \"p3\",\n        \"subsets\": {\n          \"favourite\": true\n        },\n        \"properties\": {\n          \"count\": \"5.0\"\n        }\n      }\n    ]\n  }\n\n```\n\n#### Example with text/csv and includeAll=true\n\n```\nid,name,code,parent,parentId,listId,listName,favourite,count\n206000000001,cake,c1,,,,true,1.0206000000002,bread,b2,,,,false,4.0206000000003,pastry,p3,,,,true,5.0\n```"
       }
     },
-    "/2/0/workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests": {
+    "/workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests": {
       "post": {
         "summary": "Initiate long read request",
         "parameters": [],
@@ -3540,7 +3540,7 @@
         }
       ]
     },
-    "/2/0/workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests/{requestId}": {
+    "/workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests/{requestId}": {
       "get": {
         "summary": "Retrieve status of large read request",
         "parameters": [],
@@ -3645,7 +3645,7 @@
         "description": "## Delete read requests\n\nUse this call to delete or cancel an initiated read request. This removes all the pages from the file store and stops the ongoing read request.\n\n**Notes**:\n\n*   To use this call, you must be a [**Workspace Administrator**](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html).\n*   As a best practice, use this call to clear all pages from completed exports as soon as you download all pages. Doing so will make space available for future exports.\n*   The system will automatically reclaim space for read requests not accessed for over 30 minutes. The same applies to failed read requests.\n    \n\n## Request supporting this feature\n\n```\ncurl -X DELETE 'https://api.anaplan.com/2/0/workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests/{requestId}' \\\n-H 'Authorization: AnaplanAuthToken {anaplan_auth_token}' \\\n-H 'Accept: application/json'\n\n```\n\n## Request headers\n\n| **Header** | **Details** |\n| --- | --- |\n| `Authorization: AnaplanAuthToken {anaplan_auth_token}` | <br><br>*   Required<br>*   Description: the Anaplan authentication token.<br><br> |\n| `Accept: application/json` | <br><br>*   Optional<br>*   Description: This indicates the preferred response is `application/json` format.<br><br> |\n\n## Request parameters\n\n| **Parameters** | **Details** |\n| --- | --- |\n| `{workspaceId}` | <br><br>*   Required in the first supported request (see Requests supporting this feature)<br>*   Type: `String`<br>*   Description: The workspace ID<br>*   Example: `8a8196b15b7dbae6015b8694411d13fe`<br><br> |\n| `{modelId}` | <br><br>*   Required<br>*   Type: `String`<br>*   Description: The model ID<br>*   Example: `75A40874E6B64FA3AE0743278996850F`<br><br> |\n| `{viewId}` | <br><br>*   Required<br>*   Type: `Number`<br>*   Description: The view ID.<br>*   Example: `101000000001`<br><br> |\n| `{requestId}` | <br><br>*   Required<br>*   Type: `String`<br>*   Description: The request ID<br>*   Example: `0A06B0739F0E47BB92E2326C603D86EC`<br><br> |\n\n## Response 200 body\n\nWhen the delete request completes, the API returns the following response:\n\n```\n{\n    \"meta\": {\n        \"schema\": \"https://api.anaplan.com/2/0/objects/viewReadRequest\"\n    },\n    \"status\": {\n        \"code\": 200,\n        \"message\": \"Success\"\n    },\n    \"viewReadRequest\": {\n        \"requestId\": \"0A06B0739F0E47BB92E2326C603D86EC\",\n        \"viewId\": 101000000014,\n        \"requestState\": \"COMPLETE\",\n        \"url\": \"https://api.anaplan.com/2/0/workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests/{requestId}\",\n        \"successful\": true\n    }\n}\n\n\n\n```\n\nIf the read request is in progress and you initiate the delete call, the read request will be canceled and the pages will cleared. The API returns the following response:\n\n```\n{\n    \"meta\": {\n        \"schema\": \"https://api.anaplan.com/2/0/objects/viewReadRequest\"\n    },\n    \"status\": {\n        \"code\": 200,\n        \"message\": \"Success\"\n    },\n    \"viewReadRequest\": {\n        \"requestId\": \"0A06B0739F0E47BB92E2326C603D86EC\",\n        \"viewId\": 101000000014,\n        \"requestState\": \"CANCELLED\",\n        \"url\": \"https://api.anaplan.com/2/0/workspaces/{workspaceId}/models/{modelId}/views/{viewIdƒ}/readRequests/{requestId}\",\n        \"successful\": true\n    }\n}\n\n\n```"
       }
     },
-    "/2/0/workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests/{requestId}/pages/{pageNo}": {
+    "/workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests/{requestId}/pages/{pageNo}": {
       "get": {
         "summary": "Download Pages",
         "parameters": [
@@ -3720,7 +3720,7 @@
         }
       ]
     },
-    "/2/0/models/{modelId}/views/{viewId}/data": {
+    "/models/{modelId}/views/{viewId}/data": {
       "get": {
         "summary": "Retrieve cell data for a view",
         "parameters": [
@@ -3781,7 +3781,7 @@
         }
       ]
     },
-    "/2/0/workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks/0": {
+    "/workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks/0": {
       "put": {
         "summary": "Upload a file in chunks",
         "parameters": [],
@@ -3856,7 +3856,7 @@
         ]
       }
     },
-    "/2/0/workspaces/{workspaceId}/models/{modelId}/files/{fileId}/complete": {
+    "/workspaces/{workspaceId}/models/{modelId}/files/{fileId}/complete": {
       "post": {
         "summary": "Complete the upload",
         "parameters": [],
@@ -3942,7 +3942,7 @@
         }
       ]
     },
-    "/2/0/workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}": {
+    "/workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}": {
       "get": {
         "summary": "Monitor the import task",
         "parameters": [],
@@ -4079,7 +4079,7 @@
         }
       ]
     },
-    "/2/0/workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/dump/chunks": {
+    "/workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/dump/chunks": {
       "get": {
         "summary": "Query the number of chunks in a dump file",
         "parameters": [],
@@ -4136,7 +4136,7 @@
         }
       ]
     },
-    "/2/0/workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/dump/chunks/0": {
+    "/workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/dump/chunks/0": {
       "get": {
         "summary": "Download dump file chunks",
         "parameters": [],
@@ -4193,7 +4193,7 @@
         }
       ]
     },
-    "/2/0/workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/dump": {
+    "/workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/dump": {
       "get": {
         "summary": "Check dump file for failures",
         "parameters": [],
@@ -4250,7 +4250,7 @@
         }
       ]
     },
-    "/2/0/workspaces/{workspaceId}/models/{modelId}/exports/{exportId}/tasks": {
+    "/workspaces/{workspaceId}/models/{modelId}/exports/{exportId}/tasks": {
       "post": {
         "summary": "Start the export",
         "parameters": [],
@@ -4381,7 +4381,7 @@
         "summary": "Get a list of export tasks"
       }
     },
-    "/2/0/workspaces/{workspaceId}/models/{modelId}/exports/{exportId}/tasks/{taskId}": {
+    "/workspaces/{workspaceId}/models/{modelId}/exports/{exportId}/tasks/{taskId}": {
       "get": {
         "summary": "Monitor the export tasks",
         "parameters": [],
@@ -4489,7 +4489,7 @@
         }
       ]
     },
-    "/2/0/workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks": {
+    "/workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks": {
       "get": {
         "summary": "Get Chunks Details",
         "parameters": [],
@@ -4590,7 +4590,7 @@
         }
       ]
     },
-    "/2/0/workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks": {
+    "/workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks": {
       "post": {
         "summary": "Start the process",
         "parameters": [],
@@ -4695,7 +4695,7 @@
         "description": "### Get the list of tasks for the process\n\nThis lists the tasks in the process for the given processID. This returns a JSON array containing the list of tasks in the process definition.\n\n#### Request\n\n```\ncurl -X GET \\\nhttps://api.anaplan.com/2/0/workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks \\\n-H 'authorization: AnaplanAuthToken {anaplan_auth_token}' \\\n-H \"Content-Type:application/json\"\n```\n\n#### Headers\n\n*   `Authorization:AnaplanAuthToken {anaplan_auth_token}`\n*   `Content-Type:application/json`\n    \n\n#### Body\n\n```json\n{\"localeName\": \"en_US\"}\n```\n\n#### Parameters\n\n| **Parameter** | **Description** |\n| --- | --- |\n| `workspaceId` | <br><br>*   Required<br>*   Type: string<br>*   Description: The workspace ID<br>*   Example: `8a8b8c8d8e8f8g8i`<br><br> |\n| `modelId` | <br><br>*   Required<br>*   Type: string<br>*   Description: The model ID<br>*   Example: `75A40874E6B64FA3AE0743278996850F`<br><br> |\n| `processId` | <br><br>*   Required<br>*   Type: number<br>*   Description: The process ID<br>*   Example: `118000000002`<br><br> |\n\n#"
       }
     },
-    "/2/0/workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks": {
+    "/workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks": {
       "post": {
         "summary": "Start Other Action",
         "parameters": [],
@@ -4789,7 +4789,7 @@
         "description": "### Get a list of deletion tasks\n\n#### Request\n\n```\ncurl -X GET \\\nhttps://api.anaplan.com/2/0/workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks \\\n-H 'authorization: AnaplanAuthToken {anaplan_auth_token}' \\\n-H \"Content-Type:application/json\"\n```\n\n#### Headers\n\n*   `Authorization:AnaplanAuthToken {anaplan_auth_token}`\n*   `Content-Type:application/json`\n    \n\n#### Parameters\n\n| **Parameter** | **Description** |\n| --- | --- |\n| `workspaceId` | <br><br>*   Required<br>*   Type: string<br>*   Description: The workspace ID<br>*   Example: `8a8b8c8d8e8f8g8i`<br><br> |\n| `modelId` | <br><br>*   Required<br>*   Type: string<br>*   Description: The model ID<br>*   Example: `75A40874E6B64FA3AE0743278996850F`<br><br> |\n| `actionId` | <br><br>*   Required<br>*   Type: number<br>*   Description: The ID for the Delete action.<br>*   Example: `117000000019`<br><br> |\n\n#"
       }
     },
-    "/2/0/workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks/{taskId}": {
+    "/workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks/{taskId}": {
       "get": {
         "summary": "Monitor the process tasks",
         "parameters": [],

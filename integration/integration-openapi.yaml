@@ -14,32 +14,32 @@ info:
     \ You may choose to  \n> enter in username/password combination or conversely choose to generate CA  \n> certificate signed\
     \ string and public key combination."
 servers:
-- url: https://api.anaplan.com
+- url: https://api.anaplan.com/2/0
   description: US1, US2, US5, US7, EU1, EU2, EU4, AP1
-- url: https://us9.api.anaplan.com
+- url: https://us9.api.anaplan.com/2/0
   description: US9
-- url: https://eu3.api.anaplan.com
+- url: https://eu3.api.anaplan.com/2/0
   description: EU3
-- url: https://eu5.api.anaplan.com
+- url: https://eu5.api.anaplan.com/2/0
   description: EU5
-- url: https://gb1.api.anaplan.com
+- url: https://gb1.api.anaplan.com/2/0
   description: GB1
-- url: https://ca1a.api.anaplan.com
+- url: https://ca1a.api.anaplan.com/2/0
   description: CA1
-- url: https://sg1.api.anaplan.com
+- url: https://sg1.api.anaplan.com/2/0
   description: SG1
-- url: https://ae1.api.anaplan.com
+- url: https://ae1.api.anaplan.com/2/0
   description: AE1
-- url: https://in1.api.anaplan.com
+- url: https://in1.api.anaplan.com/2/0
   description: IN1
-- url: https://id1.api.anaplan.com
+- url: https://id1.api.anaplan.com/2/0
   description: ID1
-- url: https://me1.api.anaplan.com
+- url: https://me1.api.anaplan.com/2/0
   description: ME1
-- url: https://au1a.api2.anaplan.com
+- url: https://au1a.api2.anaplan.com/2/0
   description: AU1
 paths:
-  /2/0/users/me:
+  /users/me:
     get:
       summary: Retrieve your user
       parameters: []
@@ -66,7 +66,7 @@ paths:
         \ the Anaplan authentication token<br><br> |\n| `Accept: application/json` | <br><br>*   Required<br>*   Description:\
         \ This indicates the preferred response is either `application/json` format. Note that this call only outputs in `application/json`\
         \ format.<br><br> |"
-  /2/0/users/{userId}:
+  /users/{userId}:
     get:
       summary: Retrieve user information
       parameters: []
@@ -99,7 +99,7 @@ paths:
       schema:
         type: string
       example: '{{userId}}'
-  /2/0/models:
+  /models:
     get:
       summary: List user models
       parameters:
@@ -139,7 +139,7 @@ paths:
         ,\n      \"activeState\": \"UNLOCKED\",\n      \"name\": \"FP&A\",\n      \"currentWorkspaceId\": \"8a8b8c8d8e8f8g8i\"\
         ,\n      \"currentWorkspaceName\": \"Financial Planning\",\n      \"modelUrl\": \"https://rt.anaplan.com/anaplan/rt?selectedWorkspaceId\\\
         8a8b8c8d8e8f8g8i\\u0026selectedModelId\\FC12345678912343455667\",\n      \"categoryValues\": []\n   }]\n}\n```"
-  /2/0/workspaces:
+  /workspaces:
     get:
       summary: List user workspaces
       parameters:
@@ -196,7 +196,7 @@ paths:
         \ call returns an estimate of the current size of the workspace from all the models it contains. When set to false,\
         \ or not defined, this call does not return an estimated current size of the workspace.<br>*   Example: true<br><br>\
         \ |"
-  /2/0/workspaces/{workspaceId}:
+  /workspaces/{workspaceId}:
     get:
       summary: Get single workspace metadata
       parameters:
@@ -232,7 +232,7 @@ paths:
         pattern: ^[0-9a-f]{32}$
       example: 8a868cda7c8b28f5017c9a4b2d8341cd
       description: Workspace identifier (32-character lowercase hex string).
-  /2/0/models/{modelId}:
+  /models/{modelId}:
     get:
       summary: Get single model metadata
       parameters:
@@ -266,7 +266,7 @@ paths:
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
       description: Model identifier (32-character uppercase hex string).
-  /2/0/workspaces/{workspaceId}/models:
+  /workspaces/{workspaceId}/models:
     get:
       summary: List workspace models
       description: 'Returns models accessible to the calling user within the specified workspace. The response shape is identical
@@ -299,7 +299,7 @@ paths:
         pattern: ^[0-9a-f]{32}$
       example: 8a868cd885f53bd201860f5a4fea1ff1
       description: Workspace identifier (32-character lowercase hex string).
-  /2/0/workspaces/{workspaceId}/models/{modelId}/dimensions/{dimensionId}/items:
+  /workspaces/{workspaceId}/models/{modelId}/dimensions/{dimensionId}/items:
     post:
       summary: Lookup dimension items by name or code
       parameters: []
@@ -477,7 +477,7 @@ paths:
         \   Type: String<br>*   Description: the ID for the model<br>*   Example: `75A40874E6B64FA3AE074327899685`<br><br>\
         \ |\n| `{dimensionId}` | <br><br>*   Required<br>*   Type: Number<br>*   Description: the ID for the dimension<br>*\
         \   Example: `101000000028`<br><br> |"
-  /2/0/models/{modelId}/views/{viewId}/dimensions/{dimensionId}/items:
+  /models/{modelId}/views/{viewId}/dimensions/{dimensionId}/items:
     get:
       summary: Retrieve selected items in a dimension
       parameters: []
@@ -560,7 +560,7 @@ paths:
       schema:
         type: string
       example: '{{dimensionId}}'
-  /2/0/workspaces/{workspaceId}/models/{modelId}/lists:
+  /workspaces/{workspaceId}/models/{modelId}/lists:
     get:
       summary: Retrieve Lists
       parameters: []
@@ -670,7 +670,7 @@ paths:
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
       description: Model identifier (32-character uppercase hex string).
-  /2/0/workspaces/{workspaceId}/models/{modelId}/lists/{listId}:
+  /workspaces/{workspaceId}/models/{modelId}/lists/{listId}:
     get:
       summary: Retrieve list metadata
       parameters: []
@@ -781,7 +781,7 @@ paths:
       schema:
         type: string
       example: '{{listId}}'
-  /2/0/models/{modelId}/modules:
+  /models/{modelId}/modules:
     get:
       summary: Retrieve IDs and names for all modules in a model
       parameters: []
@@ -846,7 +846,7 @@ paths:
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
       description: Model identifier (32-character uppercase hex string).
-  /2/0/models/{modelId}/modules/{moduleId}/lineItems:
+  /models/{modelId}/modules/{moduleId}/lineItems:
     get:
       summary: Retrieve all line item metadata in a module
       parameters:
@@ -965,7 +965,7 @@ paths:
       schema:
         type: string
       example: '{{moduleId}}'
-  /2/0/workspaces/{workspaceId}/models/{modelId}/views:
+  /workspaces/{workspaceId}/models/{modelId}/views:
     get:
       summary: Retrieve IDs and names for all views in a model
       parameters:
@@ -1067,7 +1067,7 @@ paths:
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
       description: Model identifier (32-character uppercase hex string).
-  /2/0/models/{modelId}/views/{viewId}:
+  /models/{modelId}/views/{viewId}:
     get:
       summary: Retrieve metadata for dimensions on a view
       parameters: []
@@ -1148,7 +1148,7 @@ paths:
       schema:
         type: string
       example: ''
-  /2/0/models/{modelId}/modules/{moduleId}/views:
+  /models/{modelId}/modules/{moduleId}/views:
     get:
       summary: Retrieve IDs and names for views in a module
       parameters:
@@ -1231,7 +1231,7 @@ paths:
       schema:
         type: string
       example: '{{moduleId}}'
-  /2/0/models/{modelId}/lineItems:
+  /models/{modelId}/lineItems:
     get:
       summary: Retrieve all line items in a model
       parameters: []
@@ -1316,7 +1316,7 @@ paths:
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
       description: Model identifier (32-character uppercase hex string).
-  /2/0/models/{modelId}/lineItems/{lineItemId}/dimensions:
+  /models/{modelId}/lineItems/{lineItemId}/dimensions:
     get:
       summary: Retrieve dimensions IDs for a line item
       parameters: []
@@ -1365,7 +1365,7 @@ paths:
       schema:
         type: string
       example: '{{lineItemId}}'
-  /2/0/models/{modelId}/lineItems/{lineItemId}/dimensions/{dimensionId}/items:
+  /models/{modelId}/lineItems/{lineItemId}/dimensions/{dimensionId}/items:
     get:
       summary: Retrieve dimension items for a line item
       parameters: []
@@ -1450,7 +1450,7 @@ paths:
       schema:
         type: string
       example: '{{dimensionId}}'
-  /2/0/models/{modelId}/versions:
+  /models/{modelId}/versions:
     get:
       summary: Retrieve version metadata
       parameters: []
@@ -1526,7 +1526,7 @@ paths:
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
       description: Model identifier (32-character uppercase hex string).
-  /2/0/workspaces/{workspaceId}/models/{modelId}/currentPeriod:
+  /workspaces/{workspaceId}/models/{modelId}/currentPeriod:
     get:
       summary: Retrieve current period
       parameters: []
@@ -1595,7 +1595,7 @@ paths:
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
       description: Model identifier (32-character uppercase hex string).
-  /2/0/workspaces/{workspaceId}/models/{modelId}/modelCalendar:
+  /workspaces/{workspaceId}/models/{modelId}/modelCalendar:
     get:
       summary: Get current fiscal year
       parameters: []
@@ -1670,7 +1670,7 @@ paths:
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
       description: Model identifier (32-character uppercase hex string).
-  /2/0/workspaces/{workspaceId}/models/{modelId}/actions:
+  /workspaces/{workspaceId}/models/{modelId}/actions:
     get:
       summary: List the actions in the model as a JSON array
       parameters: []
@@ -1718,7 +1718,7 @@ paths:
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
       description: Model identifier (32-character uppercase hex string).
-  /2/0/workspaces/{workspaceId}/models/{modelId}/processes:
+  /workspaces/{workspaceId}/models/{modelId}/processes:
     get:
       summary: List the process definitions available in a model as a JSON array
       parameters: []
@@ -1762,7 +1762,7 @@ paths:
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
       description: Model identifier (32-character uppercase hex string).
-  /2/0/workspaces/{workspaceId}/models/{modelId}/imports/:
+  /workspaces/{workspaceId}/models/{modelId}/imports/:
     get:
       summary: Get a list of import actions
       parameters: []
@@ -1825,7 +1825,7 @@ paths:
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
       description: Model identifier (32-character uppercase hex string).
-  /2/0/workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks:
+  /workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks:
     get:
       summary: Get a list of the import tasks
       parameters:
@@ -1927,7 +1927,7 @@ paths:
         \ |\n\n#### Request Body\n\n| **Body** | **Description** |\n| --- | --- |\n| `{\"localeName\": \"en_US\"}` | <br><br>*\
         \   Required<br>*   Description: Specifies the language to use for task status and error messages. `en_US` is the\
         \ only supported language type.<br><br> |\n\n#"
-  /2/0/workspaces/{workspaceId}/models/{modelId}/exports:
+  /workspaces/{workspaceId}/models/{modelId}/exports:
     get:
       summary: List the available export definitions as a JSON array
       parameters: []
@@ -1995,7 +1995,7 @@ paths:
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
       description: Model identifier (32-character uppercase hex string).
-  /2/0/models/{modelId}/processes/{processId}:
+  /models/{modelId}/processes/{processId}:
     get:
       summary: Retrieve metadata for a process
       parameters:
@@ -2094,7 +2094,7 @@ paths:
       schema:
         type: string
       example: '{{processId}}'
-  /2/0/workspaces/{workspaceId}/models/{modelId}/exports/{exportId}:
+  /workspaces/{workspaceId}/models/{modelId}/exports/{exportId}:
     get:
       summary: Get the metadata for an export definition
       parameters: []
@@ -2185,7 +2185,7 @@ paths:
       schema:
         type: string
       example: '{{exportId}}'
-  /2/0/workspaces/{workspaceId}/models/{modelId}/imports/{importId}:
+  /workspaces/{workspaceId}/models/{modelId}/imports/{importId}:
     get:
       summary: Get the metadata for an import definition
       parameters: []
@@ -2273,7 +2273,7 @@ paths:
       schema:
         type: string
       example: '{{importId}}'
-  /2/0/models/{modelId}/files:
+  /models/{modelId}/files:
     get:
       summary: Get a list of files
       parameters: []
@@ -2363,7 +2363,7 @@ paths:
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
       description: Model identifier (32-character uppercase hex string).
-  /2/0/workspaces/{workspaceId}/models/{modelId}/files/{fileId}:
+  /workspaces/{workspaceId}/models/{modelId}/files/{fileId}:
     delete:
       summary: Delete files
       parameters: []
@@ -2521,7 +2521,7 @@ paths:
       tags:
       - Model Metadata
       - File Metadata
-  /2/0/models/{modelId}/versions/{versionId}/switchover:
+  /models/{modelId}/versions/{versionId}/switchover:
     put:
       summary: Set version switchover date
       parameters: []
@@ -2596,7 +2596,7 @@ paths:
       schema:
         type: string
       example: '{{versionId}}'
-  /2/0/models/{modelId}/currentPeriod:
+  /models/{modelId}/currentPeriod:
     put:
       summary: Set current period
       parameters:
@@ -2720,7 +2720,7 @@ paths:
                     $ref: '#/components/schemas/CurrentPeriod'
       tags:
       - Model Settings
-  /2/0/models/{modelId}/modelCalendar/fiscalYear:
+  /models/{modelId}/modelCalendar/fiscalYear:
     put:
       summary: Update current fiscal year
       parameters: []
@@ -2793,7 +2793,7 @@ paths:
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
       description: Model identifier (32-character uppercase hex string).
-  /2/0/models/{modelId}/modules/{moduleId}/data:
+  /models/{modelId}/modules/{moduleId}/data:
     post:
       summary: Write cell data by coordinate to module
       parameters: []
@@ -2863,7 +2863,7 @@ paths:
       schema:
         type: string
       example: '{{moduleId}}'
-  /2/0/workspaces/{workspaceId}/models/{modelId}/lists/{listId}/items:
+  /workspaces/{workspaceId}/models/{modelId}/lists/{listId}/items:
     post:
       summary: Add list items
       parameters:
@@ -3087,7 +3087,7 @@ paths:
         \        },\n        \"properties\": {\n          \"count\": \"5.0\"\n        }\n      }\n    ]\n  }\n\n```\n\n####\
         \ Example with text/csv and includeAll=true\n\n```\nid,name,code,parent,parentId,listId,listName,favourite,count\n\
         206000000001,cake,c1,,,,true,1.0206000000002,bread,b2,,,,false,4.0206000000003,pastry,p3,,,,true,5.0\n```"
-  /2/0/workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests:
+  /workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests:
     post:
       summary: Initiate long read request
       parameters: []
@@ -3167,7 +3167,7 @@ paths:
       schema:
         type: string
       example: ''
-  /2/0/workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests/{requestId}:
+  /workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests/{requestId}:
     get:
       summary: Retrieve status of large read request
       parameters: []
@@ -3287,7 +3287,7 @@ paths:
         \      \"requestId\": \"0A06B0739F0E47BB92E2326C603D86EC\",\n        \"viewId\": 101000000014,\n        \"requestState\"\
         : \"CANCELLED\",\n        \"url\": \"https://api.anaplan.com/2/0/workspaces/{workspaceId}/models/{modelId}/views/{viewIdƒ}/readRequests/{requestId}\"\
         ,\n        \"successful\": true\n    }\n}\n\n\n```"
-  /2/0/workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests/{requestId}/pages/{pageNo}:
+  /workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests/{requestId}/pages/{pageNo}:
     get:
       summary: Download Pages
       parameters:
@@ -3366,7 +3366,7 @@ paths:
       schema:
         type: string
       example: ''
-  /2/0/models/{modelId}/views/{viewId}/data:
+  /models/{modelId}/views/{viewId}/data:
     get:
       summary: Retrieve cell data for a view
       parameters:
@@ -3478,7 +3478,7 @@ paths:
       schema:
         type: string
       example: ''
-  /2/0/workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks/0:
+  /workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks/0:
     put:
       summary: Upload a file in chunks
       parameters: []
@@ -3537,7 +3537,7 @@ paths:
           description: 'TODO: document response'
       tags:
       - Bulk Read
-  /2/0/workspaces/{workspaceId}/models/{modelId}/files/{fileId}/complete:
+  /workspaces/{workspaceId}/models/{modelId}/files/{fileId}/complete:
     post:
       summary: Complete the upload
       parameters: []
@@ -3607,7 +3607,7 @@ paths:
       schema:
         type: string
       example: '{{fileId}}'
-  /2/0/workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}:
+  /workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}:
     get:
       summary: Monitor the import task
       parameters: []
@@ -3730,7 +3730,7 @@ paths:
       schema:
         type: string
       example: '{{taskId}}'
-  /2/0/workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/dump/chunks:
+  /workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/dump/chunks:
     get:
       summary: Query the number of chunks in a dump file
       parameters: []
@@ -3789,7 +3789,7 @@ paths:
       schema:
         type: string
       example: '{{taskId}}'
-  /2/0/workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/dump/chunks/0:
+  /workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/dump/chunks/0:
     get:
       summary: Download dump file chunks
       parameters: []
@@ -3843,7 +3843,7 @@ paths:
       schema:
         type: string
       example: '{{taskId}}'
-  /2/0/workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/dump:
+  /workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/dump:
     get:
       summary: Check dump file for failures
       parameters: []
@@ -3896,7 +3896,7 @@ paths:
       schema:
         type: string
       example: '{{taskId}}'
-  /2/0/workspaces/{workspaceId}/models/{modelId}/exports/{exportId}/tasks:
+  /workspaces/{workspaceId}/models/{modelId}/exports/{exportId}/tasks:
     post:
       summary: Start the export
       parameters: []
@@ -3996,7 +3996,7 @@ paths:
                     items:
                       $ref: '#/components/schemas/Task'
       summary: Get a list of export tasks
-  /2/0/workspaces/{workspaceId}/models/{modelId}/exports/{exportId}/tasks/{taskId}:
+  /workspaces/{workspaceId}/models/{modelId}/exports/{exportId}/tasks/{taskId}:
     get:
       summary: Monitor the export tasks
       parameters: []
@@ -4087,7 +4087,7 @@ paths:
       schema:
         type: string
       example: '{{taskId}}'
-  /2/0/workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks:
+  /workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks:
     get:
       summary: Get Chunks Details
       parameters: []
@@ -4159,7 +4159,7 @@ paths:
       schema:
         type: string
       example: '{{fileId}}'
-  /2/0/workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks:
+  /workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks:
     post:
       summary: Start the process
       parameters: []
@@ -4251,7 +4251,7 @@ paths:
         \ `8a8b8c8d8e8f8g8i`<br><br> |\n| `modelId` | <br><br>*   Required<br>*   Type: string<br>*   Description: The model\
         \ ID<br>*   Example: `75A40874E6B64FA3AE0743278996850F`<br><br> |\n| `processId` | <br><br>*   Required<br>*   Type:\
         \ number<br>*   Description: The process ID<br>*   Example: `118000000002`<br><br> |\n\n#"
-  /2/0/workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks:
+  /workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks:
     post:
       summary: Start Other Action
       parameters: []
@@ -4333,7 +4333,7 @@ paths:
         \ <br><br>*   Required<br>*   Type: string<br>*   Description: The model ID<br>*   Example: `75A40874E6B64FA3AE0743278996850F`<br><br>\
         \ |\n| `actionId` | <br><br>*   Required<br>*   Type: number<br>*   Description: The ID for the Delete action.<br>*\
         \   Example: `117000000019`<br><br> |\n\n#"
-  /2/0/workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks/{taskId}:
+  /workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks/{taskId}:
     get:
       summary: Monitor the process tasks
       parameters: []
