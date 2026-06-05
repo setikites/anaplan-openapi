@@ -69,10 +69,10 @@
                   "type": "object",
                   "properties": {
                     "meta": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Meta"
                     },
                     "status": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Status"
                     },
                     "user": {
                       "$ref": "#/components/schemas/User"
@@ -102,10 +102,10 @@
                   "type": "object",
                   "properties": {
                     "meta": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Meta"
                     },
                     "status": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Status"
                     },
                     "user": {
                       "$ref": "#/components/schemas/User"
@@ -156,10 +156,10 @@
                   "type": "object",
                   "properties": {
                     "meta": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Meta"
                     },
                     "status": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Status"
                     },
                     "models": {
                       "type": "array",
@@ -232,10 +232,10 @@
                   "type": "object",
                   "properties": {
                     "meta": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Meta"
                     },
                     "status": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Status"
                     },
                     "workspaces": {
                       "type": "array",
@@ -277,10 +277,10 @@
                   "type": "object",
                   "properties": {
                     "meta": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Meta"
                     },
                     "status": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Status"
                     },
                     "workspace": {
                       "$ref": "#/components/schemas/Workspace"
@@ -334,10 +334,10 @@
                   "type": "object",
                   "properties": {
                     "meta": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Meta"
                     },
                     "status": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Status"
                     },
                     "model": {
                       "$ref": "#/components/schemas/Model"
@@ -380,10 +380,10 @@
                   "type": "object",
                   "properties": {
                     "meta": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Meta"
                     },
                     "status": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Status"
                     },
                     "models": {
                       "type": "array",
@@ -449,10 +449,10 @@
                   "type": "object",
                   "properties": {
                     "meta": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Meta"
                     },
                     "status": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Status"
                     },
                     "items": {
                       "type": "array",
@@ -598,10 +598,10 @@
                   "type": "object",
                   "properties": {
                     "meta": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Meta"
                     },
                     "status": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Status"
                     },
                     "items": {
                       "type": "array",
@@ -660,10 +660,10 @@
                   "type": "object",
                   "properties": {
                     "meta": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Meta"
                     },
                     "status": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Status"
                     },
                     "items": {
                       "type": "array",
@@ -767,10 +767,10 @@
                   "type": "object",
                   "properties": {
                     "meta": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Meta"
                     },
                     "status": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Status"
                     },
                     "lists": {
                       "type": "array",
@@ -874,10 +874,10 @@
                   "type": "object",
                   "properties": {
                     "meta": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Meta"
                     },
                     "status": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Status"
                     },
                     "metadata": {
                       "$ref": "#/components/schemas/List"
@@ -976,10 +976,10 @@
                   "type": "object",
                   "properties": {
                     "meta": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Meta"
                     },
                     "status": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Status"
                     },
                     "modules": {
                       "type": "array",
@@ -1128,10 +1128,10 @@
                   "type": "object",
                   "properties": {
                     "meta": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Meta"
                     },
                     "status": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Status"
                     },
                     "items": {
                       "type": "array",
@@ -1243,10 +1243,10 @@
                   "type": "object",
                   "properties": {
                     "meta": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Meta"
                     },
                     "status": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Status"
                     },
                     "views": {
                       "type": "array",
@@ -1315,10 +1315,10 @@
                   "type": "object",
                   "properties": {
                     "meta": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Meta"
                     },
                     "status": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Status"
                     },
                     "viewId": {
                       "type": "string"
@@ -1432,10 +1432,10 @@
                   "type": "object",
                   "properties": {
                     "meta": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Meta"
                     },
                     "status": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Status"
                     },
                     "views": {
                       "type": "array",
@@ -1549,10 +1549,10 @@
                   "type": "object",
                   "properties": {
                     "meta": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Meta"
                     },
                     "status": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Status"
                     },
                     "items": {
                       "type": "array",
@@ -1602,10 +1602,10 @@
                   "type": "object",
                   "properties": {
                     "meta": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Meta"
                     },
                     "status": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Status"
                     },
                     "dimensions": {
                       "type": "array",
@@ -1688,10 +1688,10 @@
                   "type": "object",
                   "properties": {
                     "meta": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Meta"
                     },
                     "status": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Status"
                     },
                     "items": {
                       "type": "array",
@@ -1801,10 +1801,10 @@
                   "type": "object",
                   "properties": {
                     "meta": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Meta"
                     },
                     "status": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Status"
                     },
                     "versionMetadata": {
                       "type": "array",
@@ -1873,10 +1873,10 @@
                   "type": "object",
                   "properties": {
                     "meta": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Meta"
                     },
                     "status": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Status"
                     },
                     "currentPeriod": {
                       "$ref": "#/components/schemas/CurrentPeriod"
@@ -1958,10 +1958,10 @@
                   "type": "object",
                   "properties": {
                     "meta": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Meta"
                     },
                     "status": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Status"
                     },
                     "modelCalendar": {
                       "$ref": "#/components/schemas/ModelCalendar"
@@ -2152,10 +2152,10 @@
                   "type": "object",
                   "properties": {
                     "meta": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Meta"
                     },
                     "status": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Status"
                     },
                     "imports": {
                       "type": "array",
@@ -2238,10 +2238,10 @@
                   "type": "object",
                   "properties": {
                     "meta": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Meta"
                     },
                     "status": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Status"
                     },
                     "task": {
                       "$ref": "#/components/schemas/Task"
@@ -2351,10 +2351,10 @@
                   "type": "object",
                   "properties": {
                     "meta": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Meta"
                     },
                     "status": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Status"
                     },
                     "exports": {
                       "type": "array",
@@ -2468,10 +2468,10 @@
                   "type": "object",
                   "properties": {
                     "meta": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Meta"
                     },
                     "status": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Status"
                     },
                     "processMetadata": {
                       "$ref": "#/components/schemas/Process"
@@ -2566,10 +2566,10 @@
                   "type": "object",
                   "properties": {
                     "meta": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Meta"
                     },
                     "status": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Status"
                     },
                     "exportMetadata": {
                       "$ref": "#/components/schemas/ExportMetadata"
@@ -2671,10 +2671,10 @@
                   "type": "object",
                   "properties": {
                     "meta": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Meta"
                     },
                     "status": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Status"
                     },
                     "importMetadata": {
                       "$ref": "#/components/schemas/ImportMetadata"
@@ -2794,10 +2794,10 @@
                   "type": "object",
                   "properties": {
                     "meta": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Meta"
                     },
                     "status": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Status"
                     },
                     "files": {
                       "type": "array",
@@ -2911,10 +2911,10 @@
                   "type": "object",
                   "properties": {
                     "meta": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Meta"
                     },
                     "status": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Status"
                     },
                     "file": {
                       "$ref": "#/components/schemas/File"
@@ -2973,10 +2973,10 @@
                   "type": "object",
                   "properties": {
                     "meta": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Meta"
                     },
                     "status": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Status"
                     },
                     "file": {
                       "$ref": "#/components/schemas/File"
@@ -3023,10 +3023,10 @@
                   "type": "object",
                   "properties": {
                     "meta": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Meta"
                     },
                     "status": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Status"
                     },
                     "versionSwitchover": {
                       "$ref": "#/components/schemas/Switchover"
@@ -3125,10 +3125,10 @@
                   "type": "object",
                   "properties": {
                     "meta": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Meta"
                     },
                     "status": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Status"
                     },
                     "currentPeriod": {
                       "$ref": "#/components/schemas/CurrentPeriod"
@@ -3201,10 +3201,10 @@
                   "type": "object",
                   "properties": {
                     "meta": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Meta"
                     },
                     "status": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Status"
                     },
                     "currentPeriod": {
                       "$ref": "#/components/schemas/CurrentPeriod"
@@ -3257,10 +3257,10 @@
                   "type": "object",
                   "properties": {
                     "meta": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Meta"
                     },
                     "status": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Status"
                     },
                     "modelCalendar": {
                       "$ref": "#/components/schemas/ModelCalendar"
@@ -3487,10 +3487,10 @@
                   "type": "object",
                   "properties": {
                     "meta": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Meta"
                     },
                     "status": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Status"
                     },
                     "viewReadRequest": {
                       "$ref": "#/components/schemas/ViewReadRequest"
@@ -3570,10 +3570,10 @@
                   "type": "object",
                   "properties": {
                     "meta": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Meta"
                     },
                     "status": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Status"
                     },
                     "viewReadRequest": {
                       "$ref": "#/components/schemas/ViewReadRequest"
@@ -3889,10 +3889,10 @@
                   "type": "object",
                   "properties": {
                     "meta": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Meta"
                     },
                     "status": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Status"
                     },
                     "file": {
                       "$ref": "#/components/schemas/File"
@@ -4017,10 +4017,10 @@
                   "type": "object",
                   "properties": {
                     "meta": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Meta"
                     },
                     "status": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Status"
                     },
                     "task": {
                       "$ref": "#/components/schemas/Task"
@@ -4275,10 +4275,10 @@
                   "type": "object",
                   "properties": {
                     "meta": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Meta"
                     },
                     "status": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Status"
                     },
                     "task": {
                       "$ref": "#/components/schemas/Task"
@@ -4361,10 +4361,10 @@
                   "type": "object",
                   "properties": {
                     "meta": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Meta"
                     },
                     "status": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Status"
                     },
                     "tasks": {
                       "type": "array",
@@ -4415,10 +4415,10 @@
                   "type": "object",
                   "properties": {
                     "meta": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Meta"
                     },
                     "status": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Status"
                     },
                     "task": {
                       "$ref": "#/components/schemas/Task"
@@ -4534,10 +4534,10 @@
                   "type": "object",
                   "properties": {
                     "meta": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Meta"
                     },
                     "status": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Status"
                     },
                     "chunks": {
                       "type": "array",
@@ -4667,10 +4667,10 @@
                   "type": "object",
                   "properties": {
                     "meta": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Meta"
                     },
                     "status": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Status"
                     },
                     "tasks": {
                       "type": "array",
@@ -4830,10 +4830,10 @@
                   "type": "object",
                   "properties": {
                     "meta": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Meta"
                     },
                     "status": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/Status"
                     },
                     "task": {
                       "$ref": "#/components/schemas/Task"
@@ -6227,6 +6227,50 @@
           },
           "successful": {
             "type": "boolean"
+          }
+        }
+      },
+      "Paging": {
+        "type": "object",
+        "required": [
+          "currentPageSize",
+          "totalSize",
+          "offset"
+        ],
+        "properties": {
+          "currentPageSize": {
+            "type": "integer"
+          },
+          "totalSize": {
+            "type": "integer"
+          },
+          "offset": {
+            "type": "integer"
+          }
+        }
+      },
+      "Status": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "Meta": {
+        "type": "object",
+        "required": [
+          "schema"
+        ],
+        "properties": {
+          "schema": {
+            "type": "string"
+          },
+          "paging": {
+            "$ref": "#/components/schemas/Paging"
           }
         }
       }

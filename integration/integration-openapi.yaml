@@ -52,9 +52,9 @@ paths:
                 type: object
                 properties:
                   meta:
-                    type: object
+                    $ref: '#/components/schemas/Meta'
                   status:
-                    type: object
+                    $ref: '#/components/schemas/Status'
                   user:
                     $ref: '#/components/schemas/User'
       tags:
@@ -79,9 +79,9 @@ paths:
                 type: object
                 properties:
                   meta:
-                    type: object
+                    $ref: '#/components/schemas/Meta'
                   status:
-                    type: object
+                    $ref: '#/components/schemas/Status'
                   user:
                     $ref: '#/components/schemas/User'
       tags:
@@ -118,9 +118,9 @@ paths:
                 type: object
                 properties:
                   meta:
-                    type: object
+                    $ref: '#/components/schemas/Meta'
                   status:
-                    type: object
+                    $ref: '#/components/schemas/Status'
                   models:
                     type: array
                     items:
@@ -178,9 +178,9 @@ paths:
                 type: object
                 properties:
                   meta:
-                    type: object
+                    $ref: '#/components/schemas/Meta'
                   status:
-                    type: object
+                    $ref: '#/components/schemas/Status'
                   workspaces:
                     type: array
                     items:
@@ -214,9 +214,9 @@ paths:
                 type: object
                 properties:
                   meta:
-                    type: object
+                    $ref: '#/components/schemas/Meta'
                   status:
-                    type: object
+                    $ref: '#/components/schemas/Status'
                   workspace:
                     $ref: '#/components/schemas/Workspace'
         '404':
@@ -250,9 +250,9 @@ paths:
                 type: object
                 properties:
                   meta:
-                    type: object
+                    $ref: '#/components/schemas/Meta'
                   status:
-                    type: object
+                    $ref: '#/components/schemas/Status'
                   model:
                     $ref: '#/components/schemas/Model'
       tags:
@@ -281,9 +281,9 @@ paths:
                 type: object
                 properties:
                   meta:
-                    type: object
+                    $ref: '#/components/schemas/Meta'
                   status:
-                    type: object
+                    $ref: '#/components/schemas/Status'
                   models:
                     type: array
                     items:
@@ -325,9 +325,9 @@ paths:
                 type: object
                 properties:
                   meta:
-                    type: object
+                    $ref: '#/components/schemas/Meta'
                   status:
-                    type: object
+                    $ref: '#/components/schemas/Status'
                   items:
                     type: array
                     items:
@@ -443,9 +443,9 @@ paths:
                 type: object
                 properties:
                   meta:
-                    type: object
+                    $ref: '#/components/schemas/Meta'
                   status:
-                    type: object
+                    $ref: '#/components/schemas/Status'
                   items:
                     type: array
                     items:
@@ -501,9 +501,9 @@ paths:
                 type: object
                 properties:
                   meta:
-                    type: object
+                    $ref: '#/components/schemas/Meta'
                   status:
-                    type: object
+                    $ref: '#/components/schemas/Status'
                   items:
                     type: array
                     items:
@@ -594,9 +594,9 @@ paths:
                 type: object
                 properties:
                   meta:
-                    type: object
+                    $ref: '#/components/schemas/Meta'
                   status:
-                    type: object
+                    $ref: '#/components/schemas/Status'
                   lists:
                     type: array
                     items:
@@ -716,9 +716,9 @@ paths:
                 type: object
                 properties:
                   meta:
-                    type: object
+                    $ref: '#/components/schemas/Meta'
                   status:
-                    type: object
+                    $ref: '#/components/schemas/Status'
                   metadata:
                     $ref: '#/components/schemas/List'
         '429':
@@ -814,9 +814,9 @@ paths:
                 type: object
                 properties:
                   meta:
-                    type: object
+                    $ref: '#/components/schemas/Meta'
                   status:
-                    type: object
+                    $ref: '#/components/schemas/Status'
                   modules:
                     type: array
                     items:
@@ -928,9 +928,9 @@ paths:
                 type: object
                 properties:
                   meta:
-                    type: object
+                    $ref: '#/components/schemas/Meta'
                   status:
-                    type: object
+                    $ref: '#/components/schemas/Status'
                   items:
                     type: array
                     items:
@@ -1016,9 +1016,9 @@ paths:
                 type: object
                 properties:
                   meta:
-                    type: object
+                    $ref: '#/components/schemas/Meta'
                   status:
-                    type: object
+                    $ref: '#/components/schemas/Status'
                   views:
                     type: array
                     items:
@@ -1085,9 +1085,9 @@ paths:
                 type: object
                 properties:
                   meta:
-                    type: object
+                    $ref: '#/components/schemas/Meta'
                   status:
-                    type: object
+                    $ref: '#/components/schemas/Status'
                   viewId:
                     type: string
                   viewName:
@@ -1185,9 +1185,9 @@ paths:
                 type: object
                 properties:
                   meta:
-                    type: object
+                    $ref: '#/components/schemas/Meta'
                   status:
-                    type: object
+                    $ref: '#/components/schemas/Status'
                   views:
                     type: array
                     items:
@@ -1280,9 +1280,9 @@ paths:
                 type: object
                 properties:
                   meta:
-                    type: object
+                    $ref: '#/components/schemas/Meta'
                   status:
-                    type: object
+                    $ref: '#/components/schemas/Status'
                   items:
                     type: array
                     items:
@@ -1329,9 +1329,9 @@ paths:
                 type: object
                 properties:
                   meta:
-                    type: object
+                    $ref: '#/components/schemas/Meta'
                   status:
-                    type: object
+                    $ref: '#/components/schemas/Status'
                   dimensions:
                     type: array
                     items:
@@ -1394,9 +1394,9 @@ paths:
                 type: object
                 properties:
                   meta:
-                    type: object
+                    $ref: '#/components/schemas/Meta'
                   status:
-                    type: object
+                    $ref: '#/components/schemas/Status'
                   items:
                     type: array
                     items:
@@ -1495,9 +1495,9 @@ paths:
                 type: object
                 properties:
                   meta:
-                    type: object
+                    $ref: '#/components/schemas/Meta'
                   status:
-                    type: object
+                    $ref: '#/components/schemas/Status'
                   versionMetadata:
                     type: array
                     items:
@@ -1554,9 +1554,9 @@ paths:
                 type: object
                 properties:
                   meta:
-                    type: object
+                    $ref: '#/components/schemas/Meta'
                   status:
-                    type: object
+                    $ref: '#/components/schemas/Status'
                   currentPeriod:
                     $ref: '#/components/schemas/CurrentPeriod'
         '429':
@@ -1624,9 +1624,9 @@ paths:
                 type: object
                 properties:
                   meta:
-                    type: object
+                    $ref: '#/components/schemas/Meta'
                   status:
-                    type: object
+                    $ref: '#/components/schemas/Status'
                   modelCalendar:
                     $ref: '#/components/schemas/ModelCalendar'
       tags:
@@ -1790,9 +1790,9 @@ paths:
                 type: object
                 properties:
                   meta:
-                    type: object
+                    $ref: '#/components/schemas/Meta'
                   status:
-                    type: object
+                    $ref: '#/components/schemas/Status'
                   imports:
                     type: array
                     items:
@@ -1858,9 +1858,9 @@ paths:
                 type: object
                 properties:
                   meta:
-                    type: object
+                    $ref: '#/components/schemas/Meta'
                   status:
-                    type: object
+                    $ref: '#/components/schemas/Status'
                   task:
                     $ref: '#/components/schemas/Task'
       tags:
@@ -1957,9 +1957,9 @@ paths:
                 type: object
                 properties:
                   meta:
-                    type: object
+                    $ref: '#/components/schemas/Meta'
                   status:
-                    type: object
+                    $ref: '#/components/schemas/Status'
                   exports:
                     type: array
                     items:
@@ -2046,9 +2046,9 @@ paths:
                 type: object
                 properties:
                   meta:
-                    type: object
+                    $ref: '#/components/schemas/Meta'
                   status:
-                    type: object
+                    $ref: '#/components/schemas/Status'
                   processMetadata:
                     $ref: '#/components/schemas/Process'
       tags:
@@ -2142,9 +2142,9 @@ paths:
                 type: object
                 properties:
                   meta:
-                    type: object
+                    $ref: '#/components/schemas/Meta'
                   status:
-                    type: object
+                    $ref: '#/components/schemas/Status'
                   exportMetadata:
                     $ref: '#/components/schemas/ExportMetadata'
       tags:
@@ -2230,9 +2230,9 @@ paths:
                 type: object
                 properties:
                   meta:
-                    type: object
+                    $ref: '#/components/schemas/Meta'
                   status:
-                    type: object
+                    $ref: '#/components/schemas/Status'
                   importMetadata:
                     $ref: '#/components/schemas/ImportMetadata'
       tags:
@@ -2329,9 +2329,9 @@ paths:
                 type: object
                 properties:
                   meta:
-                    type: object
+                    $ref: '#/components/schemas/Meta'
                   status:
-                    type: object
+                    $ref: '#/components/schemas/Status'
                   files:
                     type: array
                     items:
@@ -2434,9 +2434,9 @@ paths:
                 type: object
                 properties:
                   meta:
-                    type: object
+                    $ref: '#/components/schemas/Meta'
                   status:
-                    type: object
+                    $ref: '#/components/schemas/Status'
                   file:
                     $ref: '#/components/schemas/File'
       tags:
@@ -2511,9 +2511,9 @@ paths:
                 type: object
                 properties:
                   meta:
-                    type: object
+                    $ref: '#/components/schemas/Meta'
                   status:
-                    type: object
+                    $ref: '#/components/schemas/Status'
                   file:
                     $ref: '#/components/schemas/File'
         '404':
@@ -2544,9 +2544,9 @@ paths:
                 type: object
                 properties:
                   meta:
-                    type: object
+                    $ref: '#/components/schemas/Meta'
                   status:
-                    type: object
+                    $ref: '#/components/schemas/Status'
                   versionSwitchover:
                     $ref: '#/components/schemas/Switchover'
       tags:
@@ -2635,9 +2635,9 @@ paths:
                 type: object
                 properties:
                   meta:
-                    type: object
+                    $ref: '#/components/schemas/Meta'
                   status:
-                    type: object
+                    $ref: '#/components/schemas/Status'
                   currentPeriod:
                     $ref: '#/components/schemas/CurrentPeriod'
         '429':
@@ -2713,9 +2713,9 @@ paths:
                 type: object
                 properties:
                   meta:
-                    type: object
+                    $ref: '#/components/schemas/Meta'
                   status:
-                    type: object
+                    $ref: '#/components/schemas/Status'
                   currentPeriod:
                     $ref: '#/components/schemas/CurrentPeriod'
       tags:
@@ -2749,9 +2749,9 @@ paths:
                 type: object
                 properties:
                   meta:
-                    type: object
+                    $ref: '#/components/schemas/Meta'
                   status:
-                    type: object
+                    $ref: '#/components/schemas/Status'
                   modelCalendar:
                     $ref: '#/components/schemas/ModelCalendar'
       tags:
@@ -3110,9 +3110,9 @@ paths:
                 type: object
                 properties:
                   meta:
-                    type: object
+                    $ref: '#/components/schemas/Meta'
                   status:
-                    type: object
+                    $ref: '#/components/schemas/Status'
                   viewReadRequest:
                     $ref: '#/components/schemas/ViewReadRequest'
       tags:
@@ -3193,9 +3193,9 @@ paths:
                 type: object
                 properties:
                   meta:
-                    type: object
+                    $ref: '#/components/schemas/Meta'
                   status:
-                    type: object
+                    $ref: '#/components/schemas/Status'
                   viewReadRequest:
                     $ref: '#/components/schemas/ViewReadRequest'
       tags:
@@ -3566,9 +3566,9 @@ paths:
                 type: object
                 properties:
                   meta:
-                    type: object
+                    $ref: '#/components/schemas/Meta'
                   status:
-                    type: object
+                    $ref: '#/components/schemas/Status'
                   file:
                     $ref: '#/components/schemas/File'
       tags:
@@ -3673,9 +3673,9 @@ paths:
                 type: object
                 properties:
                   meta:
-                    type: object
+                    $ref: '#/components/schemas/Meta'
                   status:
-                    type: object
+                    $ref: '#/components/schemas/Status'
                   task:
                     $ref: '#/components/schemas/Task'
       tags:
@@ -3917,9 +3917,9 @@ paths:
                 type: object
                 properties:
                   meta:
-                    type: object
+                    $ref: '#/components/schemas/Meta'
                   status:
-                    type: object
+                    $ref: '#/components/schemas/Status'
                   task:
                     $ref: '#/components/schemas/Task'
       tags:
@@ -3988,9 +3988,9 @@ paths:
                 type: object
                 properties:
                   meta:
-                    type: object
+                    $ref: '#/components/schemas/Meta'
                   status:
-                    type: object
+                    $ref: '#/components/schemas/Status'
                   tasks:
                     type: array
                     items:
@@ -4025,9 +4025,9 @@ paths:
                 type: object
                 properties:
                   meta:
-                    type: object
+                    $ref: '#/components/schemas/Meta'
                   status:
-                    type: object
+                    $ref: '#/components/schemas/Status'
                   task:
                     $ref: '#/components/schemas/Task'
       tags:
@@ -4119,9 +4119,9 @@ paths:
                 type: object
                 properties:
                   meta:
-                    type: object
+                    $ref: '#/components/schemas/Meta'
                   status:
-                    type: object
+                    $ref: '#/components/schemas/Status'
                   chunks:
                     type: array
                     items:
@@ -4228,9 +4228,9 @@ paths:
                 type: object
                 properties:
                   meta:
-                    type: object
+                    $ref: '#/components/schemas/Meta'
                   status:
-                    type: object
+                    $ref: '#/components/schemas/Status'
                   tasks:
                     type: array
                     items:
@@ -4366,9 +4366,9 @@ paths:
                 type: object
                 properties:
                   meta:
-                    type: object
+                    $ref: '#/components/schemas/Meta'
                   status:
-                    type: object
+                    $ref: '#/components/schemas/Status'
                   task:
                     $ref: '#/components/schemas/Task'
       tags:
@@ -5346,6 +5346,35 @@ components:
           type: string
         successful:
           type: boolean
+    Paging:
+      type: object
+      required:
+      - currentPageSize
+      - totalSize
+      - offset
+      properties:
+        currentPageSize:
+          type: integer
+        totalSize:
+          type: integer
+        offset:
+          type: integer
+    Status:
+      type: object
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+    Meta:
+      type: object
+      required:
+      - schema
+      properties:
+        schema:
+          type: string
+        paging:
+          $ref: '#/components/schemas/Paging'
 security:
 - AnaplanAuthToken: []
 - BearerAuth: []

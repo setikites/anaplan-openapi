@@ -564,6 +564,78 @@ def test_integration_processes_declares_show_import_data_source():
     assert p.get("in") == "query"
 
 
+# ─── Integration envelope schemas (Meta / Paging / Status) ───────────────
+
+
+@_skip_integration
+def test_integration_has_status_component_schema():
+    """components/schemas/Status must exist with integer code and string message."""
+    spec = _load(_INTEGRATION_SPEC)
+    schemas = spec.get("components", {}).get("schemas", {})
+    assert "Status" in schemas, "components/schemas/Status is missing"
+    props = schemas["Status"].get("properties", {})
+    assert props.get("code", {}).get("type") == "integer", "Status.code must be type integer"
+    assert props.get("message", {}).get("type") == "string", "Status.message must be type string"
+
+
+@_skip_integration
+def test_integration_has_paging_component_schema():
+    """components/schemas/Paging must exist with three required integer fields."""
+    spec = _load(_INTEGRATION_SPEC)
+    schemas = spec.get("components", {}).get("schemas", {})
+    assert "Paging" in schemas, "components/schemas/Paging is missing"
+    s = schemas["Paging"]
+    props = s.get("properties", {})
+    for field in ("currentPageSize", "totalSize", "offset"):
+        assert props.get(field, {}).get("type") == "integer", (
+            f"Paging.{field} must be type integer"
+        )
+    assert set(s.get("required", [])) >= {"currentPageSize", "totalSize", "offset"}, (
+        "Paging must mark currentPageSize, totalSize, and offset as required"
+    )
+
+
+@_skip_integration
+def test_integration_has_meta_component_schema():
+    """components/schemas/Meta must exist with a required string schema field and optional $ref Paging."""
+    spec = _load(_INTEGRATION_SPEC)
+    schemas = spec.get("components", {}).get("schemas", {})
+    assert "Meta" in schemas, "components/schemas/Meta is missing"
+    s = schemas["Meta"]
+    props = s.get("properties", {})
+    assert props.get("schema", {}).get("type") == "string", "Meta.schema must be type string"
+    assert "schema" in s.get("required", []), "Meta.schema must be required"
+    paging_prop = props.get("paging", {})
+    assert paging_prop.get("$ref") == "#/components/schemas/Paging", (
+        "Meta.paging must $ref #/components/schemas/Paging"
+    )
+
+
+@_skip_integration
+def test_integration_response_meta_status_use_refs():
+    """Every response schema with meta/status properties must use $ref, not bare type: object."""
+    spec = _load(_INTEGRATION_SPEC)
+    violations = []
+    for path, item in spec["paths"].items():
+        for method, op in item.items():
+            if not isinstance(op, dict):
+                continue
+            for code, resp in op.get("responses", {}).items():
+                if not isinstance(resp, dict):
+                    continue
+                for ct, media in resp.get("content", {}).items():
+                    props = media.get("schema", {}).get("properties", {})
+                    for field in ("meta", "status"):
+                        if field in props:
+                            val = props[field]
+                            if val == {"type": "object"} or "$ref" not in val:
+                                violations.append(
+                                    f"{method.upper()} {path} {code}: "
+                                    f"{field} uses bare schema instead of $ref"
+                                )
+    assert not violations, "\n".join(violations)
+
+
 # ─── Description cleanliness ──────────────────────────────────────────────
 
 
