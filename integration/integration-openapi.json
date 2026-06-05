@@ -2094,7 +2094,17 @@
     "/workspaces/{workspaceId}/models/{modelId}/actions": {
       "get": {
         "summary": "List the actions in the model as a JSON array",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sort results by object properties. Prefix with `+` for ascending or `-` for descending order.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "+name"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Response 200",
@@ -2154,7 +2164,17 @@
     "/workspaces/{workspaceId}/models/{modelId}/processes": {
       "get": {
         "summary": "List the process definitions available in a model as a JSON array",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sort results by object properties. Prefix with `+` for ascending or `-` for descending order.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "+name"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Response 200",
@@ -2208,7 +2228,17 @@
     "/workspaces/{workspaceId}/models/{modelId}/imports/": {
       "get": {
         "summary": "Get a list of import actions",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sort results by object properties. Prefix with `+` for ascending or `-` for descending order.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "+name"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Response 200",
@@ -2403,7 +2433,17 @@
     "/workspaces/{workspaceId}/models/{modelId}/exports": {
       "get": {
         "summary": "List the available export definitions as a JSON array",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sort results by object properties. Prefix with `+` for ascending or `-` for descending order.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "+name"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Response 200",
@@ -2816,7 +2856,17 @@
     "/models/{modelId}/files": {
       "get": {
         "summary": "Get a list of files",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sort results by object properties. Prefix with `+` for ascending or `-` for descending order.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "+name"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Response 200",

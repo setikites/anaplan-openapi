@@ -498,24 +498,38 @@ def test_integration_view_data_declares_pages_param():
     assert p.get("in") == "query"
 
 
-_TASKS_PATHS = [
-    "/workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks",
-    "/workspaces/{workspaceId}/models/{modelId}/exports/{exportId}/tasks",
-    "/workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks",
-    "/workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks",
+# Add entries here to extend sort contract coverage to additional list endpoints.
+# sort_example must match the `example:` value declared in the spec for that path.
+_SORT_PATHS = [
+    # Task list endpoints
+    pytest.param("/workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks",    "-creationDate", id="import-tasks"),
+    pytest.param("/workspaces/{workspaceId}/models/{modelId}/exports/{exportId}/tasks",    "-creationDate", id="export-tasks"),
+    pytest.param("/workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks", "-creationDate", id="process-tasks"),
+    pytest.param("/workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks",    "-creationDate", id="action-tasks"),
+    # Model-scoped list endpoints
+    pytest.param("/models/{modelId}/files",                                                "+name",         id="files"),
+    pytest.param("/workspaces/{workspaceId}/models/{modelId}/actions",                     "+name",         id="actions"),
+    pytest.param("/workspaces/{workspaceId}/models/{modelId}/processes",                   "+name",         id="processes"),
+    pytest.param("/workspaces/{workspaceId}/models/{modelId}/imports/",                    "+name",         id="imports"),
+    pytest.param("/workspaces/{workspaceId}/models/{modelId}/exports",                     "+name",         id="exports"),
 ]
 
 
 @_skip_integration
-@pytest.mark.parametrize("path", _TASKS_PATHS, ids=lambda p: p.split("/")[-3])
-def test_integration_tasks_list_declares_sort_param(path):
-    """Every task list endpoint must declare the sort query parameter."""
+@pytest.mark.parametrize("path,sort_example", _SORT_PATHS)
+def test_integration_list_declares_sort_only_param(path, sort_example):
+    """List endpoints with sort-only support must declare sort (type: string, in: query)."""
     spec = _load(_INTEGRATION_SPEC)
     params = _all_params(spec, path, "get")
     names = {p["name"] for p in params if "name" in p}
-    assert "sort" in names, f"{path} is missing sort query parameter"
+    assert "sort" in names, f"GET {path} is missing sort query parameter"
     p = next(p for p in params if p.get("name") == "sort")
     assert p.get("in") == "query"
+    assert p.get("schema", {}).get("type") == "string"
+    assert p.get("example") == sort_example, (
+        f"GET {path} sort example: expected {sort_example!r}, got {p.get('example')!r}"
+    )
+    assert "ascending" in p.get("description", "").lower()
 
 
 @_skip_integration

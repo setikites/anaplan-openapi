@@ -317,14 +317,31 @@ def test_get_model(integration_token):
 
 
 # ─── s / sort query parameter probes ──────────────────────────────────────────
-# Add entries here to extend search/sort coverage to additional list endpoints.
-# search_key: item field used to derive the s= probe value and verify filter results.
-# sort_field: object property passed to sort=+{field} / sort=-{field}.
+# _SEARCH_SORT_PATHS: paths supporting both s= and sort=.
+#   (path, list_key, search_key, sort_field)
+#   search_key: item field for the s= probe; sort_field: field for sort=+/-{field}.
+# _ALL_SORT_PATHS: every sort-capable path (superset of _SEARCH_SORT_PATHS).
+#   (path, list_key, sort_field)
+# Add new search+sort paths to _SEARCH_SORT_PATHS AND _ALL_SORT_PATHS.
+# Add sort-only paths to _ALL_SORT_PATHS only.
 
 _SEARCH_SORT_PATHS = [
-    pytest.param("/2/0/workspaces", "workspaces", "name",      "name",        id="workspaces"),
-    pytest.param("/2/0/models",     "models",     "name",      "name",        id="models"),
-    pytest.param("/2/0/users",      "users",      "email",     "firstName",   id="users"),
+    pytest.param("/2/0/workspaces", "workspaces", "name",  "name",      id="workspaces"),
+    pytest.param("/2/0/models",     "models",     "name",  "name",      id="models"),
+    pytest.param("/2/0/users",      "users",      "email", "firstName", id="users"),
+]
+
+_ALL_SORT_PATHS = [
+    # search+sort paths (also in _SEARCH_SORT_PATHS)
+    pytest.param("/2/0/workspaces",                                                  "workspaces", "name",      id="workspaces"),
+    pytest.param("/2/0/models",                                                      "models",     "name",      id="models"),
+    pytest.param("/2/0/users",                                                       "users",      "firstName", id="users"),
+    # sort-only paths
+    pytest.param(f"/2/0/models/{MODEL_ID}/files",                                    "files",      "name",      id="files"),
+    pytest.param(f"/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/actions",        "actions",    "name",      id="actions"),
+    pytest.param(f"/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/processes",      "processes",  "name",      id="processes"),
+    pytest.param(f"/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/imports/",       "imports",    "name",      id="imports"),
+    pytest.param(f"/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/exports",        "exports",    "name",      id="exports"),
 ]
 
 
@@ -366,8 +383,8 @@ def test_s_param_filters(integration_token, path, list_key, search_key, sort_fie
 
 
 @pytest.mark.live
-@pytest.mark.parametrize("path,list_key,search_key,sort_field", _SEARCH_SORT_PATHS)
-def test_sort_param(integration_token, path, list_key, search_key, sort_field):
+@pytest.mark.parametrize("path,list_key,sort_field", _ALL_SORT_PATHS)
+def test_sort_param(integration_token, path, list_key, sort_field):
     """GET {path}?sort=+{sort_field} and ?sort=-{sort_field} both return 200.
 
     When ≥2 items exist, verifies that ascending order has first ≤ last and
