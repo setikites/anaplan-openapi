@@ -457,16 +457,16 @@ def _all_params(spec, path_str, method):
 
 @_skip_integration
 def test_integration_current_period_put_declares_date_query_param():
-    """PUT /2/0/models/{modelId}/currentPeriod must declare date as a query parameter.
+    """PUT /models/{modelId}/currentPeriod must declare date as a query parameter.
 
     Live testing confirmed the API accepts date as either a query param or
     a request body field (but not both simultaneously).
     """
     spec = _load(_INTEGRATION_SPEC)
-    params = _all_params(spec, "/2/0/models/{modelId}/currentPeriod", "put")
+    params = _all_params(spec, "/models/{modelId}/currentPeriod", "put")
     names = {p["name"] for p in params if "name" in p}
     assert "date" in names, (
-        "PUT /2/0/models/{modelId}/currentPeriod is missing date query parameter"
+        "PUT /models/{modelId}/currentPeriod is missing date query parameter"
     )
     p = next(p for p in params if p.get("name") == "date")
     assert p.get("in") == "query"
@@ -475,34 +475,34 @@ def test_integration_current_period_put_declares_date_query_param():
 
 @_skip_integration
 def test_integration_current_period_put_declares_400_response():
-    """PUT /2/0/models/{modelId}/currentPeriod must declare a 400 response."""
+    """PUT /models/{modelId}/currentPeriod must declare a 400 response."""
     spec = _load(_INTEGRATION_SPEC)
-    responses = spec["paths"]["/2/0/models/{modelId}/currentPeriod"]["put"].get(
+    responses = spec["paths"]["/models/{modelId}/currentPeriod"]["put"].get(
         "responses", {}
     )
     assert "400" in responses, (
-        "PUT /2/0/models/{modelId}/currentPeriod is missing 400 response"
+        "PUT /models/{modelId}/currentPeriod is missing 400 response"
     )
 
 
 @_skip_integration
 def test_integration_view_data_declares_pages_param():
-    """GET /2/0/models/{modelId}/views/{viewId}/data must declare the pages query parameter."""
+    """GET /models/{modelId}/views/{viewId}/data must declare the pages query parameter."""
     spec = _load(_INTEGRATION_SPEC)
-    params = _all_params(spec, "/2/0/models/{modelId}/views/{viewId}/data", "get")
+    params = _all_params(spec, "/models/{modelId}/views/{viewId}/data", "get")
     names = {p["name"] for p in params if "name" in p}
     assert "pages" in names, (
-        "GET /2/0/models/{modelId}/views/{viewId}/data is missing pages query parameter"
+        "GET /models/{modelId}/views/{viewId}/data is missing pages query parameter"
     )
     p = next(p for p in params if p.get("name") == "pages")
     assert p.get("in") == "query"
 
 
 _TASKS_PATHS = [
-    "/2/0/workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks",
-    "/2/0/workspaces/{workspaceId}/models/{modelId}/exports/{exportId}/tasks",
-    "/2/0/workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks",
-    "/2/0/workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks",
+    "/workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks",
+    "/workspaces/{workspaceId}/models/{modelId}/exports/{exportId}/tasks",
+    "/workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks",
+    "/workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks",
 ]
 
 
@@ -520,12 +520,12 @@ def test_integration_tasks_list_declares_sort_param(path):
 
 @_skip_integration
 def test_integration_models_list_declares_model_details():
-    """GET /2/0/models must declare the modelDetails query parameter."""
+    """GET /models must declare the modelDetails query parameter."""
     spec = _load(_INTEGRATION_SPEC)
-    params = _all_params(spec, "/2/0/models", "get")
+    params = _all_params(spec, "/models", "get")
     names = {p["name"] for p in params if "name" in p}
     assert "modelDetails" in names, (
-        "GET /2/0/models is missing modelDetails query parameter"
+        "GET /models is missing modelDetails query parameter"
     )
     md = next(p for p in params if p.get("name") == "modelDetails")
     assert md.get("in") == "query"
@@ -534,14 +534,14 @@ def test_integration_models_list_declares_model_details():
 
 @_skip_integration
 def test_integration_workspace_views_declares_include_subsidiary_views():
-    """GET /2/0/workspaces/{workspaceId}/models/{modelId}/views must declare includesubsidiaryviews."""
+    """GET /workspaces/{workspaceId}/models/{modelId}/views must declare includesubsidiaryviews."""
     spec = _load(_INTEGRATION_SPEC)
     params = _all_params(
-        spec, "/2/0/workspaces/{workspaceId}/models/{modelId}/views", "get"
+        spec, "/workspaces/{workspaceId}/models/{modelId}/views", "get"
     )
     names = {p["name"] for p in params if "name" in p}
     assert "includesubsidiaryviews" in names, (
-        "GET /2/0/workspaces/{workspaceId}/models/{modelId}/views is missing "
+        "GET /workspaces/{workspaceId}/models/{modelId}/views is missing "
         "includesubsidiaryviews query parameter"
     )
     p = next(p for p in params if p.get("name") == "includesubsidiaryviews")
@@ -550,14 +550,14 @@ def test_integration_workspace_views_declares_include_subsidiary_views():
 
 @_skip_integration
 def test_integration_processes_declares_show_import_data_source():
-    """GET /2/0/models/{modelId}/processes/{processId} must declare showImportDataSource."""
+    """GET /models/{modelId}/processes/{processId} must declare showImportDataSource."""
     spec = _load(_INTEGRATION_SPEC)
     params = _all_params(
-        spec, "/2/0/models/{modelId}/processes/{processId}", "get"
+        spec, "/models/{modelId}/processes/{processId}", "get"
     )
     names = {p["name"] for p in params if "name" in p}
     assert "showImportDataSource" in names, (
-        "GET /2/0/models/{modelId}/processes/{processId} is missing "
+        "GET /models/{modelId}/processes/{processId} is missing "
         "showImportDataSource query parameter"
     )
     p = next(p for p in params if p.get("name") == "showImportDataSource")
