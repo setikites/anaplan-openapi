@@ -2092,10 +2092,3 @@ def test_list_process_tasks(integration_token, process_id):
         assert "taskState" in tasks[0], "Task must have a taskState"
 
 
-# ─── Helpers ────────────────────────────────────────────────────────────────────
-
-def assert_response_code(response, expected_codes, discrepancies):
-    if response.status_code not in expected_codes:
-        discrepancies.append(
-            f"Got {response.status_code}, expected one of {expected_codes}"
-        )

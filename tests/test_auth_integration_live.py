@@ -26,6 +26,7 @@ from openapi_spec_validator import validate
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.backends import default_backend
+from spec_assertions import assert_response_code, assert_enum_value
 
 # Load spec for response validation
 SPEC_FILE = pathlib.Path(__file__).parent.parent / "authentication" / "postman-spec.yaml"
@@ -55,43 +56,6 @@ def _load_certificate(cert_path: str) -> str:
         cert_data = f.read()
     return base64.b64encode(cert_data).decode()
 
-
-@pytest.fixture
-def auth_creds():
-    """Load authentication credentials from environment."""
-    username = os.getenv("ANAPLAN_USERNAME")
-    password = os.getenv("ANAPLAN_PASSWORD")
-
-    if not username or not password:
-        pytest.skip("ANAPLAN_USERNAME and ANAPLAN_PASSWORD not set")
-
-    return {"username": username, "password": password}
-
-
-@pytest.fixture
-def ca_certs():
-    """Load CA certificate paths from environment."""
-    cert_path = os.getenv("ANAPLAN_CA_CERT_PATH")
-    key_path = os.getenv("ANAPLAN_CA_KEY_PATH")
-
-    if not cert_path or not key_path:
-        return None
-
-    cert_file = pathlib.Path(cert_path)
-    key_file = pathlib.Path(key_path)
-
-    if not cert_file.exists():
-        pytest.skip(f"CA certificate file not found: {cert_path}")
-    if not key_file.exists():
-        pytest.skip(f"Private key file not found: {key_path}")
-
-    key_password = os.getenv("ANAPLAN_CA_KEY_PASSWORD")
-
-    return {
-        "cert_path": str(cert_file),
-        "key_path": str(key_file),
-        "key_password": key_password,
-    }
 
 
 @pytest.mark.live
@@ -502,16 +466,3 @@ def test_security_scheme_oauth_bearer_on_token_endpoints():
         print(f"  {finding}")
 
 
-def assert_response_code(response, expected_codes, discrepancies):
-    """Assert response code is in expected_codes, track discrepancies."""
-    if response.status_code not in expected_codes:
-        discrepancies.append(
-            f"Got {response.status_code}, expected one of {expected_codes}"
-        )
-
-
-def assert_enum_value(body, field, expected, discrepancies, label):
-    """Assert body[field] matches the expected enum value from the spec."""
-    actual = body.get(field)
-    if actual != expected:
-        discrepancies.append(f"{label}: expected {expected!r}, got {actual!r}")

@@ -29,13 +29,13 @@ The following steps cannot be fully automated:
 """
 
 import json
-import os
 import pathlib
 import warnings
 
 import httpx
 import pytest
 from openapi_spec_validator import validate
+from spec_assertions import assert_response_code
 
 SPEC_FILE = pathlib.Path(__file__).parent.parent / "oauth" / "oauth-openapi.json"
 with open(SPEC_FILE, encoding="utf-8") as f:
@@ -43,23 +43,6 @@ with open(SPEC_FILE, encoding="utf-8") as f:
 
 API_URL = "https://us1a.app.anaplan.com"
 
-
-@pytest.fixture
-def oauth_client_id():
-    """Load Authorization Code Grant client ID from environment."""
-    client_id = os.getenv("ANAPLAN_OAUTH_CLIENT_ID")
-    if not client_id:
-        pytest.skip("ANAPLAN_OAUTH_CLIENT_ID not set")
-    return client_id
-
-
-@pytest.fixture
-def oauth_device_client_id():
-    """Load Device Authorization Grant client ID from environment."""
-    client_id = os.getenv("ANAPLAN_OAUTH_DEVICE_CLIENT_ID")
-    if not client_id:
-        pytest.skip("ANAPLAN_OAUTH_DEVICE_CLIENT_ID not set")
-    return client_id
 
 
 # ---------------------------------------------------------------------------
@@ -383,14 +366,6 @@ def test_prelogin_happy_path(oauth_client_id):
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
-
-def assert_response_code(response, expected_codes, discrepancies):
-    """Record a discrepancy if the response code is not among expected_codes."""
-    if response.status_code not in expected_codes:
-        discrepancies.append(
-            f"Got {response.status_code}, expected one of {expected_codes}"
-        )
-
 
 def assert_oauth_error_body(response, label, discrepancies):
     """Check that a 4xx response contains a valid OAuth error body."""
