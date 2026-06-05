@@ -24,6 +24,7 @@ Optional:
 import base64
 import os
 import pathlib
+import re
 import secrets
 import warnings
 
@@ -925,6 +926,150 @@ def test_get_list(integration_token, list_id):
     assert metadata is not None, f"Expected 'metadata' key; keys: {list(body.keys())}"
     assert metadata.get("id") == list_id, "Returned list ID must match requested ID"
     assert "name" in metadata, "List metadata must have a name"
+
+
+# ─── Path-duality probes (issue #26) ──────────────────────────────────────────
+# For each endpoint that has both a model-direct and a workspace-prefixed URL form,
+# probe the alternate form and compare its response shape to the known baseline.
+# 404/405 → warn (document in README); 200 → compare shape (add valid paths to spec).
+#
+# list_key conventions:
+#   str  → body[list_key] is a list or a dict; compare item/object keys to baseline
+#   None → flat response (e.g. view detail); compare top-level keys to baseline
+
+_DUALITY_PROBES = [
+    pytest.param(
+        "/2/0/models/{MODEL_ID}/modules",
+        "/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/modules",
+        "modules",
+        id="modules",
+    ),
+    pytest.param(
+        "/2/0/models/{MODEL_ID}/modules/{module_id_with_line_items}/lineItems",
+        "/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/modules/{module_id_with_line_items}/lineItems",
+        "items",
+        id="module-lineItems",
+    ),
+    pytest.param(
+        "/2/0/models/{MODEL_ID}/modules/{module_id_with_views}/views",
+        "/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/modules/{module_id_with_views}/views",
+        "views",
+        id="module-views",
+    ),
+    pytest.param(
+        "/2/0/models/{MODEL_ID}/lineItems",
+        "/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/lineItems",
+        "items",
+        id="lineItems",
+    ),
+    pytest.param(
+        "/2/0/models/{MODEL_ID}/lineItems/{line_item_id}/dimensions",
+        "/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/lineItems/{line_item_id}/dimensions",
+        "dimensions",
+        id="lineItem-dimensions",
+    ),
+    pytest.param(
+        "/2/0/models/{MODEL_ID}/lineItems/{line_item_id}/dimensions/{dimension_id}/items",
+        "/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/lineItems/{line_item_id}/dimensions/{dimension_id}/items",
+        "items",
+        id="lineItem-dimension-items",
+    ),
+    pytest.param(
+        "/2/0/models/{MODEL_ID}/views/{view_id}",
+        "/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/views/{view_id}",
+        None,
+        id="view-detail",
+    ),
+    pytest.param(
+        "/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/views",
+        "/2/0/models/{MODEL_ID}/views",
+        "views",
+        id="views",
+    ),
+    pytest.param(
+        "/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/dimensions/{dimension_id}/items",
+        "/2/0/models/{MODEL_ID}/dimensions/{dimension_id}/items",
+        "items",
+        id="dimension-items",
+    ),
+    pytest.param(
+        "/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/lists",
+        "/2/0/models/{MODEL_ID}/lists",
+        "lists",
+        id="lists",
+    ),
+    pytest.param(
+        "/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/lists/{list_id}",
+        "/2/0/models/{MODEL_ID}/lists/{list_id}",
+        "metadata",
+        id="list-detail",
+    ),
+]
+
+
+def _warn_shape_diff(label, baseline_keys, alt_keys):
+    if alt_keys - baseline_keys:
+        warnings.warn(
+            f"{label}: extra fields vs baseline: {alt_keys - baseline_keys}",
+            UserWarning, stacklevel=3,
+        )
+    if baseline_keys - alt_keys:
+        warnings.warn(
+            f"{label}: missing fields vs baseline: {baseline_keys - alt_keys}",
+            UserWarning, stacklevel=3,
+        )
+
+
+@pytest.mark.live
+@pytest.mark.parametrize("baseline_tmpl,alt_tmpl,list_key", _DUALITY_PROBES)
+def test_path_duality(request, integration_token, baseline_tmpl, alt_tmpl, list_key):
+    """Probe that each endpoint's alternate URL form returns equivalent data (issue #26).
+
+    Uses request.getfixturevalue() to resolve only the fixture IDs that appear in each
+    path template, so unrelated fixture failures don't cascade across parametrize cases.
+    """
+    ctx = {"MODEL_ID": MODEL_ID, "WORKSPACE_ID": WORKSPACE_ID}
+    for name in set(re.findall(r'\{(\w+)\}', baseline_tmpl + alt_tmpl)):
+        if name not in ctx:
+            ctx[name] = request.getfixturevalue(name)
+
+    h = _auth_headers(integration_token)
+    baseline_url = f"{API_URL}{baseline_tmpl.format(**ctx)}"
+    alt_url = f"{API_URL}{alt_tmpl.format(**ctx)}"
+
+    with httpx.Client() as client:
+        baseline = client.get(baseline_url, headers=h)
+        response = client.get(alt_url, headers=h)
+
+    if response.status_code in (404, 405):
+        warnings.warn(
+            f"GET {alt_tmpl} returned {response.status_code} — alternate URL form not available.",
+            UserWarning, stacklevel=2,
+        )
+        return
+
+    assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
+    body = response.json()
+    assert body.get("status", {}).get("code") == 200
+
+    if list_key is None:
+        if baseline.status_code == 200:
+            _warn_shape_diff(alt_tmpl, set(baseline.json().keys()), set(body.keys()))
+    else:
+        value = body.get(list_key)
+        assert value is not None, f"Expected '{list_key}' in response; keys: {list(body.keys())}"
+        if isinstance(value, list):
+            assert isinstance(value, list), f"Expected '{list_key}' to be a list"
+            if baseline.status_code == 200:
+                bl_first = (baseline.json().get(list_key) or [{}])[0]
+                alt_first = (value or [{}])[0]
+                _warn_shape_diff(alt_tmpl, set(bl_first.keys()), set(alt_first.keys()))
+        else:
+            assert isinstance(value, dict), \
+                f"Expected '{list_key}' to be a list or dict; got {type(value)}"
+            if baseline.status_code == 200:
+                bl_obj = baseline.json().get(list_key) or {}
+                _warn_shape_diff(alt_tmpl, set(bl_obj.keys()), set(value.keys()))
 
 
 # ─── pages and sort query parameter probes (issue #31) ─────────────────────────

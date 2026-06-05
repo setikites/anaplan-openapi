@@ -4512,6 +4512,1028 @@ paths:
       schema:
         type: string
       example: '{{taskId}}'
+  /workspaces/{workspaceId}/models/{modelId}/modules:
+    get:
+      summary: 'Workspace-scoped form: Retrieve IDs and names for all modules in a model'
+      parameters: []
+      responses:
+        '200':
+          description: Response 200
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              example: application/json
+          content:
+            application/json:
+              example:
+                meta:
+                  paging:
+                    currentPageSize: 1
+                    offset: 0
+                    totalSize: 1
+                  schema: https://api.anaplan.com/2/0/objects/module
+                status:
+                  code: 200
+                  message: Success
+                modules:
+                - id: '102000000125'
+                  name: REV01 Price Book
+                - id: '102000000121'
+                  name: REV02 Volume Inputs
+              schema:
+                type: object
+                properties:
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                  status:
+                    $ref: '#/components/schemas/Status'
+                  modules:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Module'
+        '429':
+          description: more detail in path description
+      tags:
+      - Model Metadata
+      - Module & Saved View Metadata
+      description: "Alternate URL form — response is equivalent to `/models/{modelId}/modules`.\n\n## Retrieve IDs and names\
+        \ for all modules in a model\n\n`/models/{modelId}/modules`\n\nUse this call to retrieve the IDs and names of all\
+        \ modules for a specified model.\n\n**Notes**:\n\n*   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html)\n\
+        *   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response\n    \n\n###\
+        \ Request\n\n```\ncurl -X GET 'https://api.anaplan.com/2/0/models/{modelId}/modules' \\\n-H 'Authorization: AnaplanAuthToken\
+        \ {anaplan_auth_token}' \\\n-H 'Accept: application/json'\n```\n\n### Request headers\n\n| **Header** | **Details**\
+        \ |\n| --- | --- |\n| `Authorization: AnaplanAuthToken {anaplan_auth_token}` | <br><br>*   Required<br>*   Description:\
+        \ the Anaplan authentication token<br><br> |\n| `Accept: application/json` | <br><br>*   Required<br>*   Description:\
+        \ This indicates the preferred response is `application/json` format.<br><br> |\n\n### Request parameters\n\n| **Parameter**\
+        \ | **Details** |\n| --- | --- |\n| `{modelId}` | <br><br>*   Required<br>*   Type: String<br>*   Description: the\
+        \ ID for the model<br>*   Example: `75A40874E6B64FA3AE074327899685`<br><br> |"
+    parameters:
+    - name: workspaceId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9a-f]{32}$
+      example: 8a868cda7c8b28f5017c9a4b2d8341cd
+      description: Workspace identifier (32-character lowercase hex string).
+    - name: modelId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9A-F]{32}$
+      example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
+  /workspaces/{workspaceId}/models/{modelId}/modules/{moduleId}/lineItems:
+    get:
+      summary: 'Workspace-scoped form: Retrieve all line item metadata in a module'
+      parameters:
+      - name: includeAll
+        in: query
+        schema:
+          type: boolean
+        example: true
+      responses:
+        '200':
+          description: Response 200
+          content:
+            application/json:
+              example:
+                meta:
+                  schema: https://api.anaplan.com/2/0/objects/lineItem
+                status:
+                  code: 200
+                  message: Success
+                items:
+                - moduleId: '102000000001'
+                  moduleName: module2
+                  id: '206000000006'
+                  name: lineitem-child
+                  isSummary: false
+                  startOfSection: false
+                  broughtForward: false
+                  useSwitchover: true
+                  breakback: false
+                  cellCount: 51
+                  version:
+                    name: All
+                    id: '16000000000'
+                  appliesTo:
+                  - name: org-sub1
+                    id: '109000000001'
+                  - name: linesubset1
+                    id: '114000000001'
+                  dataTags:
+                  - name: tag1
+                    id: '127000000002'
+                  - name: tag2
+                    id: '127000000001'
+                  - name: tag3
+                    id: '127000000000'
+                  referencedBy:
+                  - name: lineitem5
+                    id: '206000000005'
+                  parent:
+                    name: lineitem5
+                    id: '206000000005'
+                  readAccessDriver:
+                    name: lineitem2
+                    id: '206000000003'
+                  writeAccessDriver:
+                    name: lineitem2
+                    id: '206000000003'
+                  formula: 3 + 9
+                  format: NUMBER
+                  formatMetadata:
+                    dataType: NUMBER
+                    minimumSignificantDigits: 4
+                    decimalPlaces: -1
+                    negativeNumberNotation: MINUS_SIGN
+                    unitsType: NONE
+                    unitsDisplayType: NONE
+                    zeroFormat: ZERO
+                    comparisonIncrease: GOOD
+                    groupingSeparator: COMMA
+                    decimalSeparator: FULL_STOP
+                  summary: Sum
+                  timeScale: Month
+                  timeRange: timeRange1
+                  formulaScope: All Versions
+                  style: Normal
+                  code: code7
+                  notes: note1
+              schema:
+                type: object
+                properties:
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                  status:
+                    $ref: '#/components/schemas/Status'
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/LineItem'
+      tags:
+      - Model Metadata
+      - Module & Saved View Metadata
+      description: "Alternate URL form — response is equivalent to `/models/{modelId}/modules/{moduleId}/lineItems`.\n\n##\
+        \ Early access: Retrieve all line item metadata in a module\n\n**Note:**This is an early access endpoint and is not\
+        \ generally available yet.\n\nUse this call when you want to get all line items and metadata in a module.\n\n### Request\n\
+        \n`curl -X GET 'https://api.anaplan.com/2/0/models/{modelId}/}/modules/{moduleId}/lineItems?includeAll=true' \\` \
+        \ \n`-H 'Authorization: AnaplanAuthToken {anaplan_auth_token}' \\`  \n`-H 'Accept: application/json'`\n\n### Request\
+        \ Headers\n\n|  |  |\n| --- | --- |\n| **Header** | **Details** |\n| `Authorization: AnaplanAuthToken {anaplan_auth_token}`\
+        \ | <br><br>*   Required<br>*   Description: the Anaplan authentication token<br><br> |\n| `Accept: application/json`\
+        \ | <br><br>*   Optional<br>*   Description: This call uses a content type of `application/json`.<br><br> |\n\n###\
+        \ Request parameters\n\n|  |  |\n| --- | --- |\n| **Parameter** | **Details** |\n| `{modelId}` | <br><br>*   Required<br>*\
+        \   Type: String<br>*   Description: the model ID<br>*   Example: `75A40874E6B64FA3AE0743278996850F`<br><br> |\n|\
+        \ `{moduleId}` | <br><br>*   Required<br>*   Type: String<br>*   Description: the model ID<br>*   Example: `89AA40874E6B64FA3AE07432789967048`<br><br>\
+        \ |\n| includeAll | <br><br>*   Required<br>*   Type: boolean<br>*   Description: true or false<br>*   Example: `includeAll=true`<br><br><br><br>\
+        \ |\n\n### Response header\n\n`Content-Type: application/json`"
+    parameters:
+    - name: workspaceId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9a-f]{32}$
+      example: 8a868cda7c8b28f5017c9a4b2d8341cd
+      description: Workspace identifier (32-character lowercase hex string).
+    - name: modelId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9A-F]{32}$
+      example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
+    - name: moduleId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: '{{moduleId}}'
+  /workspaces/{workspaceId}/models/{modelId}/modules/{moduleId}/views:
+    get:
+      summary: 'Workspace-scoped form: Retrieve IDs and names for views in a module'
+      parameters:
+      - name: includesubsidiaryviews
+        in: query
+        schema:
+          type: boolean
+        example: true
+      responses:
+        '200':
+          description: Response 200
+          content:
+            application/json:
+              example:
+                meta:
+                  paging:
+                    currentPageSize: 1
+                    offset: 0
+                    totalSize: 1
+                  schema: https://api.anaplan.com/2/0/objects/view
+                status:
+                  code: 200
+                  message: Success
+                views:
+                - code: ''
+                  id: '102000000000'
+                  name: default
+                  moduleId: '102000000000'
+                - code: ''
+                  id: '203000000000'
+                  name: SavedView
+                  moduleId: '102000000000'
+              schema:
+                type: object
+                properties:
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                  status:
+                    $ref: '#/components/schemas/Status'
+                  views:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/View'
+        '429':
+          description: more detail in path description
+      tags:
+      - Model Metadata
+      - Module & Saved View Metadata
+      description: "Alternate URL form — response is equivalent to `/models/{modelId}/modules/{moduleId}/views`.\n\n## Retrieve\
+        \ IDs and names for views in a module\n\n`/models/{modelId}/modules/{moduleId}/views`\n\nUse this call to retrieve\
+        \ all view IDs and names for a specified module. This call also returns the default view for the module. If the user\
+        \ adds the query parameter includesubsidiaryviews=true, unsaved subsidiary views will also be included in the results.\n\
+        \n**Notes**:\n\n*   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html)\n\
+        *   For the default view, the `{viewId}` is the same as the `{moduleId}`\n*   Use of this call may be rate limited.\
+        \ If you call too frequently, you may receive a `429` response\n*   For unsaved subsidiary views, the `{viewId}` and\
+        \ `{viewName}` are the same as the `{lineItemId}` and `{lineItemName}` that the subsidiary view is created from\n\
+        \    \n\n### Request\n\n```\ncurl -X GET 'https://api.anaplan.com/2/0/models/{modelId}/modules/{moduleId}/views' \\\
+        \n-H 'Authorization: AnaplanAuthToken {anaplan_auth_token}' \\\n-H 'Accept: application/json'\n```\n\n### Request\
+        \ headers\n\n| **Header** | **Details** |\n| --- | --- |\n| `Authorization: AnaplanAuthToken {anaplan_auth_token}`\
+        \ | <br><br>*   Required<br>*   Description: the Anaplan authentication token<br><br> |\n| `Accept: application/json`\
+        \ | <br><br>*   Required<br>*   Description: This indicates the preferred response is `application/json` format.<br><br>\
+        \ |\n\n### Request parameters\n\n| **Parameter** | **Details** |\n| --- | --- |\n| `{modelId}` | <br><br>*   Required<br>*\
+        \   Type: String<br>*   Description: the ID for the model<br>*   Example: `75A40874E6B64FA3AE074327899685`<br><br>\
+        \ |\n| `{moduleId}` | <br><br>*   Required<br>*   Type: number<br>*   Description: the ID for the module<br>*   Example:\
+        \ `102000000028`<br><br> |\n| `{includesubsidiaryviews}` | <br><br>*   Optional (default false)<br>*   Type: String<br>*\
+        \   Description: Whether the response should include unsaved subsidiary views. The field is interpreted as false if\
+        \ anything other than `true` is specified<br>*   Example: `?includesubsidiaryviews=true`<br><br> |\n\n### Response\
+        \ header\n\n`Content-Type: application/json`"
+    parameters:
+    - name: workspaceId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9a-f]{32}$
+      example: 8a868cda7c8b28f5017c9a4b2d8341cd
+      description: Workspace identifier (32-character lowercase hex string).
+    - name: modelId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9A-F]{32}$
+      example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
+    - name: moduleId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: '{{moduleId}}'
+  /workspaces/{workspaceId}/models/{modelId}/lineItems:
+    get:
+      summary: 'Workspace-scoped form: Retrieve all line items in a model'
+      parameters: []
+      responses:
+        '200':
+          description: Response 200
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              example: application/json
+          content:
+            application/json:
+              example:
+                meta:
+                  schema: https://api.anaplan.com/2/0/objects/lineItem
+                status:
+                  code: 200
+                  message: Success
+                items:
+                - moduleId: '102000000000'
+                  moduleName: Sales Entry
+                  id: '206000000000'
+                  name: Quantity Sold
+                - moduleId: '102000000000'
+                  moduleName: Sales Entry
+                  id: '206000000001'
+                  name: Price
+                - moduleId: '102000000000'
+                  moduleName: Sales Entry
+                  id: '206000000002'
+                  name: Revenue
+                - moduleId: '102000000001'
+                  moduleName: Profit
+                  id: '208000000000'
+                  name: Commission
+                - moduleId: '102000000001'
+                  moduleName: Profit
+                  id: '208000000001'
+                  name: Cost
+                - moduleId: '102000000001'
+                  moduleName: Profit
+                  id: '208000000002'
+                  name: Profit
+              schema:
+                type: object
+                properties:
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                  status:
+                    $ref: '#/components/schemas/Status'
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/LineItem'
+        '429':
+          description: more detail in path description
+      tags:
+      - Model Metadata
+      - Line Item Metadata
+      description: "Alternate URL form — response is equivalent to `/models/{modelId}/lineItems`.\n\n## Retrieve all line\
+        \ items in a model\n\n`/models/{modelId}/lineItems`\n\nUse this call to retrieve identifiers of all line items in\
+        \ a model.\n\n**Notes**:\n\n*   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html).\n\
+        *   The returned line items are restricted just to those in modules to which the model role of the user has Read access.\n\
+        *   The response returns Items within a [flat list](https://help.anaplan.com/anapedia/Content/Modeling/Dimensions/Lists.html)\
+        \ (no hierarchy).\n*   This returns all the line items in the model. For line items in a specific module see [Retrieve\
+        \ Line Items For a Module](https://anaplanbulkapi20.docs.apiary.io/#RetrieveAllLineItemsModule).\n*   Use of this\
+        \ call may be rate limited. If you call too frequently, you may receive a `429` response\n    \n\n### Request\n\n\
+        ```\ncurl -X GET 'https://api.anaplan.com/2/0/models/{modelId}/lineItems' \\\n-H 'Authorization: AnaplanAuthToken\
+        \ {anaplan_auth_token}' \\\n-H 'Accept: application/json'\n```\n\n### Request headers\n\n| **Header** | **Details**\
+        \ |\n| --- | --- |\n| `Authorization: AnaplanAuthToken {anaplan_auth_token}` | <br><br>*   Required<br>*   Description:\
+        \ the Anaplan authentication token<br><br> |\n| `Accept: application/json` | <br><br>*   Optional<br>*   Description:\
+        \ This indicates the preferred response is either `application/json` format. Note that this call only outputs in `application/json`\
+        \ format.<br><br> |\n\n### Request parameters\n\n| **Parameter** | **Details** |\n| --- | --- |\n| `{modelId}` | <br><br>*\
+        \   Required<br>*   Type: String<br>*   Description: the ID for the model<br>*   Example: `75A40874E6B64FA3AE0743278996850F`<br><br>\
+        \ |"
+    parameters:
+    - name: workspaceId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9a-f]{32}$
+      example: 8a868cda7c8b28f5017c9a4b2d8341cd
+      description: Workspace identifier (32-character lowercase hex string).
+    - name: modelId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9A-F]{32}$
+      example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
+  /workspaces/{workspaceId}/models/{modelId}/lineItems/{lineItemId}/dimensions:
+    get:
+      summary: 'Workspace-scoped form: Retrieve dimensions IDs for a line item'
+      parameters: []
+      responses:
+        '200':
+          description: Dimensions that define the line item
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                  status:
+                    $ref: '#/components/schemas/Status'
+                  dimensions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Dimension'
+      tags:
+      - Model Metadata
+      - Line Item Metadata
+      description: "Alternate URL form — response is equivalent to `/models/{modelId}/lineItems/{lineItemId}/dimensions`.\n\
+        \n## Retrieve dimensions IDs for a line item\n\n`/models/{modelId}/lineItems/{lineItemId}/dimensions`\n\nUse this\
+        \ call to retrieve the IDs of dimensions that define a line item.\n\nFor reference, see [Retrieve dimension items\
+        \ for a line item](https://anaplanbulkapi20.docs.apiary.io/#RetrieveDimensionsLineItem).\n\nNotes:\n\n*   To retrieve\
+        \ the IDs for the dimensions, use a `GET` request with this URL: `https://api.anaplan.com/2/0/models/{modelId}/lineItems/{lineItemId}/dimensions`\
+        \ where `{lineItemId}` is a placeholder for the retrieved line item ID.\n*   This returns a list of all the dimensions\
+        \ that apply to that line item.\n    \n\n## Response\n\n```\n{\n    \"meta\": {\n        \"schema\": \"https://api.anaplan.com/2/0/objects/dimension\"\
+        \n    },\n    \"status\": {\n        \"code\": 200,\n        \"message\": \"Success\"\n    },\n    \"dimensions\"\
+        : [\n        {\n            \"id\": \"20000000003\",\n            \"name\": \"Time\"\n        },\n        {\n    \
+        \        \"id\": \"20000000020\",\n            \"name\": \"Versions\"\n        },\n        {\n            \"id\":\
+        \ \"101000000001\",\n            \"name\": \"Products\"\n        },\n        {\n            \"id\": \"101000000002\"\
+        ,\n            \"name\": \"Regions\"\n        }\n    ]\n}\n\n```"
+    parameters:
+    - name: workspaceId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9a-f]{32}$
+      example: 8a868cda7c8b28f5017c9a4b2d8341cd
+      description: Workspace identifier (32-character lowercase hex string).
+    - name: modelId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9A-F]{32}$
+      example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
+    - name: lineItemId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: '{{lineItemId}}'
+  /workspaces/{workspaceId}/models/{modelId}/lineItems/{lineItemId}/dimensions/{dimensionId}/items:
+    get:
+      summary: 'Workspace-scoped form: Retrieve dimension items for a line item'
+      parameters: []
+      responses:
+        '200':
+          description: Response 200
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              example: application/json
+          content:
+            application/json:
+              example:
+                meta:
+                  schema: https://api.anaplan.com/2/0/objects/dimension
+                status:
+                  code: 200
+                  message: Success
+                items:
+                - id: '220000000001'
+                  name: England
+                - id: '220000000002'
+                  name: Wales
+              schema:
+                type: object
+                properties:
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                  status:
+                    $ref: '#/components/schemas/Status'
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Dimension'
+      tags:
+      - Model Metadata
+      - Line Item Metadata
+      description: "Alternate URL form — response is equivalent to `/models/{modelId}/lineItems/{lineItemId}/dimensions/{dimensionId}/items`.\n\
+        \n## Retrieve dimension items for a line item\n\n`/models/{modelId}/lineItems/{lineItemId}/dimensions/{dimensionId}/items`\
+        \  \n\nUse this call to retrieve IDs, codes, and names for dimension items that apply for the specified line item.\n\
+        \n**Notes**:\n\n*   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html).\n\
+        *   This call works with any dimension type.\n*   Your requesting model role must allow read access to the module\
+        \ the line item belongs to. Otherwise, this call returns a `404 Not Found` HTTP status.\n*   The items in the response\
+        \ are ordered as listed in the Anaplan model.\n*   The response returns items within a [flat list](https://help.anaplan.com/anapedia/Content/Modeling/Dimensions/Lists.html)\
+        \ (no hierarchy).\n*   This returns dimension items that apply to a line item. For the view-level call, see [Retrieve\
+        \ selected items in a dimension](https://anaplanbulkapi20.docs.apiary.io/#RetrieveSelectedItemsDimension) and for\
+        \ the model-level call, see [Retrieve all items in a dimension](https://anaplanbulkapi20.docs.apiary.io/#RetrieveItemsDimension).\n\
+        *   This call only supports the retrieval of dimension items where the dimension contains a maximum of 1,000,000 items.\
+        \ If the specified dimension contains more than 1,000,000 dimension items, then the call returns a 400 Bad Request\
+        \ HTTP status, instead of a subset of the dimension items.\n*   Providing a non-existent Line Item ID or Dimension\
+        \ ID returns a 404 Not Found HTTP status.\n*   If the request provides an invalid line item ID or dimension ID this\
+        \ call returns a `400 Bad Request` HTTP status.\n*   In the future, use of this call may be rate limited.\n    \n\n\
+        ### Request\n\n```\ncurl -X GET 'https://api.anaplan.com/2/0/models/{modelId}/lineItems/{lineItemId}/dimensions/{dimensionId}/items'\
+        \ \\\n-H 'Authorization: AnaplanAuthToken {anaplan_auth_token}' \\\n-H 'Accept: application/json'\n```\n\n### Request\
+        \ headers\n\n| **Header** | **Details** |\n| --- | --- |\n| `Authorization: AnaplanAuthToken {anaplan_auth_token}`\
+        \ | <br><br>*   Required<br>*   Description: the Anaplan authentication token<br><br> |\n| `Accept: application/json`\
+        \ | <br><br>*   Optional<br>*   Description: This indicates the preferred response is either `application/json` format.\
+        \ Note that this call only outputs in `application/json` format.<br><br> |\n\n### Request parameters\n\n| **Parameter**\
+        \ | **Details** |\n| --- | --- |\n| `{modelId}` | <br><br>*   Required<br>*   Type: `String`<br>*   Description: the\
+        \ ID for the model<br>*   Example: `75A40874E6B64FA3AE0743278996850F`<br><br> |\n| `{lineItemId}` | <br><br>*   Required<br>*\
+        \   Type: `Number`<br>*   Description: the line item ID<br>*   Example: `208000000000`<br><br> |\n| `{dimensionId}`\
+        \ | <br><br>*   Required<br>*   Type: `Number`<br>*   Description: the dimension ID<br>*   Example: `101000000028`<br><br>\
+        \ |"
+    parameters:
+    - name: workspaceId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9a-f]{32}$
+      example: 8a868cda7c8b28f5017c9a4b2d8341cd
+      description: Workspace identifier (32-character lowercase hex string).
+    - name: modelId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9A-F]{32}$
+      example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
+    - name: lineItemId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: '{{lineItemId}}'
+    - name: dimensionId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: '{{dimensionId}}'
+  /workspaces/{workspaceId}/models/{modelId}/views/{viewId}:
+    get:
+      summary: 'Workspace-scoped form: Retrieve metadata for dimensions on a view'
+      parameters: []
+      responses:
+        '200':
+          description: Response 200
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              example: application/json
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                  status:
+                    $ref: '#/components/schemas/Status'
+                  viewId:
+                    type: string
+                  viewName:
+                    type: string
+                  rows:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Dimension'
+                  columns:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Dimension'
+                  pages:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Dimension'
+        '429':
+          description: more detail in path description
+      tags:
+      - Model Metadata
+      - Module & Saved View Metadata
+      description: "Alternate URL form — response is equivalent to `/models/{modelId}/views/{viewId}`.\n\n## Retrieve metadata\
+        \ for dimensions on a view\n\n`/models/{modelId}/views/{viewId}`\n\nUse this call to retrieve the name, IDs, and lists\
+        \ of names for the dimensions (columns, pages, rows) on a specified view.\n\n**Notes**:\n\n*   To use this call, you\
+        \ must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html)\n\
+        *   If a view has no dimensions on an axis, the call omits the axis field (for example, no `“rows”` field at all instead\
+        \ of `“rows”: []`)\n*   If a view is the default view, its `name` is set to be the same as the module name\n*   Use\
+        \ of this call may be rate limited. If you call too frequently, you may receive a `429` response\n*   The `viewId`\
+        \ in this request can also be replaced by any valid `lineItemId`. If the Line Item has a changed dimensionality (has\
+        \ a Subsidiary View), the response returns the metadata applicable to that line item. Otherwise, the response returns\
+        \ the default metadata\n    \n\nYou can use this API call to [map dimensions to cell data export headers](https://help.anaplan.com/43cd0223-edaa-4289-9833-eb9b73666aac-Map-dimensions-to-cell-data-export-headers)\
+        \ or [transform grid CSV format to tabular single column format](https://help.anaplan.com/c8a665b9-6b23-4254-ac68-816657a6e878-Retrieve-the-view-metadata-and-grid-view-data).\n\
+        \n### Request\n\n```\ncurl -X GET 'https://api.anaplan.com/2/0/models/{modelId}/views/{viewId}' \\\n-H 'Authorization:\
+        \ AnaplanAuthToken {anaplan_auth_token}'\\\n-H 'Accept: application/json'\n```\n\n### Request headers\n\n| **Header**\
+        \ | **Details** |\n| --- | --- |\n| `Authorization: AnaplanAuthToken {anaplan_auth_token}` | <br><br>*   Required<br>*\
+        \   Description: the Anaplan authentication token<br><br> |\n| `Accept: application/json` | <br><br>*   Required<br>*\
+        \   Description: This indicates the preferred response is `application/json` format.<br><br> |\n\n### Request parameters\n\
+        \n| **Parameter** | **Details** |\n| --- | --- |\n| `{modelId}` | <br><br>*   Required<br>*   Type: String<br>*  \
+        \ Description: the ID for the model<br>*   Example: `75A40874E6B64FA3AE074327899685`<br><br> |\n| `{viewId}` | <br><br>*\
+        \   Required<br>*   Type: Number<br>*   Description: the ID for the view<br>*   Example: `102000000000`<br><br> |\n\
+        \n### Response 200 Body\n\n```\n{\n  \"meta\": {\n    \"schema\": \"https://api.anaplan.com/2/0/objects/view\"\n \
+        \ },\n  \"status\": {\n    \"code\": 200,\n    \"message\": \"Success\"\n  },\n  \"viewName\": \"REV01 Price Book\"\
+        ,\n  \"viewId\" : \"102000000000\"\n  \"rows\": [\n    {\n      \"id\": \"101000000000\",\n      \"name\": \"Products\"\
+        \n    },\n    {\n      \"id\": \"101000000003\",\n      \"name\": \"Regions\"\n    }\n  ],\n  \"columns\": [\n   \
+        \ {\n      \"id\": \"101999999999\",\n      \"name\": \"Line items\"\n    }\n  ],\n  \"pages\": [\n    {\n      \"\
+        id\": \"101000000001\",\n      \"name\": \"Versions\"\n    }\n  ],\n}\n\n```"
+    parameters:
+    - name: workspaceId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9a-f]{32}$
+      example: 8a868cda7c8b28f5017c9a4b2d8341cd
+      description: Workspace identifier (32-character lowercase hex string).
+    - name: modelId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9A-F]{32}$
+      example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
+    - name: viewId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: '{{viewId}}'
+  /models/{modelId}/views:
+    get:
+      summary: 'Model-direct form: Retrieve IDs and names for all views in a model'
+      parameters:
+      - name: includesubsidiaryviews
+        in: query
+        schema:
+          type: string
+        example: 'true'
+        description: When set to "true", includes unsaved subsidiary views in the results. Any value other than "true" is
+          interpreted as false.
+      responses:
+        '200':
+          description: Response 200
+          content:
+            application/json:
+              example:
+                meta:
+                  paging:
+                    currentPageSize: 1
+                    offset: 0
+                    totalSize: 1
+                  schema: https://api.anaplan.com/2/0/objects/view
+                status:
+                  code: 200
+                  message: Success
+                views:
+                - code: ''
+                  id: '102000000000'
+                  name: StrategicPlanning
+                  moduleId: '102000000000'
+                - code: ''
+                  id: '207000000000'
+                  name: StrategicPlanning.UK Financial forecast
+                  moduleId: '102000000000'
+                - code: ''
+                  id: '207000000001'
+                  name: StrategicPlanning.EMEAforecastreport
+                  moduleId: '102000000000'
+                - code: ''
+                  id: '207000000002'
+                  name: StrategicPlanning.'accountSummary&overview/US$'
+                  moduleId: '102000000000'
+                - code: ''
+                  id: '237000000001'
+                  name: '''StrategicPlanning/2020''.''accountSummary&overview/US$'''
+                  moduleId: '102000000001'
+              schema:
+                type: object
+                properties:
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                  status:
+                    $ref: '#/components/schemas/Status'
+                  views:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/View'
+        '429':
+          description: more detail in path description
+      tags:
+      - Model Metadata
+      - Module & Saved View Metadata
+      description: "Alternate URL form — response is equivalent to `/workspaces/{workspaceId}/models/{modelId}/views`.\n\n\
+        ## Retrieve IDs and names for all views in a model\n\n`/models/{modelId}/views`\n\nUse this call to retrieve the ID\
+        \ and name of all views for a model. The results include default and saved views. If you add the query parameter `includesubsidiaryviews=true`,\
+        \ this includes unsaved subsidiary views in the results. This call also retrieves the ID of the module that the views\
+        \ belong to.\n\n**Notes**:\n\n*   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html)\n\
+        *   Single quotes enclose the module and view names that have special characters\n*   Use of this call may be rate\
+        \ limited. If you call too frequently, you may receive a `429` response\n    \n\n### Default views\n\nFor default\
+        \ views:\n\n*   The value of the {viewId} is identical to the value of the {moduleId}\n*   The value of the name is\
+        \ identical to the value of the module\n    \n\n### Saved views\n\nFor saved views:\n\n*   The `name` consists of\
+        \ the module name, a period, and the saved view name. For example, `REP01 Profit & Loss Report.P & L by Country`\n\
+        \    \n\nFor unsaved subsidiary views:\n\n*   The name consists of the module name and the line item name that the\
+        \ subsidiary view is created from\n*   These are separated by a period(.)\n    \n\n### Request\n\n```\ncurl -X GET\n\
+        'https://api.anaplan.com/2/0/models/{modelId}/views' \\\n-H 'Authorization: AnaplanAuthToken {anaplan_auth_token}'\
+        \ \\\n-H 'Accept: application/json'\n```\n\n### Request headers\n\n| **Header** | **Details** |\n| --- | --- |\n|\
+        \ `Authorization: AnaplanAuthToken {anaplan_auth_token}` | <br><br>*   Required<br>*   Description: the Anaplan authentication\
+        \ token<br><br> |\n| `Accept: application/json` | <br><br>*   Required<br>*   Description: This indicates the preferred\
+        \ response is `application/json` format.<br><br> |\n\n### Request parameters\n\n| **Parameter** | **Details** |\n\
+        | --- | --- |\n| `{modelId}` | <br><br>*   Required<br>*   Type: String<br>*   Description: the ID for the model<br>*\
+        \   Example: `75A40874E6B64FA3AE074327899685`<br><br> |\n\n### Query parameter\n\n| **Parameter** | **Details** |\n\
+        | --- | --- |\n| `{includesubsidiaryviews}` | <br><br>*   Optional (default false)<br>*   Type: String<br>*   Description:\
+        \ Whether the response should include unsaved subsidiary views. The field is interpreted as false if anything other\
+        \ than `true` is specified<br>*   Example: `?includesubsidiaryviews=true`<br><br> |\n\n### Response header\n\n`Content-Type:\
+        \ application/json`"
+    parameters:
+    - name: modelId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9A-F]{32}$
+      example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
+  /models/{modelId}/dimensions/{dimensionId}/items:
+    get:
+      summary: 'Model-direct form: Retrieve all items in a dimension'
+      parameters: []
+      responses:
+        '200':
+          description: Response 200
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              example: application/json
+          content:
+            application/json:
+              example:
+                meta:
+                  schema: https://api.anaplan.com/2/0/objects/dimension
+                status:
+                  code: 200
+                  message: Success
+                items:
+                - code: N
+                  id: '200000000001'
+                  name: North
+                - code: E
+                  id: '200000000002'
+                  name: East
+                - code: S
+                  id: '200000000003'
+                  name: South
+                - code: W
+                  id: '200000000004'
+                  name: West
+                - id: '200000000000'
+                  name: Total Company
+              schema:
+                type: object
+                properties:
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                  status:
+                    $ref: '#/components/schemas/Status'
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Dimension'
+        '400':
+          description: more detail in path description
+        '429':
+          description: more detail in path description
+      tags:
+      - Model Metadata
+      - List Metadata
+      description: "Alternate URL form — response is equivalent to `/workspaces/{workspaceId}/models/{modelId}/dimensions/{dimensionId}/items`.\n\
+        \n## Retrieve all items in a dimension\n\n`/models/{modelGuid}/dimensions/{dimensionId}/items`\n\nUse this call to\
+        \ retrieve the IDs, codes, and names for items in a specified dimension. The dimension must be a list, a list subset,\
+        \ a line item subset, or the Users dimension.\n\nCalls at model-level do not support the Time dimension. The calls\
+        \ return a `400` response. To avoid this, use the view dimension instead.\n\n**Notes**:\n\n*   To use this call, you\
+        \ must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html).\n\
+        *   This call is on the model-level. It returns all dimension items as it does not have view-level hiding, filtering,\
+        \ or [Selective Access](https://help.anaplan.com/anapedia/Content/Modeling/Users/Selective_Access.html). For the view-level\
+        \ endpoint, see [Retrieve selected items in a dimension](https://anaplanbulkapi20.docs.apiary.io/#RetrieveSelectedItemsDimension).\n\
+        *   If codes have not been set for an item, then the response excludes the `code` field.\n*   This call only supports\
+        \ the retrieval of dimensions and items from a dimension that contains a maximum of 1,000,000 items.  \n    The call\
+        \ returns a `400` response for any more than that number of items.\n*   Use of this call may be rate limited. If you\
+        \ call too frequently, you may receive a `429` response.\n    \n\n### Request\n\n```\ncurl -X GET\n'https://api.anaplan.com/2/0/models/{modelGuid}/dimensions/{dimensionId}/items'\\\
+        \n-H 'Authorization: AnaplanAuthToken {anaplan_auth_token}'\\\n-H 'Accept: application/json'\n```\n\n### Request headers\n\
+        \n| **Header** | **Details** |\n| --- | --- |\n| `Authorization: AnaplanAuthToken {anaplan_auth_token}` | <br><br>*\
+        \   Required<br>*   Description: the Anaplan authentication token<br><br> |\n| `Accept: application/json` | <br><br>*\
+        \   Required<br>*   Description: This indicates the preferred response is `application/json` format.<br><br> |\n\n\
+        ### Request parameters\n\n| **Parameter** | **Details** |\n| --- | --- |\n| `{modelId}` | <br><br>*   Required<br>*\
+        \   Type: String<br>*   Description: the ID for the model<br>*   Example: `75A40874E6B64FA3AE074327899685`<br><br>\
+        \ |\n| `{dimensionId}` | <br><br>*   Required<br>*   Type: Number<br>*   Description: the ID for the dimension<br>*\
+        \   Example: `101000000028`<br><br> |"
+    parameters:
+    - name: modelId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9A-F]{32}$
+      example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
+    - name: dimensionId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: '{{dimensionId}}'
+  /models/{modelId}/lists:
+    get:
+      summary: 'Model-direct form: Retrieve Lists'
+      parameters: []
+      responses:
+        '200':
+          description: Response 200
+          content:
+            application/json:
+              example:
+                meta:
+                  paging:
+                    currentPageSize: 5
+                    offset: 0
+                    totalSize: 5
+                  schema: https://api.anaplan.com/2/0/models/75A40874E6B64FA3AE0743278996850F/objects/list
+                status:
+                  code: 200
+                  message: Success
+                lists:
+                - id: '101000000000'
+                  name: Organization
+                - id: '101000000001'
+                  name: opportunities
+                - id: '101000000002'
+                  name: sales rep
+                - id: '101000000003'
+                  name: Bakery
+                - id: '101000000004'
+                  name: List2
+              schema:
+                type: object
+                properties:
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                  status:
+                    $ref: '#/components/schemas/Status'
+                  lists:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/List'
+      tags:
+      - Model Metadata
+      - List Metadata
+      description: 'Alternate URL form — response is equivalent to `/workspaces/{workspaceId}/models/{modelId}/lists`.
+
+
+        ## Retrieve lists
+
+
+        `/workspaces/{workspaceId}/models/{modelId}/lists`
+
+
+        Use this call to retrieve lists for a specified workspace and model.
+
+
+        ### Request
+
+
+        ```
+
+        curl -X GET ''https://api.anaplan.com/2/0/workspaces/{workspaceId}/models/{modelId}/lists'' \
+
+        -H ''Accept: application/json'' \
+
+        -H ''Authorization: AnaplanAuthToken {anaplan_auth_token}''
+
+        ```
+
+
+        ### Request headers
+
+
+        | **Header** | **Details** |
+
+        | --- | --- |
+
+        | `Authorization: AnaplanAuthToken {anaplan_auth_token}` | <br><br>*   Required<br>*   Description: the Anaplan authentication
+        token<br><br> |
+
+        | `Accept: application/json` | <br><br>*   Required<br>*   Description: This indicates the preferred response is `application/json`
+        format.<br><br> |
+
+
+        ### Request parameters
+
+
+        | **Parameter** | **Details** |
+
+        | --- | --- |
+
+        | `{workspaceId}` | <br><br>*   Required<br>*   Type: String<br>*   Description: The workspace ID<br>*   Example:
+        `8a8196b15b7dbae6015b8694411d13fe`<br><br> |
+
+        | `{modelId}` | <br><br>*   Required<br>*   Type: String<br>*   Description: the ID for the model<br>*   Example:
+        `75A40874E6B64FA3AE074327899685`<br><br> |'
+    parameters:
+    - name: modelId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9A-F]{32}$
+      example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
+  /models/{modelId}/lists/{listId}:
+    get:
+      summary: 'Model-direct form: Retrieve list metadata'
+      parameters: []
+      responses:
+        '200':
+          description: Response 200
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              example: application/json
+          content:
+            application/json:
+              example:
+                meta:
+                  schema: https://api.anaplan.com/2/0/models/102B/objects/list
+                status:
+                  code: 200
+                  message: Success
+                metadata:
+                  id: '101000000001'
+                  name: Sales Reps
+                  properties:
+                  - name: Salesforce
+                    format: TEXT
+                    notes: ''
+                    referencedBy: ''
+                  - name: Mail
+                    format: TEXT
+                    notes: ''
+                    referencedBy: ''
+                  hasSelectiveAccess: false
+                  parent:
+                    id: '101000000000'
+                    name: Organization
+                  managedBy: ''
+                  numberedList: false
+                  useTopLevelAsPageDefault: false
+                  itemCount: 1
+                  workflowEnabled: false
+                  productionData: false
+              schema:
+                type: object
+                properties:
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                  status:
+                    $ref: '#/components/schemas/Status'
+                  metadata:
+                    $ref: '#/components/schemas/List'
+        '429':
+          description: more detail in path description
+      tags:
+      - Model Metadata
+      - List Metadata
+      description: "Alternate URL form — response is equivalent to `/workspaces/{workspaceId}/models/{modelId}/lists/{listId}`.\n\
+        \n## Retrieve list metadata\n\n`/workspaces/{workspaceId}/models/{modelId}/lists/{listId}`\n\nUse this call to retrieve\
+        \ the following metadata for a specified list:\n\n| **Metadata** | **Description** |\n| --- | --- |\n| `category`\
+        \ | The category to which the list is assigned. |\n| `dataTags` | The data tags associated with the list. |\n| `hasSelectiveAccess`\
+        \ | If the value is true, this list uses [selective access](https://help.anaplan.com/anapedia/Content/Modeling/Users/Selective_Access.html).\
+        \ |\n| `id` | The list ID.  This corresponds to the `listId` parameter. |\n| `itemCount` | The number of list items\
+        \ present in the list. |\n| `managedBy` | Not currently used. |\n| `name` | The list name. |\n| `nextitemIndex` |\
+        \ Contains the index of the next new item in the list. Used only by numbered lists. |\n| `numberedList` | A true value\
+        \ indicates this is a numbered list. |\n| `parent` | <br><br>The parent hierarchy, which includes this information\
+        \ for the parent list:  <br><br>*   `id`<br>*   `name`<br><br> |\n| `permittedItems` | Indicates how many more items\
+        \ you can add to the existing list. This value changes when the number of items in the list change. |\n| `productionData`\
+        \ | A true value indicates this is a production list in [Application Lifecycle Management (ALM)](https://help.anaplan.com/anapedia/Content/ALM/Application_Lifecycle_Management.htm).\
+        \ |\n| `properties` | <br><br>The list properties, which include:  <br><br>*   `dataTags`<br>*   `format`<br>*   `formula`<br>*\
+        \   `notes`<br>*   `referencedBy`<br><br> |\n| `subsets` | <br><br>A list of subsets associated with the list hierarchy,\
+        \ which includes the following information for the parent list:  <br><br>*   `id`<br>*   `name`<br><br> |\n| `topLevelItem`\
+        \ | If present, indicates the top level item in a hierarchy. |\n| `useTopLevelAsPageDefault` | A true value indicates\
+        \ this list is the default item in a page selector. |\n| `workflowEnabled` | A true value indicates this list is enabled\
+        \ for [Workflow](https://help.anaplan.com/anapedia/Content/Modeling/Manage_Models/Workflow.html). |\n\nIf any of the\
+        \ metadata values are not set for a list (for example, no parent or no top level item), then the result omits the\
+        \ metadata entry.\n\n**Notes**:\n\n*   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html).\n\
+        *   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response.\n    \n\n\
+        ### Request\n\n```\ncurl -X GET 'https://api.anaplan.com/2/0/workspaces/{workspaceId}/models/{modelId}/lists/{listId}'\
+        \ \\\n-H 'Accept: application/json' \\\n-H 'Authorization: AnaplanAuthToken {anaplan_auth_token}' \\\n-H 'Content-Type:\
+        \ application/json'\n```\n\n### Request headers\n\n| **Header** | **Details** |\n| --- | --- |\n| `Authorization:\
+        \ AnaplanAuthToken {anaplan_auth_token}` | <br><br>*   Required<br>*   Description: the Anaplan authentication token<br><br>\
+        \ |\n| `Accept: application/json` | <br><br>*   Required<br>*   Description: This indicates the preferred response\
+        \ is `application/json` format.<br><br> |\n| `Content-Type: application/json` | <br><br>*   Optional<br>*   Description:\
+        \ The endpoint uses a content type of `application/json`.<br><br> |\n\n### Request parameters\n\n| **Parameter** |\
+        \ **Details** |\n| --- | --- |\n| `{workspaceId}` | <br><br>*   Required<br>*   Type: String<br>*   Description: The\
+        \ workspace ID<br>*   Example: `8a8196b15b7dbae6015b8694411d13fe`<br><br> |\n| `{modelId}` | <br><br>*   Required<br>*\
+        \   Type: String<br>*   Description: the ID for the model<br>*   Example: `75A40874E6B64FA3AE074327899685`<br><br>\
+        \ |\n| `{listId}` | <br><br>*   Required<br>*   Type: string<br>*   Description: The list ID.<br>*   Example: `101000000001`<br><br>\
+        \ |"
+    parameters:
+    - name: modelId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9A-F]{32}$
+      example: 4261ECE4389B45E18915B5EB72F7510B
+      description: Model identifier (32-character uppercase hex string).
+    - name: listId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: '{{listId}}'
 components:
   securitySchemes:
     AnaplanAuthToken:
