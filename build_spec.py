@@ -69,6 +69,25 @@ _SERVERS_API = [
     {"url": "https://au1a.api2.anaplan.com", "description": "AU1"},
 ]
 
+# Audit API server URLs are ambiguous: Apiary lists audit.anaplan.com/audit/api/1 as
+# production, while CONTEXT.md allowlist table shows api.anaplan.com as the Audit pattern.
+# Both are included; resolve correct base URL during live testing.
+_SERVERS_AUDIT = [
+    {"url": "https://audit.anaplan.com/audit/api/1", "description": "Production — Apiary source (verify)"},
+    {"url": "https://api.anaplan.com", "description": "US1, US2, US5, US7, EU1, EU2, EU4, AP1 — allowlist source (verify)"},
+    {"url": "https://us9.api.anaplan.com", "description": "US9"},
+    {"url": "https://eu3.api.anaplan.com", "description": "EU3"},
+    {"url": "https://eu5.api.anaplan.com", "description": "EU5"},
+    {"url": "https://gb1.api.anaplan.com", "description": "GB1"},
+    {"url": "https://ca1a.api.anaplan.com", "description": "CA1"},
+    {"url": "https://sg1.api.anaplan.com", "description": "SG1"},
+    {"url": "https://ae1.api.anaplan.com", "description": "AE1"},
+    {"url": "https://in1.api.anaplan.com", "description": "IN1"},
+    {"url": "https://id1.api.anaplan.com", "description": "ID1"},
+    {"url": "https://me1.api.anaplan.com", "description": "ME1"},
+    {"url": "https://au1a.api2.anaplan.com", "description": "AU1"},
+]
+
 _API_FAMILY: dict[str, list[dict]] = {
     "authentication": _SERVERS_AUTH,
     "oauth": _SERVERS_APP,
@@ -76,7 +95,7 @@ _API_FAMILY: dict[str, list[dict]] = {
     "cloudworks": _SERVERS_API,
     "scim": _SERVERS_API,
     "alm": _SERVERS_API,
-    "audit": _SERVERS_API,
+    "audit": _SERVERS_AUDIT,
     "financial-consolidation": _SERVERS_API,
     "exception": _SERVERS_API,
 }

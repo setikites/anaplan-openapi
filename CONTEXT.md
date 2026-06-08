@@ -77,12 +77,15 @@ Anaplan has 9 publicly documented REST APIs, each with different characteristics
 - **Key Points**: Unknown pending investigation
 
 #### 7. Audit API
-- **Purpose**: Access audit logs and compliance data
-- **Auth**: Likely bearer token (needs confirmation)
-- **Source of Truth**: Apiary docs + live testing
+- **Purpose**: Access audit logs and compliance data (SIEM integration, compliance tracking)
+- **Auth**: Likely bearer token (needs confirmation via live testing)
+- **Source of Truth**: Apiary (`auditservice`) + live testing
 - **Testing**: Medium (no Postman, moderate usage)
-- **Status**: Not yet started
-- **Key Points**: Unknown pending investigation
+- **Status**: Bootstrap spec generated (`audit/audit-openapi.json`)
+- **Key Points**:
+  - Apiary blueprint is not publicly readable; spec has empty paths — populate via live testing
+  - Apiary lists production URL as `https://audit.anaplan.com/audit/api/1/` (unique host, not `api.anaplan.com`)
+  - Both `audit.anaplan.com` and `api.anaplan.com` servers listed in spec; resolve correct base URL during live testing
 
 ### Lower Priority (Rarely Used or Specialty)
 
@@ -176,7 +179,7 @@ The Apiary identifier is the subdomain from the API's documentation URL (e.g. `h
 | CloudWorks | *(verify)* |
 | SCIM | `scimapi` |
 | ALM | *(verify)* |
-| Audit | *(verify)* |
+| Audit | `auditservice` |
 | Financial Consolidation | *(verify)* |
 | Exception Users | *(verify)* |
 
