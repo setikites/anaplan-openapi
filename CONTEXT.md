@@ -102,13 +102,15 @@ Anaplan has 9 publicly documented REST APIs, each with different characteristics
 
 #### 9. Exception Users API
 - **Purpose**: Manage exception users (users who can bypass SSO enforcement)
-- **Auth**: Likely bearer token or Anaplan-specific (needs confirmation)
+- **Auth**: `AnaplanAuthToken` (Apiary confirmed; Bearer not documented)
 - **Source of Truth**: Apiary docs + sample responses in `exception/README.md`
 - **Testing**: Low (lower priority; limited or no live testing expected)
-- **Status**: Partially started (sample responses documented)
+- **Status**: Spec complete (`exception/exception-openapi.json`); auth scheme and error response body shape not yet confirmed by live testing
 - **Key Points**:
-  - Lower priority; lower testing coverage
-  - Some sample responses already extracted in exception/README.md
+  - Requires Tenant Security Admin role
+  - Two endpoints: `PATCH` assign/unassign a user, `POST` search (by workspace or by user)
+  - POST search uses `oneOf` request body — `workspaceGuid` or `userGuid` (mutually exclusive)
+  - Error response body shape modeled from Apiary descriptions; confirm field names via live testing (issue #51)
 
 ## Key Patterns and Variations
 
@@ -178,7 +180,7 @@ The Apiary identifier is the subdomain from the API's documentation URL (e.g. `h
 | Integration | `anaplan` *(verify)* |
 | CloudWorks | *(verify)* |
 | SCIM | `scimapi` |
-| ALM | *(verify)* |
+| ALM | `almapi` |
 | Audit | `auditservice` |
 | Financial Consolidation | *(verify)* |
 | Exception Users | *(verify)* |
@@ -237,7 +239,7 @@ Legacy regions (us1–us7, eu1, eu2, eu4, ap1) share the older non-prefixed `api
 | ALM | ✓ | — | — | Medium | Medium | bootstrap only |
 | Audit | ✓ | — | — | Medium | Medium | bootstrap only |
 | Financial Consolidation | ✓ | — | — | Low | Low | bootstrap only |
-| Exception Users | ✓ | — | ✓ | Low | Low | bootstrap only |
+| Exception Users | ✓ | — | ✓ | Low | Low | hand-maintained (do not rebuild) |
 
 ## Project Structure
 

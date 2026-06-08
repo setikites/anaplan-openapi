@@ -1,0 +1,339 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Anaplan Exception Users API",
+    "version": "1.0.0",
+    "description": "Manage exception users — users who can bypass SSO enforcement — in Anaplan workspaces. Requires the Tenant Security Admin role. Authenticate with an AnaplanAuthToken obtained via the Authentication API."
+  },
+  "servers": [
+    {
+      "url": "https://api.anaplan.com",
+      "description": "US1 (Data Center - US East), US2 (Data Center - US West), US5 (Cloud - US East), US7 (Cloud - US), EU1 (Data Center - Netherlands), EU2 (Data Center - Germany), EU4 (Cloud - Europe), AP1 (Cloud - Japan)"
+    },
+    {
+      "url": "https://us9.api.anaplan.com",
+      "description": "US9 (Cloud - US)"
+    },
+    {
+      "url": "https://eu3.api.anaplan.com",
+      "description": "EU3 (Cloud - Europe)"
+    },
+    {
+      "url": "https://eu5.api.anaplan.com",
+      "description": "EU5 (Cloud - Europe)"
+    },
+    {
+      "url": "https://gb1.api.anaplan.com",
+      "description": "GB1 (Cloud - UK)"
+    },
+    {
+      "url": "https://ca1a.api.anaplan.com",
+      "description": "CA1 (Cloud - Canada)"
+    },
+    {
+      "url": "https://sg1.api.anaplan.com",
+      "description": "SG1 (Cloud - Singapore)"
+    },
+    {
+      "url": "https://ae1.api.anaplan.com",
+      "description": "AE1 (Cloud - UAE)"
+    },
+    {
+      "url": "https://me1.api.anaplan.com",
+      "description": "ME1 (Cloud - Saudi Arabia)"
+    },
+    {
+      "url": "https://in1.api.anaplan.com",
+      "description": "IN1 (Cloud - India)"
+    },
+    {
+      "url": "https://id1.api.anaplan.com",
+      "description": "ID1 (Cloud - Indonesia)"
+    },
+    {
+      "url": "https://au1a.api2.anaplan.com",
+      "description": "AU1 (Cloud - Australia)"
+    }
+  ],
+  "security": [
+    {"AnaplanAuthToken": []}
+  ],
+  "paths": {
+    "/admin/1/0/permissions/exception-users/users/{userGuid}": {
+      "patch": {
+        "summary": "Assign or unassign an exception user",
+        "description": "Updates the exception-user status for a user in a specific workspace. Use `op: assign` to grant exception-user access or `op: unassign` to revoke it. A caller cannot modify their own exception-user status.",
+        "operationId": "patchExceptionUser",
+        "parameters": [
+          {
+            "name": "userGuid",
+            "in": "path",
+            "required": true,
+            "description": "GUID of the user whose exception-user status is being changed.",
+            "schema": {"type": "string"}
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/ExceptionUserPatchRequest"},
+              "examples": {
+                "assign": {
+                  "summary": "Assign exception-user access",
+                  "value": {"op": "assign", "workspaceGuid": "8a81b09b5d5c10fb015d5c18a5050b99"}
+                },
+                "unassign": {
+                  "summary": "Revoke exception-user access",
+                  "value": {"op": "unassign", "workspaceGuid": "8a81b09b5d5c10fb015d5c18a5050b99"}
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Request processed successfully. No response body."
+          },
+          "400": {
+            "description": "Bad request. Possible causes: missing or invalid `op` value; missing or invalid `workspaceGuid`; workspace is not SSO-enabled; requested user not found in workspace.",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/ErrorResponse"}
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing token.",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/ErrorResponse"}
+              }
+            }
+          },
+          "403": {
+            "description": "Caller lacks Tenant Security Admin role, or is attempting to change their own exception-user status.",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/ErrorResponse"}
+              }
+            }
+          },
+          "404": {
+            "description": "User or workspace not found.",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/ErrorResponse"}
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/ErrorResponse"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/1/0/permissions/exception-users/search": {
+      "post": {
+        "summary": "Search exception users",
+        "description": "Search by workspace to list all exception users in that workspace (including visitors), or search by user to list all workspaces where that user has exception-user access (visitors' workspaces are excluded from the by-user results). Exactly one of `workspaceGuid` or `userGuid` must be provided.",
+        "operationId": "searchExceptionUsers",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/ExceptionUserSearchRequest"},
+              "examples": {
+                "byWorkspace": {
+                  "summary": "List all exception users in a workspace",
+                  "value": {"workspaceGuid": "8a81b09b5d5c10fb015d5c18a5050b99"}
+                },
+                "byUser": {
+                  "summary": "List all workspaces where a user has exception-user access",
+                  "value": {"userGuid": "8a81b010520d34ab01520d366e0f0007"}
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful search. Returns a list of workspace records, each containing the exception users in that workspace.",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/ExceptionUserSearchResponse"},
+                "example": {
+                  "response": [
+                    {
+                      "workspaceGuid": "8a81b09b5d5c10fb015d5c18a5050b99",
+                      "workspaceName": "Finance Workspace",
+                      "users": [
+                        {"userGuid": "8a81b010520d34ab01520d366e0f0007", "email": "alice@example.com"},
+                        {"userGuid": "8a81b010520d34ab01520d366e0f0008", "email": "bob@example.com"}
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request. Possible causes: neither `workspaceGuid` nor `userGuid` provided (search criteria not provided); invalid field values.",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/ErrorResponse"}
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing token.",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/ErrorResponse"}
+              }
+            }
+          },
+          "403": {
+            "description": "Caller lacks Tenant Security Admin role.",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/ErrorResponse"}
+              }
+            }
+          },
+          "404": {
+            "description": "User or workspace not found.",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/ErrorResponse"}
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/ErrorResponse"}
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "AnaplanAuthToken": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "Anaplan token authentication. Header value format: `AnaplanAuthToken <token>`. Obtain a token from the Anaplan Authentication API using username/password or CA certificate."
+      }
+    },
+    "schemas": {
+      "ExceptionUserPatchRequest": {
+        "type": "object",
+        "required": ["op", "workspaceGuid"],
+        "properties": {
+          "op": {
+            "type": "string",
+            "enum": ["assign", "unassign"],
+            "description": "Operation to perform: `assign` grants exception-user access; `unassign` revokes it."
+          },
+          "workspaceGuid": {
+            "type": "string",
+            "description": "GUID of the workspace in which to assign or unassign the exception-user status. The workspace must be SSO-enabled."
+          }
+        }
+      },
+      "ExceptionUserSearchRequest": {
+        "oneOf": [
+          {"$ref": "#/components/schemas/ExceptionUserSearchByWorkspaceRequest"},
+          {"$ref": "#/components/schemas/ExceptionUserSearchByUserRequest"}
+        ],
+        "description": "Search criteria. Provide exactly one of `workspaceGuid` (to list exception users in a workspace) or `userGuid` (to list workspaces where a user has exception-user access)."
+      },
+      "ExceptionUserSearchByWorkspaceRequest": {
+        "type": "object",
+        "required": ["workspaceGuid"],
+        "properties": {
+          "workspaceGuid": {
+            "type": "string",
+            "description": "GUID of the workspace. Returns all exception users in this workspace, including visitors."
+          }
+        }
+      },
+      "ExceptionUserSearchByUserRequest": {
+        "type": "object",
+        "required": ["userGuid"],
+        "properties": {
+          "userGuid": {
+            "type": "string",
+            "description": "GUID of the user. Returns all workspaces in the tenant where this user has exception-user access. Workspaces where the user has access as a visitor are not included."
+          }
+        }
+      },
+      "ExceptionUserSearchResponse": {
+        "type": "object",
+        "properties": {
+          "response": {
+            "type": "array",
+            "items": {"$ref": "#/components/schemas/ExceptionUserWorkspaceResult"},
+            "description": "List of workspace records matching the search criteria."
+          }
+        }
+      },
+      "ExceptionUserWorkspaceResult": {
+        "type": "object",
+        "properties": {
+          "workspaceGuid": {
+            "type": "string",
+            "description": "GUID of the workspace."
+          },
+          "workspaceName": {
+            "type": "string",
+            "description": "Display name of the workspace."
+          },
+          "users": {
+            "type": "array",
+            "items": {"$ref": "#/components/schemas/ExceptionUser"},
+            "description": "Exception users in this workspace."
+          }
+        }
+      },
+      "ExceptionUser": {
+        "type": "object",
+        "properties": {
+          "userGuid": {
+            "type": "string",
+            "description": "GUID of the exception user."
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email address of the exception user."
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Error response body. Exact field names not confirmed by live testing — verify against actual API responses.",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "Error status string, e.g. `FAILURE BAD_REQUEST`, `FAILURE INVALID TOKEN`, `FAILURE UNAUTHORIZED USER ACTION`, `FAILURE NOT FOUND`, `FAILURE GENERIC`."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error description."
+          }
+        }
+      }
+    }
+  }
+}
