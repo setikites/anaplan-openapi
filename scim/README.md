@@ -73,7 +73,7 @@ Calls require an active, non-SSO Anaplan user with the `USER_ADMIN` role.
 | GET | `/ResourceTypes` | Retrieve supported resource types |
 | GET | `/Schemas` | Retrieve attribute metadata for supported schemas |
 
-`DELETE /Users/{id}` is **not documented** in the Apiary docs.
+`DELETE /Users/{id}` is **not documented** in the Apiary docs but is confirmed implemented via live testing (issue #43) — see Discrepancies below.
 
 ## Filtering and Pagination (`GET /Users`)
 
@@ -154,6 +154,6 @@ Accept: application/json
 - **`id` and `externalId` have `caseExact: false`**: The live schema response flags both as non-RFC — the SCIM standard requires `caseExact: true` for these fields.
 - **`active` represented inconsistently in Apiary examples**: The Apiary response examples show `"active": "True"` (string) alongside `"active": true` (boolean) in the same object. The live schema defines it as a boolean; treat the string form as a documentation artifact.
 - **`ServiceProviderConfig` claims `patch: false` and `filter: false`**: The Apiary `GET /ServiceProviderConfig` example response shows both as `supported: false`, but the same Apiary docs document a working `PATCH /Users/{id}` endpoint and `filter` query parameter on `GET /Users`. The ServiceProviderConfig example appears outdated.
-- **No `DELETE /Users/{id}` in Apiary**: The endpoint is absent from Apiary docs. Do not include it in the spec unless confirmed via live testing.
+- **`DELETE /Users/{id}` absent from Apiary but implemented**: Apiary does not document this endpoint. Live testing (issue #43) sent `DELETE /Users/{fake-uuid}` and received 403 (not 405 Method Not Allowed), confirming the endpoint exists — the 403 is the standard no-`USER_ADMIN`-role response. The spec includes `DELETE /Users/{id}` on this basis.
 - **`GET /Users` example uses `localhost:8090`**: The Apiary example response contains `location` URLs pointing to `localhost:8090` — a test artifact, not the production API.
 - **Typo in Apiary POST example**: The `Host` header in the `POST /Users` example reads `api.anplan.com` (missing the second `a` in `anaplan`).

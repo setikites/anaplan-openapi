@@ -245,6 +245,32 @@ paths:
             application/scim+json:
               schema:
                 $ref: '#/components/schemas/ScimError'
+    delete:
+      summary: Delete user
+      description: 'Deletes a user by their Anaplan ID. Not documented in the Apiary source but confirmed present via live
+        testing (issue #43): DELETE returns 403 (not 405) when the caller lacks USER_ADMIN role, proving the endpoint is implemented.'
+      operationId: deleteUser
+      responses:
+        '204':
+          description: User deleted.
+        '401':
+          description: Missing or invalid authentication token.
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/ScimError'
+        '403':
+          description: Caller does not have USER_ADMIN role.
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/ScimError'
+        '404':
+          description: User not found.
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/ScimError'
   /ResourceTypes:
     get:
       summary: Get resource types

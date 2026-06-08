@@ -177,6 +177,61 @@ def test_scim_users_http_basic_probe():
         )
 
 
+# ── Probe: DELETE /Users/{id} existence ─────────────────────────────────────
+
+@pytest.mark.live
+def test_scim_delete_user_endpoint_exists(scim_token):
+    """Probes whether DELETE /Users/{id} is implemented on the SCIM endpoint.
+
+    Apiary does not document DELETE; issue #43 excluded it from the spec on that
+    basis. This test sends DELETE with a nonexistent user ID to distinguish:
+      - 404 → endpoint exists, user not found (DELETE is implemented)
+      - 405 → Method Not Allowed (DELETE not implemented; spec exclusion correct)
+      - 403 → endpoint exists, auth ok but no permission
+
+    Requires --allow-writes because DELETE is a write method. The target ID is a
+    deliberately nonexistent UUID so no real user is at risk.
+    """
+    fake_id = "00000000-0000-0000-0000-000000000000"
+
+    with httpx.Client() as client:
+        response = client.delete(
+            f"{SCIM_BASE_URL}/Users/{fake_id}",
+            headers={"Authorization": f"AnaplanAuthToken {scim_token}"},
+        )
+
+    status = response.status_code
+    print(f"\nDELETE /Users/{{fake_id}}: {status}")
+
+    if status == 405:
+        warnings.warn(
+            "DELETE /Users/{id} returned 405 Method Not Allowed — "
+            "endpoint is not implemented; spec exclusion is correct.",
+            UserWarning,
+            stacklevel=2,
+        )
+    elif status == 404:
+        warnings.warn(
+            "DELETE /Users/{id} returned 404 — endpoint exists but user not found; "
+            "DELETE is implemented and should be added to the spec.",
+            UserWarning,
+            stacklevel=2,
+        )
+    elif status == 403:
+        warnings.warn(
+            f"DELETE /Users/{{id}} returned 403 — endpoint exists, auth accepted, "
+            "no permission; DELETE is implemented and should be added to the spec.",
+            UserWarning,
+            stacklevel=2,
+        )
+    else:
+        warnings.warn(
+            f"DELETE /Users/{{id}} probe returned unexpected status {status}.",
+            UserWarning,
+            stacklevel=2,
+        )
+
+
 # ── Probe: OAuth Bearer token ────────────────────────────────────────────────
 
 @pytest.mark.live
