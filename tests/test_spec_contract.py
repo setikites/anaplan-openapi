@@ -303,6 +303,8 @@ _SCHEME_REQUIREMENTS = [
     pytest.param("alm",            "anaplan_token", id="alm-anaplan-token"),
     # Exception Users: AnaplanAuthToken only (Apiary confirmed; Bearer not documented)
     pytest.param("exception",      "anaplan_token", id="exception-anaplan-token"),
+    # Audit: AnaplanAuthToken confirmed via Apiary; Bearer declared but unconfirmed
+    pytest.param("audit",          "anaplan_token", id="audit-anaplan-token"),
 ]
 
 _SCHEME_MATCHERS = {
@@ -370,6 +372,9 @@ _REQUIRED_ENDPOINTS = [
     # Exception Users API
     pytest.param("exception",      "patch", "/permissions/exception-users/users/{userGuid}", id="exception-patch-user"),
     pytest.param("exception",      "post",  "/permissions/exception-users/search",           id="exception-search"),
+    # Audit API
+    pytest.param("audit",          "get",   "/events",                                       id="audit-get-events"),
+    pytest.param("audit",          "post",  "/events/search",                                id="audit-post-search"),
 ]
 
 
@@ -1013,3 +1018,129 @@ def test_exception_patch_declares_user_guid_path_param():
     p = next(p for p in params if p.get("name") == "userGuid")
     assert p.get("in") == "path"
     assert p.get("required") is True
+
+
+# ─── Audit API ─────────────────────────────────────────────────────────────
+# Delivers audit events (BYOK + user activity) for a tenant.
+# Auth: AnaplanAuthToken (Apiary confirmed). Bearer declared but unconfirmed.
+# Responses available in JSON or CEF (text/plain) via Accept header.
+# Endpoints extracted from Apiary HTML descriptions — no structured resources[]
+# existed in the Apiary source; spec paths were hand-authored from documentation.
+
+_AUDIT_SPEC = REPO_ROOT / "audit" / "audit-openapi.json"
+_skip_audit = _skip_if_missing("audit")
+
+
+@_skip_audit
+def test_audit_get_events_declares_type_param():
+    """GET /events must declare type query parameter with the three allowed enum values."""
+    spec = _load(_AUDIT_SPEC)
+    params = _all_params(spec, "/events", "get")
+    names = {p["name"] for p in params if "name" in p}
+    assert "type" in names, "GET /events must declare type query parameter"
+    p = next(p for p in params if p.get("name") == "type")
+    assert p.get("in") == "query"
+    assert p.get("schema", {}).get("enum") == ["all", "byok", "user_activity"], (
+        "type enum must be ['all', 'byok', 'user_activity']"
+    )
+
+
+@_skip_audit
+def test_audit_get_events_declares_paging_params():
+    """GET /events must declare limit and offset query parameters for pagination."""
+    spec = _load(_AUDIT_SPEC)
+    params = _all_params(spec, "/events", "get")
+    names = {p["name"] for p in params if "name" in p}
+    for param in ("limit", "offset"):
+        assert param in names, f"GET /events must declare {param!r} query parameter"
+    limit_p = next(p for p in params if p.get("name") == "limit")
+    assert limit_p.get("in") == "query"
+    assert limit_p.get("schema", {}).get("maximum") == 10000, (
+        "limit must declare maximum: 10000"
+    )
+
+
+@_skip_audit
+def test_audit_get_events_declares_date_range_params():
+    """GET /events must declare dateFrom, dateTo, and intervalInHours query parameters."""
+    spec = _load(_AUDIT_SPEC)
+    params = _all_params(spec, "/events", "get")
+    names = {p["name"] for p in params if "name" in p}
+    for param in ("dateFrom", "dateTo", "intervalInHours"):
+        assert param in names, f"GET /events must declare {param!r} query parameter"
+
+
+@_skip_audit
+def test_audit_post_search_has_request_body():
+    """POST /events/search must declare a JSON request body schema."""
+    spec = _load(_AUDIT_SPEC)
+    operation = spec.get("paths", {}).get("/events/search", {}).get("post", {})
+    body = operation.get("requestBody", {})
+    assert "application/json" in body.get("content", {}), (
+        "POST /events/search must declare an application/json request body"
+    )
+    schema_ref = (
+        body["content"]["application/json"].get("schema", {}).get("$ref", "")
+    )
+    assert schema_ref, "POST /events/search request body must reference a schema"
+
+
+@_skip_audit
+def test_audit_search_request_schema_has_time_range_fields():
+    """AuditSearchRequest schema must have from, to, and interval fields."""
+    spec = _load(_AUDIT_SPEC)
+    schemas = spec.get("components", {}).get("schemas", {})
+    assert "AuditSearchRequest" in schemas, "AuditSearchRequest schema must be defined"
+    props = schemas["AuditSearchRequest"].get("properties", {})
+    for field in ("from", "to", "interval"):
+        assert field in props, f"AuditSearchRequest must define {field!r} property"
+
+
+@_skip_audit
+@pytest.mark.parametrize("schema_name", ["AuditEvent", "AuditEventsResponse", "AuditPaging", "AuditSearchRequest"])
+def test_audit_spec_has_required_schema(schema_name):
+    """Core Audit API schemas must be defined in components/schemas."""
+    spec = _load(_AUDIT_SPEC)
+    schemas = spec.get("components", {}).get("schemas", {})
+    assert schema_name in schemas, (
+        f"audit spec must define {schema_name!r} in components/schemas"
+    )
+
+
+@_skip_audit
+def test_audit_event_schema_has_core_fields():
+    """AuditEvent schema must include the fields present in every documented example."""
+    spec = _load(_AUDIT_SPEC)
+    schema = spec.get("components", {}).get("schemas", {}).get("AuditEvent", {})
+    props = schema.get("properties", {})
+    for field in ("id", "eventTypeId", "userId", "tenantId", "message", "eventDate", "checksum"):
+        assert field in props, f"AuditEvent must define {field!r} property"
+
+
+@_skip_audit
+def test_audit_events_response_wraps_array_in_response_key():
+    """AuditEventsResponse must wrap event array under a top-level 'response' key."""
+    spec = _load(_AUDIT_SPEC)
+    schema = spec.get("components", {}).get("schemas", {}).get("AuditEventsResponse", {})
+    response_prop = schema.get("properties", {}).get("response", {})
+    assert response_prop.get("type") == "array", (
+        "AuditEventsResponse.response must be type array"
+    )
+    assert "response" in schema.get("required", []), (
+        "AuditEventsResponse must mark 'response' as required"
+    )
+
+
+@_skip_audit
+def test_audit_endpoints_declare_json_and_cef_responses():
+    """Both audit endpoints must declare application/json and text/plain (CEF) response media types."""
+    spec = _load(_AUDIT_SPEC)
+    for path, method in (("/events", "get"), ("/events/search", "post")):
+        operation = spec["paths"][path][method]
+        content = operation["responses"]["200"]["content"]
+        assert "application/json" in content, (
+            f"{method.upper()} {path}: must declare application/json response"
+        )
+        assert "text/plain" in content, (
+            f"{method.upper()} {path}: must declare text/plain (CEF) response"
+        )

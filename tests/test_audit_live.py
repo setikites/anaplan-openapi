@@ -1,0 +1,304 @@
+"""
+Live API integration tests for the Anaplan Audit API.
+
+Probes the GET /events and POST /events/search endpoints to verify that:
+- The spec's documented paths and response shapes match the real API.
+- The AnaplanAuthToken security scheme is accepted.
+- The type query parameter and paging parameters work as documented.
+- The Accept: text/plain header returns CEF-format output.
+
+Run with:
+    uv run --env-file .env pytest tests/test_audit_live.py --live
+
+Credentials are read from .env at the repo root. Required variables:
+    ANAPLAN_USERNAME  - username for basic auth (to obtain AnaplanAuthToken)
+    ANAPLAN_PASSWORD  - password for basic auth
+
+Optional variables:
+    ANAPLAN_AUDIT_BASE_URL - override audit base URL
+                             (default: https://audit.anaplan.com/audit/api/1)
+"""
+
+import base64
+import os
+import pathlib
+import warnings
+
+import httpx
+import pytest
+
+AUDIT_BASE_URL = os.getenv(
+    "ANAPLAN_AUDIT_BASE_URL", "https://audit.anaplan.com/audit/api/1"
+)
+AUTH_URL = "https://auth.anaplan.com"
+SPEC_PATH = pathlib.Path(__file__).parent.parent / "audit" / "audit-openapi.json"
+
+
+def _get_anaplan_token(username: str, password: str) -> str | None:
+    """Authenticate via Basic auth and return an AnaplanAuthToken value."""
+    auth_b64 = base64.b64encode(f"{username}:{password}".encode()).decode()
+    with httpx.Client() as client:
+        response = client.post(
+            f"{AUTH_URL}/token/authenticate",
+            headers={"Authorization": f"Basic {auth_b64}"},
+        )
+    if response.status_code == 201:
+        return response.json().get("tokenInfo", {}).get("tokenValue")
+    return None
+
+
+@pytest.fixture(scope="module")
+def audit_token():
+    """AnaplanAuthToken for audit calls (module-scoped). Logs out on teardown."""
+    username = os.getenv("ANAPLAN_USERNAME")
+    password = os.getenv("ANAPLAN_PASSWORD")
+    if not username or not password:
+        pytest.skip("ANAPLAN_USERNAME and ANAPLAN_PASSWORD not set")
+
+    token = _get_anaplan_token(username, password)
+    if not token:
+        pytest.skip("Failed to obtain AnaplanAuthToken from basic auth")
+
+    yield token
+
+    with httpx.Client() as client:
+        client.post(
+            f"{AUTH_URL}/token/logout",
+            headers={"Authorization": f"AnaplanAuthToken {token}"},
+        )
+
+
+# ── Tracer bullet ─────────────────────────────────────────────────────────────
+
+@pytest.mark.live
+def test_audit_get_events_responds(audit_token):
+    """GET /events is reachable and accepts AnaplanAuthToken.
+
+    A 200 confirms the token was accepted and events are returned.
+    A 403 confirms the token was recognized but the user lacks the Tenant Auditor role.
+    A 401 would indicate AnaplanAuthToken is rejected — the spec's security scheme
+    declaration would need revisiting.
+    """
+    with httpx.Client() as client:
+        response = client.get(
+            f"{AUDIT_BASE_URL}/events",
+            headers={
+                "Authorization": f"AnaplanAuthToken {audit_token}",
+                "Accept": "application/json",
+            },
+        )
+
+    print(f"\nGET /events: {response.status_code}")
+    assert response.status_code in (200, 403), (
+        f"AnaplanAuthToken was rejected (got {response.status_code}); "
+        "expected 200 (ok) or 403 (auth accepted, missing Tenant Auditor role)"
+    )
+
+
+# ── Response shape ────────────────────────────────────────────────────────────
+
+@pytest.mark.live
+def test_audit_get_events_response_has_response_key(audit_token):
+    """GET /events JSON response must include a top-level 'response' array.
+
+    Verifies the AuditEventsResponse schema shape documented in the spec.
+    Skipped if caller lacks the Tenant Auditor role (403).
+    """
+    with httpx.Client() as client:
+        response = client.get(
+            f"{AUDIT_BASE_URL}/events",
+            params={"intervalInHours": "1"},
+            headers={
+                "Authorization": f"AnaplanAuthToken {audit_token}",
+                "Accept": "application/json",
+            },
+        )
+
+    print(f"\nGET /events?intervalInHours=1: {response.status_code}")
+
+    if response.status_code == 403:
+        pytest.skip("User lacks Tenant Auditor role — cannot verify response shape")
+
+    assert response.status_code == 200, f"Unexpected status: {response.status_code}"
+    body = response.json()
+    assert "response" in body, (
+        "Response body must have a top-level 'response' key "
+        "(matches AuditEventsResponse schema)"
+    )
+    assert isinstance(body["response"], list), "'response' must be an array"
+
+
+@pytest.mark.live
+def test_audit_get_events_paging_meta_shape(audit_token):
+    """When meta.paging is present, it must include currentPageSize, totalSize, and offSet.
+
+    Verifies the AuditPaging schema fields documented in the spec.
+    Skipped if caller lacks the Tenant Auditor role (403) or no paging metadata is returned.
+    """
+    with httpx.Client() as client:
+        response = client.get(
+            f"{AUDIT_BASE_URL}/events",
+            params={"intervalInHours": "24"},
+            headers={
+                "Authorization": f"AnaplanAuthToken {audit_token}",
+                "Accept": "application/json",
+            },
+        )
+
+    print(f"\nGET /events?intervalInHours=24 (paging check): {response.status_code}")
+
+    if response.status_code == 403:
+        pytest.skip("User lacks Tenant Auditor role — cannot verify paging shape")
+
+    assert response.status_code == 200
+    body = response.json()
+    paging = body.get("meta", {}).get("paging")
+    if paging is None:
+        warnings.warn(
+            "GET /events did not return meta.paging — may not be present when "
+            "result set is small; spec's AuditPaging shape cannot be confirmed.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return
+
+    for field in ("currentPageSize", "totalSize", "offSet"):
+        assert field in paging, (
+            f"meta.paging is missing required field {field!r} "
+            f"(AuditPaging schema requires it)"
+        )
+
+
+# ── type parameter ────────────────────────────────────────────────────────────
+
+@pytest.mark.live
+def test_audit_get_events_type_param_all(audit_token):
+    """GET /events?type=all is accepted by the server.
+
+    The spec documents three enum values: all, byok, user_activity.
+    A 200 or 403 response confirms the parameter is processed without error.
+    Skipped if caller lacks role.
+    """
+    with httpx.Client() as client:
+        response = client.get(
+            f"{AUDIT_BASE_URL}/events",
+            params={"type": "all", "intervalInHours": "1"},
+            headers={
+                "Authorization": f"AnaplanAuthToken {audit_token}",
+                "Accept": "application/json",
+            },
+        )
+
+    print(f"\nGET /events?type=all: {response.status_code}")
+    assert response.status_code in (200, 403), (
+        f"type=all rejected with unexpected status {response.status_code}"
+    )
+
+
+# ── POST /events/search ───────────────────────────────────────────────────────
+
+@pytest.mark.live
+def test_audit_post_search_responds(audit_token):
+    """POST /events/search accepts an interval body and returns events or 403.
+
+    Verifies the POST endpoint exists at the documented path and accepts the
+    AuditSearchRequest schema's 'interval' field.
+    """
+    with httpx.Client() as client:
+        response = client.post(
+            f"{AUDIT_BASE_URL}/events/search",
+            json={"interval": 1},
+            headers={
+                "Authorization": f"AnaplanAuthToken {audit_token}",
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+            },
+        )
+
+    print(f"\nPOST /events/search: {response.status_code}")
+    assert response.status_code in (200, 403), (
+        f"POST /events/search responded with unexpected status {response.status_code}"
+    )
+
+
+@pytest.mark.live
+def test_audit_post_search_response_shape(audit_token):
+    """POST /events/search response must match the AuditEventsResponse envelope.
+
+    Skipped if caller lacks the Tenant Auditor role (403).
+    """
+    with httpx.Client() as client:
+        response = client.post(
+            f"{AUDIT_BASE_URL}/events/search",
+            json={"interval": 24},
+            headers={
+                "Authorization": f"AnaplanAuthToken {audit_token}",
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+            },
+        )
+
+    print(f"\nPOST /events/search (shape check): {response.status_code}")
+
+    if response.status_code == 403:
+        pytest.skip("User lacks Tenant Auditor role — cannot verify response shape")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert "response" in body, (
+        "POST /events/search body must have a top-level 'response' key"
+    )
+    assert isinstance(body["response"], list), "'response' must be an array"
+
+
+# ── CEF format probe ──────────────────────────────────────────────────────────
+
+@pytest.mark.live
+def test_audit_get_events_cef_format_probe(audit_token):
+    """Probes whether Accept: text/plain returns CEF-format output from GET /events.
+
+    The spec documents a text/plain response media type for CEF output.
+    A 200 with a non-JSON body beginning with a timestamp or 'CEF:' confirms
+    the spec's text/plain content type declaration is accurate.
+    Skipped if caller lacks the Tenant Auditor role (403).
+    """
+    with httpx.Client() as client:
+        response = client.get(
+            f"{AUDIT_BASE_URL}/events",
+            params={"intervalInHours": "1"},
+            headers={
+                "Authorization": f"AnaplanAuthToken {audit_token}",
+                "Accept": "text/plain",
+            },
+        )
+
+    print(f"\nGET /events Accept: text/plain: {response.status_code}")
+
+    if response.status_code == 403:
+        pytest.skip("User lacks Tenant Auditor role — cannot verify CEF output")
+
+    if response.status_code != 200:
+        warnings.warn(
+            f"GET /events with Accept: text/plain returned {response.status_code} "
+            "— CEF format may not be supported; verify text/plain in spec.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return
+
+    ct = response.headers.get("content-type", "")
+    body_text = response.text
+    if "text/plain" in ct or (body_text and not body_text.strip().startswith("{")):
+        warnings.warn(
+            "GET /events returned text/plain (CEF) output — "
+            "spec's text/plain content type declaration is confirmed.",
+            UserWarning,
+            stacklevel=2,
+        )
+    else:
+        warnings.warn(
+            f"GET /events with Accept: text/plain returned content-type {ct!r}; "
+            "body may be JSON rather than CEF — verify text/plain response in spec.",
+            UserWarning,
+            stacklevel=2,
+        )

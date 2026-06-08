@@ -2,35 +2,257 @@ openapi: 3.0.0
 info:
   title: Audit API
   version: 1.0.0
+  description: Retrieve audit events from an Anaplan tenant. Supports filtering by event type and date range. Responses are
+    available in JSON or Common Event Format (CEF) via the `Accept` header. Requires the Tenant Auditor role.
 servers:
 - url: https://audit.anaplan.com/audit/api/1
-  description: Production — Apiary source (verify)
-- url: https://api.anaplan.com
-  description: US1, US2, US5, US7, EU1, EU2, EU4, AP1 — allowlist source (verify)
-- url: https://us9.api.anaplan.com
+  description: Production — Apiary-confirmed base URL
+- url: https://api.anaplan.com/audit/api/1
+  description: US1, US2, US5, US7, EU1, EU2, EU4, AP1
+- url: https://us9.api.anaplan.com/audit/api/1
   description: US9
-- url: https://eu3.api.anaplan.com
+- url: https://eu3.api.anaplan.com/audit/api/1
   description: EU3
-- url: https://eu5.api.anaplan.com
+- url: https://eu5.api.anaplan.com/audit/api/1
   description: EU5
-- url: https://gb1.api.anaplan.com
+- url: https://gb1.api.anaplan.com/audit/api/1
   description: GB1
-- url: https://ca1a.api.anaplan.com
+- url: https://ca1a.api.anaplan.com/audit/api/1
   description: CA1
-- url: https://sg1.api.anaplan.com
+- url: https://sg1.api.anaplan.com/audit/api/1
   description: SG1
-- url: https://ae1.api.anaplan.com
+- url: https://ae1.api.anaplan.com/audit/api/1
   description: AE1
-- url: https://in1.api.anaplan.com
+- url: https://in1.api.anaplan.com/audit/api/1
   description: IN1
-- url: https://id1.api.anaplan.com
+- url: https://id1.api.anaplan.com/audit/api/1
   description: ID1
-- url: https://me1.api.anaplan.com
+- url: https://me1.api.anaplan.com/audit/api/1
   description: ME1
-- url: https://au1a.api2.anaplan.com
+- url: https://au1a.api2.anaplan.com/audit/api/1
   description: AU1
-paths: {}
+paths:
+  /events:
+    get:
+      summary: Retrieve audit events
+      description: |-
+        Retrieves audit events for the tenant associated with the authenticated user. Use `type` to filter by event category. Use `dateFrom`/`dateTo` for a specific date range, or `intervalInHours` for a rolling window. Use `limit` and `offset` for pagination (limit cannot exceed 10000).
+
+        Set `Accept: text/plain` to receive results in Common Event Format (CEF). Default is `application/json`.
+      operationId: getAuditEvents
+      tags:
+      - Audit Events
+      parameters:
+      - name: type
+        in: query
+        description: Type of events to return. `all` returns every event. `byok` returns only Bring Your Own Key encryption
+          events. `user_activity` returns only user activity events.
+        schema:
+          type: string
+          enum:
+          - all
+          - byok
+          - user_activity
+      - name: dateFrom
+        in: query
+        description: Start of the event date range (Unix timestamp in milliseconds, UTC).
+        schema:
+          type: integer
+      - name: dateTo
+        in: query
+        description: End of the event date range (Unix timestamp in milliseconds, UTC).
+        schema:
+          type: integer
+      - name: intervalInHours
+        in: query
+        description: Return events from the previous N hours. For example, `2` returns the last two hours of events.
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        description: Maximum number of results to return per page. Cannot exceed 10000.
+        schema:
+          type: integer
+          maximum: 10000
+      - name: offset
+        in: query
+        description: Zero-based index of the first result to return. Use with `limit` for pagination.
+        schema:
+          type: integer
+      security:
+      - AnaplanAuthToken: []
+      - BearerAuth: []
+      responses:
+        '200':
+          description: Audit events retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditEventsResponse'
+            text/plain:
+              schema:
+                type: string
+              description: Audit events in Common Event Format (CEF).
+  /events/search:
+    post:
+      summary: Search audit events
+      description: |-
+        Retrieves audit events for the tenant associated with the authenticated user using a JSON request body to specify the time range. Use `from`/`to` for a specific date range, or `interval` for a rolling window in hours. Use `type` query parameter to filter by event category.
+
+        Set `Accept: text/plain` to receive results in Common Event Format (CEF). Default is `application/json`.
+      operationId: searchAuditEvents
+      tags:
+      - Audit Events
+      parameters:
+      - name: type
+        in: query
+        description: Type of events to return. `all` returns every event. `byok` returns only Bring Your Own Key encryption
+          events. `user_activity` returns only user activity events.
+        schema:
+          type: string
+          enum:
+          - all
+          - byok
+          - user_activity
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuditSearchRequest'
+      security:
+      - AnaplanAuthToken: []
+      - BearerAuth: []
+      responses:
+        '200':
+          description: Audit events retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditEventsResponse'
+            text/plain:
+              schema:
+                type: string
+              description: Audit events in Common Event Format (CEF).
 components:
+  schemas:
+    AuditEvent:
+      type: object
+      description: A single audit event record.
+      properties:
+        id:
+          type: integer
+          description: Unique event identifier (Snowflake ID).
+        eventTypeId:
+          type: string
+          description: Event type code (for example, `DSM-DAO0267I`, `USR-04`).
+        userId:
+          type: string
+          description: ID of the user who triggered the event.
+        tenantId:
+          type: string
+          description: ID of the tenant in which the event occurred.
+        objectId:
+          type: string
+          description: ID of the object acted upon, if applicable.
+        objectTypeId:
+          type: string
+          description: Type of the object acted upon, if applicable.
+        objectTenantId:
+          type: string
+          description: Tenant ID of the object acted upon.
+        message:
+          type: string
+          description: Human-readable description of the event.
+        success:
+          type: boolean
+          description: Whether the event action succeeded.
+        errorNumber:
+          type: string
+          description: Error code, if the action failed.
+        ipAddress:
+          type: string
+          description: IP address from which the action was performed.
+        userAgent:
+          type: string
+          description: User agent string of the client that performed the action.
+        sessionId:
+          type: string
+          description: Session identifier, if applicable.
+        hostName:
+          type: string
+          description: Hostname of the server that recorded the event.
+        serviceVersion:
+          type: string
+          description: Version of the Anaplan service that generated the event.
+        eventDate:
+          type: integer
+          description: Timestamp when the event occurred (Unix milliseconds, UTC).
+        eventTimeZone:
+          type: string
+          description: Time zone of `eventDate` (for example, `UTC`).
+        createdDate:
+          type: integer
+          description: Timestamp when the event was stored in the audit database (Unix milliseconds, UTC).
+        createdTimeZone:
+          type: string
+          description: Time zone of `createdDate` (for example, `UTC`).
+        checksum:
+          type: string
+          description: SHA-256 checksum for verifying event record integrity.
+    AuditPaging:
+      type: object
+      description: Pagination metadata included in audit event list responses.
+      required:
+      - currentPageSize
+      - totalSize
+      - offSet
+      properties:
+        currentPageSize:
+          type: integer
+          description: Number of results in the current page.
+        totalSize:
+          type: integer
+          description: Total number of results matching the query.
+        offSet:
+          type: integer
+          description: Zero-based index of the first result in this page.
+        nextOffset:
+          type: integer
+          description: Offset to use to retrieve the next page, if more results exist.
+        nextUrl:
+          type: string
+          description: URL to call to retrieve the next page of results.
+    AuditEventsResponse:
+      type: object
+      description: Response envelope for audit event list and search endpoints.
+      required:
+      - response
+      properties:
+        meta:
+          type: object
+          properties:
+            paging:
+              $ref: '#/components/schemas/AuditPaging'
+        response:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditEvent'
+          description: Array of audit event records.
+    AuditSearchRequest:
+      type: object
+      description: Request body for the POST /events/search endpoint. Specify `from`/`to` for a date range or `interval` for
+        a rolling window. If `to` is omitted, results up to the current time are returned. If `from` is omitted, results from
+        the earliest available event are returned.
+      properties:
+        from:
+          type: integer
+          description: Start of the event date range (Unix timestamp in milliseconds, UTC).
+        to:
+          type: integer
+          description: End of the event date range (Unix timestamp in milliseconds, UTC).
+        interval:
+          type: integer
+          description: Return events from the previous N hours.
   securitySchemes:
     AnaplanAuthToken:
       type: apiKey
