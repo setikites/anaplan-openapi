@@ -57,7 +57,8 @@
   ],
   "security": [
     {"AnaplanAuthToken": []},
-    {"BearerAuth": []}
+    {"BearerAuth": []},
+    {"BasicAuth": []}
   ],
   "paths": {
     "/Users": {
@@ -477,6 +478,11 @@
       "BearerAuth": {
         "type": "http",
         "scheme": "bearer"
+      },
+      "BasicAuth": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "HTTP Basic authentication. Format: `Basic <base64(username:password)>`"
       }
     },
     "schemas": {

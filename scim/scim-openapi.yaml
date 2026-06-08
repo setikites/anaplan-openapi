@@ -32,6 +32,7 @@ servers:
 security:
 - AnaplanAuthToken: []
 - BearerAuth: []
+- BasicAuth: []
 paths:
   /Users:
     get:
@@ -372,6 +373,10 @@ components:
     BearerAuth:
       type: http
       scheme: bearer
+    BasicAuth:
+      type: http
+      scheme: basic
+      description: 'HTTP Basic authentication. Format: `Basic <base64(username:password)>`'
   schemas:
     User:
       type: object

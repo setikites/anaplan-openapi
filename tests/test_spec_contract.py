@@ -766,7 +766,9 @@ def test_descriptions_have_no_html_tags(spec_path):
 
 # ─── SCIM API ──────────────────────────────────────────────────────────────
 # SCIM is a standard (RFC 7644). Anaplan implements Users + entitlements only.
-# Auth: AnaplanAuthToken + BearerAuth (pending live-test validation — see issue #44).
+# Auth: AnaplanAuthToken + BearerAuth + BasicAuth — all three confirmed via live
+# testing (issue #44). All three return 403 (not 401) on GET /Users when the
+# caller lacks USER_ADMIN role, confirming the auth layer accepts each scheme.
 
 _SCIM_SPEC = REPO_ROOT / "scim" / "scim-openapi.json"
 _skip_scim = pytest.mark.skipif(
@@ -804,7 +806,7 @@ def test_scim_spec_declares_bearer_auth():
 
 @_skip_scim
 def test_scim_spec_declares_anaplan_token_scheme():
-    """Anaplan also accepts AnaplanAuthToken on SCIM endpoints (pending live validation)."""
+    """AnaplanAuthToken is accepted by the SCIM endpoint (confirmed via live testing, issue #44)."""
     spec = _load(_SCIM_SPEC)
     schemes = spec.get("components", {}).get("securitySchemes", {})
     anaplan = [
@@ -814,6 +816,20 @@ def test_scim_spec_declares_anaplan_token_scheme():
     assert anaplan, (
         "scim spec must declare an AnaplanAuthToken-style scheme "
         "(type: apiKey, in: header)"
+    )
+
+
+@_skip_scim
+def test_scim_spec_declares_basic_auth_scheme():
+    """HTTP Basic auth is accepted by the SCIM endpoint (confirmed via live testing, issue #44)."""
+    spec = _load(_SCIM_SPEC)
+    schemes = spec.get("components", {}).get("securitySchemes", {})
+    basic = [
+        name for name, d in schemes.items()
+        if d.get("type") == "http" and d.get("scheme") == "basic"
+    ]
+    assert basic, (
+        "scim spec must declare a Basic security scheme (type: http, scheme: basic)"
     )
 
 
