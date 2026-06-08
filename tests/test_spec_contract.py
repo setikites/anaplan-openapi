@@ -3,13 +3,16 @@ Contract tests verifying OpenAPI 3.0 spec files against domain invariants
 from CONTEXT.md. These tests run without network access.
 
 Invariants checked:
-  Universal   — version, info, servers[], paths, responses, refs, security
-  Cross-spec  — no path appears in more than one spec file
-  Server URLs — each API family must use its correct host pattern
-  Auth API    — BasicAuth + AnaplanAuthToken schemes; core endpoints present
-  OAuth API   — core endpoints present; TokenResponse schema complete
-  Integration — AnaplanAuthToken scheme declared (skipped until spec exists)
-  SCIM        — BearerAuth scheme declared (skipped until spec exists)
+  Universal        — version, info, servers[], paths, responses, refs, security
+  Cross-spec       — no path appears in more than one spec file
+  Server URLs      — each API family must use its correct host pattern
+  Security schemes — each API must declare the scheme(s) it accepts
+  Required paths   — each API must document its core (method, path) pairs
+  Auth API         — security requirement present on token endpoint
+  OAuth API        — TokenResponse schema complete; RFC 6749 error fields
+  Integration      — component schemas, query params, envelope schemas
+  SCIM             — User schema has entitlements; required schemas defined
+  ALM              — server URL count; specific query parameters
 """
 
 import json
@@ -240,6 +243,109 @@ def test_server_urls_dont_use_wrong_base(spec_path):
             )
 
 
+# ─── Security scheme declarations ─────────────────────────────────────────
+# Each row declares that a spec must contain at least one security scheme
+# matching the given type. New APIs: add rows here.
+#
+# Scheme types:
+#   basic         — type: http, scheme: basic
+#   bearer        — type: http, scheme: bearer
+#   anaplan_token — type: apiKey, in: header  (AnaplanAuthToken or CACertAuth)
+
+_SCHEME_REQUIREMENTS = [
+    # Authentication: Basic for token generation; AnaplanAuthToken for refresh/validate/logout
+    pytest.param("authentication", "basic",         id="auth-basic"),
+    pytest.param("authentication", "anaplan_token", id="auth-anaplan-token"),
+    # Integration: both Bearer and AnaplanAuthToken accepted
+    pytest.param("integration",    "anaplan_token", id="integration-anaplan-token"),
+    pytest.param("integration",    "bearer",        id="integration-bearer"),
+    # SCIM: all three schemes accepted (confirmed via live testing, issue #44)
+    pytest.param("scim",           "bearer",        id="scim-bearer"),
+    pytest.param("scim",           "anaplan_token", id="scim-anaplan-token"),
+    pytest.param("scim",           "basic",         id="scim-basic"),
+    # ALM: AnaplanAuthToken confirmed via Apiary; Bearer declared but unconfirmed
+    pytest.param("alm",            "anaplan_token", id="alm-anaplan-token"),
+]
+
+_SCHEME_MATCHERS = {
+    "basic":         lambda d: d.get("type") == "http" and d.get("scheme") == "basic",
+    "bearer":        lambda d: d.get("type") == "http" and d.get("scheme") == "bearer",
+    "anaplan_token": lambda d: d.get("type") == "apiKey" and d.get("in") == "header",
+}
+
+
+@pytest.mark.parametrize("api_dir,scheme_type", _SCHEME_REQUIREMENTS)
+def test_spec_declares_security_scheme(api_dir, scheme_type):
+    """Each API spec must declare the security scheme(s) it accepts."""
+    spec_path = REPO_ROOT / api_dir / f"{api_dir}-openapi.json"
+    if not spec_path.exists():
+        pytest.skip(f"{api_dir} spec not yet written")
+    spec = _load(spec_path)
+    schemes = spec.get("components", {}).get("securitySchemes", {})
+    match = _SCHEME_MATCHERS[scheme_type]
+    assert any(match(d) for d in schemes.values()), (
+        f"{api_dir}: missing {scheme_type!r} security scheme in components/securitySchemes"
+    )
+
+
+# ─── Required endpoint declarations ───────────────────────────────────────
+# Each row declares that a spec must document the given (method, path) pair.
+# New APIs: add rows here.
+
+_REQUIRED_ENDPOINTS = [
+    # Authentication API
+    pytest.param("authentication", "post", "/token/authenticate",                                                                         id="auth-token-authenticate"),
+    # OAuth API
+    pytest.param("oauth",          "post", "/oauth/token",                                                                                id="oauth-token"),
+    pytest.param("oauth",          "post", "/oauth/device/code",                                                                          id="oauth-device-code"),
+    pytest.param("oauth",          "get",  "/auth/authorize",                                                                             id="oauth-authorize"),
+    # SCIM API — user CRUD
+    pytest.param("scim",           "get",  "/Users",                                                                                      id="scim-list-users"),
+    pytest.param("scim",           "post", "/Users",                                                                                      id="scim-create-user"),
+    pytest.param("scim",           "get",  "/Users/{id}",                                                                                 id="scim-get-user"),
+    pytest.param("scim",           "put",  "/Users/{id}",                                                                                 id="scim-update-user"),
+    pytest.param("scim",           "patch","/Users/{id}",                                                                                 id="scim-patch-user"),
+    # SCIM API — discovery
+    pytest.param("scim",           "get",  "/ResourceTypes",                                                                              id="scim-resource-types"),
+    pytest.param("scim",           "get",  "/Schemas",                                                                                    id="scim-schemas"),
+    pytest.param("scim",           "get",  "/ServiceProviderConfig",                                                                      id="scim-service-provider-config"),
+    # ALM API — revisions
+    pytest.param("alm",            "get",  "/models/{modelId}/alm/latestRevision",                                                        id="alm-latest-revision"),
+    pytest.param("alm",            "get",  "/models/{modelId}/alm/revisions",                                                             id="alm-list-revisions"),
+    pytest.param("alm",            "post", "/models/{modelId}/alm/revisions",                                                             id="alm-create-revision"),
+    pytest.param("alm",            "get",  "/models/{modelId}/alm/revisions/{revisionId}/appliedToModels",                                id="alm-applied-to-models"),
+    # ALM API — sync tasks
+    pytest.param("alm",            "get",  "/models/{modelId}/alm/syncableRevisions",                                                     id="alm-syncable-revisions"),
+    pytest.param("alm",            "get",  "/models/{modelId}/alm/syncTasks",                                                             id="alm-list-sync-tasks"),
+    pytest.param("alm",            "post", "/models/{modelId}/alm/syncTasks",                                                             id="alm-create-sync-task"),
+    pytest.param("alm",            "get",  "/models/{modelId}/alm/syncTasks/{syncTaskId}",                                                id="alm-get-sync-task"),
+    # ALM API — comparison and summary reports
+    pytest.param("alm",            "post", "/models/{modelId}/alm/comparisonReportTasks",                                                 id="alm-create-comparison-task"),
+    pytest.param("alm",            "get",  "/models/{modelId}/alm/comparisonReportTasks/{taskId}",                                        id="alm-get-comparison-task"),
+    pytest.param("alm",            "get",  "/models/{modelId}/alm/comparisonReports/{targetRevisionId}/{sourceRevisionId}",               id="alm-comparison-report"),
+    pytest.param("alm",            "post", "/models/{modelId}/alm/summaryReportTasks",                                                    id="alm-create-summary-task"),
+    pytest.param("alm",            "get",  "/models/{modelId}/alm/summaryReportTasks/{taskId}",                                           id="alm-get-summary-task"),
+    pytest.param("alm",            "get",  "/models/{modelId}/alm/summaryReports/{targetRevisionId}/{sourceRevisionId}",                  id="alm-summary-report"),
+    # ALM API — online status
+    pytest.param("alm",            "post", "/models/{modelId}/onlineStatus",                                                              id="alm-online-status-post"),
+    pytest.param("alm",            "put",  "/models/{modelId}/onlineStatus",                                                              id="alm-online-status-put"),
+]
+
+
+@pytest.mark.parametrize("api_dir,method,path", _REQUIRED_ENDPOINTS)
+def test_spec_has_required_endpoint(api_dir, method, path):
+    """Each API spec must document the required (method, path) combinations."""
+    spec_path = REPO_ROOT / api_dir / f"{api_dir}-openapi.json"
+    if not spec_path.exists():
+        pytest.skip(f"{api_dir} spec not yet written")
+    spec = _load(spec_path)
+    paths = spec.get("paths", {})
+    assert path in paths, f"{api_dir}: spec must document {path}"
+    assert method in paths[path], (
+        f"{api_dir}: spec must document {method.upper()} {path}"
+    )
+
+
 # ─── Authentication API ────────────────────────────────────────────────────
 # Auth API uses HTTP Basic for token generation and AnaplanAuthToken for
 # refresh/validate/logout. Both schemes must be declared.
@@ -248,53 +354,6 @@ _AUTH_SPEC = REPO_ROOT / "authentication" / "authentication-openapi.json"
 _skip_auth = pytest.mark.skipif(
     not _AUTH_SPEC.exists(), reason="authentication spec not yet written"
 )
-
-
-@_skip_auth
-def test_auth_spec_declares_basic_auth_scheme():
-    """HTTP Basic is the primary mechanism for generating AnaplanAuthTokens."""
-    spec = _load(_AUTH_SPEC)
-    schemes = spec.get("components", {}).get("securitySchemes", {})
-    basic = [
-        name for name, d in schemes.items()
-        if d.get("type") == "http" and d.get("scheme") == "basic"
-    ]
-    assert basic, (
-        "authentication spec must declare an HTTP Basic scheme "
-        "(type: http, scheme: basic)"
-    )
-
-
-@_skip_auth
-def test_auth_spec_declares_anaplan_token_scheme():
-    """Refresh, validate, and logout endpoints authenticate with AnaplanAuthToken."""
-    spec = _load(_AUTH_SPEC)
-    schemes = spec.get("components", {}).get("securitySchemes", {})
-    # AnaplanAuthToken arrives in the Authorization header as an apiKey
-    anaplan = [
-        name for name, d in schemes.items()
-        if (
-            d.get("type") == "apiKey"
-            and d.get("in") == "header"
-            and d.get("name") == "Authorization"
-        )
-    ]
-    assert anaplan, (
-        "authentication spec must declare an AnaplanAuthToken-style scheme "
-        "(type: apiKey, in: header, name: Authorization)"
-    )
-
-
-@_skip_auth
-def test_auth_spec_has_token_authenticate_endpoint():
-    spec = _load(_AUTH_SPEC)
-    paths = spec.get("paths", {})
-    assert "/token/authenticate" in paths, (
-        "authentication spec must document /token/authenticate"
-    )
-    assert "post" in paths["/token/authenticate"], (
-        "authentication spec must document POST /token/authenticate"
-    )
 
 
 @_skip_auth
@@ -319,35 +378,6 @@ _OAUTH_SPEC = REPO_ROOT / "oauth" / "oauth-openapi.json"
 _skip_oauth = pytest.mark.skipif(
     not _OAUTH_SPEC.exists(), reason="oauth spec not yet written"
 )
-
-
-@_skip_oauth
-def test_oauth_spec_has_token_endpoint():
-    """/oauth/token is the core token issuance endpoint for both grant types."""
-    spec = _load(_OAUTH_SPEC)
-    paths = spec.get("paths", {})
-    assert "/oauth/token" in paths, "oauth spec must document /oauth/token"
-    assert "post" in paths["/oauth/token"], (
-        "oauth spec must document POST /oauth/token"
-    )
-
-
-@_skip_oauth
-def test_oauth_spec_has_device_code_endpoint():
-    """/oauth/device/code starts the Device Authorization Grant flow."""
-    spec = _load(_OAUTH_SPEC)
-    assert "/oauth/device/code" in spec.get("paths", {}), (
-        "oauth spec must document /oauth/device/code"
-    )
-
-
-@_skip_oauth
-def test_oauth_spec_has_authorize_endpoint():
-    """/auth/authorize starts the Authorization Code Grant flow."""
-    spec = _load(_OAUTH_SPEC)
-    assert "/auth/authorize" in spec.get("paths", {}), (
-        "oauth spec must document /auth/authorize"
-    )
 
 
 @_skip_oauth
@@ -387,40 +417,6 @@ _INTEGRATION_SPEC = REPO_ROOT / "integration" / "integration-openapi.json"
 _skip_integration = pytest.mark.skipif(
     not _INTEGRATION_SPEC.exists(), reason="integration spec not yet written"
 )
-
-
-@_skip_integration
-def test_integration_spec_declares_anaplan_token_scheme():
-    """Integration API uses AnaplanAuthToken — must be declared as a securityScheme."""
-    spec = _load(_INTEGRATION_SPEC)
-    schemes = spec.get("components", {}).get("securitySchemes", {})
-    # AnaplanAuthToken arrives as an apiKey in Authorization or its own header
-    anaplan = [
-        name for name, d in schemes.items()
-        if (
-            d.get("type") == "apiKey"
-            and d.get("in") == "header"
-            and d.get("name") in ("Authorization", "AnaplanAuthToken")
-        )
-    ]
-    assert anaplan, (
-        "integration spec must declare an AnaplanAuthToken security scheme "
-        "(type: apiKey, in: header)"
-    )
-
-
-@_skip_integration
-def test_integration_spec_declares_bearer_auth():
-    """Integration API also accepts standard Bearer tokens — BearerAuth must be declared."""
-    spec = _load(_INTEGRATION_SPEC)
-    schemes = spec.get("components", {}).get("securitySchemes", {})
-    bearer = [
-        name for name, d in schemes.items()
-        if d.get("type") == "http" and d.get("scheme") == "bearer"
-    ]
-    assert bearer, (
-        "integration spec must declare a BearerAuth scheme (type: http, scheme: bearer)"
-    )
 
 
 @_skip_integration
@@ -764,6 +760,7 @@ def test_descriptions_have_no_html_tags(spec_path):
         + "\n".join("  " + v for v in violations[:3])
     )
 
+
 # ─── SCIM API ──────────────────────────────────────────────────────────────
 # SCIM is a standard (RFC 7644). Anaplan implements Users + entitlements only.
 # Auth: AnaplanAuthToken + BearerAuth + BasicAuth — all three confirmed via live
@@ -774,83 +771,6 @@ _SCIM_SPEC = REPO_ROOT / "scim" / "scim-openapi.json"
 _skip_scim = pytest.mark.skipif(
     not _SCIM_SPEC.exists(), reason="scim spec not yet written"
 )
-
-_SCIM_USER_ENDPOINTS = [
-    ("get",   "/Users"),
-    ("post",  "/Users"),
-    ("get",   "/Users/{id}"),
-    ("put",   "/Users/{id}"),
-    ("patch", "/Users/{id}"),
-]
-
-_SCIM_DISCOVERY_ENDPOINTS = [
-    ("get", "/ResourceTypes"),
-    ("get", "/Schemas"),
-    ("get", "/ServiceProviderConfig"),
-]
-
-
-@_skip_scim
-def test_scim_spec_declares_bearer_auth():
-    """SCIM uses standard Bearer token auth per RFC 7644 — must be declared."""
-    spec = _load(_SCIM_SPEC)
-    schemes = spec.get("components", {}).get("securitySchemes", {})
-    bearer = [
-        name for name, d in schemes.items()
-        if d.get("type") == "http" and d.get("scheme") == "bearer"
-    ]
-    assert bearer, (
-        "scim spec must declare a Bearer security scheme (type: http, scheme: bearer)"
-    )
-
-
-@_skip_scim
-def test_scim_spec_declares_anaplan_token_scheme():
-    """AnaplanAuthToken is accepted by the SCIM endpoint (confirmed via live testing, issue #44)."""
-    spec = _load(_SCIM_SPEC)
-    schemes = spec.get("components", {}).get("securitySchemes", {})
-    anaplan = [
-        name for name, d in schemes.items()
-        if d.get("type") == "apiKey" and d.get("in") == "header"
-    ]
-    assert anaplan, (
-        "scim spec must declare an AnaplanAuthToken-style scheme "
-        "(type: apiKey, in: header)"
-    )
-
-
-@_skip_scim
-def test_scim_spec_declares_basic_auth_scheme():
-    """HTTP Basic auth is accepted by the SCIM endpoint (confirmed via live testing, issue #44)."""
-    spec = _load(_SCIM_SPEC)
-    schemes = spec.get("components", {}).get("securitySchemes", {})
-    basic = [
-        name for name, d in schemes.items()
-        if d.get("type") == "http" and d.get("scheme") == "basic"
-    ]
-    assert basic, (
-        "scim spec must declare a Basic security scheme (type: http, scheme: basic)"
-    )
-
-
-@_skip_scim
-@pytest.mark.parametrize("method,path", _SCIM_USER_ENDPOINTS, ids=lambda x: x)
-def test_scim_spec_has_user_endpoint(method, path):
-    """All SCIM user CRUD endpoints must be documented."""
-    spec = _load(_SCIM_SPEC)
-    paths = spec.get("paths", {})
-    assert path in paths, f"scim spec must document {path}"
-    assert method in paths[path], f"scim spec must document {method.upper()} {path}"
-
-
-@_skip_scim
-@pytest.mark.parametrize("method,path", _SCIM_DISCOVERY_ENDPOINTS, ids=lambda x: x)
-def test_scim_spec_has_discovery_endpoint(method, path):
-    """SCIM discovery endpoints must be documented."""
-    spec = _load(_SCIM_SPEC)
-    paths = spec.get("paths", {})
-    assert path in paths, f"scim spec must document {path}"
-    assert method in paths[path], f"scim spec must document {method.upper()} {path}"
 
 
 @_skip_scim
@@ -922,3 +842,61 @@ def test_clean_descriptions_is_idempotent():
     once = clean_descriptions(dirty)
     twice = clean_descriptions(once)
     assert once == twice
+
+
+# ─── ALM API ───────────────────────────────────────────────────────────────
+# ALM (Application Lifecycle Management) manages model revisions, sync tasks,
+# and comparison/summary reports. Auth: AnaplanAuthToken (confirmed via Apiary).
+# BearerAuth declared but unconfirmed — pending live testing.
+
+_ALM_SPEC = REPO_ROOT / "alm" / "alm-openapi.json"
+_skip_alm = pytest.mark.skipif(
+    not _ALM_SPEC.exists(), reason="alm spec not yet written"
+)
+
+
+@_skip_alm
+def test_alm_servers_use_api_anaplan_com():
+    """ALM is an api.anaplan.com-family API — all server URLs must use that host."""
+    spec = _load(_ALM_SPEC)
+    urls = [s.get("url", "") for s in spec.get("servers", [])]
+    assert any("api.anaplan.com" in url for url in urls), (
+        f"alm: no server URL contains 'api.anaplan.com'. Got: {urls}"
+    )
+
+
+@_skip_alm
+def test_alm_servers_cover_all_19_regions():
+    """ALM spec must declare server entries covering all 19 Anaplan regions."""
+    spec = _load(_ALM_SPEC)
+    urls = [s.get("url", "") for s in spec.get("servers", [])]
+    assert len(urls) >= 12, (
+        f"alm spec declares only {len(urls)} server(s); expected at least 12 "
+        f"(one per distinct regional host)"
+    )
+
+
+@_skip_alm
+def test_alm_syncable_revisions_declares_source_model_query_param():
+    """GET /models/{modelId}/alm/syncableRevisions requires sourceModelId query param."""
+    spec = _load(_ALM_SPEC)
+    params = _all_params(spec, "/models/{modelId}/alm/syncableRevisions", "get")
+    names = {p["name"] for p in params if "name" in p}
+    assert "sourceModelId" in names, (
+        "GET /models/{modelId}/alm/syncableRevisions must declare sourceModelId query parameter"
+    )
+    p = next(p for p in params if p.get("name") == "sourceModelId")
+    assert p.get("in") == "query"
+    assert p.get("required") is True
+
+
+@_skip_alm
+def test_alm_revisions_get_declares_pagination_params():
+    """GET /models/{modelId}/alm/revisions must declare limit and offset query params."""
+    spec = _load(_ALM_SPEC)
+    params = _all_params(spec, "/models/{modelId}/alm/revisions", "get")
+    names = {p["name"] for p in params if "name" in p}
+    for param in ("limit", "offset"):
+        assert param in names, (
+            f"GET /models/{{modelId}}/alm/revisions must declare {param!r} query parameter"
+        )
