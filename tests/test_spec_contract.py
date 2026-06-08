@@ -258,6 +258,7 @@ _MIN_SERVER_COUNT: dict[str, int] = {
     "alm":         12,
     "scim":        12,
     "audit":       12,
+    "exception":   12,
 }
 
 
@@ -300,6 +301,8 @@ _SCHEME_REQUIREMENTS = [
     pytest.param("scim",           "basic",         id="scim-basic"),
     # ALM: AnaplanAuthToken confirmed via Apiary; Bearer declared but unconfirmed
     pytest.param("alm",            "anaplan_token", id="alm-anaplan-token"),
+    # Exception Users: AnaplanAuthToken only (Apiary confirmed; Bearer not documented)
+    pytest.param("exception",      "anaplan_token", id="exception-anaplan-token"),
 ]
 
 _SCHEME_MATCHERS = {
@@ -364,6 +367,9 @@ _REQUIRED_ENDPOINTS = [
     # ALM API — online status
     pytest.param("alm",            "post", "/models/{modelId}/onlineStatus",                                                              id="alm-online-status-post"),
     pytest.param("alm",            "put",  "/models/{modelId}/onlineStatus",                                                              id="alm-online-status-put"),
+    # Exception Users API
+    pytest.param("exception",      "patch", "/admin/1/0/permissions/exception-users/users/{userGuid}", id="exception-patch-user"),
+    pytest.param("exception",      "post",  "/admin/1/0/permissions/exception-users/search",           id="exception-search"),
 ]
 
 
@@ -904,3 +910,106 @@ def test_alm_revisions_get_declares_pagination_params():
         assert param in names, (
             f"GET /models/{{modelId}}/alm/revisions must declare {param!r} query parameter"
         )
+
+
+# ─── Exception Users API ──────────────────────────────────────────────────
+# Manages exception users (users who bypass SSO enforcement) in workspaces.
+# Auth: AnaplanAuthToken only (Apiary confirmed). Requires Tenant Security Admin role.
+# Error response body shape not yet confirmed by live testing — see issue #51.
+
+_EXCEPTION_SPEC = REPO_ROOT / "exception" / "exception-openapi.json"
+_skip_exception = _skip_if_missing("exception")
+
+
+@_skip_exception
+@pytest.mark.parametrize("schema_name", [
+    "ExceptionUserPatchRequest",
+    "ExceptionUserSearchRequest",
+    "ExceptionUserSearchByWorkspaceRequest",
+    "ExceptionUserSearchByUserRequest",
+    "ExceptionUserSearchResponse",
+    "ExceptionUserWorkspaceResult",
+    "ExceptionUser",
+])
+def test_exception_spec_has_required_schema(schema_name):
+    """All Exception Users domain schemas must be defined in components/schemas."""
+    spec = _load(_EXCEPTION_SPEC)
+    schemas = spec.get("components", {}).get("schemas", {})
+    assert schema_name in schemas, (
+        f"exception spec must define {schema_name!r} in components/schemas"
+    )
+
+
+@_skip_exception
+def test_exception_patch_request_op_is_enum():
+    """PATCH request body must constrain op to 'assign' | 'unassign' via an enum."""
+    spec = _load(_EXCEPTION_SPEC)
+    schema = (
+        spec.get("components", {})
+        .get("schemas", {})
+        .get("ExceptionUserPatchRequest", {})
+    )
+    op_prop = schema.get("properties", {}).get("op", {})
+    assert op_prop.get("enum") == ["assign", "unassign"], (
+        "ExceptionUserPatchRequest.op must be an enum of ['assign', 'unassign']"
+    )
+
+
+@_skip_exception
+def test_exception_patch_request_requires_op_and_workspace():
+    """PATCH request body must mark both op and workspaceGuid as required."""
+    spec = _load(_EXCEPTION_SPEC)
+    schema = (
+        spec.get("components", {})
+        .get("schemas", {})
+        .get("ExceptionUserPatchRequest", {})
+    )
+    required = set(schema.get("required", []))
+    assert {"op", "workspaceGuid"} <= required, (
+        "ExceptionUserPatchRequest must require both 'op' and 'workspaceGuid'"
+    )
+
+
+@_skip_exception
+def test_exception_search_request_uses_oneof():
+    """POST search request body must use oneOf to distinguish workspace vs user search."""
+    spec = _load(_EXCEPTION_SPEC)
+    schema = (
+        spec.get("components", {})
+        .get("schemas", {})
+        .get("ExceptionUserSearchRequest", {})
+    )
+    assert "oneOf" in schema, (
+        "ExceptionUserSearchRequest must use oneOf "
+        "(workspace search and user search are mutually exclusive)"
+    )
+
+
+@_skip_exception
+def test_exception_search_response_has_response_array():
+    """Search response must wrap results in a top-level 'response' array."""
+    spec = _load(_EXCEPTION_SPEC)
+    schema = (
+        spec.get("components", {})
+        .get("schemas", {})
+        .get("ExceptionUserSearchResponse", {})
+    )
+    response_prop = schema.get("properties", {}).get("response", {})
+    assert response_prop.get("type") == "array", (
+        "ExceptionUserSearchResponse.response must be type array"
+    )
+
+
+@_skip_exception
+def test_exception_patch_declares_user_guid_path_param():
+    """PATCH endpoint must declare userGuid as a required path parameter."""
+    spec = _load(_EXCEPTION_SPEC)
+    patch_path = "/admin/1/0/permissions/exception-users/users/{userGuid}"
+    params = _all_params(spec, patch_path, "patch")
+    names = {p["name"] for p in params if "name" in p}
+    assert "userGuid" in names, (
+        f"PATCH {patch_path} must declare userGuid path parameter"
+    )
+    p = next(p for p in params if p.get("name") == "userGuid")
+    assert p.get("in") == "path"
+    assert p.get("required") is True
