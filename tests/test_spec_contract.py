@@ -84,6 +84,13 @@ def _specs_with_known_pattern() -> list[Path]:
     return [p for p in SPEC_FILES if p.parent.name in SERVER_URL_PATTERNS]
 
 
+def _skip_if_missing(api_dir: str):
+    spec_path = REPO_ROOT / api_dir / f"{api_dir}-openapi.json"
+    return pytest.mark.skipif(
+        not spec_path.exists(), reason=f"{api_dir} spec not yet written"
+    )
+
+
 # ─── Universal invariants — run on every spec file found ──────────────────
 
 @pytest.mark.parametrize("spec_path", SPEC_FILES, ids=lambda p: p.parent.name)
@@ -351,9 +358,7 @@ def test_spec_has_required_endpoint(api_dir, method, path):
 # refresh/validate/logout. Both schemes must be declared.
 
 _AUTH_SPEC = REPO_ROOT / "authentication" / "authentication-openapi.json"
-_skip_auth = pytest.mark.skipif(
-    not _AUTH_SPEC.exists(), reason="authentication spec not yet written"
-)
+_skip_auth = _skip_if_missing("authentication")
 
 
 @_skip_auth
@@ -375,9 +380,7 @@ def test_auth_spec_authenticate_endpoint_requires_security():
 # Core endpoints and the TokenResponse schema are required.
 
 _OAUTH_SPEC = REPO_ROOT / "oauth" / "oauth-openapi.json"
-_skip_oauth = pytest.mark.skipif(
-    not _OAUTH_SPEC.exists(), reason="oauth spec not yet written"
-)
+_skip_oauth = _skip_if_missing("oauth")
 
 
 @_skip_oauth
@@ -414,9 +417,7 @@ def test_oauth_error_schema_has_rfc_6749_fields():
 # Integration API accepts Bearer token OR AnaplanAuthToken (both must be declared).
 
 _INTEGRATION_SPEC = REPO_ROOT / "integration" / "integration-openapi.json"
-_skip_integration = pytest.mark.skipif(
-    not _INTEGRATION_SPEC.exists(), reason="integration spec not yet written"
-)
+_skip_integration = _skip_if_missing("integration")
 
 
 @_skip_integration
@@ -768,9 +769,7 @@ def test_descriptions_have_no_html_tags(spec_path):
 # caller lacks USER_ADMIN role, confirming the auth layer accepts each scheme.
 
 _SCIM_SPEC = REPO_ROOT / "scim" / "scim-openapi.json"
-_skip_scim = pytest.mark.skipif(
-    not _SCIM_SPEC.exists(), reason="scim spec not yet written"
-)
+_skip_scim = _skip_if_missing("scim")
 
 
 @_skip_scim
@@ -850,9 +849,7 @@ def test_clean_descriptions_is_idempotent():
 # BearerAuth declared but unconfirmed — pending live testing.
 
 _ALM_SPEC = REPO_ROOT / "alm" / "alm-openapi.json"
-_skip_alm = pytest.mark.skipif(
-    not _ALM_SPEC.exists(), reason="alm spec not yet written"
-)
+_skip_alm = _skip_if_missing("alm")
 
 
 @_skip_alm
