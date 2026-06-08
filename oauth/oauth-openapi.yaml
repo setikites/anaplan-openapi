@@ -38,22 +38,14 @@ paths:
       operationId: authorizeAuthCode
       tags:
       - Authorization Code Grant
-      description: 'Redirects the user''s browser to the Anaplan login page to begin the Authorization Code flow. On successful
-        authentication, the browser is redirected to `redirect_uri` with an authorization `code` query parameter. Exchange
-        that code for tokens via `POST /oauth/token`.
+      description: |-
+        Redirects the user's browser to the Anaplan login page to begin the Authorization Code flow. On successful authentication, the browser is redirected to `redirect_uri` with an authorization `code` query parameter. Exchange that code for tokens via `POST /oauth/token`.
 
+        **SSO:** If the user's workspace enforces SAML SSO, this endpoint initiates the SSO login. SSO is not available via the Device Authorization Grant flow.
 
-        **SSO:** If the user''s workspace enforces SAML SSO, this endpoint initiates the SSO login. SSO is not available via
-        the Device Authorization Grant flow.
+        **Note:** This endpoint does not accept an Authorization header. Authentication occurs interactively via the browser redirect.
 
-
-        **Note:** This endpoint does not accept an Authorization header. Authentication occurs interactively via the browser
-        redirect.
-
-
-        **Implementation note:** The `anaplan-sdk` library uses `GET /auth/prelogin` (same query parameters) as its `authorization_url`
-        instead of this endpoint. `/auth/prelogin` returns the login page HTML directly (200) whereas `/auth/authorize` returns
-        a 302 redirect to it. Both paths are valid entry points for the Authorization Code flow.'
+        **Implementation note:** The `anaplan-sdk` library uses `GET /auth/prelogin` (same query parameters) as its `authorization_url` instead of this endpoint. `/auth/prelogin` returns the login page HTML directly (200) whereas `/auth/authorize` returns a 302 redirect to it. Both paths are valid entry points for the Authorization Code flow.
       parameters:
       - name: response_type
         in: query
@@ -114,12 +106,10 @@ paths:
       operationId: requestDeviceCode
       tags:
       - Device Authorization Grant
-      description: 'Starts the Device Authorization flow. The client sends its `client_id` and requested `scope`. The response
-        contains a `device_code` (for polling) and a `user_code` the user must enter at `verification_uri` to approve access.
+      description: |-
+        Starts the Device Authorization flow. The client sends its `client_id` and requested `scope`. The response contains a `device_code` (for polling) and a `user_code` the user must enter at `verification_uri` to approve access.
 
-
-        After receiving this response, the client polls `POST /oauth/token` with `grant_type: urn:ietf:params:oauth:grant-type:device_code`
-        at the `interval` frequency until the user approves or the code expires.'
+        After receiving this response, the client polls `POST /oauth/token` with `grant_type: urn:ietf:params:oauth:grant-type:device_code` at the `interval` frequency until the user approves or the code expires.
       requestBody:
         required: true
         content:
@@ -198,20 +188,14 @@ paths:
       tags:
       - Authorization Code Grant
       - Device Authorization Grant
-      description: 'Issues access tokens, ID tokens, and refresh tokens. Supports three grant types:
-
+      description: |-
+        Issues access tokens, ID tokens, and refresh tokens. Supports three grant types:
 
         - **`authorization_code`**: Exchange the code from `GET /auth/authorize` for tokens. Requires `client_secret`.
+        - **`urn:ietf:params:oauth:grant-type:device_code`**: Poll during the Device Authorization flow. Returns `authorization_pending` while awaiting user approval; returns tokens once approved. If polling too fast, returns `slow_down`.
+        - **`refresh_token`**: Obtain a new access token from a valid refresh token. `client_secret` required for Authorization Code clients; omit for Device Grant clients.
 
-        - **`urn:ietf:params:oauth:grant-type:device_code`**: Poll during the Device Authorization flow. Returns `authorization_pending`
-        while awaiting user approval; returns tokens once approved. If polling too fast, returns `slow_down`.
-
-        - **`refresh_token`**: Obtain a new access token from a valid refresh token. `client_secret` required for Authorization
-        Code clients; omit for Device Grant clients.
-
-
-        Refresh tokens may be rotatable (new refresh token issued on each use, 30-day rotation) or non-rotatable, depending
-        on client configuration.'
+        Refresh tokens may be rotatable (new refresh token issued on each use, 30-day rotation) or non-rotatable, depending on client configuration.
       requestBody:
         required: true
         content:

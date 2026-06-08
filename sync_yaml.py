@@ -13,6 +13,20 @@ from pathlib import Path
 import yaml
 
 
+def _literal_representer(dumper: yaml.Dumper, data: str) -> yaml.ScalarNode:
+    if "\n" in data:
+        normalized = "\n".join(line.rstrip() for line in data.split("\n"))
+        return dumper.represent_scalar("tag:yaml.org,2002:str", normalized, style="|")
+    return dumper.represent_scalar("tag:yaml.org,2002:str", data)
+
+
+class _LiteralDumper(yaml.Dumper):
+    pass
+
+
+_LiteralDumper.add_representer(str, _literal_representer)
+
+
 def sync_yaml(json_path: Path) -> Path:
     yaml_path = json_path.with_suffix(".yaml")
 
@@ -23,6 +37,7 @@ def sync_yaml(json_path: Path) -> Path:
         yaml.dump(
             spec,
             f,
+            Dumper=_LiteralDumper,
             allow_unicode=True,
             default_flow_style=False,
             sort_keys=False,

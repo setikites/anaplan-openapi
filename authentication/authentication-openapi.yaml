@@ -76,20 +76,14 @@ paths:
       security:
       - BasicAuth: []
       - CACertAuth: []
-      description: 'Creates an AnaplanAuthToken for use with other Anaplan REST APIs. Returns 201 on success.
-
+      description: |-
+        Creates an AnaplanAuthToken for use with other Anaplan REST APIs. Returns 201 on success.
 
         **HTTP Basic Auth:** Send `Authorization: Basic {base64(username:password)}` with no request body.
 
+        **CA Certificate Auth:** Send `Authorization: CACertificate {base64_encoded_certificate}` with a JSON body containing `encodedData` (base64-encoded random bytes, 100+) and `encodedSignedData` (SHA512withRSA signature of the raw random bytes, base64-encoded). The certificate must be registered for API authentication in your Anaplan instance.
 
-        **CA Certificate Auth:** Send `Authorization: CACertificate {base64_encoded_certificate}` with a JSON body containing
-        `encodedData` (base64-encoded random bytes, 100+) and `encodedSignedData` (SHA512withRSA signature of the raw random
-        bytes, base64-encoded). The certificate must be registered for API authentication in your Anaplan instance.
-
-
-        **SSO workspaces:** Users must be assigned as an Exception User to use Basic authentication. See [Assign Exception
-        Users](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Security/Single_Sign-on/Enforcing_SAML_Authentication.html)
-        in Anapedia.'
+        **SSO workspaces:** Users must be assigned as an Exception User to use Basic authentication. See [Assign Exception Users](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Security/Single_Sign-on/Enforcing_SAML_Authentication.html) in Anapedia.
   /token/refresh:
     post:
       summary: Refresh Authentication Token
@@ -128,12 +122,10 @@ paths:
       tags:
       - Authentication
       - Other Authentication Actions
-      description: 'Extends the session for an existing AnaplanAuthToken. Tokens expire after 35 minutes; call this endpoint
-        before expiry to maintain a session without re-authenticating.
+      description: |-
+        Extends the session for an existing AnaplanAuthToken. Tokens expire after 35 minutes; call this endpoint before expiry to maintain a session without re-authenticating.
 
-
-        **Note:** Live testing shows the response returns the same `tokenValue` — the token string itself does not change,
-        but its internal expiration is reset.'
+        **Note:** Live testing shows the response returns the same `tokenValue` — the token string itself does not change, but its internal expiration is reset.
   /token/validate:
     get:
       summary: Get Authentication Token Details
@@ -197,11 +189,10 @@ paths:
       tags:
       - Authentication
       - Other Authentication Actions
-      description: 'Returns details for a valid AnaplanAuthToken, including expiry timestamp, token ID, and user/customer
-        identifiers. Returns 401 if the token is invalid, expired, or has been revoked by logout.
+      description: |-
+        Returns details for a valid AnaplanAuthToken, including expiry timestamp, token ID, and user/customer identifiers. Returns 401 if the token is invalid, expired, or has been revoked by logout.
 
-
-        **Note:** `userGuid` and `customerGuid` are 32-character hexadecimal strings (no hyphens), not standard UUIDs.'
+        **Note:** `userGuid` and `customerGuid` are 32-character hexadecimal strings (no hyphens), not standard UUIDs.
   /token/logout:
     post:
       summary: Log Out the User
