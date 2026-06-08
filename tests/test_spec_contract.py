@@ -368,8 +368,8 @@ _REQUIRED_ENDPOINTS = [
     pytest.param("alm",            "post", "/models/{modelId}/onlineStatus",                                                              id="alm-online-status-post"),
     pytest.param("alm",            "put",  "/models/{modelId}/onlineStatus",                                                              id="alm-online-status-put"),
     # Exception Users API
-    pytest.param("exception",      "patch", "/admin/1/0/permissions/exception-users/users/{userGuid}", id="exception-patch-user"),
-    pytest.param("exception",      "post",  "/admin/1/0/permissions/exception-users/search",           id="exception-search"),
+    pytest.param("exception",      "patch", "/permissions/exception-users/users/{userGuid}", id="exception-patch-user"),
+    pytest.param("exception",      "post",  "/permissions/exception-users/search",           id="exception-search"),
 ]
 
 
@@ -1004,7 +1004,7 @@ def test_exception_search_response_has_response_array():
 def test_exception_patch_declares_user_guid_path_param():
     """PATCH endpoint must declare userGuid as a required path parameter."""
     spec = _load(_EXCEPTION_SPEC)
-    patch_path = "/admin/1/0/permissions/exception-users/users/{userGuid}"
+    patch_path = "/permissions/exception-users/users/{userGuid}"
     params = _all_params(spec, patch_path, "patch")
     names = {p["name"] for p in params if "name" in p}
     assert "userGuid" in names, (

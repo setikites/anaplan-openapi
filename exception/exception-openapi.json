@@ -7,59 +7,61 @@
   },
   "servers": [
     {
-      "url": "https://api.anaplan.com",
+      "url": "https://api.anaplan.com/admin/1/0",
       "description": "US1 (Data Center - US East), US2 (Data Center - US West), US5 (Cloud - US East), US7 (Cloud - US), EU1 (Data Center - Netherlands), EU2 (Data Center - Germany), EU4 (Cloud - Europe), AP1 (Cloud - Japan)"
     },
     {
-      "url": "https://us9.api.anaplan.com",
+      "url": "https://us9.api.anaplan.com/admin/1/0",
       "description": "US9 (Cloud - US)"
     },
     {
-      "url": "https://eu3.api.anaplan.com",
+      "url": "https://eu3.api.anaplan.com/admin/1/0",
       "description": "EU3 (Cloud - Europe)"
     },
     {
-      "url": "https://eu5.api.anaplan.com",
+      "url": "https://eu5.api.anaplan.com/admin/1/0",
       "description": "EU5 (Cloud - Europe)"
     },
     {
-      "url": "https://gb1.api.anaplan.com",
+      "url": "https://gb1.api.anaplan.com/admin/1/0",
       "description": "GB1 (Cloud - UK)"
     },
     {
-      "url": "https://ca1a.api.anaplan.com",
+      "url": "https://ca1a.api.anaplan.com/admin/1/0",
       "description": "CA1 (Cloud - Canada)"
     },
     {
-      "url": "https://sg1.api.anaplan.com",
+      "url": "https://sg1.api.anaplan.com/admin/1/0",
       "description": "SG1 (Cloud - Singapore)"
     },
     {
-      "url": "https://ae1.api.anaplan.com",
+      "url": "https://ae1.api.anaplan.com/admin/1/0",
       "description": "AE1 (Cloud - UAE)"
     },
     {
-      "url": "https://me1.api.anaplan.com",
+      "url": "https://me1.api.anaplan.com/admin/1/0",
       "description": "ME1 (Cloud - Saudi Arabia)"
     },
     {
-      "url": "https://in1.api.anaplan.com",
+      "url": "https://in1.api.anaplan.com/admin/1/0",
       "description": "IN1 (Cloud - India)"
     },
     {
-      "url": "https://id1.api.anaplan.com",
+      "url": "https://id1.api.anaplan.com/admin/1/0",
       "description": "ID1 (Cloud - Indonesia)"
     },
     {
-      "url": "https://au1a.api2.anaplan.com",
+      "url": "https://au1a.api2.anaplan.com/admin/1/0",
       "description": "AU1 (Cloud - Australia)"
     }
   ],
   "security": [
-    {"AnaplanAuthToken": []}
+    {
+      "AnaplanAuthToken": []
+    }
   ],
   "paths": {
-    "/admin/1/0/permissions/exception-users/users/{userGuid}": {
+    "/permissions/exception-users/users/{userGuid}": {
       "patch": {
         "summary": "Assign or unassign an exception user",
         "description": "Updates the exception-user status for a user in a specific workspace. Use `op: assign` to grant exception-user access or `op: unassign` to revoke it. A caller cannot modify their own exception-user status.",
@@ -70,22 +72,32 @@
             "in": "path",
             "required": true,
             "description": "GUID of the user whose exception-user status is being changed.",
-            "schema": {"type": "string"}
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": {"$ref": "#/components/schemas/ExceptionUserPatchRequest"},
+              "schema": {
+                "$ref": "#/components/schemas/ExceptionUserPatchRequest"
+              },
               "examples": {
                 "assign": {
                   "summary": "Assign exception-user access",
-                  "value": {"op": "assign", "workspaceGuid": "8a81b09b5d5c10fb015d5c18a5050b99"}
+                  "value": {
+                    "op": "assign",
+                    "workspaceGuid": "8a81b09b5d5c10fb015d5c18a5050b99"
+                  }
                 },
                 "unassign": {
                   "summary": "Revoke exception-user access",
-                  "value": {"op": "unassign", "workspaceGuid": "8a81b09b5d5c10fb015d5c18a5050b99"}
+                  "value": {
+                    "op": "unassign",
+                    "workspaceGuid": "8a81b09b5d5c10fb015d5c18a5050b99"
+                  }
                 }
               }
             }
@@ -99,7 +111,9 @@
             "description": "Bad request. Possible causes: missing or invalid `op` value; missing or invalid `workspaceGuid`; workspace is not SSO-enabled; requested user not found in workspace.",
             "content": {
               "application/json": {
-                "schema": {"$ref": "#/components/schemas/ErrorResponse"}
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -107,7 +121,9 @@
             "description": "Invalid or missing token.",
             "content": {
               "application/json": {
-                "schema": {"$ref": "#/components/schemas/ErrorResponse"}
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -115,7 +131,9 @@
             "description": "Caller lacks Tenant Security Admin role, or is attempting to change their own exception-user status.",
             "content": {
               "application/json": {
-                "schema": {"$ref": "#/components/schemas/ErrorResponse"}
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -123,7 +141,9 @@
             "description": "User or workspace not found.",
             "content": {
               "application/json": {
-                "schema": {"$ref": "#/components/schemas/ErrorResponse"}
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -131,14 +151,16 @@
             "description": "Internal server error.",
             "content": {
               "application/json": {
-                "schema": {"$ref": "#/components/schemas/ErrorResponse"}
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           }
         }
       }
     },
-    "/admin/1/0/permissions/exception-users/search": {
+    "/permissions/exception-users/search": {
       "post": {
         "summary": "Search exception users",
         "description": "Search by workspace to list all exception users in that workspace (including visitors), or search by user to list all workspaces where that user has exception-user access (visitors' workspaces are excluded from the by-user results). Exactly one of `workspaceGuid` or `userGuid` must be provided.",
@@ -147,15 +169,21 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": {"$ref": "#/components/schemas/ExceptionUserSearchRequest"},
+              "schema": {
+                "$ref": "#/components/schemas/ExceptionUserSearchRequest"
+              },
               "examples": {
                 "byWorkspace": {
                   "summary": "List all exception users in a workspace",
-                  "value": {"workspaceGuid": "8a81b09b5d5c10fb015d5c18a5050b99"}
+                  "value": {
+                    "workspaceGuid": "8a81b09b5d5c10fb015d5c18a5050b99"
+                  }
                 },
                 "byUser": {
                   "summary": "List all workspaces where a user has exception-user access",
-                  "value": {"userGuid": "8a81b010520d34ab01520d366e0f0007"}
+                  "value": {
+                    "userGuid": "8a81b010520d34ab01520d366e0f0007"
+                  }
                 }
               }
             }
@@ -166,15 +194,23 @@
             "description": "Successful search. Returns a list of workspace records, each containing the exception users in that workspace.",
             "content": {
               "application/json": {
-                "schema": {"$ref": "#/components/schemas/ExceptionUserSearchResponse"},
+                "schema": {
+                  "$ref": "#/components/schemas/ExceptionUserSearchResponse"
+                },
                 "example": {
                   "response": [
                     {
                       "workspaceGuid": "8a81b09b5d5c10fb015d5c18a5050b99",
                       "workspaceName": "Finance Workspace",
                       "users": [
-                        {"userGuid": "8a81b010520d34ab01520d366e0f0007", "email": "alice@example.com"},
-                        {"userGuid": "8a81b010520d34ab01520d366e0f0008", "email": "bob@example.com"}
+                        {
+                          "userGuid": "8a81b010520d34ab01520d366e0f0007",
+                          "email": "alice@example.com"
+                        },
+                        {
+                          "userGuid": "8a81b010520d34ab01520d366e0f0008",
+                          "email": "bob@example.com"
+                        }
                       ]
                     }
                   ]
@@ -186,7 +222,9 @@
             "description": "Bad request. Possible causes: neither `workspaceGuid` nor `userGuid` provided (search criteria not provided); invalid field values.",
             "content": {
               "application/json": {
-                "schema": {"$ref": "#/components/schemas/ErrorResponse"}
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -194,7 +232,9 @@
             "description": "Invalid or missing token.",
             "content": {
               "application/json": {
-                "schema": {"$ref": "#/components/schemas/ErrorResponse"}
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -202,7 +242,9 @@
             "description": "Caller lacks Tenant Security Admin role.",
             "content": {
               "application/json": {
-                "schema": {"$ref": "#/components/schemas/ErrorResponse"}
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -210,7 +252,9 @@
             "description": "User or workspace not found.",
             "content": {
               "application/json": {
-                "schema": {"$ref": "#/components/schemas/ErrorResponse"}
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           },
@@ -218,7 +262,9 @@
             "description": "Internal server error.",
             "content": {
               "application/json": {
-                "schema": {"$ref": "#/components/schemas/ErrorResponse"}
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
               }
             }
           }
@@ -238,11 +284,17 @@
     "schemas": {
       "ExceptionUserPatchRequest": {
         "type": "object",
-        "required": ["op", "workspaceGuid"],
+        "required": [
+          "op",
+          "workspaceGuid"
+        ],
         "properties": {
           "op": {
             "type": "string",
-            "enum": ["assign", "unassign"],
+            "enum": [
+              "assign",
+              "unassign"
+            ],
             "description": "Operation to perform: `assign` grants exception-user access; `unassign` revokes it."
           },
           "workspaceGuid": {
@@ -253,14 +305,20 @@
       },
       "ExceptionUserSearchRequest": {
         "oneOf": [
-          {"$ref": "#/components/schemas/ExceptionUserSearchByWorkspaceRequest"},
-          {"$ref": "#/components/schemas/ExceptionUserSearchByUserRequest"}
+          {
+            "$ref": "#/components/schemas/ExceptionUserSearchByWorkspaceRequest"
+          },
+          {
+            "$ref": "#/components/schemas/ExceptionUserSearchByUserRequest"
+          }
         ],
         "description": "Search criteria. Provide exactly one of `workspaceGuid` (to list exception users in a workspace) or `userGuid` (to list workspaces where a user has exception-user access)."
       },
       "ExceptionUserSearchByWorkspaceRequest": {
         "type": "object",
-        "required": ["workspaceGuid"],
+        "required": [
+          "workspaceGuid"
+        ],
         "properties": {
           "workspaceGuid": {
             "type": "string",
@@ -270,7 +328,9 @@
       },
       "ExceptionUserSearchByUserRequest": {
         "type": "object",
-        "required": ["userGuid"],
+        "required": [
+          "userGuid"
+        ],
         "properties": {
           "userGuid": {
             "type": "string",
@@ -283,7 +343,9 @@
         "properties": {
           "response": {
             "type": "array",
-            "items": {"$ref": "#/components/schemas/ExceptionUserWorkspaceResult"},
+            "items": {
+              "$ref": "#/components/schemas/ExceptionUserWorkspaceResult"
+            },
             "description": "List of workspace records matching the search criteria."
           }
         }
@@ -301,7 +363,9 @@
           },
           "users": {
             "type": "array",
-            "items": {"$ref": "#/components/schemas/ExceptionUser"},
+            "items": {
+              "$ref": "#/components/schemas/ExceptionUser"
+            },
             "description": "Exception users in this workspace."
           }
         }

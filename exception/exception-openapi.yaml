@@ -5,35 +5,35 @@ info:
   description: Manage exception users — users who can bypass SSO enforcement — in Anaplan workspaces. Requires the Tenant
     Security Admin role. Authenticate with an AnaplanAuthToken obtained via the Authentication API.
 servers:
-- url: https://api.anaplan.com
+- url: https://api.anaplan.com/admin/1/0
   description: US1 (Data Center - US East), US2 (Data Center - US West), US5 (Cloud - US East), US7 (Cloud - US), EU1 (Data
     Center - Netherlands), EU2 (Data Center - Germany), EU4 (Cloud - Europe), AP1 (Cloud - Japan)
-- url: https://us9.api.anaplan.com
+- url: https://us9.api.anaplan.com/admin/1/0
   description: US9 (Cloud - US)
-- url: https://eu3.api.anaplan.com
+- url: https://eu3.api.anaplan.com/admin/1/0
   description: EU3 (Cloud - Europe)
-- url: https://eu5.api.anaplan.com
+- url: https://eu5.api.anaplan.com/admin/1/0
   description: EU5 (Cloud - Europe)
-- url: https://gb1.api.anaplan.com
+- url: https://gb1.api.anaplan.com/admin/1/0
   description: GB1 (Cloud - UK)
-- url: https://ca1a.api.anaplan.com
+- url: https://ca1a.api.anaplan.com/admin/1/0
   description: CA1 (Cloud - Canada)
-- url: https://sg1.api.anaplan.com
+- url: https://sg1.api.anaplan.com/admin/1/0
   description: SG1 (Cloud - Singapore)
-- url: https://ae1.api.anaplan.com
+- url: https://ae1.api.anaplan.com/admin/1/0
   description: AE1 (Cloud - UAE)
-- url: https://me1.api.anaplan.com
+- url: https://me1.api.anaplan.com/admin/1/0
   description: ME1 (Cloud - Saudi Arabia)
-- url: https://in1.api.anaplan.com
+- url: https://in1.api.anaplan.com/admin/1/0
   description: IN1 (Cloud - India)
-- url: https://id1.api.anaplan.com
+- url: https://id1.api.anaplan.com/admin/1/0
   description: ID1 (Cloud - Indonesia)
-- url: https://au1a.api2.anaplan.com
+- url: https://au1a.api2.anaplan.com/admin/1/0
   description: AU1 (Cloud - Australia)
 security:
 - AnaplanAuthToken: []
 paths:
-  /admin/1/0/permissions/exception-users/users/{userGuid}:
+  /permissions/exception-users/users/{userGuid}:
     patch:
       summary: Assign or unassign an exception user
       description: 'Updates the exception-user status for a user in a specific workspace. Use `op: assign` to grant exception-user
@@ -97,7 +97,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /admin/1/0/permissions/exception-users/search:
+  /permissions/exception-users/search:
     post:
       summary: Search exception users
       description: Search by workspace to list all exception users in that workspace (including visitors), or search by user
