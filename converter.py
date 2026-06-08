@@ -367,3 +367,50 @@ def _extract_apiary_paths(apiary_json: dict) -> dict:
     return paths
 
 
+# ─── Version prefix hoisting ─────────────────────────────────────────────────
+
+_VERSION_SEGMENT = _re.compile(r"^v?\d+$")
+
+
+def _is_version_segment(segment: str) -> bool:
+    return bool(_VERSION_SEGMENT.match(segment))
+
+
+def hoist_version_prefix(spec: dict) -> dict:
+    """Move a version prefix common to all paths into every server URL.
+
+    If every path begins with the same leading sequence of version-like
+    segments (e.g. /2/0 or /v1), strip that prefix from each path and
+    append it to each server URL. Returns the spec unchanged when no
+    qualifying common prefix exists.
+    """
+    paths = list(spec.get("paths", {}).keys())
+    if not paths:
+        return spec
+
+    # Split each path into non-empty segments.
+    segmented = [p.split("/")[1:] for p in paths]  # drop leading empty string
+
+    # Find how many leading segments are common to all paths.
+    min_len = min(len(s) for s in segmented)
+    common_len = 0
+    for i in range(min_len):
+        seg = segmented[0][i]
+        if all(s[i] == seg for s in segmented) and _is_version_segment(seg):
+            common_len += 1
+        else:
+            break
+
+    if common_len == 0:
+        return spec
+
+    prefix = "/" + "/".join(segmented[0][:common_len])
+
+    new_paths = {p[len(prefix):] or "/": item for p, item in spec["paths"].items()}
+    new_servers = [
+        {**s, "url": s["url"].rstrip("/") + prefix}
+        for s in spec.get("servers", [])
+    ]
+
+    return {**spec, "paths": new_paths, "servers": new_servers}
+

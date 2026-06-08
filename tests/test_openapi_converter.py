@@ -2,7 +2,7 @@ import json
 import yaml
 import pytest
 from openapi_spec_validator import validate
-from converter import convert_openapi_spec, fetch_apiary, apiary_to_openapi_skeleton, extract_op_response_details
+from converter import convert_openapi_spec, fetch_apiary, apiary_to_openapi_skeleton, extract_op_response_details, hoist_version_prefix
 
 
 # ─── Apiary fixtures (real jsapi.apiary.io format) ───────────────────────────
@@ -461,3 +461,105 @@ def test_convert_openapi_spec_promotes_response_descriptions():
     operation = result["paths"]["/items"]["get"]
     assert operation["responses"]["200"]["content"]["application/json"]["example"] == {"items": []}
     assert "### Response 200" not in operation.get("description", "")
+
+
+# ─── hoist_version_prefix ────────────────────────────────────────────────────
+
+def test_hoist_moves_common_version_prefix_to_servers():
+    """Tracer bullet: /2/0 common to all paths is stripped from paths and appended to every server URL."""
+    spec = {
+        "openapi": "3.0.0",
+        "info": {"title": "T", "version": "1.0.0"},
+        "servers": [{"url": "https://api.example.com"}],
+        "paths": {
+            "/2/0/integrations": {},
+            "/2/0/integrations/{id}": {},
+        },
+    }
+    result = hoist_version_prefix(spec)
+    assert "/integrations" in result["paths"]
+    assert "/integrations/{id}" in result["paths"]
+    assert "/2/0/integrations" not in result["paths"]
+    assert result["servers"][0]["url"] == "https://api.example.com/2/0"
+
+
+def test_hoist_single_segment_v_prefix():
+    """/v1 prefix (single version segment) is also hoisted."""
+    spec = {
+        "openapi": "3.0.0",
+        "info": {"title": "T", "version": "1.0.0"},
+        "servers": [{"url": "https://api.example.com"}],
+        "paths": {"/v1/users": {}, "/v1/orders": {}},
+    }
+    result = hoist_version_prefix(spec)
+    assert "/users" in result["paths"]
+    assert "/orders" in result["paths"]
+    assert result["servers"][0]["url"] == "https://api.example.com/v1"
+
+
+def test_hoist_no_common_prefix_leaves_spec_unchanged():
+    """Paths with no shared prefix are returned as-is."""
+    spec = {
+        "openapi": "3.0.0",
+        "info": {"title": "T", "version": "1.0.0"},
+        "servers": [{"url": "https://api.example.com"}],
+        "paths": {"/users": {}, "/orders": {}},
+    }
+    result = hoist_version_prefix(spec)
+    assert result["paths"] == spec["paths"]
+    assert result["servers"] == spec["servers"]
+
+
+def test_hoist_non_version_common_prefix_leaves_spec_unchanged():
+    """/api common prefix is not a version token — spec left unchanged."""
+    spec = {
+        "openapi": "3.0.0",
+        "info": {"title": "T", "version": "1.0.0"},
+        "servers": [{"url": "https://api.example.com"}],
+        "paths": {"/api/users": {}, "/api/orders": {}},
+    }
+    result = hoist_version_prefix(spec)
+    assert "/api/users" in result["paths"]
+    assert result["servers"][0]["url"] == "https://api.example.com"
+
+
+def test_hoist_empty_paths_leaves_spec_unchanged():
+    """Spec with no paths is returned unchanged."""
+    spec = {
+        "openapi": "3.0.0",
+        "info": {"title": "T", "version": "1.0.0"},
+        "servers": [{"url": "https://api.example.com"}],
+        "paths": {},
+    }
+    result = hoist_version_prefix(spec)
+    assert result["servers"] == spec["servers"]
+    assert result["paths"] == {}
+
+
+def test_hoist_appends_prefix_to_all_servers():
+    """When multiple servers are present, the prefix is appended to each one."""
+    spec = {
+        "openapi": "3.0.0",
+        "info": {"title": "T", "version": "1.0.0"},
+        "servers": [
+            {"url": "https://api.example.com", "description": "Default"},
+            {"url": "https://eu.api.example.com", "description": "EU"},
+        ],
+        "paths": {"/2/0/items": {}, "/2/0/items/{id}": {}},
+    }
+    result = hoist_version_prefix(spec)
+    urls = [s["url"] for s in result["servers"]]
+    assert urls == ["https://api.example.com/2/0", "https://eu.api.example.com/2/0"]
+
+
+def test_hoist_partial_prefix_match_leaves_spec_unchanged():
+    """If one path lacks the version prefix, no hoisting occurs."""
+    spec = {
+        "openapi": "3.0.0",
+        "info": {"title": "T", "version": "1.0.0"},
+        "servers": [{"url": "https://api.example.com"}],
+        "paths": {"/2/0/integrations": {}, "/health": {}},
+    }
+    result = hoist_version_prefix(spec)
+    assert "/2/0/integrations" in result["paths"]
+    assert result["servers"][0]["url"] == "https://api.example.com"

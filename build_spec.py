@@ -12,7 +12,7 @@ from pathlib import Path
 import yaml
 from openapi_spec_validator import validate
 
-from converter import apiary_to_openapi_skeleton, convert_openapi_spec, fetch_apiary
+from converter import apiary_to_openapi_skeleton, convert_openapi_spec, fetch_apiary, hoist_version_prefix
 from schema_importer import load_object_schemas, validate_response_examples, wire_response_schema_refs
 from sync_yaml import sync_yaml
 
@@ -174,6 +174,7 @@ def build_spec_from_postman(
     spec["servers"] = servers_for_api(api_name)
     spec = _apply_api_defaults(api_name, spec)
     spec = _inject_object_schemas(api_name, spec, repo_root)
+    spec = hoist_version_prefix(spec)
 
     validate(spec)
 
@@ -199,6 +200,7 @@ def build_spec_from_apiary(
     skeleton = apiary_to_openapi_skeleton(apiary_json, servers=servers_for_api(api_name))
     spec = convert_openapi_spec(skeleton)
     spec = _apply_api_defaults(api_name, spec)
+    spec = hoist_version_prefix(spec)
 
     validate(spec)
 
