@@ -174,7 +174,7 @@ The Apiary identifier is the subdomain from the API's documentation URL (e.g. `h
 | OAuth | `anaplanoauth2service` |
 | Integration | `anaplan` *(verify)* |
 | CloudWorks | *(verify)* |
-| SCIM | *(verify)* |
+| SCIM | `scimapi` |
 | ALM | *(verify)* |
 | Audit | *(verify)* |
 | Financial Consolidation | *(verify)* |

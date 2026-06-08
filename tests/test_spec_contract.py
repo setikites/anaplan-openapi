@@ -765,15 +765,33 @@ def test_descriptions_have_no_html_tags(spec_path):
     )
 
 # ─── SCIM API ──────────────────────────────────────────────────────────────
-# SCIM is a standard (RFC 7644) and uses Bearer token authentication.
+# SCIM is a standard (RFC 7644). Anaplan implements Users + entitlements only.
+# Auth: AnaplanAuthToken + BearerAuth (pending live-test validation — see issue #44).
 
-@pytest.mark.skipif(
-    not (REPO_ROOT / "scim" / "scim-openapi.json").exists(),
-    reason="scim spec not yet written",
+_SCIM_SPEC = REPO_ROOT / "scim" / "scim-openapi.json"
+_skip_scim = pytest.mark.skipif(
+    not _SCIM_SPEC.exists(), reason="scim spec not yet written"
 )
+
+_SCIM_USER_ENDPOINTS = [
+    ("get",   "/Users"),
+    ("post",  "/Users"),
+    ("get",   "/Users/{id}"),
+    ("put",   "/Users/{id}"),
+    ("patch", "/Users/{id}"),
+]
+
+_SCIM_DISCOVERY_ENDPOINTS = [
+    ("get", "/ResourceTypes"),
+    ("get", "/Schemas"),
+    ("get", "/ServiceProviderConfig"),
+]
+
+
+@_skip_scim
 def test_scim_spec_declares_bearer_auth():
     """SCIM uses standard Bearer token auth per RFC 7644 — must be declared."""
-    spec = _load(REPO_ROOT / "scim" / "scim-openapi.json")
+    spec = _load(_SCIM_SPEC)
     schemes = spec.get("components", {}).get("securitySchemes", {})
     bearer = [
         name for name, d in schemes.items()
@@ -782,6 +800,76 @@ def test_scim_spec_declares_bearer_auth():
     assert bearer, (
         "scim spec must declare a Bearer security scheme (type: http, scheme: bearer)"
     )
+
+
+@_skip_scim
+def test_scim_spec_declares_anaplan_token_scheme():
+    """Anaplan also accepts AnaplanAuthToken on SCIM endpoints (pending live validation)."""
+    spec = _load(_SCIM_SPEC)
+    schemes = spec.get("components", {}).get("securitySchemes", {})
+    anaplan = [
+        name for name, d in schemes.items()
+        if d.get("type") == "apiKey" and d.get("in") == "header"
+    ]
+    assert anaplan, (
+        "scim spec must declare an AnaplanAuthToken-style scheme "
+        "(type: apiKey, in: header)"
+    )
+
+
+@_skip_scim
+@pytest.mark.parametrize("method,path", _SCIM_USER_ENDPOINTS, ids=lambda x: x)
+def test_scim_spec_has_user_endpoint(method, path):
+    """All SCIM user CRUD endpoints must be documented."""
+    spec = _load(_SCIM_SPEC)
+    paths = spec.get("paths", {})
+    assert path in paths, f"scim spec must document {path}"
+    assert method in paths[path], f"scim spec must document {method.upper()} {path}"
+
+
+@_skip_scim
+@pytest.mark.parametrize("method,path", _SCIM_DISCOVERY_ENDPOINTS, ids=lambda x: x)
+def test_scim_spec_has_discovery_endpoint(method, path):
+    """SCIM discovery endpoints must be documented."""
+    spec = _load(_SCIM_SPEC)
+    paths = spec.get("paths", {})
+    assert path in paths, f"scim spec must document {path}"
+    assert method in paths[path], f"scim spec must document {method.upper()} {path}"
+
+
+@_skip_scim
+def test_scim_spec_user_schema_has_entitlements():
+    """User schema must include the Anaplan-specific entitlements attribute."""
+    spec = _load(_SCIM_SPEC)
+    user = spec.get("components", {}).get("schemas", {}).get("User", {})
+    props = user.get("properties", {})
+    assert "entitlements" in props, (
+        "scim User schema must include 'entitlements' property "
+        "(Anaplan-specific, not standard SCIM)"
+    )
+
+
+@_skip_scim
+@pytest.mark.parametrize("schema_name", ["ListResponse", "ScimError", "PatchOp"])
+def test_scim_spec_has_required_schema(schema_name):
+    """ListResponse, ScimError, and PatchOp must be defined in components/schemas."""
+    spec = _load(_SCIM_SPEC)
+    schemas = spec.get("components", {}).get("schemas", {})
+    assert schema_name in schemas, (
+        f"scim spec must define {schema_name!r} in components/schemas"
+    )
+
+
+@_skip_scim
+def test_scim_get_users_declares_pagination_params():
+    """GET /Users must declare the standard SCIM pagination and filter query params."""
+    spec = _load(_SCIM_SPEC)
+    params = _all_params(spec, "/Users", "get")
+    names = {p["name"] for p in params if "name" in p}
+    for param in ("startIndex", "count", "filter"):
+        assert param in names, (
+            f"GET /Users is missing {param!r} query parameter"
+        )
 
 
 # ─── Description formatting ────────────────────────────────────────────────

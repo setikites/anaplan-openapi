@@ -1,0 +1,545 @@
+openapi: 3.0.0
+info:
+  title: Anaplan SCIM API
+  version: 1.0.0
+  description: Anaplan implementation of SCIM 2.0 (RFC 7644) for user identity management. Supports Users and Anaplan-specific
+    entitlements only; Groups are not implemented.
+servers:
+- url: https://api.anaplan.com/scim/1/0/v2
+  description: US1, US2, US5, US7, EU1, EU2, EU4, AP1
+- url: https://us9.api.anaplan.com/scim/1/0/v2
+  description: US9
+- url: https://eu3.api.anaplan.com/scim/1/0/v2
+  description: EU3
+- url: https://eu5.api.anaplan.com/scim/1/0/v2
+  description: EU5
+- url: https://gb1.api.anaplan.com/scim/1/0/v2
+  description: GB1
+- url: https://ca1a.api.anaplan.com/scim/1/0/v2
+  description: CA1
+- url: https://sg1.api.anaplan.com/scim/1/0/v2
+  description: SG1
+- url: https://ae1.api.anaplan.com/scim/1/0/v2
+  description: AE1
+- url: https://in1.api.anaplan.com/scim/1/0/v2
+  description: IN1
+- url: https://id1.api.anaplan.com/scim/1/0/v2
+  description: ID1
+- url: https://me1.api.anaplan.com/scim/1/0/v2
+  description: ME1
+- url: https://au1a.api2.anaplan.com/scim/1/0/v2
+  description: AU1
+security:
+- AnaplanAuthToken: []
+- BearerAuth: []
+paths:
+  /Users:
+    get:
+      summary: List users
+      description: Returns a paginated list of users. Supports SCIM filtering, pagination, and count controls. Maximum 100
+        users per call.
+      operationId: listUsers
+      parameters:
+      - name: filter
+        in: query
+        description: SCIM filter expression (e.g. `userName eq "john@example.com"`).
+        schema:
+          type: string
+      - name: startIndex
+        in: query
+        description: 1-based index of the first result in the current set of list results.
+        schema:
+          type: integer
+          default: 1
+      - name: count
+        in: query
+        description: Maximum number of results per page. Maximum allowed value is 100.
+        schema:
+          type: integer
+          default: 100
+      responses:
+        '200':
+          description: A paginated list of users.
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/ListResponse'
+        '400':
+          description: Invalid filter expression or request.
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/ScimError'
+        '401':
+          description: Missing or invalid authentication token.
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/ScimError'
+        '403':
+          description: Caller does not have USER_ADMIN role.
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/ScimError'
+    post:
+      summary: Create user
+      description: Creates a new user and assigns Anaplan entitlements. Maximum 50 workspaces per call. SCIM does not support
+        Visiting users.
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          application/scim+json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '201':
+          description: User created.
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid request body or missing required fields.
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/ScimError'
+        '401':
+          description: Missing or invalid authentication token.
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/ScimError'
+        '403':
+          description: Caller does not have USER_ADMIN role.
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/ScimError'
+        '409':
+          description: User already exists (conflict on userName).
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/ScimError'
+  /Users/{id}:
+    parameters:
+    - name: id
+      in: path
+      required: true
+      description: Anaplan user ID.
+      schema:
+        type: string
+    get:
+      summary: Get user
+      description: Retrieves a single user by their Anaplan ID.
+      operationId: getUser
+      responses:
+        '200':
+          description: The requested user.
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Missing or invalid authentication token.
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/ScimError'
+        '403':
+          description: Caller does not have USER_ADMIN role.
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/ScimError'
+        '404':
+          description: User not found.
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/ScimError'
+    put:
+      summary: Replace user
+      description: Performs a full replacement of a user resource. All mutable attributes must be provided; omitted attributes
+        are cleared.
+      operationId: replaceUser
+      requestBody:
+        required: true
+        content:
+          application/scim+json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: User replaced.
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid request body.
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/ScimError'
+        '401':
+          description: Missing or invalid authentication token.
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/ScimError'
+        '403':
+          description: Caller does not have USER_ADMIN role.
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/ScimError'
+        '404':
+          description: User not found.
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/ScimError'
+    patch:
+      summary: Update user
+      description: Performs a partial update of a user resource using SCIM PatchOp semantics (RFC 7644 §3.5.2).
+      operationId: patchUser
+      requestBody:
+        required: true
+        content:
+          application/scim+json:
+            schema:
+              $ref: '#/components/schemas/PatchOp'
+      responses:
+        '200':
+          description: User updated.
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid PatchOp or unsupported operation.
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/ScimError'
+        '401':
+          description: Missing or invalid authentication token.
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/ScimError'
+        '403':
+          description: Caller does not have USER_ADMIN role.
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/ScimError'
+        '404':
+          description: User not found.
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/ScimError'
+  /ResourceTypes:
+    get:
+      summary: Get resource types
+      description: Returns the SCIM resource types supported by this service provider.
+      operationId: getResourceTypes
+      responses:
+        '200':
+          description: List of supported resource types.
+          content:
+            application/scim+json:
+              schema:
+                type: object
+                properties:
+                  schemas:
+                    type: array
+                    items:
+                      type: string
+                  totalResults:
+                    type: integer
+                  Resources:
+                    type: array
+                    items:
+                      type: object
+        '401':
+          description: Missing or invalid authentication token.
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/ScimError'
+  /Schemas:
+    get:
+      summary: Get schemas
+      description: Returns the SCIM schema definitions supported by this service provider.
+      operationId: getSchemas
+      responses:
+        '200':
+          description: List of schema definitions.
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/ListResponse'
+        '401':
+          description: Missing or invalid authentication token.
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/ScimError'
+  /ServiceProviderConfig:
+    get:
+      summary: Get service provider configuration
+      description: Returns a description of the service provider's SCIM configuration and capabilities (patch support, bulk,
+        filter, sort, etc.).
+      operationId: getServiceProviderConfig
+      responses:
+        '200':
+          description: Service provider configuration.
+          content:
+            application/scim+json:
+              schema:
+                type: object
+                properties:
+                  schemas:
+                    type: array
+                    items:
+                      type: string
+                  patch:
+                    type: object
+                    properties:
+                      supported:
+                        type: boolean
+                  bulk:
+                    type: object
+                    properties:
+                      supported:
+                        type: boolean
+                      maxOperations:
+                        type: integer
+                      maxPayloadSize:
+                        type: integer
+                  filter:
+                    type: object
+                    properties:
+                      supported:
+                        type: boolean
+                      maxResults:
+                        type: integer
+                  changePassword:
+                    type: object
+                    properties:
+                      supported:
+                        type: boolean
+                  sort:
+                    type: object
+                    properties:
+                      supported:
+                        type: boolean
+                  etag:
+                    type: object
+                    properties:
+                      supported:
+                        type: boolean
+                  authenticationSchemes:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                        name:
+                          type: string
+                        description:
+                          type: string
+        '401':
+          description: Missing or invalid authentication token.
+          content:
+            application/scim+json:
+              schema:
+                $ref: '#/components/schemas/ScimError'
+components:
+  securitySchemes:
+    AnaplanAuthToken:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Anaplan authentication token. Format: `AnaplanAuthToken {token}`'
+    BearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    User:
+      type: object
+      description: Anaplan SCIM User resource. Implements the SCIM core User schema plus Anaplan-specific entitlements.
+      required:
+      - userName
+      - name
+      properties:
+        schemas:
+          type: array
+          items:
+            type: string
+        id:
+          type: string
+          description: Unique identifier assigned by Anaplan (read-only, case-insensitive).
+          readOnly: true
+        externalId:
+          type: string
+          description: Unique identifier assigned by the provisioning client.
+        userName:
+          type: string
+          description: Username of the user. Required and unique (read-only after creation).
+          readOnly: true
+        name:
+          type: object
+          description: Components of the user's real name.
+          required:
+          - familyName
+          - givenName
+          properties:
+            familyName:
+              type: string
+              description: Family name of the user.
+            givenName:
+              type: string
+              description: Given name of the user.
+            formatted:
+              type: string
+              description: Formatted full name (read-only, generated from givenName + familyName).
+              readOnly: true
+        displayName:
+          type: string
+          description: Display name (read-only, generated from givenName + familyName).
+          readOnly: true
+        active:
+          type: boolean
+          description: Controls whether the user can log into Anaplan.
+        emails:
+          type: array
+          description: Email addresses for the user. Only `work` type is supported.
+          items:
+            type: object
+            properties:
+              value:
+                type: string
+                description: The email address.
+              type:
+                type: string
+                description: The type of email. Only `work` is supported.
+              primary:
+                type: boolean
+                description: Indicates the primary email address.
+                readOnly: true
+        entitlements:
+          type: array
+          description: Anaplan-specific workspace entitlements for the user. Not a standard SCIM attribute. Maximum 50 workspaces
+            per create call.
+          items:
+            type: object
+            properties:
+              value:
+                type: string
+                description: The target resource ID of the entitlement (e.g. a workspace ID).
+              display:
+                type: string
+                description: Human-readable name of the entitlement (e.g. a workspace name).
+              type:
+                type: string
+                description: The type of entitlement.
+                enum:
+                - WORKSPACE
+                - WORKSPACE_IDS
+                - WORKSPACE_NAMES
+                readOnly: true
+              primary:
+                type: boolean
+                description: Indicates the primary entitlement. At most one entry may be `true`.
+                readOnly: true
+        meta:
+          type: object
+          description: Resource metadata.
+          properties:
+            resourceType:
+              type: string
+            location:
+              type: string
+    ListResponse:
+      type: object
+      description: SCIM ListResponse envelope (RFC 7644 §3.4.2).
+      required:
+      - schemas
+      - totalResults
+      properties:
+        schemas:
+          type: array
+          items:
+            type: string
+        totalResults:
+          type: integer
+          description: Total number of results matching the query.
+        startIndex:
+          type: integer
+          description: 1-based index of the first result returned.
+        itemsPerPage:
+          type: integer
+          description: Number of results returned in this response.
+        Resources:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+    ScimError:
+      type: object
+      description: SCIM error response (RFC 7644 §3.12).
+      required:
+      - schemas
+      - status
+      properties:
+        schemas:
+          type: array
+          items:
+            type: string
+        status:
+          type: string
+          description: HTTP status code as a string.
+        detail:
+          type: string
+          description: Human-readable error message.
+        scimType:
+          type: string
+          description: SCIM-specific error type (e.g. `invalidValue`, `uniqueness`).
+    PatchOp:
+      type: object
+      description: SCIM PATCH request body (RFC 7644 §3.5.2).
+      required:
+      - schemas
+      - Operations
+      properties:
+        schemas:
+          type: array
+          items:
+            type: string
+        Operations:
+          type: array
+          description: List of PATCH operations to apply.
+          items:
+            type: object
+            required:
+            - op
+            properties:
+              op:
+                type: string
+                description: Operation type.
+                enum:
+                - add
+                - remove
+                - replace
+              path:
+                type: string
+                description: SCIM attribute path to operate on.
+              value:
+                description: New value for `add` or `replace` operations.
