@@ -250,6 +250,34 @@ def test_server_urls_dont_use_wrong_base(spec_path):
             )
 
 
+# Minimum server entry count for specs that cover all 19 Anaplan regions.
+# 12 = 11 unique regional hosts + 1 shared legacy host (api.anaplan.com).
+# cloudworks is excluded until its spec reaches full regional coverage.
+_MIN_SERVER_COUNT: dict[str, int] = {
+    "integration": 12,
+    "alm":         12,
+    "scim":        12,
+    "audit":       12,
+}
+
+
+@pytest.mark.parametrize(
+    "spec_path",
+    [p for p in SPEC_FILES if p.parent.name in _MIN_SERVER_COUNT],
+    ids=lambda p: p.parent.name,
+)
+def test_spec_covers_minimum_regions(spec_path):
+    """Specs with full regional coverage must declare at least one server per distinct host."""
+    api_dir = spec_path.parent.name
+    minimum = _MIN_SERVER_COUNT[api_dir]
+    spec = _load(spec_path)
+    urls = [s.get("url", "") for s in spec.get("servers", [])]
+    assert len(urls) >= minimum, (
+        f"{api_dir}: declares only {len(urls)} server(s); "
+        f"expected at least {minimum} (one per distinct regional host)"
+    )
+
+
 # ─── Security scheme declarations ─────────────────────────────────────────
 # Each row declares that a spec must contain at least one security scheme
 # matching the given type. New APIs: add rows here.
@@ -850,27 +878,6 @@ def test_clean_descriptions_is_idempotent():
 
 _ALM_SPEC = REPO_ROOT / "alm" / "alm-openapi.json"
 _skip_alm = _skip_if_missing("alm")
-
-
-@_skip_alm
-def test_alm_servers_use_api_anaplan_com():
-    """ALM is an api.anaplan.com-family API — all server URLs must use that host."""
-    spec = _load(_ALM_SPEC)
-    urls = [s.get("url", "") for s in spec.get("servers", [])]
-    assert any("api.anaplan.com" in url for url in urls), (
-        f"alm: no server URL contains 'api.anaplan.com'. Got: {urls}"
-    )
-
-
-@_skip_alm
-def test_alm_servers_cover_all_19_regions():
-    """ALM spec must declare server entries covering all 19 Anaplan regions."""
-    spec = _load(_ALM_SPEC)
-    urls = [s.get("url", "") for s in spec.get("servers", [])]
-    assert len(urls) >= 12, (
-        f"alm spec declares only {len(urls)} server(s); expected at least 12 "
-        f"(one per distinct regional host)"
-    )
 
 
 @_skip_alm
