@@ -93,6 +93,14 @@ paths:
               schema:
                 type: string
               description: Audit events in Common Event Format (CEF).
+        '401':
+          description: Authentication failed, or the authenticated user is not authorized. The Audit API returns 401 (not
+            403) when the user lacks the Tenant Auditor role — check `status` in the response body to distinguish an invalid
+            token from a missing role.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditErrorResponse'
   /events/search:
     post:
       summary: Search audit events
@@ -133,6 +141,14 @@ paths:
               schema:
                 type: string
               description: Audit events in Common Event Format (CEF).
+        '401':
+          description: Authentication failed, or the authenticated user is not authorized. The Audit API returns 401 (not
+            403) when the user lacks the Tenant Auditor role — check `status` in the response body to distinguish an invalid
+            token from a missing role.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditErrorResponse'
 components:
   schemas:
     AuditEvent:
@@ -238,6 +254,17 @@ components:
           items:
             $ref: '#/components/schemas/AuditEvent'
           description: Array of audit event records.
+    AuditErrorResponse:
+      type: object
+      description: Error response returned by the Audit API. The `status` field identifies the error type. `FAILURE_UNAUTHORIZED_USER_ACTION`
+        indicates the token was accepted but the user lacks the Tenant Auditor role (returned as 401, not 403).
+      properties:
+        status:
+          type: string
+          description: Error type code (for example, `FAILURE_UNAUTHORIZED_USER_ACTION`).
+        statusMessage:
+          type: string
+          description: Human-readable error description.
     AuditSearchRequest:
       type: object
       description: Request body for the POST /events/search endpoint. Specify `from`/`to` for a date range or `interval` for
