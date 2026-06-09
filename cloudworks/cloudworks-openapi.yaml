@@ -132,28 +132,81 @@ paths:
                     enum:
                     - AzureBlob
                   body:
-                    type: object
-                    required:
-                    - name
-                    - storageAccountName
-                    - sasToken
-                    - containerName
-                    properties:
-                      name:
-                        type: string
-                        description: Unique connection name.
-                      storageAccountName:
-                        type: string
-                        description: Azure Storage account name.
-                      sasToken:
-                        type: string
-                        description: Azure SAS token.
-                      containerName:
-                        type: string
-                        description: Azure Blob container name.
-                      workspaceId:
-                        type: string
-                        description: Required for restricted integration users.
+                    oneOf:
+                    - title: SAS-based authentication
+                      type: object
+                      required:
+                      - name
+                      - storageAccountName
+                      - containerName
+                      - auth_method
+                      - sasToken
+                      properties:
+                        name:
+                          type: string
+                          description: Unique connection name.
+                        auth_method:
+                          type: string
+                          enum:
+                          - SAS-based
+                          default: SAS-based
+                          description: Authentication method. `"SAS-based"` uses a Shared Access Signature token and is the
+                            backwards-compatible default. This field became required in a recent CloudWorks update that introduced
+                            OAuth 2.0 support.
+                        storageAccountName:
+                          type: string
+                          description: Azure Storage account name.
+                        sasToken:
+                          type: string
+                          description: Azure Shared Access Signature token. Required when `auth_method` is `"SAS-based"`.
+                        containerName:
+                          type: string
+                          description: Azure Blob container name.
+                        workspaceId:
+                          type: string
+                          description: Required for restricted integration users.
+                    - title: OAuth 2.0 authentication (property names unconfirmed)
+                      type: object
+                      required:
+                      - name
+                      - storageAccountName
+                      - containerName
+                      - auth_method
+                      - clientId
+                      - clientSecret
+                      - tenantId
+                      properties:
+                        name:
+                          type: string
+                          description: Unique connection name.
+                        auth_method:
+                          type: string
+                          not:
+                            enum:
+                            - SAS-based
+                          description: Authentication method for OAuth 2.0. The Anaplan UI selects `"Oauth2"` for this variant,
+                            but the exact API-level value has not been confirmed via live testing. Must not be `"SAS-based"`.
+                        storageAccountName:
+                          type: string
+                          description: Azure Storage account name.
+                        containerName:
+                          type: string
+                          description: Azure Blob container name.
+                        clientId:
+                          type: string
+                          description: Azure app registration Client ID (from Microsoft Entra ID application Overview). Property
+                            name inferred from Anaplan UI docs — exact API key name unconfirmed.
+                        clientSecret:
+                          type: string
+                          description: Azure app registration client secret (from Certificates & secrets). Property name inferred
+                            from Anaplan UI docs — exact API key name unconfirmed.
+                        tenantId:
+                          type: string
+                          description: Azure Tenant ID (from Microsoft Entra ID application Overview). Property name inferred
+                            from Anaplan UI docs — exact API key name unconfirmed.
+                        workspaceId:
+                          type: string
+                          description: Required for restricted integration users.
       responses:
         '200':
           description: Connection created.
