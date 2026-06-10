@@ -185,6 +185,22 @@ The Apiary identifier is the subdomain from the API's documentation URL (e.g. `h
 | Financial Consolidation | *(verify)* |
 | Exception Users | *(verify)* |
 
+### Accessing the Postman collection
+
+The official Anaplan Postman collection is published and maintained by Anaplan at:
+
+**https://www.postman.com/apiplan/official-anaplan-collection/**
+
+It covers 8 of the 9 APIs (all except Financial Consolidation) and is the primary source for endpoint discovery for those APIs. As Anaplan migrates documentation away from Apiary, the Postman collection is becoming the authoritative reference.
+
+#### Local copy
+
+A local copy of the collection is saved at `Official Anaplan Collection.postman_collection.json` (repo root). Use this file for offline reference and scripted processing rather than hitting the Postman API repeatedly.
+
+#### postman-spec.yaml
+
+`postman-spec.yaml` (repo root) is a YAML conversion of the collection generated from a personal fork of the official Anaplan collection. It is produced by exporting the forked collection from Postman in OpenAPI format. This file captures the collection state at a point in time and may lag behind updates to the official collection.
+
 ### Regional server URLs
 
 Each API has region-specific base URLs. Source: [URL, IP, and allowlist requirements](https://support.anaplan.com/url-ip-and-allowlist-requirements-c8235c7d-8af2-413b-a9ff-d465978806b9) (also saved as `oauth/URL, IP, and allowlist requirements _ Anaplan Support.pdf`).
@@ -247,7 +263,8 @@ Legacy regions (us1–us7, eu1, eu2, eu4, ap1) share the older non-prefixed `api
 /
 ├── CONTEXT.md                                    (this file)
 ├── README.md                                     (project overview)
-├── Official Anaplan Collection.postman_collection.json
+├── Official Anaplan Collection.postman_collection.json  (local copy of official collection)
+├── postman-spec.yaml                             (OpenAPI export from forked collection)
 ├── authentication/
 │   ├── README.md                                (Apiary docs + notes)
 │   └── authentication-openapi.json              (OpenAPI 3.0 spec)
