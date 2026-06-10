@@ -4,15 +4,16 @@ Live API integration tests for Anaplan Exception Users API.
 Verifies the contract for POST /permissions/exception-users/search and
 PATCH /permissions/exception-users/users/{userGuid} using OAuth Bearer auth.
 
-Before running, obtain an OAuth access token via the authcode flow:
-    uv run python oauth_authcode_step1.py
-    uv run python oauth_authcode_step2.py
-    uv run python oauth_authcode_step3.py   # refresh if token expired
-
-The token is read automatically from .token at the repo root.
+A service-to-service (client credentials) token is fetched automatically at
+test time using ANAPLAN_OAUTH_AUTHCODE_CLIENT_ID and
+ANAPLAN_OAUTH_AUTHCODE_CLIENT_SECRET from .env.
 
 Run with:
     uv run --env-file .env pytest tests/test_exception_live.py --live
+
+Required .env variables:
+    ANAPLAN_OAUTH_AUTHCODE_CLIENT_ID     - OAuth client ID
+    ANAPLAN_OAUTH_AUTHCODE_CLIENT_SECRET - OAuth client secret
 
 Optional .env variables:
     ANAPLAN_EXCEPTION_WORKSPACE_GUID - a workspace GUID the account has Tenant Security Admin access to
@@ -20,13 +21,13 @@ Optional .env variables:
     ANAPLAN_EXCEPTION_BASE_URL       - override base URL (default: https://api.anaplan.com/admin/1/0)
 """
 
-import json
 import os
 import warnings
 
 import httpx
 import pytest
 
+OAUTH_TOKEN_URL = "https://us1a.app.anaplan.com/oauth/token"
 EXCEPTION_BASE_URL = os.getenv(
     "ANAPLAN_EXCEPTION_BASE_URL", "https://api.anaplan.com/admin/1/0"
 )
@@ -35,15 +36,27 @@ SEARCH_URL = f"{EXCEPTION_BASE_URL}/permissions/exception-users/search"
 
 @pytest.fixture(scope="module")
 def oauth_token():
-    """Bearer access token read from .token (written by oauth_authcode_step2.py)."""
-    token_path = os.path.join(os.path.dirname(__file__), "..", ".token")
-    if not os.path.exists(token_path):
-        pytest.skip(".token file not found — run oauth_authcode_step1/2/3.py first")
-    with open(token_path) as f:
-        data = json.load(f)
-    token = data.get("access_token")
+    """Service-to-service Bearer token fetched via client credentials grant."""
+    client_id = os.getenv("ANAPLAN_OAUTH_AUTHCODE_CLIENT_ID")
+    client_secret = os.getenv("ANAPLAN_OAUTH_AUTHCODE_CLIENT_SECRET")
+    if not client_id or not client_secret:
+        pytest.skip("ANAPLAN_OAUTH_AUTHCODE_CLIENT_ID and ANAPLAN_OAUTH_AUTHCODE_CLIENT_SECRET not set")
+
+    with httpx.Client() as client:
+        response = client.post(
+            OAUTH_TOKEN_URL,
+            json={
+                "grant_type": "client_credentials",
+                "client_id": client_id,
+                "client_secret": client_secret,
+            },
+        )
+    if response.status_code != 200:
+        pytest.skip(f"Failed to obtain client-credentials token: {response.status_code} {response.text}")
+
+    token = response.json().get("access_token")
     if not token:
-        pytest.skip("No access_token in .token — run oauth_authcode_step3.py to refresh")
+        pytest.skip("No access_token in client-credentials response")
     return token
 
 
