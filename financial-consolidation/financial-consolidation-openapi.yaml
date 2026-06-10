@@ -13,7 +13,269 @@ servers:
   description: Fluence production server (single global endpoint — regional variants not documented)
 security:
 - apiToken: []
-paths: {}
+paths:
+  /odata/{tableName}:
+    parameters:
+    - $ref: '#/components/parameters/TenantHeader'
+    - name: tableName
+      in: path
+      required: true
+      description: Name of the client schema staging table.
+      schema:
+        type: string
+        example: Consolidation
+    get:
+      operationId: getODataTableData
+      summary: Get client schema table data
+      description: |-
+        Retrieve rows from a client schema staging table. Supports OData query parameters for filtering, sorting, and pagination.
+
+        When `Page` and `PageSize` are supplied the response object includes `CurrentPage`, `TotalPages`, and `TotalRows` pagination fields alongside the `value` array. Without pagination parameters the response is a bare JSON array of records.
+
+        Maximum page size: 2500 rows.
+      parameters:
+      - name: Page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+        description: Page number to retrieve. Starts at 1.
+        example: 1
+      - name: PageSize
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 2500
+        description: Number of rows per page. Maximum 2500.
+        example: 500
+      - name: $filter
+        in: query
+        schema:
+          type: string
+        description: 'OData filter expression using logical operators (`eq`, `ne`, `gt`, `lt`, `and`, `or`, `startswith`,
+          etc.). Example: `$filter=Scenario_Name eq ''Actual''`'
+      - name: $select
+        in: query
+        schema:
+          type: string
+        description: Comma-separated list of columns to retrieve. Use `*` for all columns.
+      - name: $orderby
+        in: query
+        schema:
+          type: string
+        description: 'Sort expression. Append `asc` or `desc`. Example: `$orderby=Date_Name asc`'
+      - name: $top
+        in: query
+        schema:
+          type: integer
+        description: Return only the first N records.
+      - name: $skip
+        in: query
+        schema:
+          type: integer
+        description: Skip the first N records.
+      - name: $count
+        in: query
+        schema:
+          type: boolean
+        description: Include a count of matching records in the response.
+      responses:
+        '200':
+          description: Rows retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ODataRecord'
+              example:
+              - Account_Name: '1110'
+                Audit_Name: Source GL
+                CostCenter_Name: No CostCenter
+                Currency_Name: USD
+                DataView_Name: Conversion
+                Date_Name: 2024 Dec
+                Entity_Name: '220'
+                Intercompany_Name: No Entity
+                Movement_Name: Closing
+                Product_Name: No product
+                Scenario_Name: Actual
+                Amount: 75443.48
+                Text: ''
+                Periodic_Amount: 0.0
+        '400':
+          description: Incorrect or missing parameters.
+        '401':
+          description: Invalid or malformed authentication token.
+        '403':
+          description: Insufficient permissions.
+        '404':
+          description: Table not found.
+    post:
+      operationId: addODataRecord
+      summary: Add a record to a client schema table
+      description: Insert a single row into a client schema staging table. Field names and types are defined by the table
+        schema.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ODataRecord'
+            example:
+              Account_Name: '6001'
+              Audit_Name: Reclassification
+              CostCenter_Name: '000'
+              Currency_Name: USD
+              DataView_Name: Value
+              Date_Name: 2023 Dec
+              Entity_Name: '120'
+              Intercompany_Name: No Intercompany
+              Movement_Name: Closing
+              Product_Name: No product
+              Scenario_Name: Budget
+              Amount: 25000.0
+              Text: null
+              Periodic_Amount: null
+      responses:
+        '200':
+          description: Record added successfully.
+        '400':
+          description: Incorrect or missing parameters.
+        '401':
+          description: Invalid or malformed authentication token.
+        '403':
+          description: Insufficient permissions.
+        '404':
+          description: Table not found.
+        '409':
+          description: Resource conflict.
+        '415':
+          description: Unsupported media type.
+    put:
+      operationId: updateODataRecords
+      summary: Update client schema table records
+      description: Update rows in a client schema staging table that match the `$filter` query parameter. The request body
+        contains the new field values to write to matched rows.
+      parameters:
+      - name: $filter
+        in: query
+        schema:
+          type: string
+        description: 'OData filter expression selecting rows to update. Example: `$filter=Scenario_Name eq ''Budget''`'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ODataRecord'
+            example:
+              Account_Name: '6001'
+              Scenario_Name: Budget
+              Date_Name: 2023 Dec
+              Entity_Name: '120'
+              Amount: 30000.0
+              Text: null
+              Periodic_Amount: null
+      responses:
+        '200':
+          description: Records updated successfully.
+        '400':
+          description: Incorrect or missing parameters.
+        '401':
+          description: Invalid or malformed authentication token.
+        '403':
+          description: Insufficient permissions.
+        '404':
+          description: Table not found.
+        '415':
+          description: Unsupported media type.
+    delete:
+      operationId: deleteODataRecords
+      summary: Delete data from client schema table
+      description: Remove rows from a client schema staging table. Use the `$filter` query parameter or a request body to
+        identify rows to delete. Omitting both clears all rows while preserving the table schema.
+      parameters:
+      - name: $filter
+        in: query
+        schema:
+          type: string
+        description: 'OData filter expression selecting rows to delete. Example: `$filter=Scenario_Name eq ''Budget''`'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ODataRecord'
+            example:
+              Account_Name: '6001'
+              Date_Name: 2024 Dec
+              Scenario_Name: Budget
+      responses:
+        '200':
+          description: Records deleted successfully.
+        '204':
+          description: Table cleared successfully (no content).
+        '400':
+          description: Incorrect or missing parameters.
+        '401':
+          description: Invalid or malformed authentication token.
+        '403':
+          description: Insufficient permissions.
+        '404':
+          description: Table not found.
+  /odata/batch/{tableName}:
+    parameters:
+    - $ref: '#/components/parameters/TenantHeader'
+    - name: tableName
+      in: path
+      required: true
+      description: Name of the client schema staging table.
+      schema:
+        type: string
+        example: Consolidation
+    post:
+      operationId: addODataBatchRecords
+      summary: Add batch records to a client schema table
+      description: Insert multiple rows into a client schema staging table in a single request. Use this instead of repeated
+        single-record POSTs when loading more than one record.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/ODataRecord'
+            example:
+            - Account_Name: '6001'
+              Scenario_Name: Budget
+              Date_Name: 2023 Dec
+              Entity_Name: '120'
+              Amount: 25000.0
+              Text: null
+              Periodic_Amount: null
+            - Account_Name: '6002'
+              Scenario_Name: Budget
+              Date_Name: 2023 Dec
+              Entity_Name: '120'
+              Amount: 15000.0
+              Text: null
+              Periodic_Amount: null
+      responses:
+        '200':
+          description: Batch records added successfully.
+        '400':
+          description: Incorrect or missing parameters.
+        '401':
+          description: Invalid or malformed authentication token.
+        '403':
+          description: Insufficient permissions.
+        '404':
+          description: Table not found.
+        '415':
+          description: Unsupported media type.
 components:
   securitySchemes:
     apiToken:
@@ -32,3 +294,36 @@ components:
       schema:
         type: string
         example: CustomerTenant
+  schemas:
+    ODataRecord:
+      type: object
+      description: |-
+        A row in a client schema staging table. Field names and types are defined by the table's schema and vary by client configuration.
+
+        Supported data types per field:
+        - **string** — alphanumeric text (e.g. dimension member names such as `Scenario_Name`)
+        - **number** — integer or decimal (e.g. `Amount`, `Periodic_Amount`)
+        - **boolean** — `1` for true, `0` for false
+
+        Dimension fields conventionally end with `_Name`; measure fields use bare names.
+      additionalProperties:
+        oneOf:
+        - type: string
+        - type: number
+        - type: boolean
+        - type: 'null'
+      example:
+        Account_Name: '6001'
+        Audit_Name: Reclassification
+        CostCenter_Name: '000'
+        Currency_Name: USD
+        DataView_Name: Value
+        Date_Name: 2023 Dec
+        Entity_Name: '120'
+        Intercompany_Name: No Intercompany
+        Movement_Name: Closing
+        Product_Name: No product
+        Scenario_Name: Budget
+        Amount: 25000.0
+        Text: null
+        Periodic_Amount: null

@@ -122,9 +122,7 @@ def test_servers_list_is_nonempty(spec_path):
         )
 
 
-_SCAFFOLD_SPECS = {
-    "financial-consolidation",
-}
+_SCAFFOLD_SPECS: set[str] = set()
 
 
 @pytest.mark.parametrize("spec_path", SPEC_FILES, ids=lambda p: p.parent.name)
@@ -384,6 +382,12 @@ _REQUIRED_ENDPOINTS = [
     # Audit API
     pytest.param("audit",          "get",   "/events",                                       id="audit-get-events"),
     pytest.param("audit",          "post",  "/events/search",                                id="audit-post-search"),
+    # Financial Consolidation API — OData endpoints
+    pytest.param("financial-consolidation", "get",    "/odata/{tableName}",       id="fc-odata-get"),
+    pytest.param("financial-consolidation", "post",   "/odata/{tableName}",       id="fc-odata-post"),
+    pytest.param("financial-consolidation", "post",   "/odata/batch/{tableName}", id="fc-odata-batch"),
+    pytest.param("financial-consolidation", "put",    "/odata/{tableName}",       id="fc-odata-put"),
+    pytest.param("financial-consolidation", "delete", "/odata/{tableName}",       id="fc-odata-delete"),
 ]
 
 
@@ -1190,3 +1194,76 @@ def test_financial_consolidation_has_tenant_header_parameter():
     assert tenant.get("in") == "header", "TenantHeader must be in: header"
     assert tenant.get("name") == "TENANT", "TenantHeader header name must be TENANT"
     assert tenant.get("required") is True, "TenantHeader must be required: true"
+
+
+@_skip_fc
+def test_fc_odata_get_declares_page_and_pagesize_params():
+    """GET /odata/{tableName} must declare Page and PageSize integer query parameters."""
+    spec = _load(_FC_SPEC)
+    params = _all_params(spec, "/odata/{tableName}", "get")
+    names = {p["name"] for p in params if "name" in p}
+    for param_name in ("Page", "PageSize"):
+        assert param_name in names, (
+            f"GET /odata/{{tableName}} must declare {param_name!r} query parameter"
+        )
+        p = next(p for p in params if p.get("name") == param_name)
+        assert p.get("in") == "query"
+        assert p.get("schema", {}).get("type") == "integer", (
+            f"{param_name} must be type integer"
+        )
+
+
+@_skip_fc
+def test_fc_odata_get_declares_200_json_response():
+    """GET /odata/{tableName} must declare a 200 application/json response."""
+    spec = _load(_FC_SPEC)
+    op = spec["paths"]["/odata/{tableName}"]["get"]
+    content = op.get("responses", {}).get("200", {}).get("content", {})
+    assert "application/json" in content, (
+        "GET /odata/{tableName} must declare application/json 200 response"
+    )
+
+
+@_skip_fc
+@pytest.mark.parametrize("method,path", [
+    pytest.param("post",   "/odata/{tableName}",       id="fc-odata-post-body"),
+    pytest.param("post",   "/odata/batch/{tableName}", id="fc-odata-batch-body"),
+    pytest.param("put",    "/odata/{tableName}",       id="fc-odata-put-body"),
+    pytest.param("delete", "/odata/{tableName}",       id="fc-odata-delete-body"),
+])
+def test_fc_odata_mutating_operations_declare_request_body(method, path):
+    """POST, PUT, and DELETE OData operations must declare an application/json request body."""
+    spec = _load(_FC_SPEC)
+    op = spec["paths"][path][method]
+    body = op.get("requestBody", {})
+    assert "application/json" in body.get("content", {}), (
+        f"{method.upper()} {path} must declare an application/json request body"
+    )
+
+
+@_skip_fc
+@pytest.mark.parametrize("method,path", [
+    pytest.param("get",    "/odata/{tableName}",       id="fc-tenant-get"),
+    pytest.param("post",   "/odata/{tableName}",       id="fc-tenant-post"),
+    pytest.param("post",   "/odata/batch/{tableName}", id="fc-tenant-batch"),
+    pytest.param("put",    "/odata/{tableName}",       id="fc-tenant-put"),
+    pytest.param("delete", "/odata/{tableName}",       id="fc-tenant-delete"),
+])
+def test_fc_odata_operations_reference_tenant_header(method, path):
+    """Every OData operation must reference the reusable TenantHeader component parameter."""
+    spec = _load(_FC_SPEC)
+    params = _all_params(spec, path, method)
+    refs = [p.get("$ref", "") for p in params]
+    assert "#/components/parameters/TenantHeader" in refs, (
+        f"{method.upper()} {path} must reference #/components/parameters/TenantHeader"
+    )
+
+
+@_skip_fc
+def test_fc_odata_record_schema_defined():
+    """components/schemas must define ODataRecord for reuse across OData request/response bodies."""
+    spec = _load(_FC_SPEC)
+    schemas = spec.get("components", {}).get("schemas", {})
+    assert "ODataRecord" in schemas, (
+        "financial-consolidation spec must define ODataRecord in components/schemas"
+    )
