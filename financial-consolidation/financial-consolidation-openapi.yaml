@@ -225,6 +225,109 @@ paths:
           description: Insufficient permissions.
         '404':
           description: Table not found.
+  /process/start/{path}/{name_of_workflow}:
+    parameters:
+    - $ref: '#/components/parameters/TenantHeader'
+    - name: path
+      in: path
+      required: true
+      description: Path to the workflow file in Explorer. May include nested folders separated by `/`.
+      schema:
+        type: string
+        example: ImportsandExports
+    - name: name_of_workflow
+      in: path
+      required: true
+      description: Name of the workflow file in Explorer. Avoid special characters such as `?`, `&`, and `/`.
+      schema:
+        type: string
+        example: ModelExport
+    post:
+      operationId: startWorkflow
+      summary: Start a workflow process
+      description: Commands the server to start a workflow process within the specified folder in the Explorer module. Pass
+        an array of task parameters in the request body, or an empty array if none are needed.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: array
+              items: {}
+              description: Parameters for the workflow start task. Use `[]` if no parameters are required.
+            example: []
+      responses:
+        '200':
+          description: Workflow started successfully.
+        '401':
+          description: Invalid or malformed authentication token.
+        '403':
+          description: Insufficient permissions.
+        '404':
+          description: Workflow not found at the specified path.
+  /process/stop/{path}/{name_of_workflow}:
+    parameters:
+    - $ref: '#/components/parameters/TenantHeader'
+    - name: path
+      in: path
+      required: true
+      description: Path to the workflow file in Explorer. May include nested folders separated by `/`.
+      schema:
+        type: string
+        example: ImportsandExports
+    - name: name_of_workflow
+      in: path
+      required: true
+      description: Name of the workflow file in Explorer. Avoid special characters such as `?`, `&`, and `/`.
+      schema:
+        type: string
+        example: ModelExport
+    post:
+      operationId: stopWorkflow
+      summary: Stop a workflow process
+      description: Terminates a running workflow process within the specified folder in the Explorer module.
+      responses:
+        '200':
+          description: Workflow stopped successfully.
+        '401':
+          description: Invalid or malformed authentication token.
+        '403':
+          description: Insufficient permissions.
+        '404':
+          description: Workflow not found at the specified path.
+  /process/state/{path}/{name_of_workflow}:
+    parameters:
+    - $ref: '#/components/parameters/TenantHeader'
+    - name: path
+      in: path
+      required: true
+      description: Path to the workflow file in Explorer. May include nested folders separated by `/`.
+      schema:
+        type: string
+        example: Workflows/Other
+    - name: name_of_workflow
+      in: path
+      required: true
+      description: Name of the workflow file in Explorer.
+      schema:
+        type: string
+        example: Compliance
+    get:
+      operationId: getWorkflowState
+      summary: Get the state of a workflow process
+      description: Returns the current state and run ID of a workflow process. Always returns `200 OK`. An invalid path or
+        workflow name returns a null UUID (`00000000-0000-0000-0000-000000000000`) rather than a 404.
+      responses:
+        '200':
+          description: Workflow state retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowStateResponse'
+        '401':
+          description: Invalid or malformed authentication token.
+        '403':
+          description: Insufficient permissions.
   /metadata/Dimensions:
     parameters:
     - $ref: '#/components/parameters/TenantHeader'
@@ -403,6 +506,19 @@ components:
         type: string
         example: CustomerTenant
   schemas:
+    WorkflowStateResponse:
+      type: object
+      description: Response from the get-workflow-state endpoint. Always returned with 200 OK — an invalid path or workflow
+        name produces a null UUID rather than an error.
+      properties:
+        runId:
+          type: string
+          format: uuid
+          description: Unique identifier for the workflow run. A null UUID (`00000000-0000-0000-0000-000000000000`) indicates
+            the path or workflow name was not found.
+          example: 00000000-0000-0000-0000-000000000000
+      required:
+      - runId
     DimensionProperty:
       type: object
       description: A property associated with a dimension.

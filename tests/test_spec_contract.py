@@ -392,6 +392,10 @@ _REQUIRED_ENDPOINTS = [
     pytest.param("financial-consolidation", "get", "/metadata/Dimensions",                          id="fc-metadata-dimensions-tenant"),
     pytest.param("financial-consolidation", "get", "/metadata/models/{modelName}/Dimensions",       id="fc-metadata-dimensions-model"),
     pytest.param("financial-consolidation", "get", "/metadata/Dimensions/{dimensionName}",          id="fc-metadata-dimension-members"),
+    # Financial Consolidation API — Workflow endpoints
+    pytest.param("financial-consolidation", "post", "/process/start/{path}/{name_of_workflow}", id="fc-workflow-start"),
+    pytest.param("financial-consolidation", "post", "/process/stop/{path}/{name_of_workflow}",  id="fc-workflow-stop"),
+    pytest.param("financial-consolidation", "get",  "/process/state/{path}/{name_of_workflow}", id="fc-workflow-state"),
 ]
 
 
@@ -1352,6 +1356,73 @@ def test_fc_dimension_schema_has_core_fields():
     props = schema.get("properties", {})
     for field in ("dimensionName", "properties", "processingStatus"):
         assert field in props, f"Dimension schema must define {field!r} property"
+
+
+@_skip_fc
+@pytest.mark.parametrize("path,method", [
+    pytest.param("/process/start/{path}/{name_of_workflow}", "post", id="fc-wf-start-tenant"),
+    pytest.param("/process/stop/{path}/{name_of_workflow}",  "post", id="fc-wf-stop-tenant"),
+    pytest.param("/process/state/{path}/{name_of_workflow}", "get",  id="fc-wf-state-tenant"),
+])
+def test_fc_workflow_operations_reference_tenant_header(path, method):
+    """Every workflow operation must reference the reusable TenantHeader component parameter."""
+    spec = _load(_FC_SPEC)
+    params = _all_params(spec, path, method)
+    refs = [p.get("$ref", "") for p in params]
+    assert "#/components/parameters/TenantHeader" in refs, (
+        f"{method.upper()} {path} must reference #/components/parameters/TenantHeader"
+    )
+
+
+@_skip_fc
+@pytest.mark.parametrize("path,method", [
+    pytest.param("/process/start/{path}/{name_of_workflow}", "post", id="fc-wf-start-pathparams"),
+    pytest.param("/process/stop/{path}/{name_of_workflow}",  "post", id="fc-wf-stop-pathparams"),
+    pytest.param("/process/state/{path}/{name_of_workflow}", "get",  id="fc-wf-state-pathparams"),
+])
+def test_fc_workflow_operations_declare_path_and_name_params(path, method):
+    """Every workflow operation must declare `path` and `name_of_workflow` as required path parameters."""
+    spec = _load(_FC_SPEC)
+    params = _all_params(spec, path, method)
+    named = {p["name"]: p for p in params if "name" in p}
+    for param_name in ("path", "name_of_workflow"):
+        assert param_name in named, (
+            f"{method.upper()} {path} must declare {param_name!r} path parameter"
+        )
+        p = named[param_name]
+        assert p.get("in") == "path"
+        assert p.get("required") is True
+
+
+@_skip_fc
+def test_fc_workflow_start_declares_request_body():
+    """POST /process/start must declare an application/json request body for workflow parameters."""
+    spec = _load(_FC_SPEC)
+    op = spec["paths"]["/process/start/{path}/{name_of_workflow}"]["post"]
+    body = op.get("requestBody", {})
+    assert "application/json" in body.get("content", {}), (
+        "POST /process/start/{path}/{name_of_workflow} must declare an application/json request body"
+    )
+
+
+@_skip_fc
+def test_fc_workflow_state_response_schema_has_run_id():
+    """GET /process/state 200 response must reference a schema containing runId."""
+    spec = _load(_FC_SPEC)
+    op = spec["paths"]["/process/state/{path}/{name_of_workflow}"]["get"]
+    content = op["responses"]["200"]["content"]
+    assert "application/json" in content, (
+        "GET /process/state/{path}/{name_of_workflow} must declare application/json 200 response"
+    )
+    schema_ref = content["application/json"].get("schema", {}).get("$ref", "")
+    assert schema_ref, (
+        "GET /process/state/{path}/{name_of_workflow} 200 response must reference a schema"
+    )
+    schema_name = schema_ref.split("/")[-1]
+    schemas = spec.get("components", {}).get("schemas", {})
+    assert schema_name in schemas, f"Referenced schema {schema_name!r} must exist in components/schemas"
+    props = schemas[schema_name].get("properties", {})
+    assert "runId" in props, f"{schema_name} must define a runId property"
 
 
 @_skip_fc
