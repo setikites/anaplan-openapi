@@ -2,8 +2,12 @@ openapi: 3.0.0
 info:
   title: Anaplan Exception Users API
   version: 1.0.0
-  description: Manage exception users — users who can bypass SSO enforcement — in Anaplan workspaces. Requires the Tenant
-    Security Admin role. Authenticate with an AnaplanAuthToken obtained via the Authentication API.
+  description: |-
+    Manage exception users — users who can bypass SSO enforcement — in Anaplan workspaces. Requires the Tenant Security Admin role.
+
+    Two authentication schemes are accepted:
+    - **AnaplanAuthToken** — token obtained via the Authentication API using username/password or CA certificate.
+    - **BearerAuth** — OAuth 2.0 service-to-service access token obtained via the client credentials grant (`grant_type=client_credentials`). A user authorization-code token is **not** accepted; the API specifically requires a service-to-service token.
 servers:
 - url: https://api.anaplan.com/admin/1/0
   description: US1 (Data Center - US East), US2 (Data Center - US West), US5 (Cloud - US East), US7 (Cloud - US), EU1 (Data
@@ -32,6 +36,7 @@ servers:
   description: AU1 (Cloud - Australia)
 security:
 - AnaplanAuthToken: []
+- BearerAuth: []
 paths:
   /permissions/exception-users/users/{userGuid}:
     patch:
@@ -175,6 +180,13 @@ components:
       name: Authorization
       description: 'Anaplan token authentication. Header value format: `AnaplanAuthToken <token>`. Obtain a token from the
         Anaplan Authentication API using username/password or CA certificate.'
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: OAuth 2.0 service-to-service Bearer token. Must be obtained via the client credentials grant (`grant_type=client_credentials`)
+        against `https://us1a.app.anaplan.com/oauth/token`. A user authorization-code token is not accepted — the API requires
+        a service-to-service token.
   schemas:
     ExceptionUserPatchRequest:
       type: object

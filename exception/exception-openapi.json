@@ -3,7 +3,7 @@
   "info": {
     "title": "Anaplan Exception Users API",
     "version": "1.0.0",
-    "description": "Manage exception users — users who can bypass SSO enforcement — in Anaplan workspaces. Requires the Tenant Security Admin role. Authenticate with an AnaplanAuthToken obtained via the Authentication API."
+    "description": "Manage exception users — users who can bypass SSO enforcement — in Anaplan workspaces. Requires the Tenant Security Admin role.\n\nTwo authentication schemes are accepted:\n- **AnaplanAuthToken** — token obtained via the Authentication API using username/password or CA certificate.\n- **BearerAuth** — OAuth 2.0 service-to-service access token obtained via the client credentials grant (`grant_type=client_credentials`). A user authorization-code token is **not** accepted; the API specifically requires a service-to-service token."
   },
   "servers": [
     {
@@ -58,6 +58,9 @@
   "security": [
     {
       "AnaplanAuthToken": []
+    },
+    {
+      "BearerAuth": []
     }
   ],
   "paths": {
@@ -279,6 +282,12 @@
         "in": "header",
         "name": "Authorization",
         "description": "Anaplan token authentication. Header value format: `AnaplanAuthToken <token>`. Obtain a token from the Anaplan Authentication API using username/password or CA certificate."
+      },
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "OAuth 2.0 service-to-service Bearer token. Must be obtained via the client credentials grant (`grant_type=client_credentials`) against `https://us1a.app.anaplan.com/oauth/token`. A user authorization-code token is not accepted — the API requires a service-to-service token."
       }
     },
     "schemas": {
