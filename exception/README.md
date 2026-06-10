@@ -43,18 +43,15 @@ The Exception Users API is served from `{region}.api.anaplan.com` under the `/ad
 
 ## Authentication
 
-Two schemes are declared in the spec. Live testing confirmed Bearer is accepted at the auth layer; AnaplanAuthToken acceptance is not yet confirmed due to the service-to-service token blocker (see below).
+Three schemes were probed via live testing. The `AnaplanApiKey` prefix is the correct format for Anaplan API keys; Bearer and AnaplanAuthToken are rejected for API key credentials.
 
 | Scheme | Format | Status |
 |--------|--------|--------|
-| AnaplanAuthToken | `Authorization: AnaplanAuthToken <token>` | Declared in Apiary docs; live confirmation pending |
-| BearerAuth | `Authorization: Bearer <token>` | Confirmed accepted (issue #51); **service-to-service token required** |
+| AnaplanApiKey | `Authorization: AnaplanApiKey auk_<region>_<value>` | **Confirmed accepted** (issue #51) — use this for API key auth |
+| AnaplanAuthToken | `Authorization: AnaplanAuthToken <token>` | Rejected (401 FAILURE_INVALID_TOKEN) when used with an API key |
+| BearerAuth | `Authorization: Bearer <token>` | Rejected (400 FAILURE_BAD_HEADER) when used with an API key; may work for OAuth service-to-service tokens |
 
-### Service-to-service token requirement
-
-Live testing returned `FAILURE_BAD_HEADER: token or apikey or Oauth service-to-service token is required` when a user authorization-code flow token was used. The API specifically requires a token obtained via the **client credentials grant** (`grant_type=client_credentials`), not a user-delegated token from the authorization code or device flows.
-
-The existing `ANAPLAN_OAUTH_AUTHCODE_CLIENT_ID` client is not authorized for `client_credentials`. A separate OAuth client registered with the client credentials grant type is required. Register one at `manage.auth0.anaplan.com`.
+The error message returned when auth fails: `FAILURE_BAD_HEADER: Request header invalid, token or apikey or Oauth service-to-service token is required`. This confirms three distinct auth methods exist; API keys use the `AnaplanApiKey` prefix, not `Bearer`.
 
 ## Base Path
 
@@ -90,21 +87,22 @@ Returns 204 on success. Returns 400 if `op` is invalid or missing, `workspaceGui
 
 | Endpoint | Test | Result | Notes |
 |----------|------|--------|-------|
-| `POST /search` | Bearer auth accepted | ✓ | 400 (not 401) confirms auth layer recognized token (issue #51) |
-| `POST /search` | Search by workspace — response shape | ✗ | Blocked: service-to-service client not yet registered |
-| `POST /search` | Search by user — response shape | ✗ | Blocked: service-to-service client not yet registered |
+| `POST /search` | AnaplanApiKey auth accepted | ✓ | 400 FAILURE_BAD_REQUEST (not FAILURE_BAD_HEADER) confirms auth layer accepted key |
+| `POST /search` | Bearer prefix rejected for API keys | ✓ | 400 FAILURE_BAD_HEADER confirms Bearer does not work for API key credentials |
+| `POST /search` | AnaplanAuthToken prefix rejected | ✓ | 401 FAILURE_INVALID_TOKEN |
+| `POST /search` | Search by workspace — response shape | ✗ | Blocked: API key account lacks Tenant Security Admin role (400 FAILURE_BAD_REQUEST) |
+| `POST /search` | Search by user — response shape | ✗ | Blocked: API key account lacks Tenant Security Admin role (400 FAILURE_BAD_REQUEST) |
 | `PATCH /users/{userGuid}` | Invalid `op` returns 400 | ✓ | Confirmed via live test with `op: "invalid_op"` (issue #51) |
 
-## Blocker: service-to-service OAuth client
+## Blocker: Tenant Security Admin role for API key account
 
-The search contract tests and full auth confirmation require a client credentials OAuth token. The existing authcode client (`ANAPLAN_OAUTH_AUTHCODE_CLIENT_ID`) returns `unauthorized_client` for `grant_type=client_credentials`.
+The search contract tests require the API key's account to hold the **Tenant Security Admin** role. Live testing returns `FAILURE_BAD_REQUEST: Invalid request` for both workspace and user search using `ANAPLAN_API_KEY`, indicating the key account lacks this role.
 
 **To unblock:**
-1. Register a new OAuth client at `manage.auth0.anaplan.com` with the `client_credentials` grant enabled.
-2. Add `ANAPLAN_OAUTH_S2S_CLIENT_ID` and `ANAPLAN_OAUTH_S2S_CLIENT_SECRET` to `.env`.
-3. The fixture in `tests/test_exception_live.py` will pick them up — update the env var names in the fixture.
+1. Grant the account associated with `ANAPLAN_API_KEY` the Tenant Security Admin role in Anaplan.
+2. Re-run `uv run --env-file .env pytest tests/test_exception_live.py --live --allow-writes`.
 
-Tracked in issue #51.
+The OAuth service-to-service blocker from issue #51 is now resolved — API keys with the `AnaplanApiKey` prefix are the preferred auth method for this API.
 
 ## Discrepancies and Notes
 

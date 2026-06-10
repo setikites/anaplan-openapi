@@ -35,6 +35,7 @@ servers:
 - url: https://au1a.api2.anaplan.com/admin/1/0
   description: AU1 (Cloud - Australia)
 security:
+- AnaplanApiKey: []
 - AnaplanAuthToken: []
 - BearerAuth: []
 paths:
@@ -174,6 +175,12 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 components:
   securitySchemes:
+    AnaplanApiKey:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Anaplan API key authentication. Header value format: `AnaplanApiKey auk_<region>_<value>`. Confirmed accepted
+        via live testing. API keys satisfy the service-to-service requirement.'
     AnaplanAuthToken:
       type: apiKey
       in: header
@@ -184,9 +191,9 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: OAuth 2.0 service-to-service Bearer token. Must be obtained via the client credentials grant (`grant_type=client_credentials`)
-        against `https://us1a.app.anaplan.com/oauth/token`. A user authorization-code token is not accepted — the API requires
-        a service-to-service token.
+      description: 'OAuth 2.0 service-to-service Bearer token. Must be obtained via the client credentials grant (`grant_type=client_credentials`)
+        against `https://us1a.app.anaplan.com/oauth/token`. Note: Bearer prefix is rejected for Anaplan API keys — use AnaplanApiKey
+        scheme instead.'
   schemas:
     ExceptionUserPatchRequest:
       type: object
