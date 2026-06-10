@@ -29,6 +29,8 @@ All ~20 documentation pages have been saved under `docs/` for offline reference.
 | Unassign roles | https://help.anaplan.com/unassign-user-roles-cf53e027-f854-4195-a445-0ee8347cf010 |
 | Assign roles | https://help.anaplan.com/assign-user-roles-c0dabed5-b2c3-448f-813d-36e724bd5775 |
 
+**Postman collection**: Not included in the official Anaplan Postman collection.
+
 ## Host
 
 `https://fluenceapi-prod.fluence.app` — this is the Fluence platform host, different from all other Anaplan APIs (`api.anaplan.com`, `auth.anaplan.com`, `app.anaplan.com`).

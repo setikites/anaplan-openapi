@@ -5,7 +5,7 @@
 | Source | Available | Notes |
 |--------|-----------|-------|
 | Apiary docs | ✓ | https://anaplanoauth2service.docs.apiary.io/ — primary source |
-| Postman collection | ✗ | Not included in official Anaplan Postman collection |
+| Postman collection | Partial | Official Anaplan Collection — covered within the "Authentication > OAuth 2.0" subfolder (2 requests: Obtain Refresh Token, Swap Refresh Token for Access Token via `us1a.app.anaplan.com/oauth/token`). The Authorization Code Grant and Device Authorization Grant flows in this spec are not covered by the collection. |
 | Live testing | Partial | See Testing Coverage below |
 
 ## Servers

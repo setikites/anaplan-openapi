@@ -9,10 +9,13 @@ The Authentication API generates tokens for use with other Anaplan APIs. It supp
 
 ## Sources
 
-- **Postman Collection**: `authentication/postman-spec.yaml`
-- **OpenAPI Spec**: `authentication/authentication-openapi.json`
-- **Apiary Docs**: https://anaplanauthentication.docs.apiary.io/
-- **Live Testing**: Tested against live Anaplan instance
+| Source | Available | Notes |
+|--------|-----------|-------|
+| Apiary docs | ✓ | https://anaplanauthentication.docs.apiary.io/ |
+| Postman collection | ✓ | Official Anaplan Collection — "Authentication" folder (Basic Credentials, Certificate Authority Authentication, OAuth 2.0 token requests, Other Authentication Actions) |
+| Local Postman spec | ✓ | `authentication/postman-spec.yaml` — local copy |
+| OpenAPI spec | ✓ | `authentication/authentication-openapi.json` |
+| Live testing | ✓ | Tested against live Anaplan instance |
 
 ## Testing
 

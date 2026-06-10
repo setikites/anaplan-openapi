@@ -5,7 +5,7 @@
 | Source | Location |
 |--------|----------|
 | Apiary docs | https://almapi.docs.apiary.io/ (identifier: `almapi`) |
-| Postman collection | None available |
+| Postman collection | Official Anaplan Collection — top-level "ALM" folder (Model status, Revisions, Sync tasks, Comparison reports, Summary reports) |
 | OpenAPI spec | `alm/alm-openapi.json` |
 
 ## Authentication

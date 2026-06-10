@@ -232,12 +232,12 @@ Legacy regions (us1–us7, eu1, eu2, eu4, ap1) share the older non-prefixed `api
 | API | Apiary | Postman | Extracted Schemas | Live Testing | Confidence | Spec lifecycle |
 |-----|--------|---------|-------------------|--------------|------------|----------------|
 | Authentication | ✓ | ✓ | — | High | High | hand-maintained (do not rebuild) |
-| OAuth | ✓ | — | — | Partial (device flow happy path + error cases; auth code flow not automatable) | High | hand-maintained (do not rebuild) |
+| OAuth | ✓ | Partial | — | Partial (device flow happy path + error cases; auth code flow not automatable) | High | hand-maintained (do not rebuild) |
 | Integration | ✓ | ✓ | ✓ | High | High | hand-maintained (do not rebuild) |
-| CloudWorks | ✓ | — | — | Medium | Medium | bootstrap only |
-| SCIM | ✓ | — | ✓ | Medium | Medium | bootstrap only |
-| ALM | ✓ | — | — | Medium | Medium | bootstrap only |
-| Audit | ✓ | — | — | Medium | Medium | bootstrap only |
+| CloudWorks | ✓ | ✓ | — | Medium | Medium | bootstrap only |
+| SCIM | ✓ | ✓ | ✓ | Medium | Medium | bootstrap only |
+| ALM | ✓ | ✓ | — | Medium | Medium | bootstrap only |
+| Audit | ✓ | ✓ | — | Medium | Medium | bootstrap only |
 | Financial Consolidation | ✓ | — | — | Low | Low | bootstrap only |
 | Exception Users | ✓ | ✓ | ✓ | Low | Low | hand-maintained (do not rebuild) |
 

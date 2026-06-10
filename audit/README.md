@@ -6,7 +6,7 @@
 |--------|-----------|-------|
 | Apiary docs | ✓ | https://auditservice.docs.apiary.io/ (identifier: `auditservice`) |
 | Local metadata | ✓ | `audit/apiary-blueprint.json` — Apiary API metadata cached locally |
-| Postman collection | ✗ | Not included in official Anaplan Postman collection |
+| Postman collection | ✓ | Official Anaplan Collection — "Audit Service" folder (GET and POST variants for retrieving/searching audit events) |
 | Live testing | ✗ | Not yet performed |
 
 The Apiary blueprint is not publicly readable (anonymous access returns an empty blueprint). Resource groups ("Audit Events", "Examples") are present in the metadata but contain no endpoint definitions. Endpoints must be discovered via live testing or authenticated Apiary access.

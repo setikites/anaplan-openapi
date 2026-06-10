@@ -5,7 +5,7 @@
 | Source | Available | Notes |
 |--------|-----------|-------|
 | Apiary docs | ✓ | https://scimapi.docs.apiary.io/ — primary source |
-| Postman collection | ✗ | Not included in official Anaplan Postman collection |
+| Postman collection | ✓ | Official Anaplan Collection — top-level "SCIM" folder (Users CRUD, Metadata: ServiceProviderConfig, ResourceTypes, Schemas) |
 | Live testing | Partial | ResourceTypes and Schemas responses extracted; User CRUD not yet tested |
 
 ## Servers

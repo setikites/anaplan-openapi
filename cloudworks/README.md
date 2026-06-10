@@ -5,7 +5,7 @@
 | Source | Location |
 |--------|----------|
 | Apiary docs | https://cloudworks.docs.apiary.io/ (identifier: `cloudworks`) |
-| Postman collection | None available |
+| Postman collection | Official Anaplan Collection — top-level "CloudWorks" folder (Connections, Integrations, Process integrations, Schedules, Runs and error logs, Notifications, Integration flows) |
 | OpenAPI spec | `cloudworks/cloudworks-openapi.json` |
 
 ## Authentication
