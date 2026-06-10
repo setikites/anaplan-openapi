@@ -102,10 +102,10 @@ Anaplan has 9 publicly documented REST APIs, each with different characteristics
 
 #### 9. Exception Users API
 - **Purpose**: Manage exception users (users who can bypass SSO enforcement)
-- **Auth**: `AnaplanAuthToken` (Apiary confirmed; Bearer not documented)
-- **Source of Truth**: Apiary docs + sample responses in `exception/README.md`
+- **Auth**: `AnaplanApiKey` (confirmed via live testing); Bearer (service-to-service only); AnaplanAuthToken rejected for API key credentials
+- **Source of Truth**: Apiary docs + Postman collection (top-level "Exception Users" folder, 4 requests) + sample responses in `exception/README.md`
 - **Testing**: Low (lower priority; limited or no live testing expected)
-- **Status**: Spec complete (`exception/exception-openapi.json`); auth scheme and error response body shape not yet confirmed by live testing
+- **Status**: Spec complete (`exception/exception-openapi.json`); auth scheme confirmed via live testing; search contract blocked pending Tenant Security Admin role
 - **Key Points**:
   - Requires Tenant Security Admin role
   - Two endpoints: `PATCH` assign/unassign a user, `POST` search (by workspace or by user)
@@ -239,7 +239,7 @@ Legacy regions (us1–us7, eu1, eu2, eu4, ap1) share the older non-prefixed `api
 | ALM | ✓ | — | — | Medium | Medium | bootstrap only |
 | Audit | ✓ | — | — | Medium | Medium | bootstrap only |
 | Financial Consolidation | ✓ | — | — | Low | Low | bootstrap only |
-| Exception Users | ✓ | — | ✓ | Low | Low | hand-maintained (do not rebuild) |
+| Exception Users | ✓ | ✓ | ✓ | Low | Low | hand-maintained (do not rebuild) |
 
 ## Project Structure
 

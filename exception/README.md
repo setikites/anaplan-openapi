@@ -6,7 +6,7 @@
 |--------|-----------|-------|
 | Apiary docs | ✓ | https://exceptionusersapi2.docs.apiary.io/ — primary source |
 | Local blueprint | ✓ | `exception/apiary-blueprint.json` — Apiary blueprint cached locally |
-| Postman collection | ✗ | Not included in official Anaplan Postman collection |
+| Postman collection | ✓ | Official Anaplan Collection — top-level "Exception Users" folder, 4 requests |
 | Live testing | Partial | Auth scheme and PATCH error probe confirmed; search contract blocked (see below) |
 
 ## Purpose
@@ -103,6 +103,21 @@ The search contract tests require the API key's account to hold the **Tenant Sec
 2. Re-run `uv run --env-file .env pytest tests/test_exception_live.py --live --allow-writes`.
 
 The OAuth service-to-service blocker from issue #51 is now resolved — API keys with the `AnaplanApiKey` prefix are the preferred auth method for this API.
+
+## Postman Collection
+
+The official Anaplan Postman collection contains a top-level "Exception Users" folder with 4 requests. All use `{{baseUrl}}/admin/1/0/permissions/exception-users/...` and authenticate via `{{authHeader}}`.
+
+| Request | Method | Path | Body |
+|---------|--------|------|------|
+| Assign user as exception user | PATCH | `/admin/1/0/permissions/exception-users/users/{{userGuid}}` | `{"op": "assign", "workspaceGuid": "{{workspaceGuid}}"}` |
+| Unassign user as exception user | PATCH | `/admin/1/0/permissions/exception-users/users/{{userGuid}}` | `{"op": "unassign", "workspaceGuid": "{{workspaceGuid}}"}` |
+| List exception users per workspace | POST | `/admin/1/0/permissions/exception-users/search` | `{"workspaceGuid": "{{workspaceGuid}}"}` |
+| List workspaces with exception users | POST | `/admin/1/0/permissions/exception-users/search` | `{}` |
+
+The collection description adds a note not present in Apiary: *"To use this API, you must enable a tenant-settings switch in the Anaplan Administration console. The switch is called 'Limit exception user assignment to Administration only.'"*
+
+**Discrepancy — "List workspaces with exception users" body**: The Postman collection sends an empty `{}` body for this request. Apiary documents the by-user search as requiring `{"userGuid": "..."}`. It is unclear whether the empty body is a Postman authoring error, or whether the endpoint supports a third mode (return all exception users across all workspaces). This should be confirmed via live testing with Tenant Security Admin credentials.
 
 ## Discrepancies and Notes
 
