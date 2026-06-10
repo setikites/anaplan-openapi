@@ -20,7 +20,7 @@ params = {
     'scope': 'openid profile email offline_access',
     'state': state,
 }
-auth_url = 'https://us1a.app.anaplan.com/auth/authorize?' + urllib.parse.urlencode(params)
+auth_url = 'https://us1a.app.anaplan.com/auth/prelogin?' + urllib.parse.urlencode(params)
 
 print("Open this URL in your browser:")
 print(f"  {auth_url}")
