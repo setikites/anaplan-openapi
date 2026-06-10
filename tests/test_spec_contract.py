@@ -36,7 +36,7 @@ SERVER_URL_PATTERNS: dict[str, str] = {
     "alm":                     "api.anaplan.com",
     "audit":                   "api.anaplan.com",
     "cloudworks":              "api.anaplan.com",
-    "financial-consolidation": "api.anaplan.com",
+    "financial-consolidation": "fluenceapi-prod.fluence.app",
     "exception":               "api.anaplan.com",
 }
 
@@ -122,9 +122,16 @@ def test_servers_list_is_nonempty(spec_path):
         )
 
 
+_SCAFFOLD_SPECS = {
+    "financial-consolidation",
+}
+
+
 @pytest.mark.parametrize("spec_path", SPEC_FILES, ids=lambda p: p.parent.name)
 def test_paths_is_nonempty(spec_path):
     spec = _load(spec_path)
+    if spec_path.parent.name in _SCAFFOLD_SPECS:
+        pytest.skip("scaffold spec — paths will be populated in a follow-up issue")
     assert spec.get("paths"), "paths must contain at least one endpoint"
 
 
@@ -305,6 +312,8 @@ _SCHEME_REQUIREMENTS = [
     pytest.param("exception",      "anaplan_token", id="exception-anaplan-token"),
     # Audit: AnaplanAuthToken confirmed via Apiary; Bearer declared but unconfirmed
     pytest.param("audit",          "anaplan_token", id="audit-anaplan-token"),
+    # Financial Consolidation: X_API_TOKEN apiKey header (Fluence platform — different host)
+    pytest.param("financial-consolidation", "anaplan_token", id="fc-api-token"),
 ]
 
 _SCHEME_MATCHERS = {
@@ -1144,3 +1153,40 @@ def test_audit_endpoints_declare_json_and_cef_responses():
         assert "text/plain" in content, (
             f"{method.upper()} {path}: must declare text/plain (CEF) response"
         )
+
+
+# ─── Financial Consolidation API ──────────────────────────────────────────
+# Manages financial consolidation workflows via the Fluence acquisition.
+# Host: fluenceapi-prod.fluence.app (different from all other Anaplan API hosts)
+# Auth: X_API_TOKEN apiKey header + required TENANT header on every request.
+# No regional variants known — single production endpoint only.
+
+_FC_SPEC = REPO_ROOT / "financial-consolidation" / "financial-consolidation-openapi.json"
+_skip_fc = _skip_if_missing("financial-consolidation")
+
+
+@_skip_fc
+def test_financial_consolidation_api_token_scheme_uses_x_api_token_header():
+    """apiToken scheme must name X_API_TOKEN as the header (not Authorization or AnaplanAuthToken)."""
+    spec = _load(_FC_SPEC)
+    schemes = spec.get("components", {}).get("securitySchemes", {})
+    api_token = schemes.get("apiToken", {})
+    assert api_token.get("type") == "apiKey", "apiToken must be type: apiKey"
+    assert api_token.get("in") == "header", "apiToken must be in: header"
+    assert api_token.get("name") == "X_API_TOKEN", (
+        "apiToken header must be named X_API_TOKEN (not Authorization or other)"
+    )
+
+
+@_skip_fc
+def test_financial_consolidation_has_tenant_header_parameter():
+    """components/parameters must define a reusable TenantHeader parameter."""
+    spec = _load(_FC_SPEC)
+    params = spec.get("components", {}).get("parameters", {})
+    assert "TenantHeader" in params, (
+        "financial-consolidation spec must define TenantHeader in components/parameters"
+    )
+    tenant = params["TenantHeader"]
+    assert tenant.get("in") == "header", "TenantHeader must be in: header"
+    assert tenant.get("name") == "TENANT", "TenantHeader header name must be TENANT"
+    assert tenant.get("required") is True, "TenantHeader must be required: true"

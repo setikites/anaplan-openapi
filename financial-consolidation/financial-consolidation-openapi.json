@@ -1,0 +1,42 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Anaplan Financial Consolidation API",
+    "version": "v2305.1",
+    "description": "API for financial consolidation workflows on the Fluence platform (acquired by Anaplan). Enables automation of data management, metadata synchronization, workflow control, and user administration.\n\nHost: `fluenceapi-prod.fluence.app` — different from all other Anaplan APIs. No regional variants are known; a single production endpoint serves all tenants.\n\nEvery request requires the `X_API_TOKEN` header (created in the Security module) and the `TENANT` header identifying the target tenant."
+  },
+  "servers": [
+    {
+      "url": "https://fluenceapi-prod.fluence.app/api/v2305.1",
+      "description": "Fluence production server (single global endpoint — regional variants not documented)"
+    }
+  ],
+  "security": [
+    {
+      "apiToken": []
+    }
+  ],
+  "paths": {},
+  "components": {
+    "securitySchemes": {
+      "apiToken": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X_API_TOKEN",
+        "description": "API token passed via the X_API_TOKEN request header. Created in the Financial Consolidation Security module by an administrator."
+      }
+    },
+    "parameters": {
+      "TenantHeader": {
+        "name": "TENANT",
+        "in": "header",
+        "required": true,
+        "description": "Tenant name as displayed in the Financial Consolidation UI. Must match exactly, including spaces and underscores. Required on every request.",
+        "schema": {
+          "type": "string",
+          "example": "CustomerTenant"
+        }
+      }
+    }
+  }
+}
