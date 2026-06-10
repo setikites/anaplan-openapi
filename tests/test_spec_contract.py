@@ -388,6 +388,10 @@ _REQUIRED_ENDPOINTS = [
     pytest.param("financial-consolidation", "post",   "/odata/batch/{tableName}", id="fc-odata-batch"),
     pytest.param("financial-consolidation", "put",    "/odata/{tableName}",       id="fc-odata-put"),
     pytest.param("financial-consolidation", "delete", "/odata/{tableName}",       id="fc-odata-delete"),
+    # Financial Consolidation API — Metadata endpoints
+    pytest.param("financial-consolidation", "get", "/metadata/Dimensions",                          id="fc-metadata-dimensions-tenant"),
+    pytest.param("financial-consolidation", "get", "/metadata/models/{modelName}/Dimensions",       id="fc-metadata-dimensions-model"),
+    pytest.param("financial-consolidation", "get", "/metadata/Dimensions/{dimensionName}",          id="fc-metadata-dimension-members"),
 ]
 
 
@@ -1267,3 +1271,94 @@ def test_fc_odata_record_schema_defined():
     assert "ODataRecord" in schemas, (
         "financial-consolidation spec must define ODataRecord in components/schemas"
     )
+
+
+@_skip_fc
+@pytest.mark.parametrize("path", [
+    pytest.param("/metadata/Dimensions",                          id="fc-meta-tenant"),
+    pytest.param("/metadata/models/{modelName}/Dimensions",       id="fc-meta-model"),
+    pytest.param("/metadata/Dimensions/{dimensionName}",          id="fc-meta-members"),
+])
+def test_fc_metadata_operations_reference_tenant_header(path):
+    """Every metadata GET must reference the reusable TenantHeader component parameter."""
+    spec = _load(_FC_SPEC)
+    params = _all_params(spec, path, "get")
+    refs = [p.get("$ref", "") for p in params]
+    assert "#/components/parameters/TenantHeader" in refs, (
+        f"GET {path} must reference #/components/parameters/TenantHeader"
+    )
+
+
+@_skip_fc
+def test_fc_metadata_model_dimensions_declares_model_name_path_param():
+    """GET /metadata/models/{modelName}/Dimensions must declare modelName as a required path parameter."""
+    spec = _load(_FC_SPEC)
+    path = "/metadata/models/{modelName}/Dimensions"
+    params = _all_params(spec, path, "get")
+    names = {p["name"] for p in params if "name" in p}
+    assert "modelName" in names, f"GET {path} must declare modelName path parameter"
+    p = next(p for p in params if p.get("name") == "modelName")
+    assert p.get("in") == "path"
+    assert p.get("required") is True
+
+
+@_skip_fc
+def test_fc_metadata_dimension_members_declares_dimension_name_path_param():
+    """GET /metadata/Dimensions/{dimensionName} must declare dimensionName as a required path parameter."""
+    spec = _load(_FC_SPEC)
+    path = "/metadata/Dimensions/{dimensionName}"
+    params = _all_params(spec, path, "get")
+    names = {p["name"] for p in params if "name" in p}
+    assert "dimensionName" in names, f"GET {path} must declare dimensionName path parameter"
+    p = next(p for p in params if p.get("name") == "dimensionName")
+    assert p.get("in") == "path"
+    assert p.get("required") is True
+
+
+@_skip_fc
+def test_fc_metadata_dimension_members_declares_page_and_pagesize_params():
+    """GET /metadata/Dimensions/{dimensionName} must declare Page and PageSize query parameters for pagination."""
+    spec = _load(_FC_SPEC)
+    path = "/metadata/Dimensions/{dimensionName}"
+    params = _all_params(spec, path, "get")
+    names = {p["name"] for p in params if "name" in p}
+    for param_name in ("Page", "PageSize"):
+        assert param_name in names, (
+            f"GET {path} must declare {param_name!r} query parameter"
+        )
+        p = next(p for p in params if p.get("name") == param_name)
+        assert p.get("in") == "query"
+        assert p.get("schema", {}).get("type") == "number"
+
+
+@_skip_fc
+@pytest.mark.parametrize("schema_name", [
+    "Dimension", "DimensionProperty", "DimensionMembersResponse", "DimensionMember",
+])
+def test_fc_metadata_schemas_defined(schema_name):
+    """Metadata domain schemas must be defined in components/schemas."""
+    spec = _load(_FC_SPEC)
+    schemas = spec.get("components", {}).get("schemas", {})
+    assert schema_name in schemas, (
+        f"financial-consolidation spec must define {schema_name!r} in components/schemas"
+    )
+
+
+@_skip_fc
+def test_fc_dimension_schema_has_core_fields():
+    """Dimension schema must include the fields present in the documented response example."""
+    spec = _load(_FC_SPEC)
+    schema = spec.get("components", {}).get("schemas", {}).get("Dimension", {})
+    props = schema.get("properties", {})
+    for field in ("dimensionName", "properties", "processingStatus"):
+        assert field in props, f"Dimension schema must define {field!r} property"
+
+
+@_skip_fc
+def test_fc_dimension_members_response_has_pagination_fields():
+    """DimensionMembersResponse schema must include pagination envelope fields."""
+    spec = _load(_FC_SPEC)
+    schema = spec.get("components", {}).get("schemas", {}).get("DimensionMembersResponse", {})
+    props = schema.get("properties", {})
+    for field in ("dimensionMembers", "totalRows", "currentPage", "totalPages"):
+        assert field in props, f"DimensionMembersResponse schema must define {field!r} property"

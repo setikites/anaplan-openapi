@@ -225,6 +225,114 @@ paths:
           description: Insufficient permissions.
         '404':
           description: Table not found.
+  /metadata/Dimensions:
+    parameters:
+    - $ref: '#/components/parameters/TenantHeader'
+    get:
+      operationId: getTenantDimensions
+      summary: Retrieve dimensions and properties across a tenant
+      description: Returns all dimensions and their properties for the entire tenant. Use this to synchronize dimension information
+        with external systems such as planning solutions or reporting tools.
+      responses:
+        '200':
+          description: Dimension list retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Dimension'
+        '401':
+          description: Invalid or malformed authentication token.
+        '403':
+          description: Insufficient permissions.
+  /metadata/models/{modelName}/Dimensions:
+    parameters:
+    - $ref: '#/components/parameters/TenantHeader'
+    - name: modelName
+      in: path
+      required: true
+      description: The name of the model within the tenant.
+      schema:
+        type: string
+        example: Consolidation
+    get:
+      operationId: getModelDimensions
+      summary: Retrieve dimensions and properties within a model
+      description: Returns all dimensions and their properties scoped to a specific model. After retrieving results, consult
+        the dimension properties glossary to identify the purpose and type of each property.
+      responses:
+        '200':
+          description: Model dimension list retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Dimension'
+              example:
+              - dimensionName: Account
+                dimensionType: Account
+                translations: fr
+                relatedDimension: null
+                properties:
+                - propertyName: Classification
+                  propertyType: list
+                  standardProperty: true
+                  reportingProperty: true
+                  readonlyProperty: false
+                  processingStatus: 0
+                  typeInfo: Classification
+                processingStatus: null
+        '401':
+          description: Invalid or malformed authentication token.
+        '403':
+          description: Insufficient permissions.
+        '404':
+          description: Model not found.
+  /metadata/Dimensions/{dimensionName}:
+    parameters:
+    - $ref: '#/components/parameters/TenantHeader'
+    - name: dimensionName
+      in: path
+      required: true
+      description: The name of a dimension within the tenant.
+      schema:
+        type: string
+        example: Account
+    get:
+      operationId: getDimensionMembers
+      summary: Retrieve members and properties within a dimension
+      description: Returns dimension members and their properties for the specified dimension. Supports pagination via `Page`
+        and `PageSize` query parameters.
+      parameters:
+      - name: Page
+        in: query
+        schema:
+          type: number
+          minimum: 1
+        description: Page number to retrieve. Starts at 1.
+        example: 1
+      - name: PageSize
+        in: query
+        schema:
+          type: number
+          minimum: 1
+        description: Number of member rows per page.
+        example: 100
+      responses:
+        '200':
+          description: Dimension members retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DimensionMembersResponse'
+        '401':
+          description: Invalid or malformed authentication token.
+        '403':
+          description: Insufficient permissions.
+        '404':
+          description: Dimension not found.
   /odata/batch/{tableName}:
     parameters:
     - $ref: '#/components/parameters/TenantHeader'
@@ -295,6 +403,148 @@ components:
         type: string
         example: CustomerTenant
   schemas:
+    DimensionProperty:
+      type: object
+      description: A property associated with a dimension.
+      properties:
+        propertyName:
+          type: string
+          description: Name identifier for the property.
+        propertyType:
+          type: string
+          description: Data type of the property (e.g. `string`, `Bit`, `list`).
+        standardProperty:
+          type: boolean
+          description: Whether this is a standard (built-in) property.
+        reportingProperty:
+          type: boolean
+          description: Whether this property is used for reporting.
+        readonlyProperty:
+          type: boolean
+          description: Whether this property is read-only.
+        processingStatus:
+          description: Current processing state of the property.
+          oneOf:
+          - type: integer
+          - type: 'null'
+        typeInfo:
+          type: string
+          description: Additional type information for the property.
+    Dimension:
+      type: object
+      description: A dimension and its associated properties within a tenant or model.
+      properties:
+        dimensionName:
+          type: string
+          description: Name of the dimension.
+          example: Account
+        dimensionType:
+          type: string
+          description: Classification type of the dimension.
+        translations:
+          description: Available language translations for the dimension name.
+          oneOf:
+          - type: string
+          - type: 'null'
+        relatedDimension:
+          description: Reference to an associated dimension.
+          oneOf:
+          - type: string
+          - type: 'null'
+        properties:
+          type: array
+          description: List of properties defined on this dimension.
+          items:
+            $ref: '#/components/schemas/DimensionProperty'
+        processingStatus:
+          description: Current processing state of the dimension.
+          oneOf:
+          - type: integer
+          - type: 'null'
+    DimensionMember:
+      type: object
+      description: A member within a dimension and its associated metadata.
+      properties:
+        memberName:
+          type: string
+          description: Name of the member.
+        memberTag:
+          description: Tag identifier for the member.
+          oneOf:
+          - type: string
+          - type: 'null'
+        memberCaption:
+          type: string
+          description: Display caption for the member.
+        ancestors:
+          description: Hierarchy path from root to this member.
+          oneOf:
+          - type: string
+          - type: 'null'
+        translations:
+          type: array
+          description: Available translations for the member name.
+          items: {}
+        parentMemberName:
+          description: Name of the parent member in the hierarchy.
+          oneOf:
+          - type: string
+          - type: 'null'
+        sortOrder:
+          type: integer
+          description: Sort sequence number for the member.
+        isLeaf:
+          type: boolean
+          description: Whether this member is a leaf node (has no children).
+        operator:
+          description: Operator value applied to the member.
+          oneOf:
+          - type: string
+          - type: 'null'
+        startDate:
+          description: Start of the effective date range for the member.
+          oneOf:
+          - type: string
+            format: date
+          - type: 'null'
+        endDate:
+          description: End of the effective date range for the member.
+          oneOf:
+          - type: string
+            format: date
+          - type: 'null'
+        memberStorage:
+          type: string
+          description: Storage type for the member.
+        properties:
+          type: array
+          description: Name-value property pairs associated with the member.
+          items:
+            type: object
+            additionalProperties: true
+    DimensionMembersResponse:
+      type: object
+      description: Paginated response containing dimension members.
+      properties:
+        dimensionMembers:
+          type: array
+          description: Array of dimension member objects.
+          items:
+            $ref: '#/components/schemas/DimensionMember'
+        totalRows:
+          type: integer
+          description: Total count of dimension members matching the query.
+        currentPage:
+          type: integer
+          description: Current page number.
+        totalPages:
+          type: integer
+          description: Total number of pages available.
+      required:
+      - dimensionMembers
+      - totalRows
+      - currentPage
+      - totalPages
     ODataRecord:
       type: object
       description: |-
