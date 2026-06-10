@@ -193,11 +193,23 @@ def test_security_requirements_reference_declared_schemes(spec_path):
 
 # ─── Cross-spec invariants ────────────────────────────────────────────────
 
+
+# Known cross-spec path overlaps that are intentional and not copy-paste errors.
+# Each tuple is (path, api_a, api_b). These APIs run on completely different hosts
+# and are unrelated — the path string coincidence is harmless.
+_ALLOWED_PATH_OVERLAPS: set[frozenset] = {
+    # Integration API (api.anaplan.com) and Financial Consolidation API
+    # (fluenceapi-prod.fluence.app) both expose /users for user management.
+    frozenset({"integration", "financial-consolidation"}),
+}
+
+
 def test_no_path_appears_in_more_than_one_spec():
     """Each URL path must be documented in exactly one spec file.
 
     Paths duplicated across specs cause client-generator confusion and drift
-    when the two copies fall out of sync.
+    when the two copies fall out of sync. Known intentional overlaps between
+    specs on entirely different hosts are listed in _ALLOWED_PATH_OVERLAPS.
     """
     seen: dict[str, str] = {}  # path → first spec that defines it
     duplicates: list[str] = []
@@ -207,9 +219,11 @@ def test_no_path_appears_in_more_than_one_spec():
         api_name = spec_path.parent.name
         for path in spec.get("paths", {}):
             if path in seen:
-                duplicates.append(
-                    f"{path!r}: defined in both {seen[path]!r} and {api_name!r}"
-                )
+                pair = frozenset({seen[path], api_name})
+                if pair not in _ALLOWED_PATH_OVERLAPS:
+                    duplicates.append(
+                        f"{path!r}: defined in both {seen[path]!r} and {api_name!r}"
+                    )
             else:
                 seen[path] = api_name
 
@@ -396,6 +410,14 @@ _REQUIRED_ENDPOINTS = [
     pytest.param("financial-consolidation", "post", "/process/start/{path}/{name_of_workflow}", id="fc-workflow-start"),
     pytest.param("financial-consolidation", "post", "/process/stop/{path}/{name_of_workflow}",  id="fc-workflow-stop"),
     pytest.param("financial-consolidation", "get",  "/process/state/{path}/{name_of_workflow}", id="fc-workflow-state"),
+    # Financial Consolidation API — User Management endpoints
+    pytest.param("financial-consolidation", "get",    "/users",                    id="fc-users-list"),
+    pytest.param("financial-consolidation", "post",   "/users",                    id="fc-users-add"),
+    pytest.param("financial-consolidation", "put",    "/users",                    id="fc-users-update"),
+    pytest.param("financial-consolidation", "delete", "/users/{username}",         id="fc-users-delete"),
+    pytest.param("financial-consolidation", "get",    "/user/{username}/roles",    id="fc-user-roles-list"),
+    pytest.param("financial-consolidation", "put",    "/user/{username}/roles",    id="fc-user-roles-assign"),
+    pytest.param("financial-consolidation", "delete", "/user/{username}/roles",    id="fc-user-roles-unassign"),
 ]
 
 
@@ -1433,3 +1455,67 @@ def test_fc_dimension_members_response_has_pagination_fields():
     props = schema.get("properties", {})
     for field in ("dimensionMembers", "totalRows", "currentPage", "totalPages"):
         assert field in props, f"DimensionMembersResponse schema must define {field!r} property"
+
+
+# ─── Financial Consolidation API — User Management ────────────────────────
+
+@_skip_fc
+@pytest.mark.parametrize("schema_name", ["User", "UserInput"])
+def test_fc_user_management_schemas_defined(schema_name):
+    """User management domain schemas must be defined in components/schemas."""
+    spec = _load(_FC_SPEC)
+    schemas = spec.get("components", {}).get("schemas", {})
+    assert schema_name in schemas, (
+        f"financial-consolidation spec must define {schema_name!r} in components/schemas"
+    )
+
+
+@_skip_fc
+def test_fc_user_schema_has_core_fields():
+    """User schema must include all fields present in the documented GET /users response."""
+    spec = _load(_FC_SPEC)
+    schema = spec.get("components", {}).get("schemas", {}).get("User", {})
+    props = schema.get("properties", {})
+    for field in ("userId", "userName", "fullName", "isDisabled", "email", "roles"):
+        assert field in props, f"User schema must define {field!r} property"
+
+
+@_skip_fc
+@pytest.mark.parametrize("path,method", [
+    pytest.param("/users",                 "get",    id="fc-users-list-tenant"),
+    pytest.param("/users",                 "post",   id="fc-users-add-tenant"),
+    pytest.param("/users",                 "put",    id="fc-users-update-tenant"),
+    pytest.param("/users/{username}",      "delete", id="fc-users-delete-tenant"),
+    pytest.param("/user/{username}/roles", "get",    id="fc-user-roles-list-tenant"),
+    pytest.param("/user/{username}/roles", "put",    id="fc-user-roles-assign-tenant"),
+    pytest.param("/user/{username}/roles", "delete", id="fc-user-roles-unassign-tenant"),
+])
+def test_fc_user_management_operations_reference_tenant_header(path, method):
+    """Every user management operation must reference the reusable TenantHeader component parameter."""
+    spec = _load(_FC_SPEC)
+    params = _all_params(spec, path, method)
+    refs = [p.get("$ref", "") for p in params]
+    assert "#/components/parameters/TenantHeader" in refs, (
+        f"{method.upper()} {path} must reference #/components/parameters/TenantHeader"
+    )
+
+
+@_skip_fc
+@pytest.mark.parametrize("path", [
+    pytest.param("/users/{username}",      id="fc-users-username-param"),
+    pytest.param("/user/{username}/roles", id="fc-user-roles-username-param"),
+])
+def test_fc_user_management_declares_username_path_param(path):
+    """Endpoints with {username} in path must declare it as a required path parameter."""
+    spec = _load(_FC_SPEC)
+    all_methods = [m for m in _HTTP_METHODS if m in spec.get("paths", {}).get(path, {})]
+    assert all_methods, f"No operations found for path {path!r}"
+    for method in all_methods:
+        params = _all_params(spec, path, method)
+        names = {p["name"]: p for p in params if "name" in p}
+        assert "username" in names, (
+            f"{method.upper()} {path} must declare username path parameter"
+        )
+        p = names["username"]
+        assert p.get("in") == "path"
+        assert p.get("required") is True

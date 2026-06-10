@@ -3,12 +3,12 @@
   "info": {
     "title": "Anaplan Financial Consolidation API",
     "version": "v2305.1",
-    "description": "API for financial consolidation workflows on the Fluence platform (acquired by Anaplan). Enables automation of data management, metadata synchronization, workflow control, and user administration.\n\nHost: `fluenceapi-prod.fluence.app` — different from all other Anaplan APIs. No regional variants are known; a single production endpoint serves all tenants.\n\nEvery request requires the `X_API_TOKEN` header (created in the Security module) and the `TENANT` header identifying the target tenant."
+    "description": "API for financial consolidation workflows on the Fluence platform (acquired by Anaplan). Enables automation of data management, metadata synchronization, workflow control, and user administration.\n\nHost: `fluenceapi-prod.fluence.app` \u00e2\u20ac\u201d different from all other Anaplan APIs. No regional variants are known; a single production endpoint serves all tenants.\n\nEvery request requires the `X_API_TOKEN` header (created in the Security module) and the `TENANT` header identifying the target tenant."
   },
   "servers": [
     {
       "url": "https://fluenceapi-prod.fluence.app/api/v2305.1",
-      "description": "Fluence production server (single global endpoint — regional variants not documented)"
+      "description": "Fluence production server (single global endpoint \u00e2\u20ac\u201d regional variants not documented)"
     }
   ],
   "security": [
@@ -706,6 +706,238 @@
           }
         }
       }
+    },
+    "/users": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/TenantHeader"
+        }
+      ],
+      "get": {
+        "operationId": "listUsers",
+        "summary": "List users in tenant",
+        "description": "Retrieve a roster of all users within the tenant, including their identifiers, names, contact information, enabled/disabled status, and assigned roles.",
+        "responses": {
+          "200": {
+            "description": "Array of user objects.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "addUsers",
+        "summary": "Add new users",
+        "description": "Add one or more new users to the tenant. The request body is a JSON array of user objects.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/UserInput"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The created user object.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "updateUserProfile",
+        "summary": "Update user profile",
+        "description": "Modify user data within the tenant. Can update email addresses, enable/disable accounts, and manage role assignments.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated user object.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/{username}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/TenantHeader"
+        },
+        {
+          "name": "username",
+          "in": "path",
+          "required": true,
+          "description": "Financial Consolidation app username (not the email address).",
+          "schema": {
+            "type": "string",
+            "example": "john.doe@fluence.app"
+          }
+        }
+      ],
+      "delete": {
+        "operationId": "deleteUser",
+        "summary": "Delete user account from tenant",
+        "description": "Remove a user account from the tenant. The API returns 200 OK regardless of whether the user exists \u2014 use GET /users to validate the deletion.",
+        "responses": {
+          "200": {
+            "description": "User deleted (or was not found \u2014 no 404 is returned)."
+          }
+        }
+      }
+    },
+    "/user/{username}/roles": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/TenantHeader"
+        },
+        {
+          "name": "username",
+          "in": "path",
+          "required": true,
+          "description": "Financial Consolidation app username (not the email address).",
+          "schema": {
+            "type": "string",
+            "example": "john.doe@fluence.app"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "listUserRoles",
+        "summary": "List roles for a user",
+        "description": "Retrieve the roles assigned to a specific user. Supports automation workflows such as cloning user roles during onboarding.\n\nNote: This endpoint uses the singular `/user` prefix (not `/users`), which is an inconsistency in the API design confirmed by the source documentation.",
+        "responses": {
+          "200": {
+            "description": "Array of role name strings assigned to the user.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "example": [
+                    "Admin",
+                    "Controller",
+                    "Preparer",
+                    "Reviewer"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "assignUserRoles",
+        "summary": "Assign roles to a user",
+        "description": "Assign new roles to a user. The response is additive \u2014 it returns all roles assigned to the user including both existing and newly assigned roles.\n\nNote: This endpoint uses the singular `/user` prefix (not `/users`), which is an inconsistency in the API design confirmed by the source documentation.",
+        "requestBody": {
+          "required": true,
+          "description": "Array of role names to assign.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "example": [
+                  "Controller",
+                  "Reviewer"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "All roles now assigned to the user (pre-existing plus newly assigned).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "example": [
+                    "Admin",
+                    "Controller",
+                    "Reviewer"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "unassignUserRole",
+        "summary": "Unassign a role from a user",
+        "description": "Remove a single role from a user. The request body is a JSON string (not an array) containing the role name to revoke.\n\nNote: This endpoint uses the singular `/user` prefix (not `/users`), which is an inconsistency in the API design confirmed by the source documentation.",
+        "requestBody": {
+          "required": true,
+          "description": "The role name to remove, as a JSON string.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "string",
+                "example": "Controller"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Array of remaining role names after the removal.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "example": [
+                    "Admin"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -732,7 +964,7 @@
     "schemas": {
       "WorkflowStateResponse": {
         "type": "object",
-        "description": "Response from the get-workflow-state endpoint. Always returned with 200 OK — an invalid path or workflow name produces a null UUID rather than an error.",
+        "description": "Response from the get-workflow-state endpoint. Always returned with 200 OK \u00e2\u20ac\u201d an invalid path or workflow name produces a null UUID rather than an error.",
         "properties": {
           "runId": {
             "type": "string",
@@ -741,7 +973,9 @@
             "example": "00000000-0000-0000-0000-000000000000"
           }
         },
-        "required": ["runId"]
+        "required": [
+          "runId"
+        ]
       },
       "DimensionProperty": {
         "type": "object",
@@ -770,8 +1004,12 @@
           "processingStatus": {
             "description": "Current processing state of the property.",
             "oneOf": [
-              { "type": "integer" },
-              { "type": "null" }
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "typeInfo": {
@@ -796,15 +1034,23 @@
           "translations": {
             "description": "Available language translations for the dimension name.",
             "oneOf": [
-              { "type": "string" },
-              { "type": "null" }
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "relatedDimension": {
             "description": "Reference to an associated dimension.",
             "oneOf": [
-              { "type": "string" },
-              { "type": "null" }
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "properties": {
@@ -817,8 +1063,12 @@
           "processingStatus": {
             "description": "Current processing state of the dimension.",
             "oneOf": [
-              { "type": "integer" },
-              { "type": "null" }
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
             ]
           }
         }
@@ -834,8 +1084,12 @@
           "memberTag": {
             "description": "Tag identifier for the member.",
             "oneOf": [
-              { "type": "string" },
-              { "type": "null" }
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "memberCaption": {
@@ -845,8 +1099,12 @@
           "ancestors": {
             "description": "Hierarchy path from root to this member.",
             "oneOf": [
-              { "type": "string" },
-              { "type": "null" }
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "translations": {
@@ -857,8 +1115,12 @@
           "parentMemberName": {
             "description": "Name of the parent member in the hierarchy.",
             "oneOf": [
-              { "type": "string" },
-              { "type": "null" }
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "sortOrder": {
@@ -872,22 +1134,36 @@
           "operator": {
             "description": "Operator value applied to the member.",
             "oneOf": [
-              { "type": "string" },
-              { "type": "null" }
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "startDate": {
             "description": "Start of the effective date range for the member.",
             "oneOf": [
-              { "type": "string", "format": "date" },
-              { "type": "null" }
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "endDate": {
             "description": "End of the effective date range for the member.",
             "oneOf": [
-              { "type": "string", "format": "date" },
-              { "type": "null" }
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "memberStorage": {
@@ -928,11 +1204,16 @@
             "description": "Total number of pages available."
           }
         },
-        "required": ["dimensionMembers", "totalRows", "currentPage", "totalPages"]
+        "required": [
+          "dimensionMembers",
+          "totalRows",
+          "currentPage",
+          "totalPages"
+        ]
       },
       "ODataRecord": {
         "type": "object",
-        "description": "A row in a client schema staging table. Field names and types are defined by the table's schema and vary by client configuration.\n\nSupported data types per field:\n- **string** — alphanumeric text (e.g. dimension member names such as `Scenario_Name`)\n- **number** — integer or decimal (e.g. `Amount`, `Periodic_Amount`)\n- **boolean** — `1` for true, `0` for false\n\nDimension fields conventionally end with `_Name`; measure fields use bare names.",
+        "description": "A row in a client schema staging table. Field names and types are defined by the table's schema and vary by client configuration.\n\nSupported data types per field:\n- **string** \u00e2\u20ac\u201d alphanumeric text (e.g. dimension member names such as `Scenario_Name`)\n- **number** \u00e2\u20ac\u201d integer or decimal (e.g. `Amount`, `Periodic_Amount`)\n- **boolean** \u00e2\u20ac\u201d `1` for true, `0` for false\n\nDimension fields conventionally end with `_Name`; measure fields use bare names.",
         "additionalProperties": {
           "oneOf": [
             {
@@ -964,6 +1245,89 @@
           "Amount": 25000.0,
           "Text": null,
           "Periodic_Amount": null
+        }
+      },
+      "User": {
+        "type": "object",
+        "description": "A user account in the Financial Consolidation tenant.",
+        "properties": {
+          "userId": {
+            "type": "integer",
+            "description": "Internal integer identifier for the user.",
+            "example": 3
+          },
+          "userName": {
+            "type": "string",
+            "description": "Financial Consolidation app username (not the email address).",
+            "example": "jdoe@fluence.app"
+          },
+          "fullName": {
+            "type": "string",
+            "description": "User's display name.",
+            "example": "Jane Doe"
+          },
+          "isDisabled": {
+            "type": "boolean",
+            "description": "Whether the account is disabled. false = active, true = disabled.",
+            "example": false
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "User's email address (distinct from userName).",
+            "example": "jdoe@acme.com"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Names of roles assigned to the user.",
+            "example": [
+              "Admin",
+              "Controller",
+              "Preparer"
+            ]
+          }
+        }
+      },
+      "UserInput": {
+        "type": "object",
+        "description": "User data for create or update requests.",
+        "properties": {
+          "userName": {
+            "type": "string",
+            "description": "Financial Consolidation app username.",
+            "example": "asmith@fluence.app"
+          },
+          "fullName": {
+            "type": "string",
+            "description": "User's display name.",
+            "example": "Adam Smith"
+          },
+          "isDisabled": {
+            "type": "boolean",
+            "description": "Whether the account should be disabled.",
+            "example": false
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "User's email address.",
+            "example": "asmith@acme.com"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Names of roles to assign to the user.",
+            "example": [
+              "Admin",
+              "Controller",
+              "Preparer"
+            ]
+          }
         }
       }
     }
