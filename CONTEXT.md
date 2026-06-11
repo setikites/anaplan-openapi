@@ -4,7 +4,7 @@
 
 This project generates OpenAPI 3.0 JSON specifications for the 9 publicly available Anaplan REST APIs. These specs are intended for:
 - **API client code generation** (via MCP servers and other tools)
-- **Community-maintained documentation** (since official Anaplan docs are outdated)
+- **Community-maintained documentation** (enhancing official Anaplan docs)
 
 ## The 9 Anaplan APIs
 

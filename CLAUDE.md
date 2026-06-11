@@ -49,9 +49,3 @@ The current hand-maintained specs (live tests exist — do not rebuild):
 Always use `uv` to run Python scripts in this project. Examples:
 - `uv run python scripts/build_spec.py ...`
 - `uv run pytest`
-
-## GitHub CLI
-
-The `gh` CLI is installed at: `C:\Program Files\GitHub CLI\gh.exe`
-
-When running `gh` commands, use the full path since it may not be in the PATH for non-interactive shells.
