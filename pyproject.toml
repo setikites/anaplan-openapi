@@ -9,6 +9,12 @@ dependencies = [
     "openapi-spec-validator>=0.9.0",
     "httpx>=0.24.0",
     "anaplan-sdk[cert,oauth]>=0.5.16",
+    "keyring>=25.0.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
 ]
 
 [tool.pyright]

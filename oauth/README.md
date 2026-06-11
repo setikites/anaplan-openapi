@@ -86,8 +86,8 @@ None of the OAuth service endpoints require an `Authorization` request header. A
 | `GET /auth/authorize` | Partial (302 verified) | Partial | 302 + Location header confirmed; login step and code callback require browser |
 | `POST /oauth/device/code` | ✓ | ✓ | Device approval step requires browser |
 | `POST /oauth/token` (device grant) | ✓ | ✓ | Requires user to approve at `verification_uri` |
-| `POST /oauth/token` (auth code grant) | ✓ | ✓ | Requires browser redirect to obtain code; tested via `scripts/oauth/oauth_authcode_step1.py` / `oauth_authcode_step2.py` |
-| `POST /oauth/token` (refresh) | ✓ | ✓ | Tested via `scripts/oauth/oauth_authcode_step3.py` using a live refresh token from the auth code flow |
+| `POST /oauth/token` (auth code grant) | ✓ | ✓ | Requires browser redirect to obtain code; tested via `scripts/oauth/oauth_authcode_step1.py` / `oauth_authcode_step2.py`. Step 2 stores the token blob in the OS keyring (chunked) under `ANAPLAN_OAUTH_KEYRING_SERVICE` — see [docs/TESTING.md](../docs/TESTING.md#authorization-code-grant--audit-live-tests-issue-58) |
+| `POST /oauth/token` (refresh) | ✓ | ✓ | Tested via `scripts/oauth/oauth_authcode_step3.py`, which reads the refresh token from the keyring and rotates the stored token in place |
 
 ## Discrepancies and Notes
 
