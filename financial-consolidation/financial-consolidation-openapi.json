@@ -1003,14 +1003,8 @@
           },
           "processingStatus": {
             "description": "Current processing state of the property.",
-            "oneOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ]
+            "type": "integer",
+            "nullable": true
           },
           "typeInfo": {
             "type": "string",
@@ -1033,25 +1027,13 @@
           },
           "translations": {
             "description": "Available language translations for the dimension name.",
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ]
+            "type": "string",
+            "nullable": true
           },
           "relatedDimension": {
             "description": "Reference to an associated dimension.",
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ]
+            "type": "string",
+            "nullable": true
           },
           "properties": {
             "type": "array",
@@ -1062,14 +1044,8 @@
           },
           "processingStatus": {
             "description": "Current processing state of the dimension.",
-            "oneOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ]
+            "type": "integer",
+            "nullable": true
           }
         }
       },
@@ -1083,14 +1059,8 @@
           },
           "memberTag": {
             "description": "Tag identifier for the member.",
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ]
+            "type": "string",
+            "nullable": true
           },
           "memberCaption": {
             "type": "string",
@@ -1098,14 +1068,8 @@
           },
           "ancestors": {
             "description": "Hierarchy path from root to this member.",
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ]
+            "type": "string",
+            "nullable": true
           },
           "translations": {
             "type": "array",
@@ -1114,14 +1078,8 @@
           },
           "parentMemberName": {
             "description": "Name of the parent member in the hierarchy.",
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ]
+            "type": "string",
+            "nullable": true
           },
           "sortOrder": {
             "type": "integer",
@@ -1133,38 +1091,20 @@
           },
           "operator": {
             "description": "Operator value applied to the member.",
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ]
+            "type": "string",
+            "nullable": true
           },
           "startDate": {
             "description": "Start of the effective date range for the member.",
-            "oneOf": [
-              {
-                "type": "string",
-                "format": "date"
-              },
-              {
-                "type": "null"
-              }
-            ]
+            "type": "string",
+            "format": "date",
+            "nullable": true
           },
           "endDate": {
             "description": "End of the effective date range for the member.",
-            "oneOf": [
-              {
-                "type": "string",
-                "format": "date"
-              },
-              {
-                "type": "null"
-              }
-            ]
+            "type": "string",
+            "format": "date",
+            "nullable": true
           },
           "memberStorage": {
             "type": "string",
@@ -1224,11 +1164,9 @@
             },
             {
               "type": "boolean"
-            },
-            {
-              "type": "null"
             }
-          ]
+          ],
+          "nullable": true
         },
         "example": {
           "Account_Name": "6001",

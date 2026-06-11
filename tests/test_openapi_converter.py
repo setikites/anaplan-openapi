@@ -200,6 +200,13 @@ def test_preserves_all_input_properties():
 @pytest.mark.parametrize("spec_path", [
     "authentication/authentication-openapi.json",
     "oauth/oauth-openapi.json",
+    "integration/integration-openapi.json",
+    "cloudworks/cloudworks-openapi.json",
+    "scim/scim-openapi.json",
+    "alm/alm-openapi.json",
+    "audit/audit-openapi.json",
+    "financial-consolidation/financial-consolidation-openapi.json",
+    "exception/exception-openapi.json",
 ])
 def test_validate_final_spec(spec_path):
     """Each completed *-openapi.json passes openapi-spec-validator without errors."""

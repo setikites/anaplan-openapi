@@ -701,9 +701,8 @@ components:
           description: Whether this property is read-only.
         processingStatus:
           description: Current processing state of the property.
-          oneOf:
-          - type: integer
-          - type: 'null'
+          type: integer
+          nullable: true
         typeInfo:
           type: string
           description: Additional type information for the property.
@@ -720,14 +719,12 @@ components:
           description: Classification type of the dimension.
         translations:
           description: Available language translations for the dimension name.
-          oneOf:
-          - type: string
-          - type: 'null'
+          type: string
+          nullable: true
         relatedDimension:
           description: Reference to an associated dimension.
-          oneOf:
-          - type: string
-          - type: 'null'
+          type: string
+          nullable: true
         properties:
           type: array
           description: List of properties defined on this dimension.
@@ -735,9 +732,8 @@ components:
             $ref: '#/components/schemas/DimensionProperty'
         processingStatus:
           description: Current processing state of the dimension.
-          oneOf:
-          - type: integer
-          - type: 'null'
+          type: integer
+          nullable: true
     DimensionMember:
       type: object
       description: A member within a dimension and its associated metadata.
@@ -747,26 +743,23 @@ components:
           description: Name of the member.
         memberTag:
           description: Tag identifier for the member.
-          oneOf:
-          - type: string
-          - type: 'null'
+          type: string
+          nullable: true
         memberCaption:
           type: string
           description: Display caption for the member.
         ancestors:
           description: Hierarchy path from root to this member.
-          oneOf:
-          - type: string
-          - type: 'null'
+          type: string
+          nullable: true
         translations:
           type: array
           description: Available translations for the member name.
           items: {}
         parentMemberName:
           description: Name of the parent member in the hierarchy.
-          oneOf:
-          - type: string
-          - type: 'null'
+          type: string
+          nullable: true
         sortOrder:
           type: integer
           description: Sort sequence number for the member.
@@ -775,21 +768,18 @@ components:
           description: Whether this member is a leaf node (has no children).
         operator:
           description: Operator value applied to the member.
-          oneOf:
-          - type: string
-          - type: 'null'
+          type: string
+          nullable: true
         startDate:
           description: Start of the effective date range for the member.
-          oneOf:
-          - type: string
-            format: date
-          - type: 'null'
+          type: string
+          format: date
+          nullable: true
         endDate:
           description: End of the effective date range for the member.
-          oneOf:
-          - type: string
-            format: date
-          - type: 'null'
+          type: string
+          format: date
+          nullable: true
         memberStorage:
           type: string
           description: Storage type for the member.
@@ -838,7 +828,7 @@ components:
         - type: string
         - type: number
         - type: boolean
-        - type: 'null'
+        nullable: true
       example:
         Account_Name: '6001'
         Audit_Name: Reclassification

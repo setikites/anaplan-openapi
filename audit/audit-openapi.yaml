@@ -92,7 +92,7 @@ paths:
             text/plain:
               schema:
                 type: string
-              description: Audit events in Common Event Format (CEF).
+                description: Audit events in Common Event Format (CEF).
         '401':
           description: Authentication failed, or the authenticated user is not authorized. The Audit API returns 401 (not
             403) when the user lacks the Tenant Auditor role — check `status` in the response body to distinguish an invalid
@@ -140,7 +140,7 @@ paths:
             text/plain:
               schema:
                 type: string
-              description: Audit events in Common Event Format (CEF).
+                description: Audit events in Common Event Format (CEF).
         '401':
           description: Authentication failed, or the authenticated user is not authorized. The Audit API returns 401 (not
             403) when the user lacks the Tenant Auditor role — check `status` in the response body to distinguish an invalid

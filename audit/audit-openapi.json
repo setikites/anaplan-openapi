@@ -133,9 +133,9 @@
               },
               "text/plain": {
                 "schema": {
-                  "type": "string"
-                },
-                "description": "Audit events in Common Event Format (CEF)."
+                  "type": "string",
+                  "description": "Audit events in Common Event Format (CEF)."
+                }
               }
             }
           },
@@ -193,9 +193,9 @@
               },
               "text/plain": {
                 "schema": {
-                  "type": "string"
-                },
-                "description": "Audit events in Common Event Format (CEF)."
+                  "type": "string",
+                  "description": "Audit events in Common Event Format (CEF)."
+                }
               }
             }
           },
