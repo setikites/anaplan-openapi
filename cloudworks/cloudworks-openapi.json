@@ -8,11 +8,11 @@
   "servers": [
     {
       "url": "https://api.cloudworks.anaplan.com/2/0",
-      "description": "CloudWorks API (per Apiary curl examples \u00e2\u20ac\u201d canonical pending live testing)"
+      "description": "CloudWorks API (per Apiary curl examples \u2014 canonical pending live testing)"
     },
     {
       "url": "https://api.anaplan.com/cloudworks/2/0",
-      "description": "Alternative base URL (per Apiary production URL field \u00e2\u20ac\u201d open question)"
+      "description": "Alternative base URL (per Apiary production URL field \u2014 open question)"
     }
   ],
   "security": [
@@ -2172,7 +2172,7 @@
           },
           "dayOfMonth": {
             "type": "integer",
-            "description": "Day of the month (1\u00e2\u20ac\u201c31). Required for `monthly_specific_day`.",
+            "description": "Day of the month (1\u201331). Required for `monthly_specific_day`.",
             "minimum": 1,
             "maximum": 31,
             "example": 12

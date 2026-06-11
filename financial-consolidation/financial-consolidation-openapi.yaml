@@ -5,12 +5,12 @@ info:
   description: |-
     API for financial consolidation workflows on the Fluence platform (acquired by Anaplan). Enables automation of data management, metadata synchronization, workflow control, and user administration.
 
-    Host: `fluenceapi-prod.fluence.app` â€” different from all other Anaplan APIs. No regional variants are known; a single production endpoint serves all tenants.
+    Host: `fluenceapi-prod.fluence.app` — different from all other Anaplan APIs. No regional variants are known; a single production endpoint serves all tenants.
 
     Every request requires the `X_API_TOKEN` header (created in the Security module) and the `TENANT` header identifying the target tenant.
 servers:
 - url: https://fluenceapi-prod.fluence.app/api/v2305.1
-  description: Fluence production server (single global endpoint â€” regional variants not documented)
+  description: Fluence production server (single global endpoint — regional variants not documented)
 security:
 - apiToken: []
 paths:
@@ -669,7 +669,7 @@ components:
   schemas:
     WorkflowStateResponse:
       type: object
-      description: Response from the get-workflow-state endpoint. Always returned with 200 OK â€” an invalid path or workflow
+      description: Response from the get-workflow-state endpoint. Always returned with 200 OK — an invalid path or workflow
         name produces a null UUID rather than an error.
       properties:
         runId:
@@ -818,9 +818,9 @@ components:
         A row in a client schema staging table. Field names and types are defined by the table's schema and vary by client configuration.
 
         Supported data types per field:
-        - **string** â€” alphanumeric text (e.g. dimension member names such as `Scenario_Name`)
-        - **number** â€” integer or decimal (e.g. `Amount`, `Periodic_Amount`)
-        - **boolean** â€” `1` for true, `0` for false
+        - **string** — alphanumeric text (e.g. dimension member names such as `Scenario_Name`)
+        - **number** — integer or decimal (e.g. `Amount`, `Periodic_Amount`)
+        - **boolean** — `1` for true, `0` for false
 
         Dimension fields conventionally end with `_Name`; measure fields use bare names.
       additionalProperties:

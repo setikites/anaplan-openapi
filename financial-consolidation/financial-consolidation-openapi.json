@@ -3,12 +3,12 @@
   "info": {
     "title": "Anaplan Financial Consolidation API",
     "version": "v2305.1",
-    "description": "API for financial consolidation workflows on the Fluence platform (acquired by Anaplan). Enables automation of data management, metadata synchronization, workflow control, and user administration.\n\nHost: `fluenceapi-prod.fluence.app` \u00e2\u20ac\u201d different from all other Anaplan APIs. No regional variants are known; a single production endpoint serves all tenants.\n\nEvery request requires the `X_API_TOKEN` header (created in the Security module) and the `TENANT` header identifying the target tenant."
+    "description": "API for financial consolidation workflows on the Fluence platform (acquired by Anaplan). Enables automation of data management, metadata synchronization, workflow control, and user administration.\n\nHost: `fluenceapi-prod.fluence.app` \u2014 different from all other Anaplan APIs. No regional variants are known; a single production endpoint serves all tenants.\n\nEvery request requires the `X_API_TOKEN` header (created in the Security module) and the `TENANT` header identifying the target tenant."
   },
   "servers": [
     {
       "url": "https://fluenceapi-prod.fluence.app/api/v2305.1",
-      "description": "Fluence production server (single global endpoint \u00e2\u20ac\u201d regional variants not documented)"
+      "description": "Fluence production server (single global endpoint \u2014 regional variants not documented)"
     }
   ],
   "security": [
@@ -964,7 +964,7 @@
     "schemas": {
       "WorkflowStateResponse": {
         "type": "object",
-        "description": "Response from the get-workflow-state endpoint. Always returned with 200 OK \u00e2\u20ac\u201d an invalid path or workflow name produces a null UUID rather than an error.",
+        "description": "Response from the get-workflow-state endpoint. Always returned with 200 OK \u2014 an invalid path or workflow name produces a null UUID rather than an error.",
         "properties": {
           "runId": {
             "type": "string",
@@ -1153,7 +1153,7 @@
       },
       "ODataRecord": {
         "type": "object",
-        "description": "A row in a client schema staging table. Field names and types are defined by the table's schema and vary by client configuration.\n\nSupported data types per field:\n- **string** \u00e2\u20ac\u201d alphanumeric text (e.g. dimension member names such as `Scenario_Name`)\n- **number** \u00e2\u20ac\u201d integer or decimal (e.g. `Amount`, `Periodic_Amount`)\n- **boolean** \u00e2\u20ac\u201d `1` for true, `0` for false\n\nDimension fields conventionally end with `_Name`; measure fields use bare names.",
+        "description": "A row in a client schema staging table. Field names and types are defined by the table's schema and vary by client configuration.\n\nSupported data types per field:\n- **string** \u2014 alphanumeric text (e.g. dimension member names such as `Scenario_Name`)\n- **number** \u2014 integer or decimal (e.g. `Amount`, `Periodic_Amount`)\n- **boolean** \u2014 `1` for true, `0` for false\n\nDimension fields conventionally end with `_Name`; measure fields use bare names.",
         "additionalProperties": {
           "oneOf": [
             {

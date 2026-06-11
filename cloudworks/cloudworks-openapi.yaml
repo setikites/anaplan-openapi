@@ -8,9 +8,9 @@ info:
     **Base URL note**: Apiary curl examples consistently use `https://api.cloudworks.anaplan.com/2/0/`. The Apiary production URL field references `https://api.anaplan.com/cloudworks/2/0/`. Live testing is needed to confirm which is canonical. See `cloudworks/README.md`.
 servers:
 - url: https://api.cloudworks.anaplan.com/2/0
-  description: CloudWorks API (per Apiary curl examples â€” canonical pending live testing)
+  description: CloudWorks API (per Apiary curl examples — canonical pending live testing)
 - url: https://api.anaplan.com/cloudworks/2/0
-  description: Alternative base URL (per Apiary production URL field â€” open question)
+  description: Alternative base URL (per Apiary production URL field — open question)
 security:
 - AnaplanAuthToken: []
 - BearerAuth: []
@@ -1446,7 +1446,7 @@ components:
           - 6
         dayOfMonth:
           type: integer
-          description: Day of the month (1â€“31). Required for `monthly_specific_day`.
+          description: Day of the month (1–31). Required for `monthly_specific_day`.
           minimum: 1
           maximum: 31
           example: 12
