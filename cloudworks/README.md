@@ -45,7 +45,9 @@ The CloudWorks API exposes seven resource groups:
 
 ## Spec Lifecycle
 
-Spec generated from Apiary via `scripts/build_spec.py`. A live test scaffold exists (`tests/test_cloudworks_live.py`), but key behaviors (auth scheme, server URL) remain unconfirmed pending live testing — see the notes above. Do not re-run `scripts/build_spec.py`; refine the spec by hand as behaviors are confirmed.
+Canonical lifecycle and confidence are in the [confidence table in CONTEXT.md](../CONTEXT.md#confidence-table).
+
+Note: a live test scaffold exists (`tests/test_cloudworks_live.py`), but key behaviors (auth scheme, server URL) remain unconfirmed pending live testing — see the notes above.
 
 ## Discovered Discrepancies
 

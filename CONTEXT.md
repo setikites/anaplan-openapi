@@ -10,14 +10,14 @@ This project generates OpenAPI 3.0 JSON specifications for the 9 publicly availa
 
 Anaplan has 9 publicly documented REST APIs, each with different characteristics, authentication schemes, and documentation quality. This project documents them as-is rather than normalizing across them, since they were built by different teams at different times.
 
+> **Confidence and spec lifecycle for every API are consolidated in the [Confidence table](#confidence-table) below — the single source of truth for those facts.** The per-API notes here cover purpose, authentication, sources, and key behaviors only.
+
 ### High Priority (Heavily Used)
 
 #### 1. Authentication API
 - **Purpose**: Generate authentication tokens for other Anaplan APIs
 - **Auth**: HTTP Basic credentials → returns token (different from other APIs)
 - **Source of Truth**: Apiary docs + Postman collection
-- **Testing**: High (Postman available; thorough live testing done)
-- **Status**: Complete — hand-maintained (live-tested; do not rebuild)
 - **Key Points**: 
   - Token generation is a prerequisite for other APIs
   - Supports both basic auth (username/password) and certificate-based auth
@@ -26,8 +26,6 @@ Anaplan has 9 publicly documented REST APIs, each with different characteristics
 - **Purpose**: OAuth 2.0 token generation
 - **Auth**: OAuth 2.0 flow
 - **Source of Truth**: Apiary docs only (no Postman collection available for OAuth)
-- **Testing**: Partial — device flow initiation and error cases automated; end-to-end device approval and Authorization Code Grant login require browser interaction and cannot be automated
-- **Status**: complete
 - **Key Points**:
   - Alternative to basic auth; modern OAuth 2.0 standard
   - Supports Authorization Code Grant (`/auth/authorize`) and Device Authorization Grant (`/oauth/device/code`)
@@ -39,8 +37,6 @@ Anaplan has 9 publicly documented REST APIs, each with different characteristics
 - **Purpose**: Core API for managing models, dimensions, modules, versions
 - **Auth**: Bearer token (`Authorization: Bearer <token>`) OR `AnaplanAuthToken` header
 - **Source of Truth**: Apiary docs + Postman collection + extracted JSON schemas
-- **Testing**: High (most complete info; Postman available; schemas extracted from live API)
-- **Status**: Complete — hand-maintained (live-tested; do not rebuild)
 - **Key Points**:
   - Most mature API with extensive Apiary documentation
   - Postman collection covers common workflows
@@ -51,9 +47,7 @@ Anaplan has 9 publicly documented REST APIs, each with different characteristics
 - **Purpose**: Manage CloudWorks processes and tasks
 - **Auth**: Likely bearer token (needs confirmation)
 - **Source of Truth**: Apiary docs + (possibly) live testing
-- **Testing**: Medium
-- **Status**: Spec generated; live test file present (`tests/test_cloudworks_live.py`) — see `cloudworks/README.md`
-- **Key Points**: Unknown pending investigation
+- **Key Points**: Auth scheme and server URL still unconfirmed — see `cloudworks/README.md`
 
 ### Medium Priority (Regularly Used)
 
@@ -61,8 +55,6 @@ Anaplan has 9 publicly documented REST APIs, each with different characteristics
 - **Purpose**: System for Cross-domain Identity Management (user/group provisioning)
 - **Auth**: Bearer token (SCIM standard)
 - **Source of Truth**: Apiary docs + SCIM ResourceTypes/ResourceSchema from live API
-- **Testing**: Medium (API responses provide schema definitions)
-- **Status**: Spec generated (response schemas extracted); live test file present (`tests/test_scim_live.py`)
 - **Key Points**:
   - SCIM is a standard (RFC 7644), so much behavior is expected
   - Live API returns ResourceTypes and ResourceSchema endpoints that define available resources
@@ -72,16 +64,12 @@ Anaplan has 9 publicly documented REST APIs, each with different characteristics
 - **Purpose**: Application Lifecycle Management (source control, versioning)
 - **Auth**: Likely bearer token or Anaplan-specific (needs confirmation)
 - **Source of Truth**: Apiary docs + live testing
-- **Testing**: Medium (moderate usage)
-- **Status**: Hand-maintained — live tests at `tests/test_alm_live.py` (see `alm/README.md`)
 - **Key Points**: Unknown pending investigation
 
 #### 7. Audit API
 - **Purpose**: Access audit logs and compliance data (SIEM integration, compliance tracking)
 - **Auth**: Likely bearer token (needs confirmation via live testing)
 - **Source of Truth**: Apiary (`auditservice`) + live testing
-- **Testing**: Medium (no Postman, moderate usage)
-- **Status**: Spec generated (`audit/audit-openapi.json`); live test file present (`tests/test_audit_live.py`)
 - **Key Points**:
   - Apiary blueprint is not publicly readable; spec has empty paths — populate via live testing
   - Apiary lists production URL as `https://audit.anaplan.com/audit/api/1/` (unique host, not `api.anaplan.com`)
@@ -93,8 +81,6 @@ Anaplan has 9 publicly documented REST APIs, each with different characteristics
 - **Purpose**: Specialized API for financial consolidation workflows
 - **Auth**: Unknown (needs investigation)
 - **Source of Truth**: Apiary docs only
-- **Testing**: Low (lower priority; limited live testing)
-- **Status**: Spec generated; minimal live test (`tests/test_financial_consolidation_live.py`); lowest confidence
 - **Key Points**: 
   - Lower priority; may skip if insufficient documentation
   - No Postman collection available
@@ -104,10 +90,9 @@ Anaplan has 9 publicly documented REST APIs, each with different characteristics
 - **Purpose**: Manage exception users (users who can bypass SSO enforcement)
 - **Auth**: `AnaplanApiKey` (confirmed via live testing); Bearer (service-to-service only); AnaplanAuthToken rejected for API key credentials
 - **Source of Truth**: Apiary docs + Postman collection (top-level "Exception Users" folder, 4 requests) + sample responses in `exception/README.md`
-- **Testing**: Low (lower priority; limited or no live testing expected)
-- **Status**: Spec complete (`exception/exception-openapi.json`); auth scheme confirmed via live testing; search contract blocked pending Tenant Security Admin role
 - **Key Points**:
   - Requires Tenant Security Admin role
+  - Auth scheme confirmed via live testing; search contract blocked pending Tenant Security Admin role (issue #51)
   - Two endpoints: `PATCH` assign/unassign a user, `POST` search (by workspace or by user)
   - POST search uses `oneOf` request body — `workspaceGuid` or `userGuid` (mutually exclusive)
   - Error response body shape modeled from Apiary descriptions; confirm field names via live testing (issue #51)
@@ -250,11 +235,11 @@ Legacy regions (us1–us7, eu1, eu2, eu4, ap1) share the older non-prefixed `api
 | Authentication | ✓ | ✓ | — | High | High | hand-maintained (do not rebuild) |
 | OAuth | ✓ | Partial | — | Partial (device flow happy path + error cases; auth code flow not automatable) | High | hand-maintained (do not rebuild) |
 | Integration | ✓ | ✓ | ✓ | High | High | hand-maintained (do not rebuild) |
-| CloudWorks | ✓ | ✓ | — | Medium | Medium | bootstrap only |
-| SCIM | ✓ | ✓ | ✓ | Medium | Medium | bootstrap only |
-| ALM | ✓ | ✓ | — | Medium | Medium | bootstrap only |
-| Audit | ✓ | ✓ | — | Medium | Medium | bootstrap only |
-| Financial Consolidation | ✓ | — | — | Low | Low | bootstrap only |
+| CloudWorks | ✓ | ✓ | — | Medium | Medium | hand-maintained (do not rebuild) |
+| SCIM | ✓ | ✓ | ✓ | Medium | Medium | hand-maintained (do not rebuild) |
+| ALM | ✓ | ✓ | — | Medium | Medium | hand-maintained (do not rebuild) |
+| Audit | ✓ | ✓ | — | Medium | Medium | hand-maintained (do not rebuild) |
+| Financial Consolidation | ✓ | — | — | Low | Low | hand-maintained (do not rebuild) |
 | Exception Users | ✓ | ✓ | ✓ | Low | Low | hand-maintained (do not rebuild) |
 
 ## Project Structure

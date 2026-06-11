@@ -75,7 +75,9 @@ Populate the endpoint table below as endpoints are discovered via live testing:
 
 ## Spec Lifecycle
 
-Spec generated from Apiary metadata via local cache (`sources/audit/apiary-blueprint.json`). Paths are empty because the Apiary blueprint is not publicly readable. Populate `audit/audit-openapi.json` manually as endpoints are confirmed via live testing (`tests/test_audit_live.py`), and do not re-run `scripts/build_spec.py`.
+Canonical lifecycle and confidence are in the [confidence table in CONTEXT.md](../CONTEXT.md#confidence-table).
+
+Note: the spec's paths are empty because the Apiary blueprint is not publicly readable — populate `audit/audit-openapi.json` by hand as endpoints are confirmed via live testing (`tests/test_audit_live.py`).
 
 ## Discovered Discrepancies
 

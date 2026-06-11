@@ -124,7 +124,7 @@ All successful responses wrap their payload in a standard envelope:
 
 ## Spec Lifecycle
 
-Hand-maintained — live tests exist at `tests/test_alm_live.py`. Do not re-run `scripts/build_spec.py`.
+Canonical lifecycle and confidence are in the [confidence table in CONTEXT.md](../CONTEXT.md#confidence-table). Live tests: `tests/test_alm_live.py`.
 
 Run live tests with:
 ```

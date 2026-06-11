@@ -54,8 +54,9 @@ openapi-generator-cli generate -i integration/integration-openapi.json -g python
 
 Each API directory's **README** documents its sources, auth scheme(s), and any
 behavior discovered during live testing that differs from the official docs.
-See [`CONTEXT.md`](CONTEXT.md) for the full source/confidence breakdown and
-regional server URLs.
+The Confidence column above mirrors the canonical [confidence table in
+`CONTEXT.md`](CONTEXT.md#confidence-table) (which also covers sources, spec
+lifecycle, and regional server URLs); a test keeps the two in sync.
 
 ## Authentication at a glance
 
