@@ -29,6 +29,7 @@ uv run --env-file .env pytest tests/ --live
 | `ANAPLAN_OAUTH_CLIENT_ID` | OAuth Authorization Code Grant | Client ID registered for the auth-code flow |
 | `ANAPLAN_OAUTH_DEVICE_CLIENT_ID` | OAuth Device Grant | Client ID registered for the device flow |
 | `ANAPLAN_OAUTH_AUTHCODE_CLIENT_ID` / `ANAPLAN_OAUTH_AUTHCODE_CLIENT_SECRET` | `scripts/oauth/` helpers | Auth-code client credentials for the manual OAuth helper scripts |
+| `ANAPLAN_OAUTH_KEYRING_SERVICE` | `scripts/oauth/` helpers + audit live tests | Keyring service name under which the Authorization Code grant token blob is stored (default `anaplan-oauth-authcode`). When a token is present, the audit live tests use its `access_token` as the bearer instead of basic auth. |
 
 Certificate auth is preferred where configured; basic auth is the fallback.
 Fixtures `skip` cleanly when a credential is missing, so you can run a subset
@@ -75,14 +76,45 @@ uv run --env-file .env pytest tests/test_integration_live.py --live --allow-writ
 
 The Authorization Code and Device grants need a browser step that cannot be
 automated. The helper scripts in `scripts/oauth/` walk through them
-interactively. Run them from the repo root (they read `.env` and write
-short-lived artifacts like `.auth_code` / `.token` to the working directory —
-these are git-ignored):
+interactively. Run them from the repo root (they read `.env`; step 1 writes a
+short-lived `.auth_code` to the working directory — git-ignored):
 
 ```sh
 uv run python scripts/oauth/oauth_authcode_step1.py   # print auth URL, capture redirect code
-uv run python scripts/oauth/oauth_authcode_step2.py   # exchange code for tokens
-uv run python scripts/oauth/oauth_authcode_step3.py   # refresh using a live refresh token
+uv run python scripts/oauth/oauth_authcode_step2.py   # exchange code for tokens, store in keyring
+uv run python scripts/oauth/oauth_authcode_step3.py   # refresh the stored token (rotates it in keyring)
 uv run python scripts/oauth/oauth_device_step1.py     # request device + user code
 uv run python scripts/oauth/oauth_device_step2.py     # poll for approval
 ```
+
+### Authorization Code grant → audit live tests (issue #58)
+
+The audit API's `GET /events` happy path needs a bearer token for an account
+holding the **Tenant Auditor** role, obtained via the Authorization Code grant.
+The flow is human-in-the-loop (the browser approval can't be automated), but is
+repeatable:
+
+1. **One-time setup**: assign the Tenant Auditor role to the test account in
+   Anaplan Administration, and register an Authorization Code grant OAuth client
+   (`ANAPLAN_OAUTH_AUTHCODE_CLIENT_ID` / `_SECRET` in `.env`).
+2. Run `oauth_authcode_step1.py` and approve in the browser; paste the redirect
+   URL back when prompted.
+3. Run `oauth_authcode_step2.py`. The full token response is stored in the OS
+   keyring (Windows Credential Manager / macOS Keychain / Secret Service) under
+   `ANAPLAN_OAUTH_KEYRING_SERVICE`. The JWT blob is chunked across multiple
+   keyring entries because backends cap a single secret at ~2.5 KB.
+4. Run the audit live tests. With a token in the keyring they use its
+   `access_token` as the bearer automatically — no per-run code changes:
+
+   ```sh
+   uv run --env-file .env pytest tests/test_audit_live.py --live
+   ```
+
+   `GET /events` should return `200` (not `401 FAILURE_UNAUTHORIZED_USER_ACTION`),
+   confirming both the role and the OAuth path end-to-end.
+5. When the access token expires (~35 min), run `oauth_authcode_step3.py` to
+   refresh it in place; no browser step is needed until the refresh token
+   itself expires.
+
+Remove the stored token at any time from a Python shell:
+`from oauth.token_keyring import clear_token; clear_token("anaplan-oauth-authcode")`.

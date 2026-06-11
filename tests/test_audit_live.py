@@ -21,17 +21,27 @@ Credentials are read from .env at the repo root. Required variables:
     ANAPLAN_PASSWORD  - password for basic auth
 
 Optional variables:
-    ANAPLAN_AUDIT_BASE_URL - override audit base URL
-                             (default: https://audit.anaplan.com/audit/api/1)
+    ANAPLAN_AUDIT_BASE_URL        - override audit base URL
+                                    (default: https://audit.anaplan.com/audit/api/1)
+    ANAPLAN_OAUTH_KEYRING_SERVICE - keyring service holding an OAuth token blob from
+                                    the Authorization Code grant (default:
+                                    anaplan-oauth-authcode). When a token is stored
+                                    there (via scripts/oauth/oauth_authcode_step2.py),
+                                    its access_token is used as the bearer instead of
+                                    basic auth — required to exercise the Tenant
+                                    Auditor role over the OAuth path (issue #58).
 """
 
 import base64
+import json
 import os
 import pathlib
 import warnings
 
 import httpx
 import pytest
+
+from oauth.token_keyring import load_token
 
 AUDIT_BASE_URL = os.getenv(
     "ANAPLAN_AUDIT_BASE_URL", "https://audit.anaplan.com/audit/api/1"
@@ -55,6 +65,23 @@ def _get_anaplan_token(username: str, password: str) -> str | None:
     return None
 
 
+def _get_oauth_access_token() -> str | None:
+    """Return the access_token from the OAuth token blob in the keyring, if any.
+
+    The Authorization Code grant helper scripts store the full token response under
+    ANAPLAN_OAUTH_KEYRING_SERVICE. Anaplan accepts an OAuth access_token under the
+    same ``AnaplanAuthToken`` Authorization scheme as a basic-auth token.
+    """
+    service = os.getenv("ANAPLAN_OAUTH_KEYRING_SERVICE", "anaplan-oauth-authcode")
+    blob = load_token(service)
+    if not blob:
+        return None
+    try:
+        return json.loads(blob).get("access_token")
+    except (ValueError, AttributeError):
+        return None
+
+
 def _is_no_role_401(response: httpx.Response) -> bool:
     """Return True when a 401 means 'token valid, user lacks Tenant Auditor role'.
 
@@ -73,11 +100,25 @@ def _is_no_role_401(response: httpx.Response) -> bool:
 
 @pytest.fixture(scope="module")
 def audit_token():
-    """AnaplanAuthToken for audit calls (module-scoped). Logs out on teardown."""
+    """Bearer token for audit calls (module-scoped).
+
+    Prefers an OAuth access_token from the keyring (Authorization Code grant, the
+    path that can carry the Tenant Auditor role — issue #58). Falls back to a
+    basic-auth AnaplanAuthToken when no OAuth token is stored. The basic-auth
+    token is logged out on teardown; the OAuth token is left intact (it is owned
+    by the human-run grant flow and revoking it would break repeat test runs).
+    """
+    oauth_token = _get_oauth_access_token()
+    if oauth_token:
+        yield oauth_token
+        return
+
     username = os.getenv("ANAPLAN_USERNAME")
     password = os.getenv("ANAPLAN_PASSWORD")
     if not username or not password:
-        pytest.skip("ANAPLAN_USERNAME and ANAPLAN_PASSWORD not set")
+        pytest.skip(
+            "No OAuth token in keyring and ANAPLAN_USERNAME/ANAPLAN_PASSWORD not set"
+        )
 
     token = _get_anaplan_token(username, password)
     if not token:
