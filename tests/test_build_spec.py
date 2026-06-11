@@ -10,7 +10,7 @@ from openapi_spec_validator import validate
 from build_spec import build_spec_from_postman, servers_for_api
 
 REPO_ROOT = Path(__file__).parent.parent
-AUTH_POSTMAN = REPO_ROOT / "authentication" / "postman-spec.yaml"
+AUTH_POSTMAN = REPO_ROOT / "sources" / "postman-spec.yaml"
 
 
 # ─── servers_for_api ──────────────────────────────────────────────────────────

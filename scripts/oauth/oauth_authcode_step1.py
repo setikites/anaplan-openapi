@@ -47,7 +47,7 @@ if not code:
 
 print(f"Code captured: {code[:12]}...")
 print()
-print("Run next: uv run python oauth_authcode_step2.py")
+print("Run next: uv run python scripts/oauth/oauth_authcode_step2.py")
 
 with open('.auth_code', 'w') as f:
     json.dump({

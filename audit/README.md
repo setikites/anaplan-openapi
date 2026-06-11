@@ -5,7 +5,7 @@
 | Source | Available | Notes |
 |--------|-----------|-------|
 | Apiary docs | ✓ | https://auditservice.docs.apiary.io/ (identifier: `auditservice`) |
-| Local metadata | ✓ | `audit/apiary-blueprint.json` — Apiary API metadata cached locally |
+| Local metadata | ✓ | `sources/audit/apiary-blueprint.json` — Apiary API metadata cached locally |
 | Postman collection | ✓ | Official Anaplan Collection — "Audit Service" folder (GET and POST variants for retrieving/searching audit events) |
 | Live testing | ✗ | Not yet performed |
 
@@ -75,7 +75,7 @@ Populate the endpoint table below as endpoints are discovered via live testing:
 
 ## Spec Lifecycle
 
-Bootstrap-only — spec generated from Apiary metadata via local cache (`audit/apiary-blueprint.json`). Paths are empty because the Apiary blueprint is not publicly readable. Populate `audit/audit-openapi.json` manually as endpoints are confirmed via live testing, then transition to hand-maintained (do not re-run `build_spec.py`).
+Spec generated from Apiary metadata via local cache (`sources/audit/apiary-blueprint.json`). Paths are empty because the Apiary blueprint is not publicly readable. Populate `audit/audit-openapi.json` manually as endpoints are confirmed via live testing (`tests/test_audit_live.py`), and do not re-run `scripts/build_spec.py`.
 
 ## Discovered Discrepancies
 

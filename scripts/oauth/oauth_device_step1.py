@@ -20,7 +20,7 @@ print(f"  {data['verification_uri_complete']}")
 print(f"  User code: {data['user_code']}")
 print(f"  Expires in: {data['expires_in']}s")
 print()
-print("Approve in the browser, then run: uv run python oauth_device_step2.py")
+print("Approve in the browser, then run: uv run python scripts/oauth/oauth_device_step2.py")
 
 with open('.device_code', 'w') as f:
     json.dump({'device_code': data['device_code'], 'client_id': client_id}, f)

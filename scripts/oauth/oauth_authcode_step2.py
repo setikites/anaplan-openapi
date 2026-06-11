@@ -23,4 +23,4 @@ if r.status_code == 200:
     with open('.token', 'w') as f:
         json.dump({**saved, **body}, f)
     print()
-    print("Token saved. Run next: uv run python oauth_authcode_step3.py")
+    print("Token saved. Run next: uv run python scripts/oauth/oauth_authcode_step3.py")

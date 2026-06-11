@@ -1,5 +1,10 @@
 # PRD: OpenAPI 3.0 Specifications for Anaplan APIs
 
+> **Historical document.** This is the original product requirements document
+> that kicked off the project, retained for context. Status fields and phasing
+> below reflect the project's early plan, not its current state — see
+> [`../CONTEXT.md`](../CONTEXT.md) for current per-API status and confidence.
+
 ## Problem Statement
 
 Anaplan provides 9 publicly available REST APIs, but their official Apiary documentation is outdated and incomplete. There are no machine-readable OpenAPI specifications available, making it difficult to:

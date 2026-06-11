@@ -16,8 +16,8 @@ Anaplan has 9 publicly documented REST APIs, each with different characteristics
 - **Purpose**: Generate authentication tokens for other Anaplan APIs
 - **Auth**: HTTP Basic credentials → returns token (different from other APIs)
 - **Source of Truth**: Apiary docs + Postman collection
-- **Testing**: High (Postman available, expected to have thorough live testing)
-- **Status**: Not yet started
+- **Testing**: High (Postman available; thorough live testing done)
+- **Status**: Complete — hand-maintained (live-tested; do not rebuild)
 - **Key Points**: 
   - Token generation is a prerequisite for other APIs
   - Supports both basic auth (username/password) and certificate-based auth
@@ -40,7 +40,7 @@ Anaplan has 9 publicly documented REST APIs, each with different characteristics
 - **Auth**: Bearer token (`Authorization: Bearer <token>`) OR `AnaplanAuthToken` header
 - **Source of Truth**: Apiary docs + Postman collection + extracted JSON schemas
 - **Testing**: High (most complete info; Postman available; schemas extracted from live API)
-- **Status**: Not yet started
+- **Status**: Complete — hand-maintained (live-tested; do not rebuild)
 - **Key Points**:
   - Most mature API with extensive Apiary documentation
   - Postman collection covers common workflows
@@ -51,8 +51,8 @@ Anaplan has 9 publicly documented REST APIs, each with different characteristics
 - **Purpose**: Manage CloudWorks processes and tasks
 - **Auth**: Likely bearer token (needs confirmation)
 - **Source of Truth**: Apiary docs + (possibly) live testing
-- **Testing**: Medium (high priority but no Postman yet)
-- **Status**: Not yet started
+- **Testing**: Medium
+- **Status**: Spec generated; live test file present (`tests/test_cloudworks_live.py`) — see `cloudworks/README.md`
 - **Key Points**: Unknown pending investigation
 
 ### Medium Priority (Regularly Used)
@@ -62,7 +62,7 @@ Anaplan has 9 publicly documented REST APIs, each with different characteristics
 - **Auth**: Bearer token (SCIM standard)
 - **Source of Truth**: Apiary docs + SCIM ResourceTypes/ResourceSchema from live API
 - **Testing**: Medium (API responses provide schema definitions)
-- **Status**: Partially started (extracted API response schemas)
+- **Status**: Spec generated (response schemas extracted); live test file present (`tests/test_scim_live.py`)
 - **Key Points**:
   - SCIM is a standard (RFC 7644), so much behavior is expected
   - Live API returns ResourceTypes and ResourceSchema endpoints that define available resources
@@ -72,8 +72,8 @@ Anaplan has 9 publicly documented REST APIs, each with different characteristics
 - **Purpose**: Application Lifecycle Management (source control, versioning)
 - **Auth**: Likely bearer token or Anaplan-specific (needs confirmation)
 - **Source of Truth**: Apiary docs + live testing
-- **Testing**: Medium (no Postman, moderate usage)
-- **Status**: Not yet started
+- **Testing**: Medium (moderate usage)
+- **Status**: Hand-maintained — live tests at `tests/test_alm_live.py` (see `alm/README.md`)
 - **Key Points**: Unknown pending investigation
 
 #### 7. Audit API
@@ -81,7 +81,7 @@ Anaplan has 9 publicly documented REST APIs, each with different characteristics
 - **Auth**: Likely bearer token (needs confirmation via live testing)
 - **Source of Truth**: Apiary (`auditservice`) + live testing
 - **Testing**: Medium (no Postman, moderate usage)
-- **Status**: Bootstrap spec generated (`audit/audit-openapi.json`)
+- **Status**: Spec generated (`audit/audit-openapi.json`); live test file present (`tests/test_audit_live.py`)
 - **Key Points**:
   - Apiary blueprint is not publicly readable; spec has empty paths — populate via live testing
   - Apiary lists production URL as `https://audit.anaplan.com/audit/api/1/` (unique host, not `api.anaplan.com`)
@@ -93,8 +93,8 @@ Anaplan has 9 publicly documented REST APIs, each with different characteristics
 - **Purpose**: Specialized API for financial consolidation workflows
 - **Auth**: Unknown (needs investigation)
 - **Source of Truth**: Apiary docs only
-- **Testing**: Low (lower priority; may have limited live testing)
-- **Status**: Not yet started
+- **Testing**: Low (lower priority; limited live testing)
+- **Status**: Spec generated; minimal live test (`tests/test_financial_consolidation_live.py`); lowest confidence
 - **Key Points**: 
   - Lower priority; may skip if insufficient documentation
   - No Postman collection available
@@ -195,15 +195,15 @@ It covers 8 of the 9 APIs (all except Financial Consolidation) and is the primar
 
 #### Local copy
 
-A local copy of the collection is saved at `Official Anaplan Collection.postman_collection.json` (repo root). Use this file for offline reference and scripted processing rather than hitting the Postman API repeatedly.
+A local copy of the collection is saved at `sources/Official Anaplan Collection.postman_collection.json`. Use this file for offline reference and scripted processing rather than hitting the Postman API repeatedly.
 
 #### postman-spec.yaml
 
-`postman-spec.yaml` (repo root) is a YAML conversion of the collection generated from a personal fork of the official Anaplan collection. It is produced by exporting the forked collection from Postman in OpenAPI format. This file captures the collection state at a point in time and may lag behind updates to the official collection.
+`sources/postman-spec.yaml` is a YAML conversion of the collection generated from a personal fork of the official Anaplan collection. It is produced by exporting the forked collection from Postman in OpenAPI format. This file captures the collection state at a point in time and may lag behind updates to the official collection.
 
 ### Regional server URLs
 
-Each API has region-specific base URLs. Source: [URL, IP, and allowlist requirements](https://support.anaplan.com/url-ip-and-allowlist-requirements-c8235c7d-8af2-413b-a9ff-d465978806b9) (also saved as `oauth/URL, IP, and allowlist requirements _ Anaplan Support.pdf`).
+Each API has region-specific base URLs. Source: [URL, IP, and allowlist requirements](https://support.anaplan.com/url-ip-and-allowlist-requirements-c8235c7d-8af2-413b-a9ff-d465978806b9) (also saved as `sources/oauth/URL, IP, and allowlist requirements _ Anaplan Support.pdf`).
 
 The URL pattern varies by API type:
 
@@ -243,7 +243,7 @@ Legacy regions (us1–us7, eu1, eu2, eu4, ap1) share the older non-prefixed `api
 
 ### Confidence table
 
-`build_spec.py` is a one-time bootstrap per API. Once live tests exist the spec is hand-maintained — do not run `build_spec.py` against it again (see `CLAUDE.md`).
+`scripts/build_spec.py` is a one-time bootstrap per API. Once live tests exist the spec is hand-maintained — do not run it against that spec again (see `CLAUDE.md`).
 
 | API | Apiary | Postman | Extracted Schemas | Live Testing | Confidence | Spec lifecycle |
 |-----|--------|---------|-------------------|--------------|------------|----------------|
@@ -261,57 +261,49 @@ Legacy regions (us1–us7, eu1, eu2, eu4, ap1) share the older non-prefixed `api
 
 ```
 /
-├── CONTEXT.md                                    (this file)
-├── README.md                                     (project overview)
-├── Official Anaplan Collection.postman_collection.json  (local copy of official collection)
-├── postman-spec.yaml                             (OpenAPI export from forked collection)
-├── authentication/
-│   ├── README.md                                (Apiary docs + notes)
-│   └── authentication-openapi.json              (OpenAPI 3.0 spec)
-├── oauth/
-│   ├── README.md
-│   └── oauth-openapi.json
-├── integration/
-│   ├── README.md
-│   ├── integration-openapi.json
-│   ├── objectSchema.json                        (extracted schemas)
-│   └── modelObjectschema.json
-├── cloudworks/
-│   ├── README.md
-│   └── cloudworks-openapi.json
-├── scim/
-│   ├── README.md
-│   ├── scim-openapi.json
-│   └── SCIM-OpenAPISpec.json                    (reference only)
-├── alm/
-│   ├── README.md
-│   └── alm-openapi.json
-├── audit/
-│   ├── README.md
-│   └── audit-openapi.json
-├── financial-consolidation/
-│   ├── README.md
-│   └── financial-consolidation-openapi.json
-└── exception/
-    ├── README.md
-    └── exception-users-openapi.json
+├── README.md                 (audience-first overview: what the specs are, how to use them)
+├── CONTRIBUTING.md           (tooling, build pipeline, how to run tests)
+├── CONTEXT.md                (this file)
+├── CLAUDE.md                 (agent instructions)
+├── LICENSE  NOTICE           (Apache-2.0 + Anaplan disclaimer)
+├── docs/
+│   ├── TESTING.md            (live-test setup, env vars, flags)
+│   ├── PRD.md                (original PRD, historical)
+│   ├── adr/                  (architecture decision records)
+│   └── agents/               (agent skill docs)
+├── scripts/                  (build/maintenance tooling)
+│   ├── build_spec.py  converter.py  schema_importer.py
+│   ├── revise_spec.py  validate.py  sync_yaml.py
+│   └── oauth/                (interactive OAuth flow helpers)
+├── sources/                  (raw source data)
+│   ├── Official Anaplan Collection.postman_collection.json
+│   ├── postman-spec.yaml     (OpenAPI export from forked collection)
+│   ├── audit/  alm/  exception/   (Apiary blueprints/metadata)
+│   ├── integration/          (objectSchema.json, modelObjectschema.json)
+│   ├── scim/                 (scim-schema.json)
+│   └── oauth/                (reference PDFs)
+├── tests/                    (pytest suite: unit/contract + *_live.py)
+└── <api>/                    (one per API: authentication, oauth, integration,
+    ├── README.md              cloudworks, scim, alm, audit,
+    ├── <api>-openapi.json     financial-consolidation, exception)
+    └── <api>-openapi.yaml
 ```
 
 Each API folder contains:
-- **README.md**: Apiary docs link, sample responses, testing notes, and any discovered discrepancies
-- **`{api}-openapi.json`**: The OpenAPI 3.0 specification (canonical spec for code generation)
+- **README.md**: sources, auth scheme(s), and behavior discovered during live testing
+- **`<api>-openapi.json`**: the canonical OpenAPI 3.0 spec (for code generation)
+- **`<api>-openapi.yaml`**: YAML counterpart, regenerated from the JSON
 
-## Next Steps
+## Maintenance
 
-1. **Start with Integration API** (most information available)
-   - Compare Postman collection structure to Apiary docs
-   - Validate endpoints and parameters against live instance
-   - Document discovered fields/errors not in Apiary
-   - Generate OpenAPI spec
+All 9 specs now exist. Ongoing work is refinement rather than initial authoring:
 
-2. **Work through high-priority APIs** in order (Authentication → OAuth → CloudWorks → SCIM → ALM → Audit)
-
-3. **Handle low-priority APIs** last (Financial Consolidation, Exception Users)
-   - May be lower confidence due to limited testing
-
-4. **Document findings** in each README.md where specs differ from Apiary docs
+- **Hand-maintained specs** (Authentication, OAuth, Integration) have live tests
+  and must be edited by hand — do **not** re-run `scripts/build_spec.py` against
+  them (see [CONTRIBUTING.md](CONTRIBUTING.md)).
+- **Bootstrap specs** (CloudWorks, SCIM, ALM, Audit, Financial Consolidation,
+  Exception Users) can be improved by adding live tests and graduating them to
+  hand-maintained as coverage grows.
+- Record any behavior that differs from the official docs in the relevant
+  `<api>/README.md` under "Discrepancies".
+- Live-test setup is documented in [docs/TESTING.md](docs/TESTING.md).

@@ -124,7 +124,7 @@ All successful responses wrap their payload in a standard envelope:
 
 ## Spec Lifecycle
 
-Hand-maintained — live tests exist at `tests/test_alm_live.py`. Do not re-run `build_spec.py`.
+Hand-maintained — live tests exist at `tests/test_alm_live.py`. Do not re-run `scripts/build_spec.py`.
 
 Run live tests with:
 ```

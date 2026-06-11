@@ -13,59 +13,29 @@ The Authentication API generates tokens for use with other Anaplan APIs. It supp
 |--------|-----------|-------|
 | Apiary docs | ✓ | https://anaplanauthentication.docs.apiary.io/ |
 | Postman collection | ✓ | Official Anaplan Collection — "Authentication" folder (Basic Credentials, Certificate Authority Authentication, OAuth 2.0 token requests, Other Authentication Actions) |
-| Postman spec (fork) | ✓ | `postman-spec.yaml` (repo root) — generated from a fork of the official Anaplan collection |
+| Postman spec (fork) | ✓ | `sources/postman-spec.yaml` — generated from a fork of the official Anaplan collection |
 | OpenAPI spec | ✓ | `authentication/authentication-openapi.json` |
 | Live testing | ✓ | Tested against live Anaplan instance |
 
 ## Testing
 
-### Unit/Integration Tests
+Validate the spec and run the unit/contract suite (no credentials needed):
 
-Run OpenAPI validation:
-```bash
-uv run validate.py authentication/authentication-openapi.json
+```sh
+uv run python scripts/validate.py authentication/authentication-openapi.json
+uv run pytest
 ```
 
-Run all tests:
-```bash
-uv run pytest tests/
-```
+Live tests (`tests/test_auth_integration_live.py`) exercise the full
+authenticate → validate → refresh → logout flow plus CA-certificate
+authentication against a live instance. Credential setup, certificate
+prerequisites, and invocation are documented in
+[docs/TESTING.md](../docs/TESTING.md).
 
-### Live API Tests
-
-Live API tests require credentials and are skipped by default. To run them:
-
-```bash
-uv run --env-file .env pytest tests/test_auth_integration_live.py --live
-```
-
-Credentials are read from `.env` at the repo root. The `--env-file` flag handles special characters in passwords and Windows paths correctly.
-
-#### With CA Certificate Authentication
-
-**Prerequisites:**
-- An X.509 certificate issued by a CA (PEM format)
-- The corresponding private key (PEM format)
-- Optional: password for the private key
-- **Important:** The certificate must be registered and enabled for API authentication in your Anaplan instance. SMIME/email certificates alone will not work for API authentication.
-
-```bash
-uv run --env-file .env pytest tests/test_auth_integration_live.py::test_auth_workflow_ca_cert --live
-```
-
-Set `ANAPLAN_CA_CERT_PATH`, `ANAPLAN_CA_KEY_PATH`, and optionally `ANAPLAN_CA_KEY_PASSWORD` in `.env`.
-
-**Test Flow (matches anaplan-sdk implementation):**
-The test implements the Anaplan certificate authentication flow:
-1. Generates a random 150-byte string
-2. Base64-encodes the random data
-3. Signs the random data with the private key using SHA512withRSA algorithm
-4. Base64-encodes the signature
-5. Sends both `encodedData` and `encodedSignedData` to `/token/authenticate`
-6. Validates the returned token
-7. Logs out
-
-**Implementation Note:** This test implementation matches the community-contributed `anaplan-sdk` library's certificate authentication flow, ensuring compatibility with the established approach in the Anaplan ecosystem.
+The certificate authentication flow matches the community `anaplan-sdk`
+implementation: generate a random byte string, sign it with the private key
+using SHA512withRSA, and send `encodedData` + `encodedSignedData` to
+`/token/authenticate`. See the endpoint documentation below.
 
 ## Endpoints
 

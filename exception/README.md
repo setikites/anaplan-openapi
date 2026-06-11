@@ -5,7 +5,7 @@
 | Source | Available | Notes |
 |--------|-----------|-------|
 | Apiary docs | ✓ | https://exceptionusersapi2.docs.apiary.io/ — primary source |
-| Local blueprint | ✓ | `exception/apiary-blueprint.json` — Apiary blueprint cached locally |
+| Local blueprint | ✓ | `sources/exception/apiary-blueprint.json` — Apiary blueprint cached locally |
 | Postman collection | ✓ | Official Anaplan Collection — top-level "Exception Users" folder, 4 requests |
 | Live testing | Partial | Auth scheme and PATCH error probe confirmed; search contract blocked (see below) |
 

@@ -29,7 +29,7 @@ from cryptography.hazmat.backends import default_backend
 from spec_assertions import assert_response_code, assert_enum_value
 
 # Load spec for response validation
-SPEC_FILE = pathlib.Path(__file__).parent.parent / "authentication" / "postman-spec.yaml"
+SPEC_FILE = pathlib.Path(__file__).parent.parent / "sources" / "postman-spec.yaml"
 with open(SPEC_FILE, encoding="utf-8") as f:
     SPEC = yaml.safe_load(f)
 

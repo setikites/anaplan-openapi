@@ -5,8 +5,8 @@
 | Source | Location |
 |--------|----------|
 | Apiary docs | https://anaplan.docs.apiary.io/ (identifier: `anaplan`) |
-| Postman collection | `Official Anaplan Collection.postman_collection.json` (repo root and `integration/`) |
-| Extracted schemas | `integration/objectSchema.json`, `integration/modelObjectschema.json` |
+| Postman collection | `sources/Official Anaplan Collection.postman_collection.json` |
+| Extracted schemas | `sources/integration/objectSchema.json`, `sources/integration/modelObjectschema.json` |
 | OpenAPI spec | `integration/integration-openapi.json` |
 
 ## Authentication
@@ -37,8 +37,8 @@ Anaplan previously served the Integration API at `https://us1a.app.anaplan.com/2
 
 ## Extracted Schema Files
 
-- **`objectSchema.json`** — Schema extracted from live `/objects/` API response. Documents the structure of Anaplan model objects.
-- **`modelObjectschema.json`** — Schema extracted from live model object API response. Used to validate model-level object payloads.
+- **`sources/integration/objectSchema.json`** — Schema extracted from live `/objects/` API response. Documents the structure of Anaplan model objects.
+- **`sources/integration/modelObjectschema.json`** — Schema extracted from live model object API response. Used to validate model-level object payloads.
 
 These files were extracted from a live Anaplan instance and represent actual API response shapes.
 
@@ -53,22 +53,11 @@ Live testing (`test_auth_scheme_probe`) confirmed both schemes are accepted on `
 
 Both schemes are declared as `securitySchemes` and applied via the global `security` array.
 
-## Live Test Harness
+## Live Test Coverage
 
-```
-uv run --env-file .env pytest tests/test_integration_live.py --live
-```
-
-Credentials required (cert preferred, basic fallback):
-
-| Variable | Description |
-|----------|-------------|
-| `ANAPLAN_CA_CERT_PATH` | Path to CA certificate (PEM) |
-| `ANAPLAN_CA_KEY_PATH` | Path to private key (PEM) |
-| `ANAPLAN_CA_KEY_PASSWORD` | Key password (if encrypted) |
-| `ANAPLAN_USERNAME` | Username (basic auth fallback) |
-| `ANAPLAN_PASSWORD` | Password (basic auth fallback) |
-| `ANAPLAN_API_BASE_URL` | Override base URL (default: `https://api.anaplan.com`) |
+Setup and how to run live tests (credentials, `.env`, flags) are documented in
+[docs/TESTING.md](../docs/TESTING.md). The suite for this API is
+`tests/test_integration_live.py`.
 
 Endpoints covered:
 
@@ -92,20 +81,13 @@ Endpoints covered:
 
 ## Modern Endpoint Validation (post-legacy retirement)
 
-Live test suite run against `https://api.anaplan.com` on 2026-06-04, confirming the modern endpoint is fully operational after retirement of the legacy `app.anaplan.com/2` URLs.
+The live suite was run against `https://api.anaplan.com` (2026-06-04), confirming
+the modern endpoint is fully operational after retirement of the legacy
+`app.anaplan.com/2` URLs. No regressions were detected.
 
-| Result | Count |
-|--------|-------|
-| Passed | 23 |
-| Skipped (expected) | 3 |
-| Failed | 0 |
-
-Skips (all expected):
+Expected skips:
 - `test_get_workspace_model` — `GET /workspaces/{workspaceId}/models/{modelId}` returns 405; endpoint is not implemented (documented below)
-- `test_current_period_invalid_date_in_body_returns_400` — PUT blocked by write-guard (`--allow-writes` not passed; non-destructive by design)
-- `test_current_period_invalid_date_as_query_param_returns_400` — same write-guard skip
-
-No regressions detected. All previously-passing endpoints continue to respond correctly on the modern endpoint.
+- `test_current_period_invalid_date_*_returns_400` — PUT blocked by the write-guard unless `--allow-writes` is passed (non-destructive by design)
 
 ## Discovered Discrepancies
 

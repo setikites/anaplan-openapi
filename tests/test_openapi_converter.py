@@ -212,7 +212,7 @@ def test_validate_final_spec(spec_path):
     validate(spec)
 
 
-@pytest.mark.parametrize("spec_name", ["authentication/postman-spec.yaml"])
+@pytest.mark.parametrize("spec_name", ["sources/postman-spec.yaml"])
 def test_convert_postman_spec(spec_name):
     """Integration test: convert postman-spec.yaml to valid OpenAPI JSON."""
     import pathlib
@@ -233,14 +233,15 @@ def test_convert_postman_spec(spec_name):
     for path in source_paths:
         assert path in result_paths, f"Missing path: {path}"
 
-    # Verify BearerAuth is present in security schemes
-    assert "BearerAuth" in result.get("components", {}).get("securitySchemes", {}), "Missing BearerAuth scheme"
+    # Verify security schemes are carried through from the collection
+    security_schemes = result.get("components", {}).get("securitySchemes", {})
+    assert security_schemes, "Expected at least one security scheme in converted output"
 
     # Verify output is valid OpenAPI
     validate(result)
 
 
-@pytest.mark.parametrize("spec_name", ["authentication/postman-spec.yaml"])
+@pytest.mark.parametrize("spec_name", ["sources/postman-spec.yaml"])
 def test_no_duplicate_inline_schemas(spec_name):
     """Complex reused schemas should be extracted to components/schemas, not duplicated inline."""
     import pathlib

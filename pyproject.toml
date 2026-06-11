@@ -1,8 +1,9 @@
 [project]
 name = "anaplan-openapi"
 version = "0.1.0"
-description = "Add your description here"
+description = "Community-maintained OpenAPI 3.0 specifications for the 9 publicly documented Anaplan REST APIs."
 readme = "README.md"
+license = { text = "Apache-2.0" }
 requires-python = ">=3.14"
 dependencies = [
     "openapi-spec-validator>=0.9.0",
@@ -16,6 +17,7 @@ venv = ".venv"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["scripts", "tests"]
 python_files = ["test_*.py"]
 markers = [
     "live: mark test as requiring live API access (skipped by default)",

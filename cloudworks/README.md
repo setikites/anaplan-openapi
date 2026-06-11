@@ -45,7 +45,7 @@ The CloudWorks API exposes seven resource groups:
 
 ## Spec Lifecycle
 
-Bootstrap-only — spec generated from Apiary via `build_spec.py`. No live test harness exists yet. Once live tests are added, the spec transitions to hand-maintained (do not re-run `build_spec.py`).
+Spec generated from Apiary via `scripts/build_spec.py`. A live test scaffold exists (`tests/test_cloudworks_live.py`), but key behaviors (auth scheme, server URL) remain unconfirmed pending live testing — see the notes above. Do not re-run `scripts/build_spec.py`; refine the spec by hand as behaviors are confirmed.
 
 ## Discovered Discrepancies
 

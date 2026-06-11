@@ -17,10 +17,10 @@ from schema_importer import load_object_schemas, validate_response_examples, wir
 from sync_yaml import sync_yaml
 
 # Source files for integration schema injection.
-_INTEGRATION_OBJECT_SCHEMA = "integration/objectSchema.json"
-_INTEGRATION_MODEL_SCHEMA = "integration/modelObjectschema.json"
+_INTEGRATION_OBJECT_SCHEMA = "sources/integration/objectSchema.json"
+_INTEGRATION_MODEL_SCHEMA = "sources/integration/modelObjectschema.json"
 
-_REPO_ROOT = Path(__file__).parent
+_REPO_ROOT = Path(__file__).parent.parent
 
 # Servers arrays sourced from existing validated specs (authentication, oauth)
 # and CONTEXT.md regional URL table for the api.anaplan.com family.

@@ -1,0 +1,14 @@
+anaplan-openapi
+Copyright 2026 Michael B. Moore and the anaplan-openapi contributors
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+This is a community-maintained project. It is not affiliated with, endorsed
+by, or sponsored by Anaplan, Inc. "Anaplan" and the Anaplan logo are
+trademarks of Anaplan, Inc. References to Anaplan and its APIs are for
+descriptive and interoperability purposes only.
+
+The OpenAPI specifications in this repository document the publicly available
+Anaplan REST APIs as observed through Anaplan's published documentation
+(Apiary, the official Anaplan Postman collection) and live API testing. They
+are provided "as is" without warranty of accuracy or completeness.

@@ -1,0 +1,1255 @@
+[
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "version": "1.0",
+    "title": "user",
+    "description": "user",
+    "type": "object",
+    "name": "users",
+    "order": [],
+    "properties": {
+      "id": {
+        "description": "id",
+        "type": "string"
+      },
+      "firstName": {
+        "description": "first name",
+        "type": "string"
+      },
+      "lastName": {
+        "description": "last name",
+        "type": "string"
+      },
+      "email": {
+        "description": "email",
+        "type": "string",
+        "pattern": "^[_A-Za-z0-9-\\\\+]+(\\\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\\\.[A-Za-z0-9]+)*(\\\\.[A-Za-z]{2,})$"
+      },
+      "active": {
+        "description": "active",
+        "type": "boolean"
+      },
+      "lastLoginDate": {
+        "description": "last login",
+        "type": "date-time"
+      },
+      "emailOptIn": {
+        "description": "email opt in",
+        "type": "boolean"
+      },
+      "customerId": {
+        "description": "customer id",
+        "type": "string"
+      }
+    },
+    "primaryKey": [
+      "id"
+    ],
+    "foreignKeys": [
+      {
+        "reference": {
+          "datapackage": "https://api.anaplan.com/2/0/objects/model",
+          "resource": "model",
+          "type": "MANY"
+        }
+      },
+      {
+        "reference": {
+          "datapackage": "https://api.anaplan.com/2/0/objects/workspace",
+          "resource": "workspace",
+          "type": "MANY"
+        }
+      }
+    ],
+    "bulk": [
+      {
+        "resource": "active",
+        "validation": "ONE"
+      }
+    ]
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "version": "1.0",
+    "title": "model",
+    "description": "model",
+    "type": "object",
+    "name": "models",
+    "order": [],
+    "properties": {
+      "id": {
+        "description": "id",
+        "type": "string"
+      },
+      "name": {
+        "description": "name",
+        "type": "string"
+      },
+      "activeState": {
+        "description": "state",
+        "type": "string"
+      },
+      "currentWorkspaceId": {
+        "description": "workspace",
+        "type": "string"
+      },
+      "currentWorkspaceName": {
+        "description": "workspace",
+        "type": "string"
+      },
+      "modelUrl": {
+        "description": "model url",
+        "type": "string"
+      },
+      "categoryValues": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "description": "Category value Id",
+              "type": "string"
+            },
+            "attribute": {
+              "description": "Category value",
+              "type": "string"
+            },
+            "categoryId": {
+              "description": "Category Id",
+              "type": "string"
+            },
+            "categoryName": {
+              "description": "Category name",
+              "type": {
+                "enum": [
+                  "App",
+                  "Environment",
+                  "Department",
+                  "Region",
+                  "Planning Cycle"
+                ]
+              }
+            }
+          }
+        },
+        "minItems": 0,
+        "maxItems": 5
+      },
+      "isoCreationDate": {
+        "description": "isoCreationDate",
+        "type": "string"
+      },
+      "lastModified": {
+        "description": "lastModified",
+        "type": "string"
+      },
+      "lastModifiedByUserGuid": {
+        "description": "lastModifiedByUserGuid",
+        "type": "string"
+      },
+      "lastSavedSerialNumber": {
+        "description": "lastSavedSerialNumber",
+        "type": "string"
+      },
+      "memoryUsage": {
+        "description": "memoryUsage",
+        "type": "number"
+      },
+      "modelTransactionRunning": {
+        "description": "modelTransactionRunning",
+        "type": "boolean"
+      }
+    },
+    "primaryKey": [
+      "id"
+    ],
+    "foreignKeys": [
+      {
+        "reference": {
+          "datapackage": "https://api.anaplan.com/2/0/objects/user",
+          "resource": "user",
+          "type": "MANY"
+        }
+      },
+      {
+        "reference": {
+          "datapackage": "https://api.anaplan.com/2/0/objects/workspace",
+          "resource": "workspace",
+          "type": "ONE"
+        }
+      }
+    ],
+    "bulk": []
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "version": "1.0",
+    "title": "workspace",
+    "description": "workspace",
+    "type": "object",
+    "name": "workspaces",
+    "order": [],
+    "properties": {
+      "id": {
+        "description": "id",
+        "type": "string"
+      },
+      "name": {
+        "description": "name",
+        "type": "string"
+      },
+      "active": {
+        "description": "active",
+        "type": "boolean"
+      },
+      "sizeAllowance": {
+        "description": "size allowance",
+        "type": "integer"
+      },
+      "currentSize": {
+        "description": "current size",
+        "type": "integer"
+      }
+    },
+    "primaryKey": [
+      "id"
+    ],
+    "foreignKeys": [
+      {
+        "reference": {
+          "datapackage": "https://api.anaplan.com/2/0/objects/user",
+          "resource": "user",
+          "type": "MANY"
+        }
+      },
+      {
+        "reference": {
+          "datapackage": "https://api.anaplan.com/2/0/objects/model",
+          "resource": "model",
+          "type": "MANY"
+        }
+      },
+      {
+        "reference": {
+          "datapackage": "https://api.anaplan.com/2/0/objects/admin",
+          "resource": "admin",
+          "type": "MANY"
+        }
+      },
+      {
+        "reference": {
+          "datapackage": "https://api.anaplan.com/2/0/objects/visitor",
+          "resource": "visitor",
+          "type": "MANY"
+        }
+      }
+    ],
+    "bulk": []
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "version": "1.0",
+    "title": "category",
+    "description": "category",
+    "type": "object",
+    "name": "categories",
+    "order": [],
+    "hidden": true,
+    "properties": {
+      "id": {
+        "description": "id",
+        "type": "string"
+      },
+      "name": {
+        "description": "name",
+        "type": "string"
+      },
+      "categoryValues": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "description": "Category value Id",
+              "type": "string"
+            },
+            "attribute": {
+              "description": "Category value",
+              "type": "string"
+            },
+            "categoryId": {
+              "description": "Category Id",
+              "type": "string"
+            },
+            "categoryName": {
+              "description": "Category name",
+              "type": {
+                "enum": [
+                  "App",
+                  "Environment",
+                  "Department",
+                  "Region",
+                  "Planning Cycle"
+                ]
+              }
+            }
+          }
+        },
+        "minItems": 0,
+        "maxItems": 5
+      }
+    },
+    "primaryKey": [
+      "id"
+    ],
+    "foreignKeys": [
+      {
+        "reference": {
+          "datapackage": "https://api.anaplan.com/2/0/objects/cat_value",
+          "resource": "categoryValue",
+          "type": "MANY"
+        }
+      }
+    ],
+    "bulk": []
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "version": "1.0",
+    "title": "categoryValue",
+    "description": "categoryValue",
+    "type": "object",
+    "name": "categoryValues",
+    "order": [],
+    "hidden": true,
+    "properties": {
+      "id": {
+        "description": "id",
+        "type": "string"
+      },
+      "attribute": {
+        "description": "name",
+        "type": "string"
+      },
+      "categoryId": {
+        "description": "category id",
+        "type": "string"
+      },
+      "categoryName": {
+        "description": "category name",
+        "type": "string"
+      },
+      "customerId": {
+        "description": "customer id",
+        "type": "string"
+      }
+    },
+    "primaryKey": [
+      "id"
+    ],
+    "foreignKeys": [
+      {
+        "reference": {
+          "datapackage": "https://api.anaplan.com/2/0/objects/category",
+          "resource": "category",
+          "type": "ONE"
+        }
+      },
+      {
+        "reference": {
+          "datapackage": "https://api.anaplan.com/2/0/objects/customer",
+          "resource": "customer",
+          "type": "MANY"
+        }
+      }
+    ],
+    "bulk": []
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "version": "1.0",
+    "title": "admin",
+    "description": "admin",
+    "type": "object",
+    "name": "admins",
+    "order": [],
+    "properties": {
+      "firstName": {
+        "description": "first name",
+        "type": "string"
+      },
+      "lastName": {
+        "description": "last name",
+        "type": "string"
+      },
+      "email": {
+        "description": "email",
+        "type": "string",
+        "pattern": "^[_A-Za-z0-9-\\\\+]+(\\\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\\\.[A-Za-z0-9]+)*(\\\\.[A-Za-z]{2,})$"
+      },
+      "active": {
+        "description": "active",
+        "type": "boolean"
+      },
+      "otherWorkspaces": {
+        "description": "other workspaces",
+        "type": "set"
+      }
+    },
+    "primaryKey": [
+      "email"
+    ],
+    "foreignKeys": [
+      {
+        "reference": {
+          "datapackage": "https://api.anaplan.com/2/0/objects/customer",
+          "resource": "customer",
+          "type": "ONE"
+        }
+      },
+      {
+        "reference": {
+          "datapackage": "https://api.anaplan.com/2/0/objects/workspace",
+          "resource": "workspace",
+          "type": "ONE"
+        }
+      }
+    ],
+    "bulk": [
+      {
+        "resource": "active",
+        "validation": "ONE"
+      }
+    ]
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "version": "1.0",
+    "title": "visitor",
+    "description": "visitor",
+    "type": "object",
+    "name": "visitors",
+    "order": [],
+    "properties": {
+      "firstName": {
+        "description": "first name",
+        "type": "string"
+      },
+      "lastName": {
+        "description": "last name",
+        "type": "string"
+      },
+      "email": {
+        "description": "email",
+        "type": "string",
+        "pattern": "^[_A-Za-z0-9-\\\\+]+(\\\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\\\.[A-Za-z0-9]+)*(\\\\.[A-Za-z]{2,})$"
+      },
+      "active": {
+        "description": "active",
+        "type": "boolean"
+      },
+      "otherWorkspaces": {
+        "description": "other workspaces",
+        "type": "set"
+      }
+    },
+    "primaryKey": [
+      "email"
+    ],
+    "foreignKeys": [
+      {
+        "reference": {
+          "datapackage": "https://api.anaplan.com/2/0/objects/customer",
+          "resource": "customer",
+          "type": "ONE"
+        }
+      },
+      {
+        "reference": {
+          "datapackage": "https://api.anaplan.com/2/0/objects/workspace",
+          "resource": "workspace",
+          "type": "ONE"
+        }
+      }
+    ],
+    "bulk": [
+      {
+        "resource": "active",
+        "validation": "ONE"
+      }
+    ]
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "version": "1.0",
+    "title": "module",
+    "description": "module",
+    "type": "object",
+    "name": "modules",
+    "order": [],
+    "properties": {
+      "id": {
+        "description": "id",
+        "type": "string"
+      },
+      "name": {
+        "description": "name",
+        "type": "string"
+      }
+    },
+    "primaryKey": [
+      "id"
+    ],
+    "foreignKeys": [
+      {
+        "reference": {
+          "datapackage": "https://api.anaplan.com/2/0/objects/model",
+          "resource": "model",
+          "type": "MANY"
+        }
+      },
+      {
+        "reference": {
+          "datapackage": "https://api.anaplan.com/2/0/objects/view",
+          "resource": "views",
+          "type": "MANY"
+        }
+      },
+      {
+        "reference": {
+          "datapackage": "https://api.anaplan.com/2/0/objects/dimension",
+          "resource": "dimension",
+          "type": "MANY"
+        }
+      }
+    ],
+    "bulk": []
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "version": "1.0",
+    "title": "view",
+    "description": "view",
+    "type": "object",
+    "name": "views",
+    "order": [],
+    "properties": {
+      "viewId": {
+        "description": "id",
+        "type": "string"
+      },
+      "viewName": {
+        "description": "name",
+        "type": "string"
+      },
+      "columns": {
+        "description": "columns",
+        "type": "array"
+      },
+      "rows": {
+        "description": "rows",
+        "type": "array"
+      },
+      "pages": {
+        "description": "pages",
+        "type": "array"
+      }
+    },
+    "primaryKey": [
+      "viewId"
+    ],
+    "foreignKeys": [
+      {
+        "reference": {
+          "datapackage": "https://api.anaplan.com/2/0/objects/model",
+          "resource": "model",
+          "type": "MANY"
+        }
+      },
+      {
+        "reference": {
+          "datapackage": "https://api.anaplan.com/2/0/objects/module",
+          "resource": "module",
+          "type": "MANY"
+        }
+      },
+      {
+        "reference": {
+          "datapackage": "https://api.anaplan.com/2/0/objects/dimension",
+          "resource": "dimension",
+          "type": "MANY"
+        }
+      }
+    ],
+    "bulk": []
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "version": "1.0",
+    "title": "dimension",
+    "description": "dimension",
+    "type": "object",
+    "name": "dimensions",
+    "order": [],
+    "properties": {
+      "code": {
+        "description": "code",
+        "type": "string"
+      },
+      "id": {
+        "description": "id",
+        "type": "string"
+      },
+      "name": {
+        "description": "name",
+        "type": "string"
+      }
+    },
+    "primaryKey": [
+      "id"
+    ],
+    "foreignKeys": [
+      {
+        "reference": {
+          "datapackage": "https://api.anaplan.com/2/0/objects/model",
+          "resource": "model",
+          "type": "MANY"
+        }
+      },
+      {
+        "reference": {
+          "datapackage": "https://api.anaplan.com/2/0/objects/view",
+          "resource": "views",
+          "type": "MANY"
+        }
+      }
+    ],
+    "bulk": []
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "version": "1.0",
+    "title": "currentPeriod",
+    "description": "currentPeriod",
+    "type": "object",
+    "name": "currentPeriod",
+    "properties": {
+      "periodText": {
+        "description": "periodText",
+        "type": "string"
+      },
+      "lastDay": {
+        "description": "lastDay",
+        "type": "string"
+      },
+      "calendarType": {
+        "description": "calendarType",
+        "type": "string"
+      }
+    },
+    "primaryKey": [],
+    "foreignKeys": [],
+    "bulk": []
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "version": "1.0",
+    "title": "process",
+    "description": "process",
+    "type": "object",
+    "name": "process",
+    "properties": {
+      "name": {
+        "description": "name",
+        "type": "string"
+      },
+      "actions": {
+        "description": "actions",
+        "type": "array"
+      }
+    },
+    "primaryKey": [],
+    "foreignKeys": [],
+    "bulk": []
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "version": "1.1",
+    "title": "modelCalendar",
+    "description": "modelCalendar",
+    "type": "object",
+    "name": "modelCalendar",
+    "properties": {
+      "calendarType": {
+        "description": "calendarType",
+        "type": "string"
+      },
+      "weekGrouping": {
+        "description": "weekGrouping",
+        "type": "string"
+      },
+      "fiscalYear": {
+        "description": "fiscalYear",
+        "type": "object",
+        "properties": {
+          "year": {
+            "description": "year",
+            "type": "string"
+          },
+          "startDate": {
+            "description": "startDate",
+            "type": "string"
+          },
+          "endDate": {
+            "description": "endDate",
+            "type": "string"
+          }
+        }
+      },
+      "pastYearsCount": {
+        "description": "pastYearsCount",
+        "type": "integer"
+      },
+      "futureYearsCount": {
+        "description": "futureYearsCount",
+        "type": "integer"
+      },
+      "extraWeekMonth": {
+        "description": "extraWeekMonth",
+        "type": "integer"
+      },
+      "weekFormat": {
+        "description": "weekFormat",
+        "type": "string"
+      },
+      "startDate": {
+        "description": "startDate",
+        "type": "string"
+      },
+      "weeksCount": {
+        "description": "weeksCount",
+        "type": "integer"
+      },
+      "currentPeriod": {
+        "description": "currentPeriod",
+        "type": "object",
+        "properties": {
+          "periodText": {
+            "description": "periodText",
+            "type": "string"
+          },
+          "lastDay": {
+            "description": "lastDay",
+            "type": "string"
+          }
+        }
+      },
+      "totalsSelection": {
+        "description": "totalsSelection",
+        "type": "object",
+        "properties": {
+          "quarterTotals": {
+            "description": "quarterTotals",
+            "type": "boolean"
+          },
+          "halfYearTotals": {
+            "description": "halfYearTotals",
+            "type": "boolean"
+          },
+          "extraMonthQuarter": {
+            "description": "extraMonthQuarter",
+            "type": "integer"
+          },
+          "yearToDateSummary": {
+            "description": "yearToDateSummary",
+            "type": "boolean"
+          },
+          "yearToGoSummary": {
+            "description": "yearToGoSummary",
+            "type": "boolean"
+          },
+          "totalOfAllPeriods": {
+            "description": "totalOfAllPeriods",
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "primaryKey": [],
+    "foreignKeys": [],
+    "bulk": [],
+    "order": []
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "version": "1.0",
+    "title": "writeCellDataResponse",
+    "description": "writeCellDataResponse",
+    "type": "object",
+    "name": "writeCellDataResponse",
+    "properties": {
+      "numberOfCellsChanged": {
+        "description": "numberOfCellsChanged",
+        "type": "number"
+      },
+      "failures": {
+        "description": "an array of cell write failures",
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "requestIndex": {
+              "description": "index of the cell write request from the request array",
+              "type": "number"
+            },
+            "failureType": {
+              "description": "failure reason",
+              "type": "string"
+            },
+            "failureMessageDetails": {
+              "description": "details on the failure reason",
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "primaryKey": [],
+    "foreignKeys": [],
+    "bulk": []
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "version": "1.0",
+    "title": "list",
+    "description": "list",
+    "type": "object",
+    "name": "list",
+    "properties": {
+      "id": {
+        "description": "id",
+        "type": "string"
+      },
+      "name": {
+        "description": "name",
+        "type": "string"
+      },
+      "code": {
+        "description": "code",
+        "type": "string"
+      },
+      "parent": {
+        "description": "parent",
+        "type": "string"
+      },
+      "parentId": {
+        "description": "parentId",
+        "type": "string"
+      },
+      "listId": {
+        "description": "listId",
+        "type": "string"
+      },
+      "listName": {
+        "description": "listName",
+        "type": "string"
+      },
+      "read": {
+        "description": "read",
+        "type": "set"
+      },
+      "write": {
+        "description": "write",
+        "type": "set"
+      },
+      "subsets": {
+        "description": "subsets",
+        "type": "object"
+      },
+      "properties": {
+        "description": "properties",
+        "type": "object"
+      }
+    },
+    "primaryKey": [],
+    "foreignKeys": [],
+    "bulk": []
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "version": "1.0",
+    "title": "version",
+    "description": "version",
+    "type": "object",
+    "name": "versions",
+    "order": [],
+    "properties": {
+      "id": {
+        "description": "id",
+        "type": "string"
+      },
+      "name": {
+        "description": "name",
+        "type": "string"
+      },
+      "isCurrent": {
+        "description": "isCurrent",
+        "type": "boolean"
+      },
+      "isActual": {
+        "description": "isActual",
+        "type": "boolean"
+      },
+      "switchover": {
+        "description": "switchover",
+        "type": "object"
+      },
+      "formula": {
+        "description": "formula",
+        "type": "string"
+      },
+      "editFrom": {
+        "description": "editFrom",
+        "type": "object"
+      },
+      "editTo": {
+        "description": "editTo",
+        "type": "object"
+      },
+      "notes": {
+        "description": "notes",
+        "type": "string"
+      }
+    },
+    "primaryKey": [
+      "id"
+    ],
+    "foreignKeys": [
+      {
+        "reference": {
+          "datapackage": "https://api.anaplan.com/2/0/objects/switchover",
+          "resource": "switchover",
+          "type": "ONE"
+        }
+      }
+    ],
+    "bulk": []
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "version": "1.0",
+    "title": "switchover",
+    "description": "switchover",
+    "type": "object",
+    "name": "switchover",
+    "properties": {
+      "periodText": {
+        "description": "periodText",
+        "type": "string"
+      },
+      "date": {
+        "description": "date",
+        "type": "string"
+      },
+      "calendarType": {
+        "description": "calendarType",
+        "type": "string"
+      }
+    },
+    "primaryKey": [],
+    "foreignKeys": [
+      {
+        "reference": {
+          "datapackage": "https://api.anaplan.com/2/0/objects/versions",
+          "resource": "version",
+          "type": "ONE"
+        }
+      }
+    ],
+    "bulk": []
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "version": "1.0",
+    "title": "taskWithUrl",
+    "description": "taskWithUrl",
+    "type": "object",
+    "name": "taskWithUrl",
+    "properties": {
+      "taskId": {
+        "description": "ID of the task",
+        "type": "string"
+      },
+      "taskUrl": {
+        "description": "URL of the task",
+        "type": "string"
+      },
+      "taskState": {
+        "description": "current state of the task",
+        "type": "string"
+      },
+      "creationTime": {
+        "description": "creation time of the task (millis since epoch)",
+        "type": "number"
+      }
+    },
+    "primaryKey": [],
+    "foreignKeys": [],
+    "bulk": []
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "version": "1.0",
+    "title": "syncTask",
+    "description": "syncTask",
+    "type": "object",
+    "name": "syncTask",
+    "properties": {
+      "taskId": {
+        "description": "ID of the task",
+        "type": "string"
+      },
+      "currentStep": {
+        "description": "current step of the task",
+        "type": "string"
+      },
+      "taskState": {
+        "description": "current state of the task",
+        "type": "string"
+      },
+      "creationTime": {
+        "description": "creation time of the task (millis since epoch)",
+        "type": "number"
+      },
+      "result": {
+        "description": "result of the task",
+        "type": "object"
+      }
+    },
+    "primaryKey": [],
+    "foreignKeys": [],
+    "bulk": []
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "version": "1.0",
+    "title": "revision",
+    "description": "revision",
+    "type": "object",
+    "name": "revision",
+    "properties": {
+      "id": {
+        "description": "id",
+        "type": "string"
+      },
+      "name": {
+        "description": "name",
+        "type": "string"
+      },
+      "createdBy": {
+        "description": "createdBy",
+        "type": "string"
+      },
+      "description": {
+        "description": "description",
+        "type": "string"
+      },
+      "creationMethod": {
+        "description": "creationMethod",
+        "type": "string"
+      }
+    },
+    "primaryKey": [
+      "id"
+    ],
+    "foreignKeys": [],
+    "bulk": []
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "version": "1.0",
+    "title": "listReadRequest",
+    "description": "listReadRequest",
+    "type": "object",
+    "name": "listReadRequest",
+    "properties": {
+      "requestId": {
+        "description": "requestId",
+        "type": "string"
+      },
+      "listId": {
+        "description": "listId",
+        "type": "string"
+      },
+      "requestState": {
+        "description": "requestState",
+        "type": "string"
+      },
+      "url": {
+        "description": "url",
+        "type": "string"
+      },
+      "availablePages": {
+        "description": "availablePages",
+        "type": "string"
+      },
+      "successful": {
+        "description": "successful",
+        "type": "string"
+      }
+    },
+    "primaryKey": [],
+    "foreignKeys": [
+      {
+        "reference": {
+          "datapackage": "https://api.anaplan.com/2/0/objects/list",
+          "resource": "list",
+          "type": "ONE"
+        }
+      }
+    ],
+    "bulk": []
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "version": "1.0",
+    "title": "viewReadRequest",
+    "description": "viewReadRequest",
+    "type": "object",
+    "name": "viewReadRequest",
+    "properties": {
+      "requestId": {
+        "description": "requestId",
+        "type": "string"
+      },
+      "viewId": {
+        "description": "viewId",
+        "type": "string"
+      },
+      "requestState": {
+        "description": "requestState",
+        "type": "string"
+      },
+      "url": {
+        "description": "url",
+        "type": "string"
+      },
+      "availablePages": {
+        "description": "availablePages",
+        "type": "string"
+      },
+      "successful": {
+        "description": "successful",
+        "type": "string"
+      }
+    },
+    "primaryKey": [],
+    "foreignKeys": [
+      {
+        "reference": {
+          "datapackage": "https://api.anaplan.com/2/0/objects/view",
+          "resource": "view",
+          "type": "ONE"
+        }
+      }
+    ],
+    "bulk": []
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "version": "1.0",
+    "title": "appliedToModel",
+    "description": "appliedToModel",
+    "type": "object",
+    "name": "appliedToModel",
+    "properties": {
+      "modelId": {
+        "description": "modelId",
+        "type": "string"
+      },
+      "modelName": {
+        "description": "modelName",
+        "type": "string"
+      },
+      "workspaceId": {
+        "description": "workspaceId",
+        "type": "string"
+      },
+      "appliedBy": {
+        "description": "appliedBy",
+        "type": "string"
+      },
+      "appliedOn": {
+        "description": "appliedOn",
+        "type": "string"
+      },
+      "appliedMethod": {
+        "description": "appliedMethod",
+        "type": "string"
+      },
+      "modelDeleted": {
+        "description": "modelDeleted",
+        "type": "boolean"
+      }
+    },
+    "primaryKey": [
+      "id"
+    ],
+    "foreignKeys": [],
+    "bulk": []
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "version": "1.0",
+    "title": "summaryReport",
+    "description": "summaryReport",
+    "type": "object",
+    "name": "summaryReport",
+    "properties": {
+      "targetRevisionId": {
+        "description": "targetRevisionId",
+        "type": "string"
+      },
+      "sourceRevisionId": {
+        "description": "sourceRevisionId",
+        "type": "string"
+      },
+      "totals": {
+        "description": "totals",
+        "type": "object"
+      },
+      "differences": {
+        "description": "differences",
+        "type": "object"
+      }
+    },
+    "primaryKey": [
+      "id"
+    ],
+    "foreignKeys": [],
+    "bulk": []
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "version": "1.0",
+    "title": "bulkDeleteModels",
+    "description": "bulkDeleteModels",
+    "type": "object",
+    "name": "bulkDeleteModels",
+    "properties": {
+      "modelsDeleted": {
+        "description": "modelsDeleted",
+        "type": "integer"
+      },
+      "bulkDeleteModelsFailures": {
+        "description": "bulkDeleteModelsFailures",
+        "type": "object"
+      }
+    },
+    "primaryKey": [
+      "id"
+    ],
+    "foreignKeys": [],
+    "bulk": []
+  }
+]

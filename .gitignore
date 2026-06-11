@@ -121,6 +121,11 @@ celerybeat.pid
 # SageMath parsed files
 *.sage.py
 
+# Anaplan secrets written by scripts/oauth helpers (never commit)
+.token
+.auth_code
+.device_code
+
 # Environments
 .env
 .venv

@@ -1,0 +1,1011 @@
+[
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "A saved action (not an import, export or process) in an Anaplan model",
+    "id": "https://api.anaplan.com/2/0/models/0858271D80B543489FE68291C4A3069D/objects/action#",
+    "properties": {
+      "code": {
+        "type": "string"
+      },
+      "id": {
+        "type": "string"
+      },
+      "name": {
+        "type": "string"
+      }
+    }
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "A model that a revision is applied to",
+    "id": "https://api.anaplan.com/2/0/models/0858271D80B543489FE68291C4A3069D/objects/appliedToModel#",
+    "properties": {}
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "Result of bulk deleting models",
+    "id": "https://api.anaplan.com/2/0/models/0858271D80B543489FE68291C4A3069D/objects/bulkDeleteModels#",
+    "properties": {}
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "A unit of partial file content",
+    "id": "https://api.anaplan.com/2/0/models/0858271D80B543489FE68291C4A3069D/objects/chunk#",
+    "properties": {
+      "code": {
+        "type": "string"
+      },
+      "id": {
+        "type": "string"
+      },
+      "name": {
+        "type": "string"
+      }
+    }
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "About current Period",
+    "id": "https://api.anaplan.com/2/0/models/0858271D80B543489FE68291C4A3069D/objects/currentPeriod#",
+    "properties": {}
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "A dashboard in an Anaplan model",
+    "id": "https://api.anaplan.com/2/0/models/0858271D80B543489FE68291C4A3069D/objects/dashboard#",
+    "properties": {
+      "code": {
+        "type": "string"
+      },
+      "id": {
+        "type": "string"
+      },
+      "name": {
+        "type": "string"
+      }
+    }
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "A dimension in an Anaplan model",
+    "id": "https://api.anaplan.com/2/0/models/0858271D80B543489FE68291C4A3069D/objects/dimension#",
+    "properties": {
+      "code": {
+        "type": "string"
+      },
+      "id": {
+        "type": "string"
+      },
+      "name": {
+        "type": "string"
+      }
+    }
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "A dimension item in an Anaplan model",
+    "id": "https://api.anaplan.com/2/0/models/0858271D80B543489FE68291C4A3069D/objects/dimensionItem#",
+    "properties": {
+      "code": {
+        "type": "string"
+      },
+      "id": {
+        "type": "string"
+      },
+      "listId": {
+        "type": "string"
+      },
+      "listName": {
+        "type": "string"
+      },
+      "name": {
+        "type": "string"
+      },
+      "parent": {
+        "type": "string"
+      },
+      "parentId": {
+        "type": "string"
+      },
+      "properties": {
+        "properties": {},
+        "type": "object"
+      },
+      "read": {
+        "type": "array"
+      },
+      "subsetId": {
+        "type": "string"
+      },
+      "subsets": {
+        "properties": {},
+        "type": "object"
+      },
+      "write": {
+        "type": "array"
+      }
+    }
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "An export in an Anaplan model",
+    "id": "https://api.anaplan.com/2/0/models/0858271D80B543489FE68291C4A3069D/objects/export#",
+    "properties": {
+      "code": {
+        "type": "string"
+      },
+      "exportType": {
+        "type": "string"
+      },
+      "id": {
+        "type": "string"
+      },
+      "name": {
+        "type": "string"
+      }
+    }
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "Metadata about an export",
+    "id": "https://api.anaplan.com/2/0/models/0858271D80B543489FE68291C4A3069D/objects/exportMetadata#",
+    "properties": {
+      "columnCount": {
+        "type": "integer"
+      },
+      "dataTypes": {
+        "items": {
+          "enum": [
+            "NONE",
+            "NUMBER",
+            "ENTITY",
+            "DATE",
+            "TEXT",
+            "BOOLEAN",
+            "FORMAT",
+            "SUMMARY",
+            "MULTISELECT_HIERARCHY",
+            "MULTISELECT_USER",
+            "MULTISELECT_ENTITY",
+            "MULTISELECT_MODULE",
+            "ACTION_DEFINITION",
+            "MIXED",
+            "TIME_ENTITY",
+            "REMOTE_MODEL_DEFINITION",
+            "MULTISELECT_TAG"
+          ]
+        },
+        "type": "array"
+      },
+      "delimiter": {
+        "type": "string"
+      },
+      "encoding": {
+        "type": "string"
+      },
+      "exportFormat": {
+        "type": "string"
+      },
+      "headerNames": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "listNames": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "rowCount": {
+        "type": "integer"
+      },
+      "separator": {
+        "type": "string"
+      }
+    }
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "A file associated with an import data source, import failure dump, or export",
+    "id": "https://api.anaplan.com/2/0/models/0858271D80B543489FE68291C4A3069D/objects/file#",
+    "properties": {
+      "chunkCount": {
+        "type": "integer"
+      },
+      "code": {
+        "type": "string"
+      },
+      "country": {
+        "type": "string"
+      },
+      "delimiter": {
+        "type": "string"
+      },
+      "encoding": {
+        "type": "string"
+      },
+      "firstDataRow": {
+        "type": "integer"
+      },
+      "format": {
+        "type": "string"
+      },
+      "headerRow": {
+        "type": "integer"
+      },
+      "id": {
+        "type": "string"
+      },
+      "language": {
+        "type": "string"
+      },
+      "name": {
+        "type": "string"
+      },
+      "origin": {
+        "type": "string"
+      },
+      "separator": {
+        "type": "string"
+      }
+    }
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "A history read request in an Anaplan model",
+    "id": "https://api.anaplan.com/2/0/models/0858271D80B543489FE68291C4A3069D/objects/historyReadRequest#",
+    "properties": {
+      "requestId": {
+        "type": "string"
+      },
+      "requestState": {
+        "enum": [
+          "NOT_STARTED",
+          "IN_PROGRESS",
+          "COMPLETE",
+          "CANCELLING",
+          "CANCELLED"
+        ]
+      },
+      "url": {
+        "type": "string"
+      }
+    }
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "An import in an Anaplan model",
+    "id": "https://api.anaplan.com/2/0/models/0858271D80B543489FE68291C4A3069D/objects/import#",
+    "properties": {
+      "code": {
+        "type": "string"
+      },
+      "id": {
+        "type": "string"
+      },
+      "importDataSource": {
+        "properties": {
+          "importDataSourceId": {
+            "type": "string"
+          },
+          "sourceModelId": {
+            "type": "string"
+          },
+          "sourceModelName": {
+            "type": "string"
+          },
+          "sourceWorkspaceId": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "importDataSourceId": {
+        "type": "string"
+      },
+      "importType": {
+        "type": "string"
+      },
+      "name": {
+        "type": "string"
+      }
+    }
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "Metadata about an import",
+    "id": "https://api.anaplan.com/2/0/models/0858271D80B543489FE68291C4A3069D/objects/importMetadata#",
+    "properties": {}
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "A line item in an Anaplan model",
+    "id": "https://api.anaplan.com/2/0/models/0858271D80B543489FE68291C4A3069D/objects/lineItem#",
+    "properties": {
+      "appliesTo": {
+        "type": "array"
+      },
+      "breakback": {
+        "type": "boolean"
+      },
+      "broughtForward": {
+        "type": "boolean"
+      },
+      "cellCount": {
+        "type": "integer"
+      },
+      "code": {
+        "type": "string"
+      },
+      "dataTags": {
+        "type": "array"
+      },
+      "format": {
+        "type": "string"
+      },
+      "formatMetadata": {
+        "properties": {},
+        "type": "object"
+      },
+      "formula": {
+        "type": "string"
+      },
+      "formulaScope": {
+        "type": "string"
+      },
+      "isSummary": {
+        "type": "boolean"
+      },
+      "moduleId": {
+        "type": "string"
+      },
+      "moduleName": {
+        "type": "string"
+      },
+      "name": {
+        "type": "string"
+      },
+      "notes": {
+        "type": "string"
+      },
+      "parent": {
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "readAccessDriver": {
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "referencedBy": {
+        "type": "array"
+      },
+      "startOfSection": {
+        "type": "boolean"
+      },
+      "style": {
+        "type": "string"
+      },
+      "summary": {
+        "type": "string"
+      },
+      "timeRange": {
+        "type": "string"
+      },
+      "timeScale": {
+        "type": "string"
+      },
+      "useSwitchover": {
+        "type": "boolean"
+      },
+      "version": {
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "writeAccessDriver": {
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    }
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "A list in an Anaplan model",
+    "id": "https://api.anaplan.com/2/0/models/0858271D80B543489FE68291C4A3069D/objects/list#",
+    "properties": {
+      "code": {
+        "type": "string"
+      },
+      "id": {
+        "type": "string"
+      },
+      "name": {
+        "type": "string"
+      }
+    }
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "A list item in an Anaplan model",
+    "id": "https://api.anaplan.com/2/0/models/0858271D80B543489FE68291C4A3069D/objects/listItem#",
+    "properties": {
+      "code": {
+        "type": "string"
+      },
+      "id": {
+        "type": "string"
+      },
+      "listId": {
+        "type": "string"
+      },
+      "listName": {
+        "type": "string"
+      },
+      "name": {
+        "type": "string"
+      },
+      "parent": {
+        "type": "string"
+      },
+      "parentId": {
+        "type": "string"
+      },
+      "properties": {
+        "properties": {},
+        "type": "object"
+      },
+      "read": {
+        "type": "array"
+      },
+      "subsetId": {
+        "type": "string"
+      },
+      "subsets": {
+        "properties": {},
+        "type": "object"
+      },
+      "write": {
+        "type": "array"
+      }
+    }
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "A task tracking the execution of a export",
+    "id": "https://api.anaplan.com/2/0/models/0858271D80B543489FE68291C4A3069D/objects/listReadRequest#",
+    "properties": {
+      "availablePages": {
+        "type": "integer"
+      },
+      "listId": {
+        "type": "integer"
+      },
+      "requestId": {
+        "type": "string"
+      },
+      "requestState": {
+        "enum": [
+          "NOT_STARTED",
+          "IN_PROGRESS",
+          "COMPLETE",
+          "CANCELLING",
+          "CANCELLED"
+        ]
+      },
+      "successful": {
+        "type": "boolean"
+      },
+      "url": {
+        "type": "string"
+      }
+    }
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "About model calendar",
+    "id": "https://api.anaplan.com/2/0/models/0858271D80B543489FE68291C4A3069D/objects/modelCalendar#",
+    "properties": {
+      "calendarType": {
+        "type": "string"
+      },
+      "currentPeriod": {
+        "properties": {
+          "lastDay": {
+            "type": "string"
+          },
+          "periodText": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "extraWeekMonth": {
+        "type": "integer"
+      },
+      "fiscalYear": {
+        "properties": {
+          "endDate": {
+            "type": "string"
+          },
+          "fiscalYearLabel": {
+            "type": "string"
+          },
+          "startDate": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "futureYearsCount": {
+        "type": "integer"
+      },
+      "pastYearsCount": {
+        "type": "integer"
+      },
+      "startDate": {
+        "type": "string"
+      },
+      "totalsSelection": {
+        "properties": {
+          "extraMonthQuarter": {
+            "type": "integer"
+          },
+          "isHalfYearTotals": {
+            "type": "boolean"
+          },
+          "isQuarterTotals": {
+            "type": "boolean"
+          },
+          "isTotalOfAllPeriods": {
+            "type": "boolean"
+          },
+          "isYearToDateSummary": {
+            "type": "boolean"
+          },
+          "isYearToGoSummary": {
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "weekFormat": {
+        "type": "string"
+      },
+      "weekGrouping": {
+        "type": "string"
+      },
+      "weeksCount": {
+        "type": "integer"
+      }
+    }
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "A module in an Anaplan model",
+    "id": "https://api.anaplan.com/2/0/models/0858271D80B543489FE68291C4A3069D/objects/module#",
+    "properties": {
+      "code": {
+        "type": "string"
+      },
+      "id": {
+        "type": "string"
+      },
+      "name": {
+        "type": "string"
+      }
+    }
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "A period of time in the model",
+    "id": "https://api.anaplan.com/2/0/models/0858271D80B543489FE68291C4A3069D/objects/period#",
+    "properties": {
+      "date": {
+        "type": "string"
+      },
+      "periodText": {
+        "type": "string"
+      }
+    }
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "Metadata about a process",
+    "id": "https://api.anaplan.com/2/0/models/0858271D80B543489FE68291C4A3069D/objects/process#",
+    "properties": {}
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "The large read disk quota and usage for a workspace",
+    "id": "https://api.anaplan.com/2/0/models/0858271D80B543489FE68291C4A3069D/objects/readRequestsQuota#",
+    "properties": {}
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "A tagged revision of a model",
+    "id": "https://api.anaplan.com/2/0/models/0858271D80B543489FE68291C4A3069D/objects/revision#",
+    "properties": {
+      "appliedBy": {
+        "type": "string"
+      },
+      "appliedOn": {
+        "properties": {
+          "date": {
+            "type": "integer"
+          },
+          "hours": {
+            "type": "integer"
+          },
+          "minutes": {
+            "type": "integer"
+          },
+          "month": {
+            "type": "integer"
+          },
+          "seconds": {
+            "type": "integer"
+          },
+          "time": {
+            "type": "integer"
+          },
+          "year": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "createdBy": {
+        "type": "string"
+      },
+      "createdOn": {
+        "properties": {
+          "date": {
+            "type": "integer"
+          },
+          "hours": {
+            "type": "integer"
+          },
+          "minutes": {
+            "type": "integer"
+          },
+          "month": {
+            "type": "integer"
+          },
+          "seconds": {
+            "type": "integer"
+          },
+          "time": {
+            "type": "integer"
+          },
+          "year": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "creationMethod": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
+      "id": {
+        "type": "string"
+      },
+      "name": {
+        "type": "string"
+      },
+      "revisionType": {
+        "enum": [
+          "FULL",
+          "PARTIAL",
+          "UNKNOWN"
+        ]
+      }
+    }
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "A summary report",
+    "id": "https://api.anaplan.com/2/0/models/0858271D80B543489FE68291C4A3069D/objects/summaryReport#",
+    "properties": {}
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "The date that the version switches over from actual to forecast",
+    "id": "https://api.anaplan.com/2/0/models/0858271D80B543489FE68291C4A3069D/objects/switchover#",
+    "properties": {
+      "calendarType": {
+        "type": "string"
+      },
+      "code": {
+        "type": "string"
+      },
+      "date": {
+        "type": "string"
+      },
+      "id": {
+        "type": "string"
+      },
+      "name": {
+        "type": "string"
+      },
+      "periodText": {
+        "type": "string"
+      }
+    }
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "A task tracking the execution of an ALM Sync",
+    "id": "https://api.anaplan.com/2/0/models/0858271D80B543489FE68291C4A3069D/objects/syncTask#",
+    "properties": {
+      "creationTime": {
+        "type": "integer"
+      },
+      "currentStep": {
+        "type": "string"
+      },
+      "result": {
+        "properties": {
+          "error": {
+            "properties": {
+              "messageText": {
+                "type": "string"
+              },
+              "subtitle": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "reportFileUrl": {
+            "type": "string"
+          },
+          "sourceRevisionId": {
+            "type": "string"
+          },
+          "successful": {
+            "type": "boolean"
+          },
+          "targetRevisionId": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "taskId": {
+        "type": "string"
+      },
+      "taskState": {
+        "enum": [
+          "NOT_STARTED",
+          "IN_PROGRESS",
+          "COMPLETE",
+          "CANCELLING",
+          "CANCELLED"
+        ]
+      }
+    }
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "A task tracking the execution of a process/import/export/action",
+    "id": "https://api.anaplan.com/2/0/models/0858271D80B543489FE68291C4A3069D/objects/task#",
+    "properties": {
+      "creationTime": {
+        "type": "integer"
+      },
+      "taskId": {
+        "type": "string"
+      },
+      "taskState": {
+        "enum": [
+          "NOT_STARTED",
+          "IN_PROGRESS",
+          "COMPLETE",
+          "CANCELLING",
+          "CANCELLED"
+        ]
+      }
+    }
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "The result of a completed task",
+    "id": "https://api.anaplan.com/2/0/models/0858271D80B543489FE68291C4A3069D/objects/taskResult#",
+    "properties": {
+      "details": {
+        "items": {
+          "properties": {
+            "localMessageText": {
+              "type": "string"
+            },
+            "occurrences": {
+              "type": "integer"
+            },
+            "type": {
+              "type": "string"
+            },
+            "values": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "type": "object"
+        },
+        "type": "array"
+      },
+      "duration": {
+        "type": "string"
+      },
+      "failureDumpAvailable": {
+        "type": "boolean"
+      },
+      "nestedResults": {
+        "items": {
+          "$ref": "https://api.anaplan.com/2/0/models/0858271D80B543489FE68291C4A3069D/objects/taskResult#"
+        },
+        "type": "array"
+      },
+      "objectId": {
+        "type": "string"
+      },
+      "objectName": {
+        "type": "string"
+      },
+      "startTime": {
+        "type": "string"
+      },
+      "successful": {
+        "type": "boolean"
+      }
+    }
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "A task tracking the execution of a long running action",
+    "id": "https://api.anaplan.com/2/0/models/0858271D80B543489FE68291C4A3069D/objects/taskWithUrl#",
+    "properties": {
+      "creationTime": {
+        "type": "integer"
+      },
+      "taskId": {
+        "type": "string"
+      },
+      "taskState": {
+        "enum": [
+          "NOT_STARTED",
+          "IN_PROGRESS",
+          "COMPLETE",
+          "CANCELLING",
+          "CANCELLED"
+        ]
+      }
+    }
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "The version of data being used in an Anaplan model",
+    "id": "https://api.anaplan.com/2/0/models/0858271D80B543489FE68291C4A3069D/objects/version#",
+    "properties": {
+      "code": {
+        "type": "string"
+      },
+      "editFrom": {
+        "$ref": "https://api.anaplan.com/2/0/models/0858271D80B543489FE68291C4A3069D/objects/period#"
+      },
+      "editTo": {
+        "$ref": "https://api.anaplan.com/2/0/models/0858271D80B543489FE68291C4A3069D/objects/period#"
+      },
+      "formula": {
+        "type": "string"
+      },
+      "id": {
+        "type": "string"
+      },
+      "isActual": {
+        "type": "boolean"
+      },
+      "isCurrent": {
+        "type": "boolean"
+      },
+      "name": {
+        "type": "string"
+      },
+      "notes": {
+        "type": "string"
+      },
+      "switchover": {
+        "$ref": "https://api.anaplan.com/2/0/models/0858271D80B543489FE68291C4A3069D/objects/period#"
+      }
+    }
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "A view in an Anaplan model",
+    "id": "https://api.anaplan.com/2/0/models/0858271D80B543489FE68291C4A3069D/objects/view#",
+    "properties": {
+      "code": {
+        "type": "string"
+      },
+      "id": {
+        "type": "string"
+      },
+      "moduleId": {
+        "type": "string"
+      },
+      "name": {
+        "type": "string"
+      }
+    }
+  },
+  {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "A task tracking the execution of a export",
+    "id": "https://api.anaplan.com/2/0/models/0858271D80B543489FE68291C4A3069D/objects/viewReadRequest#",
+    "properties": {
+      "availablePages": {
+        "type": "integer"
+      },
+      "requestId": {
+        "type": "string"
+      },
+      "requestState": {
+        "enum": [
+          "NOT_STARTED",
+          "IN_PROGRESS",
+          "COMPLETE",
+          "CANCELLING",
+          "CANCELLED"
+        ]
+      },
+      "successful": {
+        "type": "boolean"
+      },
+      "url": {
+        "type": "string"
+      },
+      "viewId": {
+        "type": "integer"
+      }
+    }
+  }
+]
