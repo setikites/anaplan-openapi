@@ -96,6 +96,54 @@ def check_spec_ordering(spec: dict, name: str) -> list[str]:
     return violations
 
 
+def _reorder_keys(obj: dict, canonical: list) -> dict:
+    """Return a new dict with canonical keys first (in order), then remaining keys."""
+    return {
+        **{k: obj[k] for k in canonical if k in obj},
+        **{k: v for k, v in obj.items() if k not in canonical},
+    }
+
+
+def reorder_spec(spec: dict) -> dict:
+    """Return a copy of spec with all fields reordered to conform to ADR 0002."""
+    spec = _reorder_keys(spec, _DOC_ORDER)
+
+    if "info" in spec:
+        spec["info"] = _reorder_keys(spec["info"], _INFO_ORDER)
+
+    for path_str, path_item in spec.get("paths", {}).items():
+        if not isinstance(path_item, dict):
+            continue
+        for method in _HTTP_METHODS:
+            op = path_item.get(method)
+            if not isinstance(op, dict):
+                continue
+
+            path_item[method] = op = _reorder_keys(op, _OP_ORDER)
+
+            params = op.get("parameters", [])
+            inline = [p for p in params if isinstance(p, dict) and "$ref" not in p]
+
+            reordered = []
+            for p in params:
+                if isinstance(p, dict) and "$ref" not in p:
+                    reordered.append(_reorder_keys(p, _PARAM_FIELD_ORDER))
+                else:
+                    reordered.append(p)
+
+            if len(inline) == len(params):
+                reordered = sorted(reordered, key=_param_rank)
+
+            if reordered:
+                op["parameters"] = reordered
+
+            for status_code, response in op.get("responses", {}).items():
+                if isinstance(response, dict) and "$ref" not in response:
+                    op["responses"][status_code] = _reorder_keys(response, _RESPONSE_ORDER)
+
+    return spec
+
+
 def main() -> int:
     import json
     import pathlib

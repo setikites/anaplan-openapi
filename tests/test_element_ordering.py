@@ -159,9 +159,8 @@ def test_checker_skips_array_ordering_when_ref_params_present():
     assert check_spec_ordering(spec, "test") == []
 
 
-# ─── Integration tests (xfail until issue #73 remediates specs) ───────────
+# ─── Integration tests: all 9 specs must conform ──────────────────────────
 
-@pytest.mark.xfail(reason="Spec remediation tracked in issue #73", strict=False)
 @pytest.mark.parametrize("spec_path", SPEC_FILES, ids=lambda p: p.parent.name)
 def test_spec_conforms_to_element_ordering_standard(spec_path):
     spec = json.loads(spec_path.read_text(encoding="utf-8"))

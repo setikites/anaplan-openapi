@@ -56,9 +56,15 @@
     }
   ],
   "security": [
-    {"AnaplanAuthToken": []},
-    {"BearerAuth": []},
-    {"BasicAuth": []}
+    {
+      "AnaplanAuthToken": []
+    },
+    {
+      "BearerAuth": []
+    },
+    {
+      "BasicAuth": []
+    }
   ],
   "paths": {
     "/Users": {
@@ -71,19 +77,27 @@
             "name": "filter",
             "in": "query",
             "description": "SCIM filter expression (e.g. `userName eq \"john@example.com\"`).",
-            "schema": {"type": "string"}
+            "schema": {
+              "type": "string"
+            }
           },
           {
             "name": "startIndex",
             "in": "query",
             "description": "1-based index of the first result in the current set of list results.",
-            "schema": {"type": "integer", "default": 1}
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
           },
           {
             "name": "count",
             "in": "query",
             "description": "Maximum number of results per page. Maximum allowed value is 100.",
-            "schema": {"type": "integer", "default": 100}
+            "schema": {
+              "type": "integer",
+              "default": 100
+            }
           }
         ],
         "responses": {
@@ -91,7 +105,9 @@
             "description": "A paginated list of users.",
             "content": {
               "application/scim+json": {
-                "schema": {"$ref": "#/components/schemas/ListResponse"}
+                "schema": {
+                  "$ref": "#/components/schemas/ListResponse"
+                }
               }
             }
           },
@@ -99,7 +115,9 @@
             "description": "Invalid filter expression or request.",
             "content": {
               "application/scim+json": {
-                "schema": {"$ref": "#/components/schemas/ScimError"}
+                "schema": {
+                  "$ref": "#/components/schemas/ScimError"
+                }
               }
             }
           },
@@ -107,7 +125,9 @@
             "description": "Missing or invalid authentication token.",
             "content": {
               "application/scim+json": {
-                "schema": {"$ref": "#/components/schemas/ScimError"}
+                "schema": {
+                  "$ref": "#/components/schemas/ScimError"
+                }
               }
             }
           },
@@ -115,7 +135,9 @@
             "description": "Caller does not have USER_ADMIN role.",
             "content": {
               "application/scim+json": {
-                "schema": {"$ref": "#/components/schemas/ScimError"}
+                "schema": {
+                  "$ref": "#/components/schemas/ScimError"
+                }
               }
             }
           }
@@ -129,7 +151,9 @@
           "required": true,
           "content": {
             "application/scim+json": {
-              "schema": {"$ref": "#/components/schemas/User"}
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
             }
           }
         },
@@ -138,7 +162,9 @@
             "description": "User created.",
             "content": {
               "application/scim+json": {
-                "schema": {"$ref": "#/components/schemas/User"}
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
               }
             }
           },
@@ -146,7 +172,9 @@
             "description": "Invalid request body or missing required fields.",
             "content": {
               "application/scim+json": {
-                "schema": {"$ref": "#/components/schemas/ScimError"}
+                "schema": {
+                  "$ref": "#/components/schemas/ScimError"
+                }
               }
             }
           },
@@ -154,7 +182,9 @@
             "description": "Missing or invalid authentication token.",
             "content": {
               "application/scim+json": {
-                "schema": {"$ref": "#/components/schemas/ScimError"}
+                "schema": {
+                  "$ref": "#/components/schemas/ScimError"
+                }
               }
             }
           },
@@ -162,7 +192,9 @@
             "description": "Caller does not have USER_ADMIN role.",
             "content": {
               "application/scim+json": {
-                "schema": {"$ref": "#/components/schemas/ScimError"}
+                "schema": {
+                  "$ref": "#/components/schemas/ScimError"
+                }
               }
             }
           },
@@ -170,7 +202,9 @@
             "description": "User already exists (conflict on userName).",
             "content": {
               "application/scim+json": {
-                "schema": {"$ref": "#/components/schemas/ScimError"}
+                "schema": {
+                  "$ref": "#/components/schemas/ScimError"
+                }
               }
             }
           }
@@ -184,7 +218,9 @@
           "in": "path",
           "required": true,
           "description": "Anaplan user ID.",
-          "schema": {"type": "string"}
+          "schema": {
+            "type": "string"
+          }
         }
       ],
       "get": {
@@ -196,7 +232,9 @@
             "description": "The requested user.",
             "content": {
               "application/scim+json": {
-                "schema": {"$ref": "#/components/schemas/User"}
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
               }
             }
           },
@@ -204,7 +242,9 @@
             "description": "Missing or invalid authentication token.",
             "content": {
               "application/scim+json": {
-                "schema": {"$ref": "#/components/schemas/ScimError"}
+                "schema": {
+                  "$ref": "#/components/schemas/ScimError"
+                }
               }
             }
           },
@@ -212,7 +252,9 @@
             "description": "Caller does not have USER_ADMIN role.",
             "content": {
               "application/scim+json": {
-                "schema": {"$ref": "#/components/schemas/ScimError"}
+                "schema": {
+                  "$ref": "#/components/schemas/ScimError"
+                }
               }
             }
           },
@@ -220,7 +262,9 @@
             "description": "User not found.",
             "content": {
               "application/scim+json": {
-                "schema": {"$ref": "#/components/schemas/ScimError"}
+                "schema": {
+                  "$ref": "#/components/schemas/ScimError"
+                }
               }
             }
           }
@@ -234,7 +278,9 @@
           "required": true,
           "content": {
             "application/scim+json": {
-              "schema": {"$ref": "#/components/schemas/User"}
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
             }
           }
         },
@@ -243,7 +289,9 @@
             "description": "User replaced.",
             "content": {
               "application/scim+json": {
-                "schema": {"$ref": "#/components/schemas/User"}
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
               }
             }
           },
@@ -251,7 +299,9 @@
             "description": "Invalid request body.",
             "content": {
               "application/scim+json": {
-                "schema": {"$ref": "#/components/schemas/ScimError"}
+                "schema": {
+                  "$ref": "#/components/schemas/ScimError"
+                }
               }
             }
           },
@@ -259,7 +309,9 @@
             "description": "Missing or invalid authentication token.",
             "content": {
               "application/scim+json": {
-                "schema": {"$ref": "#/components/schemas/ScimError"}
+                "schema": {
+                  "$ref": "#/components/schemas/ScimError"
+                }
               }
             }
           },
@@ -267,7 +319,9 @@
             "description": "Caller does not have USER_ADMIN role.",
             "content": {
               "application/scim+json": {
-                "schema": {"$ref": "#/components/schemas/ScimError"}
+                "schema": {
+                  "$ref": "#/components/schemas/ScimError"
+                }
               }
             }
           },
@@ -275,7 +329,9 @@
             "description": "User not found.",
             "content": {
               "application/scim+json": {
-                "schema": {"$ref": "#/components/schemas/ScimError"}
+                "schema": {
+                  "$ref": "#/components/schemas/ScimError"
+                }
               }
             }
           }
@@ -289,7 +345,9 @@
           "required": true,
           "content": {
             "application/scim+json": {
-              "schema": {"$ref": "#/components/schemas/PatchOp"}
+              "schema": {
+                "$ref": "#/components/schemas/PatchOp"
+              }
             }
           }
         },
@@ -298,7 +356,9 @@
             "description": "User updated.",
             "content": {
               "application/scim+json": {
-                "schema": {"$ref": "#/components/schemas/User"}
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
               }
             }
           },
@@ -306,7 +366,9 @@
             "description": "Invalid PatchOp or unsupported operation.",
             "content": {
               "application/scim+json": {
-                "schema": {"$ref": "#/components/schemas/ScimError"}
+                "schema": {
+                  "$ref": "#/components/schemas/ScimError"
+                }
               }
             }
           },
@@ -314,7 +376,9 @@
             "description": "Missing or invalid authentication token.",
             "content": {
               "application/scim+json": {
-                "schema": {"$ref": "#/components/schemas/ScimError"}
+                "schema": {
+                  "$ref": "#/components/schemas/ScimError"
+                }
               }
             }
           },
@@ -322,7 +386,9 @@
             "description": "Caller does not have USER_ADMIN role.",
             "content": {
               "application/scim+json": {
-                "schema": {"$ref": "#/components/schemas/ScimError"}
+                "schema": {
+                  "$ref": "#/components/schemas/ScimError"
+                }
               }
             }
           },
@@ -330,7 +396,9 @@
             "description": "User not found.",
             "content": {
               "application/scim+json": {
-                "schema": {"$ref": "#/components/schemas/ScimError"}
+                "schema": {
+                  "$ref": "#/components/schemas/ScimError"
+                }
               }
             }
           }
@@ -348,7 +416,9 @@
             "description": "Missing or invalid authentication token.",
             "content": {
               "application/scim+json": {
-                "schema": {"$ref": "#/components/schemas/ScimError"}
+                "schema": {
+                  "$ref": "#/components/schemas/ScimError"
+                }
               }
             }
           },
@@ -356,7 +426,9 @@
             "description": "Caller does not have USER_ADMIN role.",
             "content": {
               "application/scim+json": {
-                "schema": {"$ref": "#/components/schemas/ScimError"}
+                "schema": {
+                  "$ref": "#/components/schemas/ScimError"
+                }
               }
             }
           },
@@ -364,7 +436,9 @@
             "description": "User not found.",
             "content": {
               "application/scim+json": {
-                "schema": {"$ref": "#/components/schemas/ScimError"}
+                "schema": {
+                  "$ref": "#/components/schemas/ScimError"
+                }
               }
             }
           }
@@ -384,9 +458,21 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "schemas": {"type": "array", "items": {"type": "string"}},
-                    "totalResults": {"type": "integer"},
-                    "Resources": {"type": "array", "items": {"type": "object"}}
+                    "schemas": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "totalResults": {
+                      "type": "integer"
+                    },
+                    "Resources": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
                   }
                 }
               }
@@ -396,7 +482,9 @@
             "description": "Missing or invalid authentication token.",
             "content": {
               "application/scim+json": {
-                "schema": {"$ref": "#/components/schemas/ScimError"}
+                "schema": {
+                  "$ref": "#/components/schemas/ScimError"
+                }
               }
             }
           }
@@ -413,7 +501,9 @@
             "description": "List of schema definitions.",
             "content": {
               "application/scim+json": {
-                "schema": {"$ref": "#/components/schemas/ListResponse"}
+                "schema": {
+                  "$ref": "#/components/schemas/ListResponse"
+                }
               }
             }
           },
@@ -421,7 +511,9 @@
             "description": "Missing or invalid authentication token.",
             "content": {
               "application/scim+json": {
-                "schema": {"$ref": "#/components/schemas/ScimError"}
+                "schema": {
+                  "$ref": "#/components/schemas/ScimError"
+                }
               }
             }
           }
@@ -441,46 +533,83 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "schemas": {"type": "array", "items": {"type": "string"}},
+                    "schemas": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
                     "patch": {
                       "type": "object",
-                      "properties": {"supported": {"type": "boolean"}}
+                      "properties": {
+                        "supported": {
+                          "type": "boolean"
+                        }
+                      }
                     },
                     "bulk": {
                       "type": "object",
                       "properties": {
-                        "supported": {"type": "boolean"},
-                        "maxOperations": {"type": "integer"},
-                        "maxPayloadSize": {"type": "integer"}
+                        "supported": {
+                          "type": "boolean"
+                        },
+                        "maxOperations": {
+                          "type": "integer"
+                        },
+                        "maxPayloadSize": {
+                          "type": "integer"
+                        }
                       }
                     },
                     "filter": {
                       "type": "object",
                       "properties": {
-                        "supported": {"type": "boolean"},
-                        "maxResults": {"type": "integer"}
+                        "supported": {
+                          "type": "boolean"
+                        },
+                        "maxResults": {
+                          "type": "integer"
+                        }
                       }
                     },
                     "changePassword": {
                       "type": "object",
-                      "properties": {"supported": {"type": "boolean"}}
+                      "properties": {
+                        "supported": {
+                          "type": "boolean"
+                        }
+                      }
                     },
                     "sort": {
                       "type": "object",
-                      "properties": {"supported": {"type": "boolean"}}
+                      "properties": {
+                        "supported": {
+                          "type": "boolean"
+                        }
+                      }
                     },
                     "etag": {
                       "type": "object",
-                      "properties": {"supported": {"type": "boolean"}}
+                      "properties": {
+                        "supported": {
+                          "type": "boolean"
+                        }
+                      }
                     },
                     "authenticationSchemes": {
                       "type": "array",
                       "items": {
                         "type": "object",
                         "properties": {
-                          "type": {"type": "string"},
-                          "name": {"type": "string"},
-                          "description": {"type": "string"}
+                          "type": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          }
                         }
                       }
                     }
@@ -493,7 +622,9 @@
             "description": "Missing or invalid authentication token.",
             "content": {
               "application/scim+json": {
-                "schema": {"$ref": "#/components/schemas/ScimError"}
+                "schema": {
+                  "$ref": "#/components/schemas/ScimError"
+                }
               }
             }
           }
@@ -523,11 +654,16 @@
       "User": {
         "type": "object",
         "description": "Anaplan SCIM User resource. Implements the SCIM core User schema plus Anaplan-specific entitlements.",
-        "required": ["userName", "name"],
+        "required": [
+          "userName",
+          "name"
+        ],
         "properties": {
           "schemas": {
             "type": "array",
-            "items": {"type": "string"}
+            "items": {
+              "type": "string"
+            }
           },
           "id": {
             "type": "string",
@@ -546,7 +682,10 @@
           "name": {
             "type": "object",
             "description": "Components of the user's real name.",
-            "required": ["familyName", "givenName"],
+            "required": [
+              "familyName",
+              "givenName"
+            ],
             "properties": {
               "familyName": {
                 "type": "string",
@@ -611,7 +750,11 @@
                 "type": {
                   "type": "string",
                   "description": "The type of entitlement.",
-                  "enum": ["WORKSPACE", "WORKSPACE_IDS", "WORKSPACE_NAMES"],
+                  "enum": [
+                    "WORKSPACE",
+                    "WORKSPACE_IDS",
+                    "WORKSPACE_NAMES"
+                  ],
                   "readOnly": true
                 },
                 "primary": {
@@ -626,8 +769,12 @@
             "type": "object",
             "description": "Resource metadata.",
             "properties": {
-              "resourceType": {"type": "string"},
-              "location": {"type": "string"}
+              "resourceType": {
+                "type": "string"
+              },
+              "location": {
+                "type": "string"
+              }
             }
           }
         }
@@ -635,11 +782,16 @@
       "ListResponse": {
         "type": "object",
         "description": "SCIM ListResponse envelope (RFC 7644 §3.4.2).",
-        "required": ["schemas", "totalResults"],
+        "required": [
+          "schemas",
+          "totalResults"
+        ],
         "properties": {
           "schemas": {
             "type": "array",
-            "items": {"type": "string"}
+            "items": {
+              "type": "string"
+            }
           },
           "totalResults": {
             "type": "integer",
@@ -655,18 +807,25 @@
           },
           "Resources": {
             "type": "array",
-            "items": {"$ref": "#/components/schemas/User"}
+            "items": {
+              "$ref": "#/components/schemas/User"
+            }
           }
         }
       },
       "ScimError": {
         "type": "object",
         "description": "SCIM error response (RFC 7644 §3.12).",
-        "required": ["schemas", "status"],
+        "required": [
+          "schemas",
+          "status"
+        ],
         "properties": {
           "schemas": {
             "type": "array",
-            "items": {"type": "string"}
+            "items": {
+              "type": "string"
+            }
           },
           "status": {
             "type": "string",
@@ -685,23 +844,34 @@
       "PatchOp": {
         "type": "object",
         "description": "SCIM PATCH request body (RFC 7644 §3.5.2).",
-        "required": ["schemas", "Operations"],
+        "required": [
+          "schemas",
+          "Operations"
+        ],
         "properties": {
           "schemas": {
             "type": "array",
-            "items": {"type": "string"}
+            "items": {
+              "type": "string"
+            }
           },
           "Operations": {
             "type": "array",
             "description": "List of PATCH operations to apply.",
             "items": {
               "type": "object",
-              "required": ["op"],
+              "required": [
+                "op"
+              ],
               "properties": {
                 "op": {
                   "type": "string",
                   "description": "Operation type.",
-                  "enum": ["add", "remove", "replace"]
+                  "enum": [
+                    "add",
+                    "remove",
+                    "replace"
+                  ]
                 },
                 "path": {
                   "type": "string",
