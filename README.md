@@ -51,7 +51,7 @@ openapi-generator-cli generate -i integration/integration-openapi.json -g python
 | ALM | [`alm/`](alm/) | [`alm-openapi.json`](alm/alm-openapi.json) | Medium |
 | Audit | [`audit/`](audit/) | [`audit-openapi.json`](audit/audit-openapi.json) | High — live-tested |
 | Financial Consolidation | [`financial-consolidation/`](financial-consolidation/) | [`financial-consolidation-openapi.json`](financial-consolidation/financial-consolidation-openapi.json) | Low |
-| Exception Users | [`exception/`](exception/) | [`exception-openapi.json`](exception/exception-openapi.json) | Low — live-tested auth |
+| Exception Users | [`exception/`](exception/) | [`exception-openapi.json`](exception/exception-openapi.json) | High — live-tested |
 
 Each API directory's **README** documents its sources, auth scheme(s), and any
 behavior discovered during live testing that differs from the official docs.

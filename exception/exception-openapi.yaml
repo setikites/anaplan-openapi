@@ -263,12 +263,13 @@ components:
           description: Email address of the exception user.
     ErrorResponse:
       type: object
-      description: Error response body. Exact field names not confirmed by live testing — verify against actual API responses.
+      description: 'Error response body. Field names confirmed via live testing (issue #51).'
       properties:
         status:
           type: string
-          description: Error status string, e.g. `FAILURE BAD_REQUEST`, `FAILURE INVALID TOKEN`, `FAILURE UNAUTHORIZED USER
-            ACTION`, `FAILURE NOT FOUND`, `FAILURE GENERIC`.
-        message:
+          description: Error status string, e.g. `FAILURE_BAD_HEADER`, `FAILURE_BAD_REQUEST`, `FAILURE_INVALID_TOKEN`, `FAILURE_UNAUTHORIZED_USER_ACTION`,
+            `FAILURE_NOT_FOUND`.
+        statusMessage:
           type: string
-          description: Human-readable error description.
+          description: 'Human-readable error description. Note: Apiary documented this field as `message`; the confirmed field
+            name from live testing is `statusMessage`.'

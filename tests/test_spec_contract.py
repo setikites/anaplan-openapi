@@ -968,8 +968,10 @@ def test_alm_revisions_get_declares_pagination_params():
 
 # ─── Exception Users API ──────────────────────────────────────────────────
 # Manages exception users (users who bypass SSO enforcement) in workspaces.
-# Auth: AnaplanAuthToken only (Apiary confirmed). Requires Tenant Security Admin role.
-# Error response body shape not yet confirmed by live testing — see issue #51.
+# Auth: AnaplanAuthToken (OAuth Authorization Code tokens accepted) and
+# AnaplanApiKey — both confirmed via live testing (issue #51).
+# Bearer rejected with FAILURE_BAD_HEADER even for valid OAuth tokens.
+# Error response shape confirmed: { status, statusMessage } (not { status, message }).
 
 _EXCEPTION_SPEC = REPO_ROOT / "exception" / "exception-openapi.json"
 _skip_exception = _skip_if_missing("exception")
@@ -1067,6 +1069,29 @@ def test_exception_patch_declares_user_guid_path_param():
     p = next(p for p in params if p.get("name") == "userGuid")
     assert p.get("in") == "path"
     assert p.get("required") is True
+
+
+@_skip_exception
+def test_exception_error_response_has_status_message_property():
+    """ErrorResponse must declare statusMessage (not message) as confirmed by live testing.
+
+    Live testing returned { "status": "FAILURE_BAD_HEADER", "statusMessage": "..." }.
+    Apiary documented the field as 'message'; the confirmed name is 'statusMessage'.
+    """
+    spec = _load(_EXCEPTION_SPEC)
+    props = (
+        spec.get("components", {})
+        .get("schemas", {})
+        .get("ErrorResponse", {})
+        .get("properties", {})
+    )
+    assert "statusMessage" in props, (
+        "ErrorResponse must declare 'statusMessage' property "
+        "(confirmed field name from live testing — Apiary used 'message')"
+    )
+    assert props["statusMessage"].get("type") == "string", (
+        "ErrorResponse.statusMessage must be type string"
+    )
 
 
 # ─── Audit API ─────────────────────────────────────────────────────────────
