@@ -1132,6 +1132,30 @@ def test_audit_get_events_declares_date_range_params():
 
 
 @_skip_audit
+@pytest.mark.parametrize(
+    "method,path", [("get", "/events"), ("post", "/events/search")]
+)
+def test_audit_events_declare_400_response(method, path):
+    """The events endpoints must document a 400 response with the error schema.
+
+    The dateFrom/dateTo and intervalInHours/interval descriptions promise a 400
+    (FAILURE_BAD_REQUEST) for a range over 30 days — confirmed via live testing —
+    so the response must be declared (using AuditErrorResponse).
+    """
+    spec = _load(_AUDIT_SPEC)
+    responses = spec["paths"][path][method]["responses"]
+    assert "400" in responses, (
+        f"audit {method.upper()} {path} must document a 400 response"
+    )
+    schema = (
+        responses["400"].get("content", {}).get("application/json", {}).get("schema", {})
+    )
+    assert schema.get("$ref", "").endswith("/AuditErrorResponse"), (
+        f"audit {method.upper()} {path} 400 must use the AuditErrorResponse schema"
+    )
+
+
+@_skip_audit
 def test_audit_post_search_has_request_body():
     """POST /events/search must declare a JSON request body schema."""
     spec = _load(_AUDIT_SPEC)
