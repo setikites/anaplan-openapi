@@ -39,6 +39,7 @@ import pathlib
 import warnings
 
 import httpx
+import jsonschema
 import pytest
 
 from oauth.token_keyring import load_token
@@ -48,6 +49,10 @@ AUDIT_BASE_URL = os.getenv(
 )
 AUTH_URL = "https://auth.anaplan.com"
 SPEC_PATH = pathlib.Path(__file__).parent.parent / "audit" / "audit-openapi.json"
+
+with open(SPEC_PATH, encoding="utf-8") as _f:
+    _SPEC = json.load(_f)
+_AUDIT_EVENT_SCHEMA = _SPEC["components"]["schemas"]["AuditEvent"]
 
 _NO_ROLE_STATUS = "FAILURE_UNAUTHORIZED_USER_ACTION"
 
@@ -136,6 +141,33 @@ def audit_token():
             f"{AUTH_URL}/token/logout",
             headers={"Authorization": f"AnaplanAuthToken {token}"},
         )
+
+
+@pytest.fixture(scope="module")
+def audit_events(audit_token):
+    """One real GET /events page for contract checks (module-scoped).
+
+    Requires a role-enabled token. Skips cleanly (rather than asserting) when the
+    caller lacks the Tenant Auditor role, so the suite still runs end-to-end with
+    a role-less token — the event-contract tests simply don't execute.
+    """
+    with httpx.Client(timeout=_REQUEST_TIMEOUT) as client:
+        response = client.get(
+            f"{AUDIT_BASE_URL}/events",
+            params={"intervalInHours": "24", "type": "all"},
+            headers={
+                "Authorization": f"AnaplanAuthToken {audit_token}",
+                "Accept": "application/json",
+            },
+        )
+
+    if _is_no_role_401(response):
+        pytest.skip("User lacks Tenant Auditor role — cannot verify event contract")
+
+    assert response.status_code == 200, (
+        f"GET /events returned {response.status_code}: {response.text[:200]}"
+    )
+    return response.json()
 
 
 # ── Tracer bullet ─────────────────────────────────────────────────────────────
@@ -388,3 +420,85 @@ def test_audit_get_events_cef_format_probe(audit_token):
             UserWarning,
             stacklevel=2,
         )
+
+
+# ── Event record contract (issue #59) ─────────────────────────────────────────
+
+@pytest.mark.live
+def test_audit_event_fields_are_all_documented(audit_events):
+    """Every field a live event returns must be documented in the AuditEvent schema.
+
+    Guards against the spec silently omitting fields the API actually returns.
+    """
+    records = audit_events["response"]
+    assert records, "expected >=1 audit event record to verify the field contract"
+
+    documented = set(_AUDIT_EVENT_SCHEMA["properties"])
+    returned = set().union(*(record.keys() for record in records))
+    undocumented = returned - documented
+
+    assert not undocumented, (
+        "live events return fields not documented in the AuditEvent schema: "
+        f"{sorted(undocumented)}"
+    )
+
+
+@pytest.mark.live
+def test_audit_event_records_validate_against_schema(audit_events):
+    """Each live event record conforms to the AuditEvent schema (declared types).
+
+    Catches type drift between the spec and the real API — e.g. a field the spec
+    types as a string that the API returns as an integer.
+    """
+    records = audit_events["response"]
+    assert records, "expected >=1 audit event record to validate"
+
+    for index, record in enumerate(records):
+        try:
+            jsonschema.validate(record, _AUDIT_EVENT_SCHEMA)
+        except jsonschema.ValidationError as exc:
+            pytest.fail(
+                f"event record {index} (id={record.get('id')}) violates the "
+                f"AuditEvent schema at {list(exc.absolute_path)}: {exc.message}"
+            )
+
+
+# Core fields that identify every audit event, with their documented JSON types.
+# Confirmed present on every record across a 7-day live sample (issue #59).
+_CORE_EVENT_FIELDS = {
+    "id": int,
+    "eventTypeId": str,
+    "userId": str,
+    "message": str,
+    "success": bool,
+    "eventDate": int,
+    "checksum": str,
+}
+
+
+@pytest.mark.live
+def test_audit_event_has_core_fields_with_documented_types(audit_events):
+    """Every event carries the core identity fields with their documented types.
+
+    These are the always-present fields named in the AuditEvent contract; the API
+    must return them on every record for downstream SIEM consumers.
+    """
+    records = audit_events["response"]
+    assert records, "expected >=1 audit event record to verify core fields"
+
+    for index, record in enumerate(records):
+        for field, expected_type in _CORE_EVENT_FIELDS.items():
+            assert field in record, (
+                f"event record {index} (id={record.get('id')}) is missing core "
+                f"field {field!r}"
+            )
+            value = record[field]
+            # bool is a subclass of int; keep the integer fields strictly non-bool.
+            if expected_type is int:
+                ok = isinstance(value, int) and not isinstance(value, bool)
+            else:
+                ok = isinstance(value, expected_type)
+            assert ok, (
+                f"event record {index} field {field!r} should be "
+                f"{expected_type.__name__}, got {type(value).__name__} ({value!r})"
+            )

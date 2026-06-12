@@ -176,6 +176,11 @@ components:
         objectTenantId:
           type: string
           description: Tenant ID of the object acted upon.
+        additionalAttributes:
+          type: object
+          additionalProperties: true
+          description: Event-type-specific attributes as a free-form map. Keys vary by event type (for example, `clientName`
+            on token events).
         message:
           type: string
           description: Human-readable description of the event.
@@ -214,7 +219,8 @@ components:
           description: Time zone of `createdDate` (for example, `UTC`).
         checksum:
           type: string
-          description: SHA-256 checksum for verifying event record integrity.
+          description: Checksum for verifying event record integrity. Returned as a numeric string (live testing showed a
+            short integer value, not a SHA-256 hash).
     AuditPaging:
       type: object
       description: Pagination metadata included in audit event list responses.

@@ -81,4 +81,30 @@ Note: the spec's paths are empty because the Apiary blueprint is not publicly re
 
 ## Discovered Discrepancies
 
-_Document differences between Apiary docs and live API behavior here as they are discovered._
+### `GET /events` event records (live testing 2026-06-12, issue #59)
+
+Confirmed against real records with a role-enabled OAuth bearer token (Authorization
+Code grant; the account holds the Tenant Auditor role). The response matches the
+`AuditEventsResponse` envelope — a top-level `response` array of `AuditEvent` records
+plus `meta.paging` (`AuditPaging`). Field reconciliations:
+
+- **`additionalAttributes` was undocumented** — real events carry an
+  `additionalAttributes` object (a free-form, event-type-specific map; e.g.
+  `{"clientName": "..."}` on token events). Added to the `AuditEvent` schema.
+- **`checksum` is not a SHA-256 hash** — the spec described it as a "SHA-256
+  checksum", but the live value is a short numeric string (e.g. `"1118902891"`).
+  The type (string) is correct; the description has been corrected.
+- **Conditional fields not seen in the sample** — `objectTypeId`, `errorNumber`,
+  `sessionId`, and `serviceVersion` did not appear on any record in the sample.
+  They are kept in the spec as optional: they are expected to surface
+  conditionally (e.g. `errorNumber` on failed actions, `sessionId` on
+  session-scoped events) rather than being absent from the API.
+
+Core fields present on every record (verified across a multi-day sample): `id`
+(int), `eventTypeId`, `userId`, `tenantId`, `objectId`, `message`, `success`
+(bool), `ipAddress`, `userAgent`, `hostName`, `eventDate` (int, Unix ms),
+`eventTimeZone`, `createdDate` (int, Unix ms), `createdTimeZone`, `checksum`,
+`additionalAttributes`.
+
+These are asserted (not skipped) by `tests/test_audit_live.py` when a role-enabled
+token is present.
