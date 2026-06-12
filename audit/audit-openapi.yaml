@@ -36,7 +36,7 @@ paths:
     get:
       summary: Retrieve audit events
       description: |-
-        Retrieves audit events for the tenant associated with the authenticated user. Use `type` to filter by event category. Use `dateFrom`/`dateTo` for a specific date range, or `intervalInHours` for a rolling window. Use `limit` and `offset` for pagination (limit cannot exceed 10000).
+        Retrieves audit events for the tenant associated with the authenticated user. Use `type` to filter by event category. Use `dateFrom`/`dateTo` for a specific date range, or `intervalInHours` for a rolling window. Use `limit` and `offset` for pagination (the documented limit cap of 10000 is not enforced server-side — see the `limit` parameter).
 
         Set `Accept: text/plain` to receive results in Common Event Format (CEF). Default is `application/json`.
       operationId: getAuditEvents
@@ -45,22 +45,34 @@ paths:
       parameters:
       - name: type
         in: query
-        description: Type of events to return. `all` returns every event. `byok` returns only Bring Your Own Key encryption
-          events. `user_activity` returns only user activity events.
+        description: 'Type of events to return. Each value filters to events whose `eventTypeId` carries a matching prefix.
+          Confirmed via live testing: `all` (every event), `user_activity` (`USR-*`), `access_control` (`AUTHZ-*`), `int`
+          (integrations, `INT-*`), `conn_mgmt` (connection / SAML management, `CONN-*`), `comment` (`COMMENT-*`), `byok` (Bring
+          Your Own Key encryption), `plan_iq` (PlanIQ), and `forecaster`. A `workflow` category also exists for the Workflow
+          product but could not be confirmed on the test tenant (product not enabled), so it is omitted from the enum. Note:
+          the enum is not enforced server-side — an unrecognised value is treated as `all` rather than rejected.'
         schema:
           type: string
           enum:
           - all
-          - byok
           - user_activity
+          - access_control
+          - int
+          - conn_mgmt
+          - comment
+          - byok
+          - plan_iq
+          - forecaster
       - name: dateFrom
         in: query
-        description: Start of the event date range (Unix timestamp in milliseconds, UTC).
+        description: Start of the event date range (Unix timestamp in milliseconds, UTC). The span between `dateFrom` and
+          `dateTo` cannot exceed 30 days — a wider range returns 400 `FAILURE_BAD_REQUEST`.
         schema:
           type: integer
       - name: dateTo
         in: query
-        description: End of the event date range (Unix timestamp in milliseconds, UTC).
+        description: End of the event date range (Unix timestamp in milliseconds, UTC). The span between `dateFrom` and `dateTo`
+          cannot exceed 30 days — a wider range returns 400 `FAILURE_BAD_REQUEST`.
         schema:
           type: integer
       - name: intervalInHours
@@ -70,10 +82,10 @@ paths:
           type: integer
       - name: limit
         in: query
-        description: Maximum number of results to return per page. Cannot exceed 10000.
+        description: Maximum number of results to return per page. The documentation states a cap of 10000, but live testing
+          showed the server does not enforce it — larger limits are honored and return more than 10000 records.
         schema:
           type: integer
-          maximum: 10000
       - name: offset
         in: query
         description: Zero-based index of the first result to return. Use with `limit` for pagination.
@@ -114,14 +126,21 @@ paths:
       parameters:
       - name: type
         in: query
-        description: Type of events to return. `all` returns every event. `byok` returns only Bring Your Own Key encryption
-          events. `user_activity` returns only user activity events.
+        description: 'Type of events to return. Same vocabulary as the `type` filter on `GET /events` (each value matches
+          an `eventTypeId` prefix): `all`, `user_activity`, `access_control`, `int`, `conn_mgmt`, `comment`, `byok`, `plan_iq`,
+          `forecaster`. The values were confirmed against `GET /events`; the enum is not enforced server-side.'
         schema:
           type: string
           enum:
           - all
-          - byok
           - user_activity
+          - access_control
+          - int
+          - conn_mgmt
+          - comment
+          - byok
+          - plan_iq
+          - forecaster
       requestBody:
         content:
           application/json:
@@ -244,6 +263,10 @@ components:
         nextUrl:
           type: string
           description: URL to call to retrieve the next page of results.
+        previousUrl:
+          type: string
+          description: URL to call to retrieve the previous page of results. Present once paging past the first page (offset
+            > 0).
     AuditEventsResponse:
       type: object
       description: Response envelope for audit event list and search endpoints.

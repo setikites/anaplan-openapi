@@ -36,6 +36,7 @@ import base64
 import json
 import os
 import pathlib
+import time
 import warnings
 
 import httpx
@@ -53,6 +54,10 @@ SPEC_PATH = pathlib.Path(__file__).parent.parent / "audit" / "audit-openapi.json
 with open(SPEC_PATH, encoding="utf-8") as _f:
     _SPEC = json.load(_f)
 _AUDIT_EVENT_SCHEMA = _SPEC["components"]["schemas"]["AuditEvent"]
+_AUDIT_PAGING_SCHEMA = _SPEC["components"]["schemas"]["AuditPaging"]
+_TYPE_ENUM = next(
+    p for p in _SPEC["paths"]["/events"]["get"]["parameters"] if p["name"] == "type"
+)["schema"]["enum"]
 
 _NO_ROLE_STATUS = "FAILURE_UNAUTHORIZED_USER_ACTION"
 
@@ -502,3 +507,259 @@ def test_audit_event_has_core_fields_with_documented_types(audit_events):
                 f"event record {index} field {field!r} should be "
                 f"{expected_type.__name__}, got {type(value).__name__} ({value!r})"
             )
+
+
+# ── Filtering and pagination (issue #60) ──────────────────────────────────────
+
+def _get_events(token, **params):
+    """GET /events with the given query params and a role-enabled token."""
+    with httpx.Client(timeout=_REQUEST_TIMEOUT) as client:
+        return client.get(
+            f"{AUDIT_BASE_URL}/events",
+            params=params,
+            headers={
+                "Authorization": f"AnaplanAuthToken {token}",
+                "Accept": "application/json",
+            },
+        )
+
+
+def _paging_or_skip(response):
+    """Return meta.paging from a 200 response, or skip if the role is absent."""
+    if _is_no_role_401(response):
+        pytest.skip("User lacks Tenant Auditor role — cannot verify filtering/paging")
+    assert response.status_code == 200, (
+        f"GET /events returned {response.status_code}: {response.text[:200]}"
+    )
+    return response.json()["meta"]["paging"]
+
+
+@pytest.mark.live
+def test_audit_paging_fields_are_all_documented(audit_token):
+    """Every field the API returns in meta.paging is documented in AuditPaging.
+
+    Fetches a middle page (offset > 0 with more results after) so the full paging
+    block — including nextOffset/nextUrl and previousUrl — is exercised.
+    """
+    response = _get_events(
+        audit_token, type="all", intervalInHours="168", limit="3", offset="3"
+    )
+    paging = _paging_or_skip(response)
+
+    documented = set(_AUDIT_PAGING_SCHEMA["properties"])
+    undocumented = set(paging) - documented
+
+    assert not undocumented, (
+        "meta.paging returns fields not documented in AuditPaging: "
+        f"{sorted(undocumented)}"
+    )
+
+
+@pytest.fixture(scope="module")
+def audit_30d_window():
+    """A 29-day dateFrom/dateTo window (the server caps the range at 30 days)."""
+    now = int(time.time() * 1000)
+    return {"dateFrom": str(now - 29 * 24 * 3600 * 1000), "dateTo": str(now)}
+
+
+@pytest.fixture(scope="module")
+def audit_all_total(audit_token, audit_30d_window):
+    """totalSize for type=all over the window — the baseline for recognition checks."""
+    response = _get_events(audit_token, type="all", limit="1", **audit_30d_window)
+    if _is_no_role_401(response):
+        pytest.skip("User lacks Tenant Auditor role — cannot verify type recognition")
+    assert response.status_code == 200, response.text[:200]
+    return response.json()["meta"]["paging"]["totalSize"]
+
+
+@pytest.mark.live
+@pytest.mark.parametrize("event_type", _TYPE_ENUM)
+def test_audit_type_enum_value_is_recognized(
+    audit_token, audit_30d_window, audit_all_total, event_type
+):
+    """Every value in the spec's `type` enum is recognized by the server (filters).
+
+    A recognized type filters to a strict subset of events; an unrecognised value
+    is silently treated as `all` and returns the full count (confirmed discrepancy
+    — the enum is not enforced). Asserting each enum value filters guards against
+    unverified values landing in the enum (e.g. `workflow`, which the server
+    ignores and which is deliberately omitted).
+
+    Types tied to products not used by the tenant (e.g. `byok`, `plan_iq`,
+    `forecaster`) legitimately return zero — still a strict subset of `all`.
+    """
+    response = _get_events(audit_token, type=event_type, limit="1", **audit_30d_window)
+    paging = _paging_or_skip(response)
+    total = paging["totalSize"]
+    assert isinstance(total, int) and total >= 0
+
+    if event_type == "all":
+        return
+    assert total < audit_all_total, (
+        f"type={event_type!r} returned {total}, the same as 'all' "
+        f"({audit_all_total}) — the server does not recognise it as a filter, so "
+        f"it should not be in the enum"
+    )
+
+
+@pytest.mark.live
+def test_audit_invalid_type_is_not_rejected(audit_token):
+    """An unrecognised `type` value is not rejected — the server treats it as `all`.
+
+    Confirmed discrepancy (live testing): the documented enum is not enforced
+    server-side; an unknown value returns 200 with the full (unfiltered) result
+    set rather than a 4xx. Documented in audit/README.md.
+    """
+    response = _get_events(
+        audit_token, type="not_a_real_type", intervalInHours="168", limit="5"
+    )
+    invalid_paging = _paging_or_skip(response)
+
+    all_response = _get_events(
+        audit_token, type="all", intervalInHours="168", limit="5"
+    )
+    all_paging = all_response.json()["meta"]["paging"]
+
+    # totalSize drifts slightly as new events arrive; assert the unknown type maps
+    # to the unfiltered 'all' count rather than filtering to a smaller set.
+    assert invalid_paging["totalSize"] >= all_paging["totalSize"] * 0.95, (
+        "expected an unknown type to behave like 'all' (no filtering), but "
+        f"totalSize {invalid_paging['totalSize']} << all {all_paging['totalSize']}"
+    )
+
+
+@pytest.mark.live
+def test_audit_date_range_filters_to_window(audit_token):
+    """dateFrom/dateTo (Unix-ms) constrain results to events within the window."""
+    now = int(time.time() * 1000)
+    date_from = now - 24 * 3600 * 1000  # last 24h
+    date_to = now
+
+    response = _get_events(
+        audit_token, type="all", dateFrom=str(date_from), dateTo=str(date_to), limit="50"
+    )
+    if _is_no_role_401(response):
+        pytest.skip("User lacks Tenant Auditor role — cannot verify date-range filter")
+    assert response.status_code == 200
+    events = response.json()["response"]
+    assert events, "expected >=1 event in the last 24h to verify date-range filtering"
+
+    out_of_range = [
+        e["eventDate"] for e in events if not (date_from <= e["eventDate"] <= date_to)
+    ]
+    assert not out_of_range, (
+        f"dateFrom/dateTo window not honored — {len(out_of_range)} events fell "
+        f"outside [{date_from}, {date_to}]: {out_of_range[:3]}"
+    )
+
+
+@pytest.mark.live
+def test_audit_interval_hours_returns_recent_events(audit_token):
+    """intervalInHours returns a rolling window of the previous N hours of events."""
+    interval_hours = 24
+    now = int(time.time() * 1000)
+    # Generous slack for server/client clock skew and the createdDate lag.
+    earliest = now - (interval_hours + 1) * 3600 * 1000
+    latest = now + 5 * 60 * 1000
+
+    response = _get_events(audit_token, type="all", intervalInHours=str(interval_hours), limit="50")
+    if _is_no_role_401(response):
+        pytest.skip("User lacks Tenant Auditor role — cannot verify interval window")
+    assert response.status_code == 200
+    events = response.json()["response"]
+    assert events, "expected >=1 event in the last 24h to verify the interval window"
+
+    out_of_window = [e["eventDate"] for e in events if not (earliest <= e["eventDate"] <= latest)]
+    assert not out_of_window, (
+        f"intervalInHours={interval_hours} returned {len(out_of_window)} events "
+        f"outside the rolling window: {out_of_window[:3]}"
+    )
+
+
+@pytest.mark.live
+def test_audit_limit_offset_paginates_disjoint_pages(audit_token):
+    """limit caps page size; offset advances; consecutive pages are disjoint.
+
+    Also confirms the paging cursors: page 1 exposes nextOffset/nextUrl, and
+    page 2 (offset > 0) exposes previousUrl.
+    """
+    page_size = 3
+    page0 = _get_events(
+        audit_token, type="all", intervalInHours="168", limit=str(page_size), offset="0"
+    )
+    paging0 = _paging_or_skip(page0)
+    records0 = page0.json()["response"]
+
+    assert len(records0) == page_size, f"limit not honored: got {len(records0)} records"
+    assert paging0["currentPageSize"] == page_size
+    assert paging0["offSet"] == 0
+    if paging0["totalSize"] > page_size:
+        assert paging0["nextOffset"] == page_size
+        assert "nextUrl" in paging0
+        assert "previousUrl" not in paging0, "first page should not expose previousUrl"
+
+    page1 = _get_events(
+        audit_token, type="all", intervalInHours="168", limit=str(page_size), offset=str(page_size)
+    )
+    assert page1.status_code == 200
+    paging1 = page1.json()["meta"]["paging"]
+    records1 = page1.json()["response"]
+
+    assert paging1["offSet"] == page_size
+    assert "previousUrl" in paging1, "second page should expose previousUrl"
+
+    ids0 = {e["id"] for e in records0}
+    ids1 = {e["id"] for e in records1}
+    assert ids0.isdisjoint(ids1), (
+        f"pages overlap — offset paging not advancing: {ids0 & ids1}"
+    )
+
+
+@pytest.mark.live
+def test_audit_limit_above_documented_max_is_accepted(audit_token):
+    """A limit above the documented 10000 cap is accepted, not enforced.
+
+    Confirmed discrepancy (live testing): the API description says the limit
+    "cannot exceed 10000", but the server honors larger limits and returns more
+    than 10000 records. The spec's hard `maximum` constraint was relaxed to match;
+    this test locks the observed behavior. Documented in audit/README.md.
+    """
+    over_limit = 10001
+    response = _get_events(
+        audit_token, type="all", intervalInHours="168", limit=str(over_limit)
+    )
+    paging = _paging_or_skip(response)
+
+    records = response.json()["response"]
+    assert paging["currentPageSize"] > 10000, (
+        f"expected the server to honor limit>10000, got currentPageSize="
+        f"{paging['currentPageSize']}"
+    )
+    assert len(records) > 10000, (
+        f"expected >10000 records for limit={over_limit}, got {len(records)}"
+    )
+
+
+@pytest.mark.live
+def test_audit_date_range_over_30_days_is_rejected(audit_token):
+    """A dateFrom/dateTo span wider than 30 days is rejected with 400.
+
+    Confirmed via live testing: the server caps the date range at 30 days and
+    returns 400 FAILURE_BAD_REQUEST. Documented in the spec and audit/README.md.
+    """
+    now = int(time.time() * 1000)
+    date_from = now - 31 * 24 * 3600 * 1000  # 31-day span exceeds the cap
+
+    response = _get_events(
+        audit_token, type="all", dateFrom=str(date_from), dateTo=str(now), limit="1"
+    )
+    if _is_no_role_401(response):
+        pytest.skip("User lacks Tenant Auditor role — cannot verify date-range cap")
+
+    assert response.status_code == 400, (
+        f"expected 400 for a >30-day range, got {response.status_code}: "
+        f"{response.text[:200]}"
+    )
+    assert "30 day" in response.text.lower(), (
+        f"expected a 30-day-cap message, got: {response.text[:200]}"
+    )

@@ -1076,16 +1076,23 @@ _skip_audit = _skip_if_missing("audit")
 
 @_skip_audit
 def test_audit_get_events_declares_type_param():
-    """GET /events must declare type query parameter with the three allowed enum values."""
+    """GET /events must declare the type query param with the confirmed enum values.
+
+    The enum was expanded beyond the original three after live testing confirmed
+    additional recognized values (issue #60); each maps to an eventTypeId prefix.
+    """
     spec = _load(_AUDIT_SPEC)
     params = _all_params(spec, "/events", "get")
     names = {p["name"] for p in params if "name" in p}
     assert "type" in names, "GET /events must declare type query parameter"
     p = next(p for p in params if p.get("name") == "type")
     assert p.get("in") == "query"
-    assert p.get("schema", {}).get("enum") == ["all", "byok", "user_activity"], (
-        "type enum must be ['all', 'byok', 'user_activity']"
-    )
+    enum = p.get("schema", {}).get("enum")
+    expected = {
+        "all", "user_activity", "access_control", "int", "conn_mgmt",
+        "comment", "byok", "plan_iq", "forecaster",
+    }
+    assert set(enum) == expected, f"type enum drifted from the confirmed set: {enum}"
 
 
 @_skip_audit
@@ -1098,8 +1105,13 @@ def test_audit_get_events_declares_paging_params():
         assert param in names, f"GET /events must declare {param!r} query parameter"
     limit_p = next(p for p in params if p.get("name") == "limit")
     assert limit_p.get("in") == "query"
-    assert limit_p.get("schema", {}).get("maximum") == 10000, (
-        "limit must declare maximum: 10000"
+    assert limit_p.get("schema", {}).get("type") == "integer"
+    # The documented 10000 cap is not enforced by the server (confirmed via live
+    # testing, issue #60), so the spec must not declare a hard maximum the API
+    # does not apply.
+    assert "maximum" not in limit_p.get("schema", {}), (
+        "limit must not declare a maximum — the documented 10000 cap is not "
+        "enforced server-side (issue #60)"
     )
 
 
