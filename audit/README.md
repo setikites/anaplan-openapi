@@ -7,9 +7,9 @@
 | Apiary docs | ✓ | https://auditservice.docs.apiary.io/ (identifier: `auditservice`) |
 | Local metadata | ✓ | `sources/audit/apiary-blueprint.json` — Apiary API metadata cached locally |
 | Postman collection | ✓ | Official Anaplan Collection — "Audit Service" folder (GET and POST variants for retrieving/searching audit events) |
-| Live testing | ✗ | Not yet performed |
+| Live testing | ✓ | Events path confirmed end-to-end (issues #58–#61) — see [Discovered Discrepancies](#discovered-discrepancies) |
 
-The Apiary blueprint is not publicly readable (anonymous access returns an empty blueprint). Resource groups ("Audit Events", "Examples") are present in the metadata but contain no endpoint definitions. Endpoints must be discovered via live testing or authenticated Apiary access.
+The Apiary blueprint is not publicly readable (anonymous access returns an empty blueprint), so the endpoints were discovered and confirmed via live testing against a tenant with the Tenant Auditor role. See the testing coverage and findings below.
 
 ## Purpose
 
@@ -17,67 +17,30 @@ The Audit API provides access to audit event logs from an Anaplan tenant. Intend
 
 ## Authentication
 
-The spec includes both standard Anaplan schemes as defaults — which one(s) the Audit API actually requires is unconfirmed pending live testing:
+Confirmed via live testing: requests authenticate with `Authorization: AnaplanAuthToken {token}`, where the token may be obtained from basic/certificate auth **or** an OAuth Authorization Code grant access token (Anaplan accepts an OAuth `access_token` under the same scheme). The account must hold the **Tenant Auditor** role — without it, `GET /events` returns `401 FAILURE_UNAUTHORIZED_USER_ACTION` (the token is accepted; the role is missing).
 
 | Scheme | Format |
 |--------|--------|
 | Anaplan Auth Token | `Authorization: AnaplanAuthToken {token}` |
-| Bearer Token | `Authorization: Bearer {token}` |
 
-## Base URL (Open Question)
+## Base URL
 
-Two conflicting sources have been identified — live testing is needed to determine which is correct:
+Confirmed via live testing: the Audit API is served from `https://audit.anaplan.com/audit/api/1` (a unique host, **not** the `api.anaplan.com` data-plane pattern used by Integration/ALM/SCIM). This matches the Apiary production URL.
 
-| Source | Base URL |
-|--------|----------|
-| Apiary production URL | `https://audit.anaplan.com/audit/api/1/` |
-| CONTEXT.md allowlist table | `https://{region}.api.anaplan.com` (same pattern as Integration, ALM, SCIM) |
+## Endpoints
 
-Both candidates are included in the spec's `servers[]` array. Remove the incorrect one and document the resolution here once confirmed via live testing.
-
-If the `api.anaplan.com` pattern applies, the full regional server table (matching SCIM/Integration) is:
-
-| Region | Description | Base URL |
-|--------|-------------|----------|
-| us1 | Data Center - US East | `https://api.anaplan.com` |
-| us2 | Data Center - US West | `https://api.anaplan.com` |
-| us5 | Cloud - US East | `https://api.anaplan.com` |
-| us7 | Cloud - US | `https://api.anaplan.com` |
-| us9 | Cloud - US | `https://us9.api.anaplan.com` |
-| eu1 | Data Center - Netherlands | `https://api.anaplan.com` |
-| eu2 | Data Center - Germany | `https://api.anaplan.com` |
-| eu3 | Cloud - Europe | `https://eu3.api.anaplan.com` |
-| eu4 | Cloud - Europe | `https://api.anaplan.com` |
-| eu5 | Cloud - Europe | `https://eu5.api.anaplan.com` |
-| gb1 | Cloud - UK | `https://gb1.api.anaplan.com` |
-| ap1 | Cloud - Japan | `https://api.anaplan.com` |
-| au1 | Cloud - Australia | `https://au1a.api2.anaplan.com` |
-| ca1 | Cloud - Canada | `https://ca1a.api.anaplan.com` |
-| sg1 | Cloud - Singapore | `https://sg1.api.anaplan.com` |
-| ae1 | Cloud - UAE | `https://ae1.api.anaplan.com` |
-| in1 | Cloud - India | `https://in1.api.anaplan.com` |
-| id1 | Cloud - Indonesia | `https://id1.api.anaplan.com` |
-| me1 | Cloud - Saudi Arabia | `https://me1.api.anaplan.com` |
-
-## Resource Groups
-
-The Apiary TOC lists two resource groups — "Audit Events" and "Examples" — but their endpoint definitions are not accessible without authenticated Apiary access. Known structural hints from the Apiary TOC:
-
-- Paging is supported (referenced in the "Getting Started" section)
-- The API follows standard HTTP verbs
-- Response formats are documented (likely JSON)
-
-Populate the endpoint table below as endpoints are discovered via live testing:
+Confirmed via live testing (the Apiary blueprint is not publicly readable):
 
 | Method | Path | Description |
 |--------|------|-------------|
-| — | — | Endpoints to be discovered via live testing |
+| GET | `/events` | Retrieve audit events. Supports `type` filtering, `dateFrom`/`dateTo` or `intervalInHours` (≤ 30 days), `limit`/`offset` paging, and JSON or CEF (`Accept: text/plain`) output. |
+| POST | `/events/search` | Retrieve audit events using a JSON request body for the time range (`from`/`to` or `interval`). |
 
 ## Spec Lifecycle
 
 Canonical lifecycle and confidence are in the [confidence table in CONTEXT.md](../CONTEXT.md#confidence-table).
 
-Note: the spec's paths are empty because the Apiary blueprint is not publicly readable — populate `audit/audit-openapi.json` by hand as endpoints are confirmed via live testing (`tests/test_audit_live.py`).
+The spec is **hand-maintained and live-tested** (`tests/test_audit_live.py`, issues #58–#61): the `/events` and `/events/search` paths were discovered and confirmed against the live API with a Tenant Auditor role. Do not rebuild from the bootstrap script.
 
 ## Discovered Discrepancies
 

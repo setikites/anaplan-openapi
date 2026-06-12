@@ -49,7 +49,7 @@ openapi-generator-cli generate -i integration/integration-openapi.json -g python
 | CloudWorks | [`cloudworks/`](cloudworks/) | [`cloudworks-openapi.json`](cloudworks/cloudworks-openapi.json) | Medium |
 | SCIM | [`scim/`](scim/) | [`scim-openapi.json`](scim/scim-openapi.json) | Medium |
 | ALM | [`alm/`](alm/) | [`alm-openapi.json`](alm/alm-openapi.json) | Medium |
-| Audit | [`audit/`](audit/) | [`audit-openapi.json`](audit/audit-openapi.json) | Medium |
+| Audit | [`audit/`](audit/) | [`audit-openapi.json`](audit/audit-openapi.json) | High — live-tested |
 | Financial Consolidation | [`financial-consolidation/`](financial-consolidation/) | [`financial-consolidation-openapi.json`](financial-consolidation/financial-consolidation-openapi.json) | Low |
 | Exception Users | [`exception/`](exception/) | [`exception-openapi.json`](exception/exception-openapi.json) | Low — live-tested auth |
 
