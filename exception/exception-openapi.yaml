@@ -5,9 +5,11 @@ info:
   description: |-
     Manage exception users — users who can bypass SSO enforcement — in Anaplan workspaces. Requires the Tenant Security Admin role.
 
-    Two authentication schemes are accepted:
-    - **AnaplanAuthToken** — token obtained via the Authentication API using username/password or CA certificate.
-    - **BearerAuth** — OAuth 2.0 service-to-service access token obtained via the client credentials grant (`grant_type=client_credentials`). A user authorization-code token is **not** accepted; the API specifically requires a service-to-service token.
+    Two authentication schemes are accepted (confirmed via live testing):
+    - **AnaplanAuthToken** — token obtained via the Authentication API (username/password or CA certificate), or an OAuth Authorization Code access token passed with the `AnaplanAuthToken` prefix.
+    - **AnaplanApiKey** — Anaplan API key (`AnaplanApiKey auk_<region>_<value>`).
+
+    Note: the `Bearer` prefix is rejected with `FAILURE_BAD_HEADER` even for valid OAuth tokens.
 servers:
 - url: https://api.anaplan.com/admin/1/0
   description: US1 (Data Center - US East), US2 (Data Center - US West), US5 (Cloud - US East), US7 (Cloud - US), EU1 (Data
@@ -37,7 +39,6 @@ servers:
 security:
 - AnaplanApiKey: []
 - AnaplanAuthToken: []
-- BearerAuth: []
 paths:
   /permissions/exception-users/users/{userGuid}:
     patch:
@@ -48,8 +49,8 @@ paths:
       parameters:
       - name: userGuid
         in: path
-        required: true
         description: GUID of the user whose exception-user status is being changed.
+        required: true
         schema:
           type: string
       requestBody:
@@ -185,15 +186,9 @@ components:
       type: apiKey
       in: header
       name: Authorization
-      description: 'Anaplan token authentication. Header value format: `AnaplanAuthToken <token>`. Obtain a token from the
-        Anaplan Authentication API using username/password or CA certificate.'
-    BearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
-      description: 'OAuth 2.0 service-to-service Bearer token. Must be obtained via the client credentials grant (`grant_type=client_credentials`)
-        against `https://us1a.app.anaplan.com/oauth/token`. Note: Bearer prefix is rejected for Anaplan API keys — use AnaplanApiKey
-        scheme instead.'
+      description: 'Anaplan token authentication. Header value format: `AnaplanAuthToken <token>`. Accepted tokens: Authentication
+        API token (username/password or CA certificate) or an OAuth Authorization Code access token. Note: the `Bearer` prefix
+        is rejected even for valid OAuth tokens — always use `AnaplanAuthToken`.'
   schemas:
     ExceptionUserPatchRequest:
       type: object
