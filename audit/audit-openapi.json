@@ -8,55 +8,7 @@
   "servers": [
     {
       "url": "https://audit.anaplan.com/audit/api/1",
-      "description": "Production — Apiary-confirmed base URL"
-    },
-    {
-      "url": "https://api.anaplan.com/audit/api/1",
-      "description": "US1, US2, US5, US7, EU1, EU2, EU4, AP1"
-    },
-    {
-      "url": "https://us9.api.anaplan.com/audit/api/1",
-      "description": "US9"
-    },
-    {
-      "url": "https://eu3.api.anaplan.com/audit/api/1",
-      "description": "EU3"
-    },
-    {
-      "url": "https://eu5.api.anaplan.com/audit/api/1",
-      "description": "EU5"
-    },
-    {
-      "url": "https://gb1.api.anaplan.com/audit/api/1",
-      "description": "GB1"
-    },
-    {
-      "url": "https://ca1a.api.anaplan.com/audit/api/1",
-      "description": "CA1"
-    },
-    {
-      "url": "https://sg1.api.anaplan.com/audit/api/1",
-      "description": "SG1"
-    },
-    {
-      "url": "https://ae1.api.anaplan.com/audit/api/1",
-      "description": "AE1"
-    },
-    {
-      "url": "https://in1.api.anaplan.com/audit/api/1",
-      "description": "IN1"
-    },
-    {
-      "url": "https://id1.api.anaplan.com/audit/api/1",
-      "description": "ID1"
-    },
-    {
-      "url": "https://me1.api.anaplan.com/audit/api/1",
-      "description": "ME1"
-    },
-    {
-      "url": "https://au1a.api2.anaplan.com/audit/api/1",
-      "description": "AU1"
+      "description": "Production base URL — Apiary-confirmed and live-tested. The Audit API is served only from this dedicated host; the regional api.anaplan.com data-plane hosts return 404 for /audit/api/1."
     }
   ],
   "paths": {
