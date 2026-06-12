@@ -376,55 +376,101 @@ def test_audit_post_search_response_shape(audit_token):
 
 # ── CEF format probe ──────────────────────────────────────────────────────────
 
-@pytest.mark.live
-def test_audit_get_events_cef_format_probe(audit_token):
-    """Probes whether Accept: text/plain returns CEF-format output from GET /events.
+# ── CEF (text/plain) output (issue #61) ───────────────────────────────────────
 
-    The spec documents a text/plain response media type for CEF output.
-    A 200 with a non-JSON body beginning with a timestamp or 'CEF:' confirms
-    the spec's text/plain content type declaration is accurate.
-    Skipped if caller lacks the Tenant Auditor role.
-    """
+def _get_cef(token, **params):
+    """GET /events with Accept: text/plain (CEF) and a role-enabled token."""
     with httpx.Client(timeout=_REQUEST_TIMEOUT) as client:
-        response = client.get(
+        return client.get(
             f"{AUDIT_BASE_URL}/events",
-            params={"intervalInHours": "1"},
+            params=params,
             headers={
-                "Authorization": f"AnaplanAuthToken {audit_token}",
+                "Authorization": f"AnaplanAuthToken {token}",
                 "Accept": "text/plain",
             },
         )
 
-    print(f"\nGET /events Accept: text/plain: {response.status_code}")
 
+@pytest.mark.live
+def test_audit_get_events_returns_cef_text_plain(audit_token):
+    """Accept: text/plain returns 200 CEF output — text/plain, non-JSON, CEF header.
+
+    Confirms the spec's text/plain media-type declaration against real output and
+    that a CEF line carries the event identity as key=value extension fields.
+    """
+    response = _get_cef(audit_token, type="all", intervalInHours="1")
     if _is_no_role_401(response):
         pytest.skip("User lacks Tenant Auditor role — cannot verify CEF output")
 
-    if response.status_code != 200:
-        warnings.warn(
-            f"GET /events with Accept: text/plain returned {response.status_code} "
-            "— CEF format may not be supported; verify text/plain in spec.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return
+    assert response.status_code == 200, (
+        f"expected 200 for Accept: text/plain, got {response.status_code}: "
+        f"{response.text[:200]}"
+    )
 
-    ct = response.headers.get("content-type", "")
-    body_text = response.text
-    if "text/plain" in ct or (body_text and not body_text.strip().startswith("{")):
-        warnings.warn(
-            "GET /events returned text/plain (CEF) output — "
-            "spec's text/plain content type declaration is confirmed.",
-            UserWarning,
-            stacklevel=2,
+    content_type = response.headers.get("content-type", "")
+    assert "text/plain" in content_type, (
+        f"expected text/plain content-type, got {content_type!r}"
+    )
+
+    body = response.text
+    assert not body.lstrip().startswith(("{", "[")), (
+        "expected non-JSON CEF output, but body looks like JSON"
+    )
+
+    lines = [ln for ln in body.splitlines() if ln.strip()]
+    assert lines, "expected >=1 CEF line in the last hour of events"
+
+    # Each line is: "<ISO-8601 timestamp>  CEF:0|Anaplan, Inc.||null|<eventTypeId>
+    # |<message>|<key=value extensions>". Find a representative CEF line.
+    cef_line = next((ln for ln in lines if "CEF:0|" in ln), None)
+    assert cef_line is not None, (
+        f"no CEF header found in text/plain output; first line: {lines[0][:200]!r}"
+    )
+    assert "CEF:0|Anaplan, Inc.|" in cef_line, (
+        f"unexpected CEF header vendor field: {cef_line[:120]!r}"
+    )
+    # The CEF extension carries the event identity as key=value pairs.
+    extension = cef_line.split("CEF:0|", 1)[1]
+    for key in ("id=", "userId="):
+        assert key in extension, (
+            f"CEF extension missing {key!r} field: {extension[:200]!r}"
         )
-    else:
-        warnings.warn(
-            f"GET /events with Accept: text/plain returned content-type {ct!r}; "
-            "body may be JSON rather than CEF — verify text/plain response in spec.",
-            UserWarning,
-            stacklevel=2,
-        )
+
+
+@pytest.mark.live
+def test_audit_cef_output_is_not_paginated(audit_token):
+    """CEF (text/plain) output ignores limit and returns the full result set.
+
+    Confirmed discrepancy (live testing): unlike the JSON envelope, the text/plain
+    response is not paged — it returns every matching event as CEF lines regardless
+    of limit, and carries no meta/paging block. Uses the low-volume `conn_mgmt`
+    type so the full CEF body stays small and deterministic. Documented in
+    audit/README.md and the spec's text/plain media-type description.
+    """
+    page_size = 5
+    cef = _get_cef(audit_token, type="conn_mgmt", limit=str(page_size))
+    if _is_no_role_401(cef):
+        pytest.skip("User lacks Tenant Auditor role — cannot verify CEF paging")
+    assert cef.status_code == 200
+    cef_lines = len([ln for ln in cef.text.splitlines() if ln.strip()])
+
+    json_resp = _get_events(audit_token, type="conn_mgmt", limit=str(page_size))
+    records = json_resp.json()["response"]
+    json_total = json_resp.json()["meta"]["paging"]["totalSize"]
+
+    if json_total <= page_size:
+        pytest.skip("Too few conn_mgmt events to demonstrate CEF non-paging")
+
+    # JSON honors the limit; CEF ignores it and returns the whole set.
+    assert len(records) == page_size, "JSON envelope should honor the limit"
+    assert cef_lines > page_size, (
+        f"CEF appears limited to {cef_lines} line(s) despite {json_total} matching "
+        f"events — expected the full (unpaginated) set"
+    )
+    assert cef_lines >= json_total * 0.8, (
+        f"CEF returned {cef_lines} lines but ~{json_total} events match; expected "
+        "the full set, not a paged subset"
+    )
 
 
 # ── Event record contract (issue #59) ─────────────────────────────────────────
@@ -762,4 +808,49 @@ def test_audit_date_range_over_30_days_is_rejected(audit_token):
     )
     assert "30 day" in response.text.lower(), (
         f"expected a 30-day-cap message, got: {response.text[:200]}"
+    )
+
+
+@pytest.mark.live
+def test_audit_interval_hours_over_30_days_is_rejected(audit_token):
+    """intervalInHours above 720 (30 days) is rejected with the same 30-day cap.
+
+    The 30-day range cap applies to the rolling window too (confirmed: 720 is
+    accepted, 744 returns 400). Documented in the spec and audit/README.md.
+    """
+    response = _get_events(audit_token, type="all", intervalInHours="744", limit="1")
+    if _is_no_role_401(response):
+        pytest.skip("User lacks Tenant Auditor role — cannot verify interval cap")
+
+    assert response.status_code == 400, (
+        f"expected 400 for intervalInHours>720, got {response.status_code}: "
+        f"{response.text[:200]}"
+    )
+    assert "30 day" in response.text.lower(), (
+        f"expected a 30-day-cap message, got: {response.text[:200]}"
+    )
+
+
+@pytest.mark.live
+def test_audit_no_date_filter_defaults_to_30_day_window(audit_token):
+    """With no date filter, the server returns the previous 30 days, not all history.
+
+    Confirmed via live testing: an otherwise-unfiltered request is implicitly
+    bounded to the last 30 days. Uses the low-volume `conn_mgmt` type so the full
+    set is small. Documented in the spec and audit/README.md.
+    """
+    now = int(time.time() * 1000)
+    response = _get_events(audit_token, type="conn_mgmt", limit="10000")  # no date filter
+    if _is_no_role_401(response):
+        pytest.skip("User lacks Tenant Auditor role — cannot verify default window")
+    assert response.status_code == 200
+    events = response.json()["response"]
+    if not events:
+        pytest.skip("No conn_mgmt events to verify the default window")
+
+    oldest = min(e["eventDate"] for e in events)
+    # The default window is the previous 30 days; allow a day of slack.
+    assert oldest >= now - 31 * 24 * 3600 * 1000, (
+        f"oldest unfiltered event is {(now - oldest) / 86400000:.1f} days old — "
+        "expected the default window to bound results to ~30 days"
     )

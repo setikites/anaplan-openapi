@@ -63,7 +63,7 @@
     "/events": {
       "get": {
         "summary": "Retrieve audit events",
-        "description": "Retrieves audit events for the tenant associated with the authenticated user. Use `type` to filter by event category. Use `dateFrom`/`dateTo` for a specific date range, or `intervalInHours` for a rolling window. Use `limit` and `offset` for pagination (the documented limit cap of 10000 is not enforced server-side — see the `limit` parameter).\n\nSet `Accept: text/plain` to receive results in Common Event Format (CEF). Default is `application/json`.",
+        "description": "Retrieves audit events for the tenant associated with the authenticated user. Use `type` to filter by event category. Use `dateFrom`/`dateTo` for a specific date range, or `intervalInHours` for a rolling window; the queried range cannot exceed 30 days. If no date filter is supplied, the previous 30 days are returned. Use `limit` and `offset` for pagination (the documented limit cap of 10000 is not enforced server-side — see the `limit` parameter).\n\nSet `Accept: text/plain` to receive results in Common Event Format (CEF). Default is `application/json`.",
         "operationId": "getAuditEvents",
         "tags": ["Audit Events"],
         "parameters": [
@@ -95,9 +95,10 @@
           {
             "name": "intervalInHours",
             "in": "query",
-            "description": "Return events from the previous N hours. For example, `2` returns the last two hours of events.",
+            "description": "Return events from the previous N hours. For example, `2` returns the last two hours of events. Bound by the same 30-day cap as the date range: a value above `720` (30 days) returns 400 `FAILURE_BAD_REQUEST`.",
             "schema": {
-              "type": "integer"
+              "type": "integer",
+              "maximum": 720
             }
           },
           {
@@ -133,7 +134,7 @@
               "text/plain": {
                 "schema": {
                   "type": "string",
-                  "description": "Audit events in Common Event Format (CEF)."
+                  "description": "Audit events in Common Event Format (CEF), one event per line. Each line has the form `<ISO-8601 timestamp>  CEF:0|Anaplan, Inc.||null|<eventTypeId>|<message>|<key=value extensions>`, where the extension carries the event fields (`id`, `userId`, `tenantId`, `success`, `additionalAttributes`, ...). Unlike the JSON response, the CEF output is not paginated: it returns every event in the requested window, ignores `limit`/`offset`, and has no `meta`/paging block."
                 }
               }
             }
@@ -193,7 +194,7 @@
               "text/plain": {
                 "schema": {
                   "type": "string",
-                  "description": "Audit events in Common Event Format (CEF)."
+                  "description": "Audit events in Common Event Format (CEF), one event per line. Each line has the form `<ISO-8601 timestamp>  CEF:0|Anaplan, Inc.||null|<eventTypeId>|<message>|<key=value extensions>`, where the extension carries the event fields (`id`, `userId`, `tenantId`, `success`, `additionalAttributes`, ...). Unlike the JSON response, the CEF output is not paginated: it returns every event in the requested window, ignores `limit`/`offset`, and has no `meta`/paging block."
                 }
               }
             }

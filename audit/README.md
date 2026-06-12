@@ -143,8 +143,14 @@ Confirmed against real, multi-record data with a role-enabled token:
 - **Date range** — `dateFrom`/`dateTo` (Unix-ms) constrain results to the window
   (verified: every returned event's `eventDate` falls within range). The
   `intervalInHours` rolling window likewise returns only events from the previous
-  N hours. **The `dateFrom`/`dateTo` span cannot exceed 30 days** — a wider range
-  returns `400 FAILURE_BAD_REQUEST` (`"Date range cannot exceed 30 days"`).
+  N hours. **The queried range cannot exceed 30 days** — a wider span returns
+  `400 FAILURE_BAD_REQUEST` (`"Date range cannot exceed 30 days"`). This cap
+  applies to both forms: `dateFrom`/`dateTo` more than 30 days apart, and
+  `intervalInHours` above `720` (30 days), are both rejected.
+- **Default window** — if no date filter (`dateFrom`/`dateTo` or `intervalInHours`)
+  is supplied, the server returns the **previous 30 days** (confirmed: the
+  `meta.paging.nextUrl` of an otherwise-unfiltered request carries an
+  auto-populated `dateFrom`/`dateTo` spanning exactly 30 days).
 - **Pagination** — `limit` caps the page size (`meta.paging.currentPageSize`
   matches), `offset` advances cleanly (consecutive pages are disjoint). `meta.paging`
   exposes `nextOffset`/`nextUrl` when more results exist, and **`previousUrl`** once
@@ -156,3 +162,26 @@ Confirmed against real, multi-record data with a role-enabled token:
 
 All of the above are asserted by `tests/test_audit_live.py` when a role-enabled
 token is present.
+
+### `GET /events` CEF (text/plain) output (live testing 2026-06-12, issue #61)
+
+`GET /events` with `Accept: text/plain` returns `200` with `Content-Type: text/plain`
+and a non-JSON body in Common Event Format (CEF), one event per line. The spec's
+`text/plain` media-type declaration is confirmed accurate.
+
+Representative line (IDs / IP redacted):
+
+```
+2026-06-12T07:35:27.000Z  CEF:0|Anaplan, Inc.||null|USR-8|User login success|id=2598676438 userId=<user-guid> tenantId=<tenant-guid> eventTimeZone=UTC createdDate=1781249727000 createdTimeZone=UTC success=true objectId=<object-guid> additionalAttributes={"clientName":"<client>"} ipAddress=<ip> userAgent=Mozilla/5.0 (...)
+```
+
+Line structure: a leading ISO-8601 timestamp, two spaces, then the CEF header
+`CEF:0|Anaplan, Inc.||null|<eventTypeId>|<message>|` followed by the event fields
+as `key=value` extension pairs. (Note: Anaplan's CEF omits the standard CEF
+severity field — the extension follows directly after the name/message.)
+
+- **CEF output is not paginated** — unlike the JSON envelope, the `text/plain`
+  response ignores `limit`/`offset` and returns **every** matching event (confirmed
+  with `type=conn_mgmt`: `limit=5`, `limit=50`, and no limit all returned the same
+  211 CEF lines, while JSON `limit=5` returned 5 records out of `totalSize=211`).
+  There is no `meta`/paging block. Documented on the spec's `text/plain` media type.
