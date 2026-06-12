@@ -4,8 +4,9 @@ Live API integration tests for the Anaplan Exception Users API.
 Verifies the contract for POST /permissions/exception-users/search and
 PATCH /permissions/exception-users/users/{userGuid} against the real API.
 
-Authentication uses the OAuth Authorization Code grant — the account must
-hold the Tenant Security Admin role. Authenticate interactively before running:
+Authentication uses the OAuth Authorization Code grant with the AnaplanAuthToken
+scheme — the account must hold the Tenant Security Admin role. Authenticate
+interactively before running:
 
     uv run python scripts/oauth/oauth_authcode.py
 
@@ -44,8 +45,8 @@ def _get_oauth_access_token() -> str | None:
     """Return the access_token from the OAuth token blob in the keyring, if any.
 
     The Authorization Code grant helper stores the full token response under
-    ANAPLAN_OAUTH_KEYRING_SERVICE. Anaplan accepts an OAuth access_token under
-    the AnaplanAuthToken Authorization scheme.
+    ANAPLAN_OAUTH_KEYRING_SERVICE. The Exception Users API accepts OAuth tokens
+    under the AnaplanAuthToken scheme (Bearer is rejected with FAILURE_BAD_HEADER).
     """
     service = os.getenv("ANAPLAN_OAUTH_KEYRING_SERVICE", "anaplan-oauth-authcode")
     blob = load_token(service)
@@ -80,23 +81,25 @@ def exception_token():
 # ── Tracer bullet ─────────────────────────────────────────────────────────────
 
 @pytest.mark.live
-def test_exception_users_bearer_accepted(exception_token):
-    """Bearer (OAuth access token) is accepted by the Exception Users search endpoint.
+def test_exception_users_anaplan_auth_token_accepted(exception_token):
+    """AnaplanAuthToken (OAuth access token) is accepted by the Exception Users search endpoint.
 
-    A 400 (bad GUID format) or 200 confirms the token was recognised; a 401
-    means BearerAuth is not valid for this endpoint and the spec needs updating.
+    A non-401, non-FAILURE_BAD_HEADER response confirms the token was recognised.
+    Live testing confirmed Bearer is rejected (FAILURE_BAD_HEADER); AnaplanAuthToken
+    returns 404 (auth accepted, resource not found for the dummy GUID).
     """
     with httpx.Client() as client:
         response = client.post(
             SEARCH_URL,
-            headers={"Authorization": f"Bearer {exception_token}"},
+            headers={"Authorization": f"AnaplanAuthToken {exception_token}"},
             json={"workspaceGuid": "00000000000000000000000000000000"},
         )
 
     status = response.status_code
-    print(f"\nPOST /search with Bearer (OAuth): {status} — {response.text[:200]}")
-    assert status != 401, (
-        f"Bearer token rejected (401); BearerAuth not valid for this endpoint"
+    print(f"\nPOST /search with AnaplanAuthToken (OAuth): {status} — {response.text[:200]}")
+    assert status != 401, "AnaplanAuthToken rejected (401)"
+    assert "FAILURE_BAD_HEADER" not in response.text, (
+        f"AnaplanAuthToken rejected (FAILURE_BAD_HEADER): {response.text}"
     )
 
 
@@ -117,7 +120,7 @@ def test_exception_search_by_workspace_returns_response_array(exception_token):
     with httpx.Client() as client:
         response = client.post(
             SEARCH_URL,
-            headers={"Authorization": f"Bearer {exception_token}"},
+            headers={"Authorization": f"AnaplanAuthToken {exception_token}"},
             json={"workspaceGuid": workspace_guid},
         )
 
@@ -154,7 +157,7 @@ def test_exception_search_by_user_returns_response_array(exception_token):
     with httpx.Client() as client:
         response = client.post(
             SEARCH_URL,
-            headers={"Authorization": f"Bearer {exception_token}"},
+            headers={"Authorization": f"AnaplanAuthToken {exception_token}"},
             json={"userGuid": user_guid},
         )
 
@@ -191,7 +194,7 @@ def test_exception_patch_invalid_op_returns_400(exception_token):
     with httpx.Client() as client:
         response = client.patch(
             patch_url,
-            headers={"Authorization": f"Bearer {exception_token}"},
+            headers={"Authorization": f"AnaplanAuthToken {exception_token}"},
             json={"op": "invalid_op", "workspaceGuid": workspace_guid},
         )
 
@@ -201,36 +204,37 @@ def test_exception_patch_invalid_op_returns_400(exception_token):
     )
 
 
-# ── Probe: AnaplanAuthToken scheme ───────────────────────────────────────────
+# ── Probe: Bearer scheme ─────────────────────────────────────────────────────
 
 @pytest.mark.live
-def test_exception_users_anaplan_auth_token_scheme_probe(exception_token):
-    """Probes whether the OAuth access token is also accepted with the AnaplanAuthToken prefix.
+def test_exception_users_bearer_scheme_probe(exception_token):
+    """Confirms that Bearer is NOT accepted by the Exception Users API.
 
-    The spec declares AnaplanAuthToken. If 400 (bad GUID) or 200 is returned,
-    the scheme is valid for this endpoint. A 401 means only Bearer is accepted.
+    Live testing showed Bearer returns FAILURE_BAD_HEADER (400). This probe
+    documents that finding — if the status changes to non-400 or the body no
+    longer contains FAILURE_BAD_HEADER, update the spec to add BearerAuth.
     """
     with httpx.Client() as client:
         response = client.post(
             SEARCH_URL,
-            headers={"Authorization": f"AnaplanAuthToken {exception_token}"},
+            headers={"Authorization": f"Bearer {exception_token}"},
             json={"workspaceGuid": "00000000000000000000000000000000"},
         )
 
     status = response.status_code
-    print(f"\nPOST /search AnaplanAuthToken probe: {status} — {response.text[:200]}")
+    print(f"\nPOST /search Bearer probe: {status} — {response.text[:200]}")
 
-    if status != 401:
+    if "FAILURE_BAD_HEADER" in response.text or status == 401:
         warnings.warn(
-            f"AnaplanAuthToken accepted OAuth token on POST /search (status {status}) — "
-            "AnaplanAuthToken scheme is confirmed valid for this endpoint.",
+            f"Bearer rejected on POST /search (status {status}, FAILURE_BAD_HEADER) — "
+            "BearerAuth correctly absent from the spec.",
             UserWarning,
             stacklevel=2,
         )
     else:
         warnings.warn(
-            "AnaplanAuthToken rejected OAuth token on POST /search (401) — "
-            "remove AnaplanAuthToken from the spec; Bearer is the correct scheme.",
+            f"Bearer accepted on POST /search (status {status}) — "
+            "add BearerAuth to the spec's security schemes.",
             UserWarning,
             stacklevel=2,
         )
