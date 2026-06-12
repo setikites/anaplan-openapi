@@ -76,13 +76,11 @@ uv run --env-file .env pytest tests/test_integration_live.py --live --allow-writ
 
 The Authorization Code and Device grants need a browser step that cannot be
 automated. The helper scripts in `scripts/oauth/` walk through them
-interactively. Run them from the repo root (they read `.env`; step 1 writes a
-short-lived `.auth_code` to the working directory — git-ignored):
+interactively. Run them from the repo root (they read `.env`):
 
 ```sh
-uv run python scripts/oauth/oauth_authcode_step1.py   # print auth URL, capture redirect code
-uv run python scripts/oauth/oauth_authcode_step2.py   # exchange code for tokens, store in keyring
-uv run python scripts/oauth/oauth_authcode_step3.py   # refresh the stored token (rotates it in keyring)
+uv run python scripts/oauth/oauth_authcode.py         # print auth URL, capture code, exchange + store in keyring
+uv run python scripts/oauth/oauth_authcode_refresh.py # refresh the stored token (rotates it in keyring)
 uv run python scripts/oauth/oauth_device_step1.py     # request device + user code
 uv run python scripts/oauth/oauth_device_step2.py     # poll for approval
 ```
@@ -97,13 +95,13 @@ repeatable:
 1. **One-time setup**: assign the Tenant Auditor role to the test account in
    Anaplan Administration, and register an Authorization Code grant OAuth client
    (`ANAPLAN_OAUTH_AUTHCODE_CLIENT_ID` / `_SECRET` in `.env`).
-2. Run `oauth_authcode_step1.py` and approve in the browser; paste the redirect
-   URL back when prompted.
-3. Run `oauth_authcode_step2.py`. The full token response is stored in the OS
-   keyring (Windows Credential Manager / macOS Keychain / Secret Service) under
-   `ANAPLAN_OAUTH_KEYRING_SERVICE`. The JWT blob is chunked across multiple
-   keyring entries because backends cap a single secret at ~2.5 KB.
-4. Run the audit live tests. With a token in the keyring they use its
+2. Run `oauth_authcode.py`, approve in the browser, and paste the redirect URL
+   back when prompted. The script exchanges the code and stores the full token
+   response in the OS keyring (Windows Credential Manager / macOS Keychain /
+   Secret Service) under `ANAPLAN_OAUTH_KEYRING_SERVICE`. The JWT blob is chunked
+   across multiple keyring entries because backends cap a single secret at
+   ~2.5 KB.
+3. Run the audit live tests. With a token in the keyring they use its
    `access_token` as the bearer automatically — no per-run code changes:
 
    ```sh
@@ -112,7 +110,7 @@ repeatable:
 
    `GET /events` should return `200` (not `401 FAILURE_UNAUTHORIZED_USER_ACTION`),
    confirming both the role and the OAuth path end-to-end.
-5. When the access token expires (~35 min), run `oauth_authcode_step3.py` to
+4. When the access token expires (~35 min), run `oauth_authcode_refresh.py` to
    refresh it in place; no browser step is needed until the refresh token
    itself expires.
 

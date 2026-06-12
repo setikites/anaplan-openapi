@@ -26,7 +26,7 @@ Optional variables:
     ANAPLAN_OAUTH_KEYRING_SERVICE - keyring service holding an OAuth token blob from
                                     the Authorization Code grant (default:
                                     anaplan-oauth-authcode). When a token is stored
-                                    there (via scripts/oauth/oauth_authcode_step2.py),
+                                    there (via scripts/oauth/oauth_authcode.py),
                                     its access_token is used as the bearer instead of
                                     basic auth — required to exercise the Tenant
                                     Auditor role over the OAuth path (issue #58).

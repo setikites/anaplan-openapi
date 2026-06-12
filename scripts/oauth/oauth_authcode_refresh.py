@@ -1,9 +1,9 @@
-"""Step 2: Exchange the authorization code for tokens and store them in the OS keyring.
+"""Refresh the Authorization Code grant access token using the stored refresh token.
 
-The full token response (access_token, refresh_token, id_token, ...) is stored as
-one JSON blob in the operating system credential store via ``token_keyring``,
-chunked to fit backend size limits. The keyring service name is read from
-ANAPLAN_OAUTH_KEYRING_SERVICE in .env (default: anaplan-oauth-authcode).
+Reads the token blob from the OS keyring (service from ANAPLAN_OAUTH_KEYRING_SERVICE,
+default anaplan-oauth-authcode), refreshes it, and stores the rotated token back.
+
+    uv run python scripts/oauth/oauth_authcode_refresh.py
 """
 import json
 import os
@@ -13,7 +13,7 @@ import sys
 import httpx
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from token_keyring import store_token
+from token_keyring import load_token, store_token
 
 
 def _load_env():
@@ -31,17 +31,21 @@ def _load_env():
 _load_env()
 service = os.getenv("ANAPLAN_OAUTH_KEYRING_SERVICE", "anaplan-oauth-authcode")
 
-with open(".auth_code") as f:
-    saved = json.load(f)
+stored = load_token(service)
+if not stored:
+    print(f"No token found in keyring under service '{service}'.")
+    print("Run oauth_authcode.py first to obtain a token.")
+    raise SystemExit(1)
+
+saved = json.loads(stored)
 
 r = httpx.post(
     "https://us1a.app.anaplan.com/oauth/token",
     json={
-        "grant_type": "authorization_code",
-        "code": saved["code"],
+        "grant_type": "refresh_token",
         "client_id": saved["client_id"],
         "client_secret": saved["client_secret"],
-        "redirect_uri": saved["redirect_uri"],
+        "refresh_token": saved["refresh_token"],
     },
 )
 
@@ -53,5 +57,4 @@ if r.status_code == 200:
     token_blob = {**saved, **body}
     store_token(service, json.dumps(token_blob))
     print()
-    print(f"Token stored in OS keyring under service '{service}'.")
-    print("Run next: uv run python scripts/oauth/oauth_authcode_step3.py")
+    print(f"Refreshed token stored in OS keyring under service '{service}'.")
