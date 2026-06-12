@@ -88,6 +88,14 @@ paths:
                   carries the event fields (`id`, `userId`, `tenantId`, `success`, `additionalAttributes`, ...). Unlike the
                   JSON response, the CEF output is not paginated: it returns every event in the requested window, ignores
                   `limit`/`offset`, and has no `meta`/paging block.'
+        '400':
+          description: Bad request — the query parameters or request body are invalid. For example, a queried date range longer
+            than 30 days (`dateFrom`/`dateTo`, or `intervalInHours`/`interval` above 720 hours) returns `status` `FAILURE_BAD_REQUEST`
+            with message `Date range cannot exceed 30 days`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditErrorResponse'
         '401':
           description: Authentication failed, or the authenticated user is not authorized. The Audit API returns 401 (not
             403) when the user lacks the Tenant Auditor role — check `status` in the response body to distinguish an invalid
@@ -147,6 +155,14 @@ paths:
                   carries the event fields (`id`, `userId`, `tenantId`, `success`, `additionalAttributes`, ...). Unlike the
                   JSON response, the CEF output is not paginated: it returns every event in the requested window, ignores
                   `limit`/`offset`, and has no `meta`/paging block.'
+        '400':
+          description: Bad request — the query parameters or request body are invalid. For example, a queried date range longer
+            than 30 days (`dateFrom`/`dateTo`, or `intervalInHours`/`interval` above 720 hours) returns `status` `FAILURE_BAD_REQUEST`
+            with message `Date range cannot exceed 30 days`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditErrorResponse'
         '401':
           description: Authentication failed, or the authenticated user is not authorized. The Audit API returns 401 (not
             403) when the user lacks the Tenant Auditor role — check `status` in the response body to distinguish an invalid

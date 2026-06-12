@@ -91,6 +91,16 @@
               }
             }
           },
+          "400": {
+            "description": "Bad request — the query parameters or request body are invalid. For example, a queried date range longer than 30 days (`dateFrom`/`dateTo`, or `intervalInHours`/`interval` above 720 hours) returns `status` `FAILURE_BAD_REQUEST` with message `Date range cannot exceed 30 days`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditErrorResponse"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Authentication failed, or the authenticated user is not authorized. The Audit API returns 401 (not 403) when the user lacks the Tenant Auditor role — check `status` in the response body to distinguish an invalid token from a missing role.",
             "content": {
@@ -147,6 +157,16 @@
                 "schema": {
                   "type": "string",
                   "description": "Audit events in Common Event Format (CEF), one event per line. Each line has the form `<ISO-8601 timestamp>  CEF:0|Anaplan, Inc.||null|<eventTypeId>|<message>|<key=value extensions>`, where the extension carries the event fields (`id`, `userId`, `tenantId`, `success`, `additionalAttributes`, ...). Unlike the JSON response, the CEF output is not paginated: it returns every event in the requested window, ignores `limit`/`offset`, and has no `meta`/paging block."
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request — the query parameters or request body are invalid. For example, a queried date range longer than 30 days (`dateFrom`/`dateTo`, or `intervalInHours`/`interval` above 720 hours) returns `status` `FAILURE_BAD_REQUEST` with message `Date range cannot exceed 30 days`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditErrorResponse"
                 }
               }
             }
