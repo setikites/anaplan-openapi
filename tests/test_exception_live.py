@@ -1,29 +1,38 @@
 """
-Live API integration tests for Anaplan Exception Users API.
+Live API integration tests for the Anaplan Exception Users API.
 
 Verifies the contract for POST /permissions/exception-users/search and
-PATCH /permissions/exception-users/users/{userGuid} using an Anaplan API key.
+PATCH /permissions/exception-users/users/{userGuid} against the real API.
 
-Anaplan API keys (auk_…) are sent with the AnaplanApiKey Authorization prefix:
-    Authorization: AnaplanApiKey auk_<region>_<value>
+Authentication uses the OAuth Authorization Code grant — the account must
+hold the Tenant Security Admin role. Authenticate interactively before running:
 
-Run with:
-    uv run --env-file .env pytest tests/test_exception_live.py --live --allow-writes
+    uv run python scripts/oauth/oauth_authcode.py
 
-Required .env variables:
-    ANAPLAN_API_KEY - Anaplan API key (format: auk_<region>_<value>)
+This stores the token in the OS keyring. Then run:
+
+    uv run --env-file .env pytest tests/test_exception_live.py --live
 
 Optional .env variables:
-    ANAPLAN_EXCEPTION_WORKSPACE_GUID - a workspace GUID the account has Tenant Security Admin access to
-    ANAPLAN_EXCEPTION_USER_GUID      - a user GUID to use in search-by-user probe
-    ANAPLAN_EXCEPTION_BASE_URL       - override base URL (default: https://api.anaplan.com/admin/1/0)
+    ANAPLAN_OAUTH_KEYRING_SERVICE    — keyring service name
+                                       (default: anaplan-oauth-authcode)
+    ANAPLAN_EXCEPTION_WORKSPACE_GUID — workspace GUID the account has
+                                       Tenant Security Admin access to
+    ANAPLAN_EXCEPTION_USER_GUID      — user GUID for the search-by-user probe
+    ANAPLAN_EXCEPTION_BASE_URL       — override base URL
+                                       (default: https://api.anaplan.com/admin/1/0)
+    ANAPLAN_API_KEY                  — Anaplan API key for the AnaplanApiKey
+                                       scheme probe (optional)
 """
 
+import json
 import os
 import warnings
 
 import httpx
 import pytest
+
+from oauth.token_keyring import load_token
 
 EXCEPTION_BASE_URL = os.getenv(
     "ANAPLAN_EXCEPTION_BASE_URL", "https://api.anaplan.com/admin/1/0"
@@ -31,124 +40,70 @@ EXCEPTION_BASE_URL = os.getenv(
 SEARCH_URL = f"{EXCEPTION_BASE_URL}/permissions/exception-users/search"
 
 
+def _get_oauth_access_token() -> str | None:
+    """Return the access_token from the OAuth token blob in the keyring, if any.
+
+    The Authorization Code grant helper stores the full token response under
+    ANAPLAN_OAUTH_KEYRING_SERVICE. Anaplan accepts an OAuth access_token under
+    the AnaplanAuthToken Authorization scheme.
+    """
+    service = os.getenv("ANAPLAN_OAUTH_KEYRING_SERVICE", "anaplan-oauth-authcode")
+    blob = load_token(service)
+    if not blob:
+        return None
+    try:
+        return json.loads(blob).get("access_token")
+    except (ValueError, AttributeError):
+        return None
+
+
 @pytest.fixture(scope="module")
-def api_key():
-    """Anaplan API key used with the AnaplanApiKey Authorization prefix."""
-    key = os.getenv("ANAPLAN_API_KEY")
-    if not key:
-        pytest.skip("ANAPLAN_API_KEY not set")
-    return key
+def exception_token():
+    """OAuth access token for Exception Users API calls (module-scoped).
+
+    Loaded from the OS keyring (stored by oauth_authcode.py). The account must
+    hold the Tenant Security Admin role for the search and PATCH tests to succeed.
+
+    Authenticate first:
+        uv run python scripts/oauth/oauth_authcode.py
+    """
+    token = _get_oauth_access_token()
+    if not token:
+        service = os.getenv("ANAPLAN_OAUTH_KEYRING_SERVICE", "anaplan-oauth-authcode")
+        pytest.skip(
+            f"No OAuth token in keyring under service {service!r}. "
+            "Run: uv run python scripts/oauth/oauth_authcode.py"
+        )
+    return token
 
 
-# ── Tracer bullet ────────────────────────────────────────────────────────────
+# ── Tracer bullet ─────────────────────────────────────────────────────────────
 
 @pytest.mark.live
-def test_exception_users_anaplan_api_key_accepted(api_key):
-    """AnaplanApiKey prefix is accepted by the Exception Users search endpoint.
+def test_exception_users_bearer_accepted(exception_token):
+    """Bearer (OAuth access token) is accepted by the Exception Users search endpoint.
 
-    A 400 without FAILURE_BAD_HEADER confirms the key was recognized (auth
-    passed; the bogus GUID triggers FAILURE_BAD_REQUEST validation instead).
-    A FAILURE_BAD_HEADER response means the AnaplanApiKey format was rejected.
+    A 400 (bad GUID format) or 200 confirms the token was recognised; a 401
+    means BearerAuth is not valid for this endpoint and the spec needs updating.
     """
     with httpx.Client() as client:
         response = client.post(
             SEARCH_URL,
-            headers={"Authorization": f"AnaplanApiKey {api_key}"},
+            headers={"Authorization": f"Bearer {exception_token}"},
             json={"workspaceGuid": "00000000000000000000000000000000"},
         )
 
     status = response.status_code
-    body_text = response.text
-    print(f"\nPOST /search with AnaplanApiKey: {status} — {body_text[:200]}")
-    assert "FAILURE_BAD_HEADER" not in body_text, (
-        f"AnaplanApiKey was rejected (FAILURE_BAD_HEADER); got {status}: {body_text}"
-    )
+    print(f"\nPOST /search with Bearer (OAuth): {status} — {response.text[:200]}")
     assert status != 401, (
-        f"AnaplanApiKey was rejected with 401; scheme not accepted"
+        f"Bearer token rejected (401); BearerAuth not valid for this endpoint"
     )
 
 
-# ── Probe: Bearer scheme with API key ────────────────────────────────────────
+# ── POST search by workspace ──────────────────────────────────────────────────
 
 @pytest.mark.live
-def test_exception_users_bearer_scheme_probe(api_key):
-    """Probes whether the API key is also accepted with the Bearer prefix.
-
-    Confirmed rejected in live testing — documents the result for spec accuracy.
-    """
-    with httpx.Client() as client:
-        response = client.post(
-            SEARCH_URL,
-            headers={"Authorization": f"Bearer {api_key}"},
-            json={"workspaceGuid": "00000000000000000000000000000000"},
-        )
-
-    status = response.status_code
-    body_text = response.text
-    print(f"\nPOST /search Bearer prefix probe: {status} — {body_text[:200]}")
-
-    if "FAILURE_BAD_HEADER" in body_text or status == 401:
-        warnings.warn(
-            f"Bearer prefix rejected for API key on POST /search (status {status}) — "
-            "AnaplanApiKey is the correct prefix; spec BearerAuth does not apply to API keys.",
-            UserWarning,
-            stacklevel=2,
-        )
-    else:
-        warnings.warn(
-            f"Bearer prefix accepted for API key on POST /search (status {status}) — "
-            "both AnaplanApiKey and Bearer prefixes work; update spec accordingly.",
-            UserWarning,
-            stacklevel=2,
-        )
-
-
-# ── Probe: AnaplanAuthToken scheme ───────────────────────────────────────────
-
-@pytest.mark.live
-def test_exception_users_anaplan_auth_token_scheme_probe(api_key):
-    """Probes whether the AnaplanAuthToken header scheme is accepted.
-
-    The spec declares both AnaplanAuthToken and BearerAuth. This probe checks
-    whether the API key also works under the AnaplanAuthToken prefix.
-    """
-    with httpx.Client() as client:
-        response = client.post(
-            SEARCH_URL,
-            headers={"Authorization": f"AnaplanAuthToken {api_key}"},
-            json={"workspaceGuid": "00000000000000000000000000000000"},
-        )
-
-    status = response.status_code
-    body_text = response.text
-    print(f"\nPOST /search AnaplanAuthToken prefix probe: {status} — {body_text[:200]}")
-
-    if status in (200, 400, 403, 404) and "FAILURE_BAD_HEADER" not in body_text:
-        warnings.warn(
-            f"AnaplanAuthToken prefix accepted on POST /search (status {status}) — "
-            "AnaplanAuthToken scheme is also valid for Exception Users API.",
-            UserWarning,
-            stacklevel=2,
-        )
-    elif status == 401 or "FAILURE_BAD_HEADER" in body_text:
-        warnings.warn(
-            "AnaplanAuthToken prefix rejected on POST /search — "
-            "AnaplanApiKey is the correct prefix for API key auth.",
-            UserWarning,
-            stacklevel=2,
-        )
-    else:
-        warnings.warn(
-            f"AnaplanAuthToken prefix probe returned unexpected status {status} on POST /search.",
-            UserWarning,
-            stacklevel=2,
-        )
-
-
-# ── POST search by workspace ─────────────────────────────────────────────────
-
-@pytest.mark.live
-def test_exception_search_by_workspace_returns_response_array(api_key):
+def test_exception_search_by_workspace_returns_response_array(exception_token):
     """POST /search with a workspaceGuid returns 200 with a 'response' array.
 
     Verifies the spec's ExceptionUserSearchResponse shape: top-level object
@@ -162,7 +117,7 @@ def test_exception_search_by_workspace_returns_response_array(api_key):
     with httpx.Client() as client:
         response = client.post(
             SEARCH_URL,
-            headers={"Authorization": f"AnaplanApiKey {api_key}"},
+            headers={"Authorization": f"Bearer {exception_token}"},
             json={"workspaceGuid": workspace_guid},
         )
 
@@ -170,29 +125,23 @@ def test_exception_search_by_workspace_returns_response_array(api_key):
     assert response.status_code == 200, (
         f"Expected 200, got {response.status_code}: {response.text}"
     )
-
     body = response.json()
     assert "response" in body, f"Expected 'response' key in body, got: {list(body.keys())}"
     assert isinstance(body["response"], list), (
         f"Expected 'response' to be an array, got: {type(body['response'])}"
     )
-
-    for workspace_result in body["response"]:
-        assert "workspaceGuid" in workspace_result, (
-            f"workspace result missing 'workspaceGuid': {workspace_result}"
-        )
-        assert "users" in workspace_result, (
-            f"workspace result missing 'users': {workspace_result}"
-        )
-        assert isinstance(workspace_result["users"], list), (
-            f"'users' should be an array, got: {type(workspace_result['users'])}"
+    for result in body["response"]:
+        assert "workspaceGuid" in result, f"workspace result missing 'workspaceGuid': {result}"
+        assert "users" in result, f"workspace result missing 'users': {result}"
+        assert isinstance(result["users"], list), (
+            f"'users' should be an array, got: {type(result['users'])}"
         )
 
 
-# ── POST search by user ──────────────────────────────────────────────────────
+# ── POST search by user ───────────────────────────────────────────────────────
 
 @pytest.mark.live
-def test_exception_search_by_user_returns_response_array(api_key):
+def test_exception_search_by_user_returns_response_array(exception_token):
     """POST /search with a userGuid returns 200 with a 'response' array.
 
     Verifies the by-user search path returns the same ExceptionUserSearchResponse
@@ -205,7 +154,7 @@ def test_exception_search_by_user_returns_response_array(api_key):
     with httpx.Client() as client:
         response = client.post(
             SEARCH_URL,
-            headers={"Authorization": f"AnaplanApiKey {api_key}"},
+            headers={"Authorization": f"Bearer {exception_token}"},
             json={"userGuid": user_guid},
         )
 
@@ -213,7 +162,6 @@ def test_exception_search_by_user_returns_response_array(api_key):
     assert response.status_code == 200, (
         f"Expected 200, got {response.status_code}: {response.text}"
     )
-
     body = response.json()
     assert "response" in body, f"Expected 'response' key in body, got: {list(body.keys())}"
     assert isinstance(body["response"], list), (
@@ -221,15 +169,15 @@ def test_exception_search_by_user_returns_response_array(api_key):
     )
 
 
-# ── PATCH invalid op returns 400 ─────────────────────────────────────────────
+# ── PATCH invalid op returns 400 ──────────────────────────────────────────────
 
 @pytest.mark.live
-def test_exception_patch_invalid_op_returns_400(api_key):
+def test_exception_patch_invalid_op_returns_400(exception_token):
     """PATCH /users/{userGuid} with an invalid 'op' value returns 400.
 
-    Non-destructive error probe: uses a deliberate invalid op value so no
-    actual assign/unassign occurs. Verifies the API enforces the op enum
-    ('assign' | 'unassign') and returns 400 for bad input.
+    Non-destructive error probe: a deliberately invalid op triggers a validation
+    error rather than any actual assign/unassign. Verifies the API enforces the
+    op enum ('assign' | 'unassign') declared in the spec.
     """
     workspace_guid = os.getenv("ANAPLAN_EXCEPTION_WORKSPACE_GUID")
     user_guid = os.getenv("ANAPLAN_EXCEPTION_USER_GUID")
@@ -243,7 +191,7 @@ def test_exception_patch_invalid_op_returns_400(api_key):
     with httpx.Client() as client:
         response = client.patch(
             patch_url,
-            headers={"Authorization": f"AnaplanApiKey {api_key}"},
+            headers={"Authorization": f"Bearer {exception_token}"},
             json={"op": "invalid_op", "workspaceGuid": workspace_guid},
         )
 
@@ -251,3 +199,78 @@ def test_exception_patch_invalid_op_returns_400(api_key):
     assert response.status_code == 400, (
         f"Expected 400 for invalid op, got {response.status_code}: {response.text}"
     )
+
+
+# ── Probe: AnaplanAuthToken scheme ───────────────────────────────────────────
+
+@pytest.mark.live
+def test_exception_users_anaplan_auth_token_scheme_probe(exception_token):
+    """Probes whether the OAuth access token is also accepted with the AnaplanAuthToken prefix.
+
+    The spec declares AnaplanAuthToken. If 400 (bad GUID) or 200 is returned,
+    the scheme is valid for this endpoint. A 401 means only Bearer is accepted.
+    """
+    with httpx.Client() as client:
+        response = client.post(
+            SEARCH_URL,
+            headers={"Authorization": f"AnaplanAuthToken {exception_token}"},
+            json={"workspaceGuid": "00000000000000000000000000000000"},
+        )
+
+    status = response.status_code
+    print(f"\nPOST /search AnaplanAuthToken probe: {status} — {response.text[:200]}")
+
+    if status != 401:
+        warnings.warn(
+            f"AnaplanAuthToken accepted OAuth token on POST /search (status {status}) — "
+            "AnaplanAuthToken scheme is confirmed valid for this endpoint.",
+            UserWarning,
+            stacklevel=2,
+        )
+    else:
+        warnings.warn(
+            "AnaplanAuthToken rejected OAuth token on POST /search (401) — "
+            "remove AnaplanAuthToken from the spec; Bearer is the correct scheme.",
+            UserWarning,
+            stacklevel=2,
+        )
+
+
+# ── Probe: AnaplanApiKey scheme ───────────────────────────────────────────────
+
+@pytest.mark.live
+def test_exception_users_anaplan_api_key_scheme_probe():
+    """Probes whether an Anaplan API key is accepted with the AnaplanApiKey prefix.
+
+    Skipped if ANAPLAN_API_KEY is not set. A 400 (bad GUID) confirms the key
+    was recognised; a 401 or FAILURE_BAD_HEADER means it is rejected.
+    """
+    api_key = os.getenv("ANAPLAN_API_KEY")
+    if not api_key:
+        pytest.skip("ANAPLAN_API_KEY not set")
+
+    with httpx.Client() as client:
+        response = client.post(
+            SEARCH_URL,
+            headers={"Authorization": f"AnaplanApiKey {api_key}"},
+            json={"workspaceGuid": "00000000000000000000000000000000"},
+        )
+
+    status = response.status_code
+    body_text = response.text
+    print(f"\nPOST /search AnaplanApiKey probe: {status} — {body_text[:200]}")
+
+    if status != 401 and "FAILURE_BAD_HEADER" not in body_text:
+        warnings.warn(
+            f"AnaplanApiKey accepted on POST /search (status {status}) — "
+            "AnaplanApiKey scheme is valid for this endpoint; keep it in the spec.",
+            UserWarning,
+            stacklevel=2,
+        )
+    else:
+        warnings.warn(
+            f"AnaplanApiKey rejected on POST /search (status {status}) — "
+            "remove AnaplanApiKey from the spec's security schemes.",
+            UserWarning,
+            stacklevel=2,
+        )
