@@ -108,3 +108,51 @@ Core fields present on every record (verified across a multi-day sample): `id`
 
 These are asserted (not skipped) by `tests/test_audit_live.py` when a role-enabled
 token is present.
+
+### `GET /events` filtering and pagination (live testing 2026-06-12, issue #60)
+
+Confirmed against real, multi-record data with a role-enabled token:
+
+- **`type` filter** — the documented enum (`all`, `byok`, `user_activity`) is
+  **incomplete**. Each `type` value filters to events whose `eventTypeId` carries
+  a matching prefix, and live probing confirmed nine recognized values. **The enum
+  is not enforced**: an unrecognised value returns `200` and is treated as `all`
+  rather than rejected — which is how the recognized values were discovered (a
+  recognised value filters to a strict subset; an ignored one returns the full
+  `all` count). The spec enum has been expanded to the confirmed set:
+
+  | `type` value | `eventTypeId` prefix | Notes |
+  |--------------|----------------------|-------|
+  | `all` | (every event) | |
+  | `user_activity` | `USR-*` | ~79% of events in the test tenant |
+  | `access_control` | `AUTHZ-*` | ~17% |
+  | `int` | `INT-*` | integrations (~4%) |
+  | `conn_mgmt` | `CONN-*` | connection / SAML management |
+  | `comment` | `COMMENT-*` | |
+  | `byok` | (BYOK) | `0` events without BYOK encryption |
+  | `plan_iq` | (PlanIQ) | recognized; `0` events in window |
+  | `forecaster` | (Forecaster) | recognized; `0` events in window |
+
+  Naming is not mechanical — some values are abbreviations of the prefix (`int`,
+  `conn_mgmt`), others are full names (`user_activity` for `USR-*`,
+  `access_control` for `AUTHZ-*`). Wrong-format guesses (`integration`, `planiq`,
+  `comments`, `connection`, `saml*`, `workflow`, `guardpoint`, `host`, …) are all
+  ignored and fall back to `all`. A **`workflow`** category exists for the Workflow
+  product but could not be confirmed on the test tenant (product not enabled), so
+  it is omitted from the enum.
+- **Date range** — `dateFrom`/`dateTo` (Unix-ms) constrain results to the window
+  (verified: every returned event's `eventDate` falls within range). The
+  `intervalInHours` rolling window likewise returns only events from the previous
+  N hours. **The `dateFrom`/`dateTo` span cannot exceed 30 days** — a wider range
+  returns `400 FAILURE_BAD_REQUEST` (`"Date range cannot exceed 30 days"`).
+- **Pagination** — `limit` caps the page size (`meta.paging.currentPageSize`
+  matches), `offset` advances cleanly (consecutive pages are disjoint). `meta.paging`
+  exposes `nextOffset`/`nextUrl` when more results exist, and **`previousUrl`** once
+  paging past the first page. `previousUrl` was undocumented and has been added to
+  the `AuditPaging` schema.
+- **`limit` max not enforced** — the docs state a cap of 10000, but the server
+  honors larger limits (`limit=15000` returned 15000 records). The spec's hard
+  `maximum: 10000` constraint was removed and the description updated to match.
+
+All of the above are asserted by `tests/test_audit_live.py` when a role-enabled
+token is present.
