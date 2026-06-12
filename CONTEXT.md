@@ -68,12 +68,12 @@ Anaplan has 9 publicly documented REST APIs, each with different characteristics
 
 #### 7. Audit API
 - **Purpose**: Access audit logs and compliance data (SIEM integration, compliance tracking)
-- **Auth**: Likely bearer token (needs confirmation via live testing)
+- **Auth**: `AnaplanAuthToken` / OAuth bearer access token; requires the **Tenant Auditor** role (confirmed via live testing)
 - **Source of Truth**: Apiary (`auditservice`) + live testing
 - **Key Points**:
-  - Apiary blueprint is not publicly readable; spec has empty paths — populate via live testing
-  - Apiary lists production URL as `https://audit.anaplan.com/audit/api/1/` (unique host, not `api.anaplan.com`)
-  - Both `audit.anaplan.com` and `api.anaplan.com` servers listed in spec; resolve correct base URL during live testing
+  - **Live-tested end-to-end (issues #58–#61)**: `GET /events` role/OAuth auth, the `AuditEvent` envelope and field contract, `type` filtering, date-range and pagination, and CEF (`text/plain`) output. Paths are populated and hand-maintained.
+  - Base URL confirmed as `https://audit.anaplan.com/audit/api/1` (unique host, not `api.anaplan.com`)
+  - Behaviors confirmed: the `type` filter recognizes more values than originally documented; the queried date range is capped at 30 days (default 30-day window); `limit` over 10000 is honored; CEF output is unpaginated — see `audit/README.md`
 
 ### Lower Priority (Rarely Used or Specialty)
 
@@ -238,7 +238,7 @@ Legacy regions (us1–us7, eu1, eu2, eu4, ap1) share the older non-prefixed `api
 | CloudWorks | ✓ | ✓ | — | Medium | Medium | hand-maintained (do not rebuild) |
 | SCIM | ✓ | ✓ | ✓ | Medium | Medium | hand-maintained (do not rebuild) |
 | ALM | ✓ | ✓ | — | Medium | Medium | hand-maintained (do not rebuild) |
-| Audit | ✓ | ✓ | — | Medium | Medium | hand-maintained (do not rebuild) |
+| Audit | ✓ | ✓ | — | High (events path: auth/role, event contract, filtering/pagination, CEF — issues #58–#61) | High | hand-maintained (do not rebuild) |
 | Financial Consolidation | ✓ | — | — | Low | Low | hand-maintained (do not rebuild) |
 | Exception Users | ✓ | ✓ | ✓ | Low | Low | hand-maintained (do not rebuild) |
 
