@@ -3,12 +3,12 @@
   "info": {
     "title": "Anaplan Financial Consolidation API",
     "version": "v2305.1",
-    "description": "API for financial consolidation workflows on the Fluence platform (acquired by Anaplan). Enables automation of data management, metadata synchronization, workflow control, and user administration.\n\nHost: `fluenceapi-prod.fluence.app` \u2014 different from all other Anaplan APIs. No regional variants are known; a single production endpoint serves all tenants.\n\nEvery request requires the `X_API_TOKEN` header (created in the Security module) and the `TENANT` header identifying the target tenant."
+    "description": "API for financial consolidation workflows on the Fluence platform (acquired by Anaplan). Enables automation of data management, metadata synchronization, workflow control, and user administration.\n\nHost: `fluenceapi-prod.fluence.app` — different from all other Anaplan APIs. No regional variants are known; a single production endpoint serves all tenants.\n\nEvery request requires the `X_API_TOKEN` header (created in the Security module) and the `TENANT` header identifying the target tenant."
   },
   "servers": [
     {
       "url": "https://fluenceapi-prod.fluence.app/api/v2305.1",
-      "description": "Fluence production server (single global endpoint \u2014 regional variants not documented)"
+      "description": "Fluence production server (single global endpoint — regional variants not documented)"
     }
   ],
   "security": [
@@ -34,78 +34,78 @@
         }
       ],
       "get": {
-        "operationId": "getODataTableData",
         "summary": "Get client schema table data",
         "description": "Retrieve rows from a client schema staging table. Supports OData query parameters for filtering, sorting, and pagination.\n\nWhen `Page` and `PageSize` are supplied the response object includes `CurrentPage`, `TotalPages`, and `TotalRows` pagination fields alongside the `value` array. Without pagination parameters the response is a bare JSON array of records.\n\nMaximum page size: 2500 rows.",
+        "operationId": "getODataTableData",
         "parameters": [
           {
             "name": "Page",
             "in": "query",
+            "description": "Page number to retrieve. Starts at 1.",
             "schema": {
               "type": "integer",
               "minimum": 1
             },
-            "description": "Page number to retrieve. Starts at 1.",
             "example": 1
           },
           {
             "name": "PageSize",
             "in": "query",
+            "description": "Number of rows per page. Maximum 2500.",
             "schema": {
               "type": "integer",
               "minimum": 1,
               "maximum": 2500
             },
-            "description": "Number of rows per page. Maximum 2500.",
             "example": 500
           },
           {
             "name": "$filter",
             "in": "query",
+            "description": "OData filter expression using logical operators (`eq`, `ne`, `gt`, `lt`, `and`, `or`, `startswith`, etc.). Example: `$filter=Scenario_Name eq 'Actual'`",
             "schema": {
               "type": "string"
-            },
-            "description": "OData filter expression using logical operators (`eq`, `ne`, `gt`, `lt`, `and`, `or`, `startswith`, etc.). Example: `$filter=Scenario_Name eq 'Actual'`"
+            }
           },
           {
             "name": "$select",
             "in": "query",
+            "description": "Comma-separated list of columns to retrieve. Use `*` for all columns.",
             "schema": {
               "type": "string"
-            },
-            "description": "Comma-separated list of columns to retrieve. Use `*` for all columns."
+            }
           },
           {
             "name": "$orderby",
             "in": "query",
+            "description": "Sort expression. Append `asc` or `desc`. Example: `$orderby=Date_Name asc`",
             "schema": {
               "type": "string"
-            },
-            "description": "Sort expression. Append `asc` or `desc`. Example: `$orderby=Date_Name asc`"
+            }
           },
           {
             "name": "$top",
             "in": "query",
+            "description": "Return only the first N records.",
             "schema": {
               "type": "integer"
-            },
-            "description": "Return only the first N records."
+            }
           },
           {
             "name": "$skip",
             "in": "query",
+            "description": "Skip the first N records.",
             "schema": {
               "type": "integer"
-            },
-            "description": "Skip the first N records."
+            }
           },
           {
             "name": "$count",
             "in": "query",
+            "description": "Include a count of matching records in the response.",
             "schema": {
               "type": "boolean"
-            },
-            "description": "Include a count of matching records in the response."
+            }
           }
         ],
         "responses": {
@@ -155,9 +155,9 @@
         }
       },
       "post": {
-        "operationId": "addODataRecord",
         "summary": "Add a record to a client schema table",
         "description": "Insert a single row into a client schema staging table. Field names and types are defined by the table schema.",
+        "operationId": "addODataRecord",
         "requestBody": {
           "required": true,
           "content": {
@@ -209,17 +209,17 @@
         }
       },
       "put": {
-        "operationId": "updateODataRecords",
         "summary": "Update client schema table records",
         "description": "Update rows in a client schema staging table that match the `$filter` query parameter. The request body contains the new field values to write to matched rows.",
+        "operationId": "updateODataRecords",
         "parameters": [
           {
             "name": "$filter",
             "in": "query",
+            "description": "OData filter expression selecting rows to update. Example: `$filter=Scenario_Name eq 'Budget'`",
             "schema": {
               "type": "string"
-            },
-            "description": "OData filter expression selecting rows to update. Example: `$filter=Scenario_Name eq 'Budget'`"
+            }
           }
         ],
         "requestBody": {
@@ -263,17 +263,17 @@
         }
       },
       "delete": {
-        "operationId": "deleteODataRecords",
         "summary": "Delete data from client schema table",
         "description": "Remove rows from a client schema staging table. Use the `$filter` query parameter or a request body to identify rows to delete. Omitting both clears all rows while preserving the table schema.",
+        "operationId": "deleteODataRecords",
         "parameters": [
           {
             "name": "$filter",
             "in": "query",
+            "description": "OData filter expression selecting rows to delete. Example: `$filter=Scenario_Name eq 'Budget'`",
             "schema": {
               "type": "string"
-            },
-            "description": "OData filter expression selecting rows to delete. Example: `$filter=Scenario_Name eq 'Budget'`"
+            }
           }
         ],
         "requestBody": {
@@ -340,9 +340,9 @@
         }
       ],
       "post": {
-        "operationId": "startWorkflow",
         "summary": "Start a workflow process",
         "description": "Commands the server to start a workflow process within the specified folder in the Explorer module. Pass an array of task parameters in the request body, or an empty array if none are needed.",
+        "operationId": "startWorkflow",
         "requestBody": {
           "required": false,
           "content": {
@@ -399,9 +399,9 @@
         }
       ],
       "post": {
-        "operationId": "stopWorkflow",
         "summary": "Stop a workflow process",
         "description": "Terminates a running workflow process within the specified folder in the Explorer module.",
+        "operationId": "stopWorkflow",
         "responses": {
           "200": {
             "description": "Workflow stopped successfully."
@@ -445,9 +445,9 @@
         }
       ],
       "get": {
-        "operationId": "getWorkflowState",
         "summary": "Get the state of a workflow process",
         "description": "Returns the current state and run ID of a workflow process. Always returns `200 OK`. An invalid path or workflow name returns a null UUID (`00000000-0000-0000-0000-000000000000`) rather than a 404.",
+        "operationId": "getWorkflowState",
         "responses": {
           "200": {
             "description": "Workflow state retrieved successfully.",
@@ -475,9 +475,9 @@
         }
       ],
       "get": {
-        "operationId": "getTenantDimensions",
         "summary": "Retrieve dimensions and properties across a tenant",
         "description": "Returns all dimensions and their properties for the entire tenant. Use this to synchronize dimension information with external systems such as planning solutions or reporting tools.",
+        "operationId": "getTenantDimensions",
         "responses": {
           "200": {
             "description": "Dimension list retrieved successfully.",
@@ -518,9 +518,9 @@
         }
       ],
       "get": {
-        "operationId": "getModelDimensions",
         "summary": "Retrieve dimensions and properties within a model",
         "description": "Returns all dimensions and their properties scoped to a specific model. After retrieving results, consult the dimension properties glossary to identify the purpose and type of each property.",
+        "operationId": "getModelDimensions",
         "responses": {
           "200": {
             "description": "Model dimension list retrieved successfully.",
@@ -584,28 +584,28 @@
         }
       ],
       "get": {
-        "operationId": "getDimensionMembers",
         "summary": "Retrieve members and properties within a dimension",
         "description": "Returns dimension members and their properties for the specified dimension. Supports pagination via `Page` and `PageSize` query parameters.",
+        "operationId": "getDimensionMembers",
         "parameters": [
           {
             "name": "Page",
             "in": "query",
+            "description": "Page number to retrieve. Starts at 1.",
             "schema": {
               "type": "number",
               "minimum": 1
             },
-            "description": "Page number to retrieve. Starts at 1.",
             "example": 1
           },
           {
             "name": "PageSize",
             "in": "query",
+            "description": "Number of member rows per page.",
             "schema": {
               "type": "number",
               "minimum": 1
             },
-            "description": "Number of member rows per page.",
             "example": 100
           }
         ],
@@ -649,9 +649,9 @@
         }
       ],
       "post": {
-        "operationId": "addODataBatchRecords",
         "summary": "Add batch records to a client schema table",
         "description": "Insert multiple rows into a client schema staging table in a single request. Use this instead of repeated single-record POSTs when loading more than one record.",
+        "operationId": "addODataBatchRecords",
         "requestBody": {
           "required": true,
           "content": {
@@ -714,9 +714,9 @@
         }
       ],
       "get": {
-        "operationId": "listUsers",
         "summary": "List users in tenant",
         "description": "Retrieve a roster of all users within the tenant, including their identifiers, names, contact information, enabled/disabled status, and assigned roles.",
+        "operationId": "listUsers",
         "responses": {
           "200": {
             "description": "Array of user objects.",
@@ -734,9 +734,9 @@
         }
       },
       "post": {
-        "operationId": "addUsers",
         "summary": "Add new users",
         "description": "Add one or more new users to the tenant. The request body is a JSON array of user objects.",
+        "operationId": "addUsers",
         "requestBody": {
           "required": true,
           "content": {
@@ -764,9 +764,9 @@
         }
       },
       "put": {
-        "operationId": "updateUserProfile",
         "summary": "Update user profile",
         "description": "Modify user data within the tenant. Can update email addresses, enable/disable accounts, and manage role assignments.",
+        "operationId": "updateUserProfile",
         "requestBody": {
           "required": true,
           "content": {
@@ -808,12 +808,12 @@
         }
       ],
       "delete": {
-        "operationId": "deleteUser",
         "summary": "Delete user account from tenant",
-        "description": "Remove a user account from the tenant. The API returns 200 OK regardless of whether the user exists \u2014 use GET /users to validate the deletion.",
+        "description": "Remove a user account from the tenant. The API returns 200 OK regardless of whether the user exists — use GET /users to validate the deletion.",
+        "operationId": "deleteUser",
         "responses": {
           "200": {
-            "description": "User deleted (or was not found \u2014 no 404 is returned)."
+            "description": "User deleted (or was not found — no 404 is returned)."
           }
         }
       }
@@ -835,9 +835,9 @@
         }
       ],
       "get": {
-        "operationId": "listUserRoles",
         "summary": "List roles for a user",
         "description": "Retrieve the roles assigned to a specific user. Supports automation workflows such as cloning user roles during onboarding.\n\nNote: This endpoint uses the singular `/user` prefix (not `/users`), which is an inconsistency in the API design confirmed by the source documentation.",
+        "operationId": "listUserRoles",
         "responses": {
           "200": {
             "description": "Array of role name strings assigned to the user.",
@@ -861,9 +861,9 @@
         }
       },
       "put": {
-        "operationId": "assignUserRoles",
         "summary": "Assign roles to a user",
-        "description": "Assign new roles to a user. The response is additive \u2014 it returns all roles assigned to the user including both existing and newly assigned roles.\n\nNote: This endpoint uses the singular `/user` prefix (not `/users`), which is an inconsistency in the API design confirmed by the source documentation.",
+        "description": "Assign new roles to a user. The response is additive — it returns all roles assigned to the user including both existing and newly assigned roles.\n\nNote: This endpoint uses the singular `/user` prefix (not `/users`), which is an inconsistency in the API design confirmed by the source documentation.",
+        "operationId": "assignUserRoles",
         "requestBody": {
           "required": true,
           "description": "Array of role names to assign.",
@@ -904,9 +904,9 @@
         }
       },
       "delete": {
-        "operationId": "unassignUserRole",
         "summary": "Unassign a role from a user",
         "description": "Remove a single role from a user. The request body is a JSON string (not an array) containing the role name to revoke.\n\nNote: This endpoint uses the singular `/user` prefix (not `/users`), which is an inconsistency in the API design confirmed by the source documentation.",
+        "operationId": "unassignUserRole",
         "requestBody": {
           "required": true,
           "description": "The role name to remove, as a JSON string.",
@@ -964,7 +964,7 @@
     "schemas": {
       "WorkflowStateResponse": {
         "type": "object",
-        "description": "Response from the get-workflow-state endpoint. Always returned with 200 OK \u2014 an invalid path or workflow name produces a null UUID rather than an error.",
+        "description": "Response from the get-workflow-state endpoint. Always returned with 200 OK — an invalid path or workflow name produces a null UUID rather than an error.",
         "properties": {
           "runId": {
             "type": "string",
@@ -1153,7 +1153,7 @@
       },
       "ODataRecord": {
         "type": "object",
-        "description": "A row in a client schema staging table. Field names and types are defined by the table's schema and vary by client configuration.\n\nSupported data types per field:\n- **string** \u2014 alphanumeric text (e.g. dimension member names such as `Scenario_Name`)\n- **number** \u2014 integer or decimal (e.g. `Amount`, `Periodic_Amount`)\n- **boolean** \u2014 `1` for true, `0` for false\n\nDimension fields conventionally end with `_Name`; measure fields use bare names.",
+        "description": "A row in a client schema staging table. Field names and types are defined by the table's schema and vary by client configuration.\n\nSupported data types per field:\n- **string** — alphanumeric text (e.g. dimension member names such as `Scenario_Name`)\n- **number** — integer or decimal (e.g. `Amount`, `Periodic_Amount`)\n- **boolean** — `1` for true, `0` for false\n\nDimension fields conventionally end with `_Name`; measure fields use bare names.",
         "additionalProperties": {
           "oneOf": [
             {

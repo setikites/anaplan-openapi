@@ -56,13 +56,19 @@
     }
   ],
   "security": [
-    { "AnaplanAuthToken": [] },
-    { "BearerAuth": [] }
+    {
+      "AnaplanAuthToken": []
+    },
+    {
+      "BearerAuth": []
+    }
   ],
   "paths": {
     "/models/{modelId}/onlineStatus": {
       "parameters": [
-        { "$ref": "#/components/parameters/modelId" }
+        {
+          "$ref": "#/components/parameters/modelId"
+        }
       ],
       "post": {
         "summary": "Change a model's online status",
@@ -72,16 +78,28 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/OnlineStatusRequest" }
+              "schema": {
+                "$ref": "#/components/schemas/OnlineStatusRequest"
+              }
             }
           }
         },
         "responses": {
-          "204": { "description": "Online status updated successfully." },
-          "400": { "description": "Invalid status value or model is locked." },
-          "403": { "description": "Forbidden. Caller lacks Workspace Administrator role." },
-          "404": { "description": "Model not found or caller has no access." },
-          "422": { "description": "Model is archived." }
+          "204": {
+            "description": "Online status updated successfully."
+          },
+          "400": {
+            "description": "Invalid status value or model is locked."
+          },
+          "403": {
+            "description": "Forbidden. Caller lacks Workspace Administrator role."
+          },
+          "404": {
+            "description": "Model not found or caller has no access."
+          },
+          "422": {
+            "description": "Model is archived."
+          }
         }
       },
       "put": {
@@ -92,22 +110,36 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/OnlineStatusRequest" }
+              "schema": {
+                "$ref": "#/components/schemas/OnlineStatusRequest"
+              }
             }
           }
         },
         "responses": {
-          "204": { "description": "Online status updated successfully." },
-          "400": { "description": "Invalid status value or model is locked." },
-          "403": { "description": "Forbidden. Caller lacks Workspace Administrator role." },
-          "404": { "description": "Model not found or caller has no access." },
-          "422": { "description": "Model is archived." }
+          "204": {
+            "description": "Online status updated successfully."
+          },
+          "400": {
+            "description": "Invalid status value or model is locked."
+          },
+          "403": {
+            "description": "Forbidden. Caller lacks Workspace Administrator role."
+          },
+          "404": {
+            "description": "Model not found or caller has no access."
+          },
+          "422": {
+            "description": "Model is archived."
+          }
         }
       }
     },
     "/models/{modelId}/alm/syncableRevisions": {
       "parameters": [
-        { "$ref": "#/components/parameters/modelId" }
+        {
+          "$ref": "#/components/parameters/modelId"
+        }
       ],
       "get": {
         "summary": "Retrieve compatible source model revisions",
@@ -117,9 +149,11 @@
           {
             "name": "sourceModelId",
             "in": "query",
-            "required": true,
             "description": "GUID of the source model whose revisions to evaluate.",
-            "schema": { "type": "string" }
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -127,18 +161,26 @@
             "description": "List of compatible source model revisions.",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/RevisionListResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/RevisionListResponse"
+                }
               }
             }
           },
-          "403": { "description": "Forbidden. Caller lacks Workspace Administrator role on one or both models." },
-          "404": { "description": "Model not found or caller has no access." }
+          "403": {
+            "description": "Forbidden. Caller lacks Workspace Administrator role on one or both models."
+          },
+          "404": {
+            "description": "Model not found or caller has no access."
+          }
         }
       }
     },
     "/models/{modelId}/alm/latestRevision": {
       "parameters": [
-        { "$ref": "#/components/parameters/modelId" }
+        {
+          "$ref": "#/components/parameters/modelId"
+        }
       ],
       "get": {
         "summary": "Retrieve latest revision",
@@ -149,18 +191,26 @@
             "description": "Latest revision, or an empty result if no revisions exist.",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/RevisionResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/RevisionResponse"
+                }
               }
             }
           },
-          "403": { "description": "Forbidden. Caller lacks Workspace Administrator role." },
-          "404": { "description": "Model not found or caller has no access." }
+          "403": {
+            "description": "Forbidden. Caller lacks Workspace Administrator role."
+          },
+          "404": {
+            "description": "Model not found or caller has no access."
+          }
         }
       }
     },
     "/models/{modelId}/alm/revisions": {
       "parameters": [
-        { "$ref": "#/components/parameters/modelId" }
+        {
+          "$ref": "#/components/parameters/modelId"
+        }
       ],
       "get": {
         "summary": "Retrieve revisions in a model",
@@ -170,32 +220,44 @@
           {
             "name": "appliedAfter",
             "in": "query",
-            "schema": { "type": "string", "format": "date" },
-            "description": "Filter to revisions applied on or after this date (YYYY-MM-DD)."
+            "description": "Filter to revisions applied on or after this date (YYYY-MM-DD).",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
           },
           {
             "name": "appliedBefore",
             "in": "query",
-            "schema": { "type": "string", "format": "date" },
-            "description": "Filter to revisions applied on or before this date (YYYY-MM-DD)."
+            "description": "Filter to revisions applied on or before this date (YYYY-MM-DD).",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
           },
           {
             "name": "sort",
             "in": "query",
-            "schema": { "type": "string" },
-            "description": "Property name to sort by. Prefix with `-` for descending order."
+            "description": "Property name to sort by. Prefix with `-` for descending order.",
+            "schema": {
+              "type": "string"
+            }
           },
           {
             "name": "limit",
             "in": "query",
-            "schema": { "type": "integer" },
-            "description": "Maximum number of results to return."
+            "description": "Maximum number of results to return.",
+            "schema": {
+              "type": "integer"
+            }
           },
           {
             "name": "offset",
             "in": "query",
-            "schema": { "type": "integer" },
-            "description": "Zero-based starting position for results."
+            "description": "Zero-based starting position for results.",
+            "schema": {
+              "type": "integer"
+            }
           }
         ],
         "responses": {
@@ -203,12 +265,18 @@
             "description": "Paginated list of revisions.",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/RevisionListResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/RevisionListResponse"
+                }
               }
             }
           },
-          "403": { "description": "Forbidden. Caller lacks Workspace Administrator role." },
-          "404": { "description": "Model not found or caller has no access." }
+          "403": {
+            "description": "Forbidden. Caller lacks Workspace Administrator role."
+          },
+          "404": {
+            "description": "Model not found or caller has no access."
+          }
         }
       },
       "post": {
@@ -219,7 +287,9 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/RevisionRequest" }
+              "schema": {
+                "$ref": "#/components/schemas/RevisionRequest"
+              }
             }
           }
         },
@@ -228,21 +298,35 @@
             "description": "Revision created.",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/RevisionResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/RevisionResponse"
+                }
               }
             }
           },
-          "400": { "description": "name exceeds 60 characters or description exceeds 250 characters." },
-          "403": { "description": "Forbidden. Caller lacks Workspace Administrator role." },
-          "404": { "description": "Model not found or caller has no access." },
-          "422": { "description": "Model is archived." }
+          "400": {
+            "description": "name exceeds 60 characters or description exceeds 250 characters."
+          },
+          "403": {
+            "description": "Forbidden. Caller lacks Workspace Administrator role."
+          },
+          "404": {
+            "description": "Model not found or caller has no access."
+          },
+          "422": {
+            "description": "Model is archived."
+          }
         }
       }
     },
     "/models/{modelId}/alm/revisions/{revisionId}/appliedToModels": {
       "parameters": [
-        { "$ref": "#/components/parameters/modelId" },
-        { "$ref": "#/components/parameters/revisionId" }
+        {
+          "$ref": "#/components/parameters/modelId"
+        },
+        {
+          "$ref": "#/components/parameters/revisionId"
+        }
       ],
       "get": {
         "summary": "Retrieve the models for a specific revision",
@@ -253,18 +337,26 @@
             "description": "List of models the revision has been applied to.",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/AppliedModelsResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/AppliedModelsResponse"
+                }
               }
             }
           },
-          "403": { "description": "Forbidden. Caller lacks Workspace Administrator role." },
-          "404": { "description": "Model or revision not found." }
+          "403": {
+            "description": "Forbidden. Caller lacks Workspace Administrator role."
+          },
+          "404": {
+            "description": "Model or revision not found."
+          }
         }
       }
     },
     "/models/{modelId}/alm/syncTasks": {
       "parameters": [
-        { "$ref": "#/components/parameters/modelId" }
+        {
+          "$ref": "#/components/parameters/modelId"
+        }
       ],
       "get": {
         "summary": "Retrieve sync tasks for a model",
@@ -275,12 +367,18 @@
             "description": "List of sync tasks.",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/SyncTaskListResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/SyncTaskListResponse"
+                }
               }
             }
           },
-          "403": { "description": "Forbidden. Caller lacks Workspace Administrator role." },
-          "404": { "description": "Model not found or caller has no access." }
+          "403": {
+            "description": "Forbidden. Caller lacks Workspace Administrator role."
+          },
+          "404": {
+            "description": "Model not found or caller has no access."
+          }
         }
       },
       "post": {
@@ -291,7 +389,9 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/SyncTaskRequest" }
+              "schema": {
+                "$ref": "#/components/schemas/SyncTaskRequest"
+              }
             }
           }
         },
@@ -300,21 +400,35 @@
             "description": "Sync task created and running.",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/SyncTaskResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/SyncTaskResponse"
+                }
               }
             }
           },
-          "400": { "description": "Missing required fields in request body." },
-          "403": { "description": "Forbidden. Caller lacks Workspace Administrator role." },
-          "404": { "description": "Model not found or caller has no access." },
-          "422": { "description": "Model is archived." }
+          "400": {
+            "description": "Missing required fields in request body."
+          },
+          "403": {
+            "description": "Forbidden. Caller lacks Workspace Administrator role."
+          },
+          "404": {
+            "description": "Model not found or caller has no access."
+          },
+          "422": {
+            "description": "Model is archived."
+          }
         }
       }
     },
     "/models/{modelId}/alm/syncTasks/{syncTaskId}": {
       "parameters": [
-        { "$ref": "#/components/parameters/modelId" },
-        { "$ref": "#/components/parameters/syncTaskId" }
+        {
+          "$ref": "#/components/parameters/modelId"
+        },
+        {
+          "$ref": "#/components/parameters/syncTaskId"
+        }
       ],
       "get": {
         "summary": "Retrieve model sync task info",
@@ -325,18 +439,26 @@
             "description": "Sync task details.",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/SyncTaskResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/SyncTaskResponse"
+                }
               }
             }
           },
-          "403": { "description": "Forbidden. Caller lacks Workspace Administrator role." },
-          "404": { "description": "Model or sync task not found." }
+          "403": {
+            "description": "Forbidden. Caller lacks Workspace Administrator role."
+          },
+          "404": {
+            "description": "Model or sync task not found."
+          }
         }
       }
     },
     "/models/{modelId}/alm/comparisonReportTasks": {
       "parameters": [
-        { "$ref": "#/components/parameters/modelId" }
+        {
+          "$ref": "#/components/parameters/modelId"
+        }
       ],
       "post": {
         "summary": "Create a full comparison report generation task",
@@ -346,7 +468,9 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/SyncTaskRequest" }
+              "schema": {
+                "$ref": "#/components/schemas/SyncTaskRequest"
+              }
             }
           }
         },
@@ -355,20 +479,32 @@
             "description": "Comparison report task created.",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ReportTaskResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ReportTaskResponse"
+                }
               }
             }
           },
-          "403": { "description": "Forbidden. Caller lacks Workspace Administrator role on one or both models." },
-          "404": { "description": "Model not found or caller has no access." },
-          "422": { "description": "Model is archived." }
+          "403": {
+            "description": "Forbidden. Caller lacks Workspace Administrator role on one or both models."
+          },
+          "404": {
+            "description": "Model not found or caller has no access."
+          },
+          "422": {
+            "description": "Model is archived."
+          }
         }
       }
     },
     "/models/{modelId}/alm/comparisonReportTasks/{taskId}": {
       "parameters": [
-        { "$ref": "#/components/parameters/modelId" },
-        { "$ref": "#/components/parameters/taskId" }
+        {
+          "$ref": "#/components/parameters/modelId"
+        },
+        {
+          "$ref": "#/components/parameters/taskId"
+        }
       ],
       "get": {
         "summary": "Retrieve full comparison report task info",
@@ -379,20 +515,32 @@
             "description": "Comparison report task details.",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ReportTaskResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ReportTaskResponse"
+                }
               }
             }
           },
-          "403": { "description": "Forbidden." },
-          "404": { "description": "Model or task not found." }
+          "403": {
+            "description": "Forbidden."
+          },
+          "404": {
+            "description": "Model or task not found."
+          }
         }
       }
     },
     "/models/{modelId}/alm/comparisonReports/{targetRevisionId}/{sourceRevisionId}": {
       "parameters": [
-        { "$ref": "#/components/parameters/modelId" },
-        { "$ref": "#/components/parameters/targetRevisionId" },
-        { "$ref": "#/components/parameters/sourceRevisionId" }
+        {
+          "$ref": "#/components/parameters/modelId"
+        },
+        {
+          "$ref": "#/components/parameters/targetRevisionId"
+        },
+        {
+          "$ref": "#/components/parameters/sourceRevisionId"
+        }
       ],
       "get": {
         "summary": "Retrieve full comparison report content",
@@ -403,18 +551,27 @@
             "description": "Comparison report file (TSV).",
             "content": {
               "application/octet-stream": {
-                "schema": { "type": "string", "format": "binary" }
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
               }
             }
           },
-          "403": { "description": "Forbidden." },
-          "404": { "description": "Report not found or has expired (reports expire after 48 hours)." }
+          "403": {
+            "description": "Forbidden."
+          },
+          "404": {
+            "description": "Report not found or has expired (reports expire after 48 hours)."
+          }
         }
       }
     },
     "/models/{modelId}/alm/summaryReportTasks": {
       "parameters": [
-        { "$ref": "#/components/parameters/modelId" }
+        {
+          "$ref": "#/components/parameters/modelId"
+        }
       ],
       "post": {
         "summary": "Create a summary report generation task",
@@ -424,7 +581,9 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/SyncTaskRequest" }
+              "schema": {
+                "$ref": "#/components/schemas/SyncTaskRequest"
+              }
             }
           }
         },
@@ -433,20 +592,32 @@
             "description": "Summary report task created.",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ReportTaskResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ReportTaskResponse"
+                }
               }
             }
           },
-          "403": { "description": "Forbidden. Caller lacks Workspace Administrator role." },
-          "404": { "description": "Model not found or caller has no access." },
-          "422": { "description": "Model is archived." }
+          "403": {
+            "description": "Forbidden. Caller lacks Workspace Administrator role."
+          },
+          "404": {
+            "description": "Model not found or caller has no access."
+          },
+          "422": {
+            "description": "Model is archived."
+          }
         }
       }
     },
     "/models/{modelId}/alm/summaryReportTasks/{taskId}": {
       "parameters": [
-        { "$ref": "#/components/parameters/modelId" },
-        { "$ref": "#/components/parameters/taskId" }
+        {
+          "$ref": "#/components/parameters/modelId"
+        },
+        {
+          "$ref": "#/components/parameters/taskId"
+        }
       ],
       "get": {
         "summary": "Retrieve summary report task info",
@@ -457,20 +628,32 @@
             "description": "Summary report task details.",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ReportTaskResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/ReportTaskResponse"
+                }
               }
             }
           },
-          "403": { "description": "Forbidden." },
-          "404": { "description": "Model or task not found." }
+          "403": {
+            "description": "Forbidden."
+          },
+          "404": {
+            "description": "Model or task not found."
+          }
         }
       }
     },
     "/models/{modelId}/alm/summaryReports/{targetRevisionId}/{sourceRevisionId}": {
       "parameters": [
-        { "$ref": "#/components/parameters/modelId" },
-        { "$ref": "#/components/parameters/targetRevisionId" },
-        { "$ref": "#/components/parameters/sourceRevisionId" }
+        {
+          "$ref": "#/components/parameters/modelId"
+        },
+        {
+          "$ref": "#/components/parameters/targetRevisionId"
+        },
+        {
+          "$ref": "#/components/parameters/sourceRevisionId"
+        }
       ],
       "get": {
         "summary": "Retrieve summary report content",
@@ -481,12 +664,18 @@
             "description": "Summary report.",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/SummaryReportResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/SummaryReportResponse"
+                }
               }
             }
           },
-          "403": { "description": "Forbidden." },
-          "404": { "description": "Report not found or has expired (reports expire after 48 hours)." }
+          "403": {
+            "description": "Forbidden."
+          },
+          "404": {
+            "description": "Report not found or has expired (reports expire after 48 hours)."
+          }
         }
       }
     }
@@ -498,59 +687,78 @@
         "in": "path",
         "required": true,
         "description": "Unique identifier of the model.",
-        "schema": { "type": "string" }
+        "schema": {
+          "type": "string"
+        }
       },
       "revisionId": {
         "name": "revisionId",
         "in": "path",
         "required": true,
         "description": "Unique identifier of the revision.",
-        "schema": { "type": "string" }
+        "schema": {
+          "type": "string"
+        }
       },
       "syncTaskId": {
         "name": "syncTaskId",
         "in": "path",
         "required": true,
         "description": "Unique identifier of the sync task.",
-        "schema": { "type": "string" }
+        "schema": {
+          "type": "string"
+        }
       },
       "taskId": {
         "name": "taskId",
         "in": "path",
         "required": true,
         "description": "Unique identifier of the report generation task.",
-        "schema": { "type": "string" }
+        "schema": {
+          "type": "string"
+        }
       },
       "targetRevisionId": {
         "name": "targetRevisionId",
         "in": "path",
         "required": true,
         "description": "Unique identifier of the target revision.",
-        "schema": { "type": "string" }
+        "schema": {
+          "type": "string"
+        }
       },
       "sourceRevisionId": {
         "name": "sourceRevisionId",
         "in": "path",
         "required": true,
         "description": "Unique identifier of the source revision.",
-        "schema": { "type": "string" }
+        "schema": {
+          "type": "string"
+        }
       }
     },
     "schemas": {
       "OnlineStatusRequest": {
         "type": "object",
-        "required": ["status"],
+        "required": [
+          "status"
+        ],
         "properties": {
           "status": {
             "type": "string",
-            "enum": ["online", "offline"],
+            "enum": [
+              "online",
+              "offline"
+            ],
             "description": "Target online status for the model."
           }
         }
       },
       "RevisionRequest": {
         "type": "object",
-        "required": ["name"],
+        "required": [
+          "name"
+        ],
         "properties": {
           "name": {
             "type": "string",
@@ -566,7 +774,10 @@
       },
       "SyncTaskRequest": {
         "type": "object",
-        "required": ["sourceRevisionId", "sourceModelId"],
+        "required": [
+          "sourceRevisionId",
+          "sourceModelId"
+        ],
         "properties": {
           "sourceRevisionId": {
             "type": "string",
@@ -585,136 +796,265 @@
       "Revision": {
         "type": "object",
         "properties": {
-          "id": { "type": "string", "description": "Revision identifier." },
-          "name": { "type": "string", "description": "Revision name." },
-          "description": { "type": "string", "description": "Revision description." },
-          "createdOn": { "type": "string", "format": "date-time", "description": "Timestamp when the revision was created." },
-          "createdBy": { "type": "string", "description": "User who created the revision." },
-          "creationMethod": { "type": "string", "description": "How the revision was created." },
-          "appliedOn": { "type": "string", "format": "date-time", "description": "Timestamp when the revision was last applied." },
-          "appliedBy": { "type": "string", "description": "User who last applied the revision." }
+          "id": {
+            "type": "string",
+            "description": "Revision identifier."
+          },
+          "name": {
+            "type": "string",
+            "description": "Revision name."
+          },
+          "description": {
+            "type": "string",
+            "description": "Revision description."
+          },
+          "createdOn": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the revision was created."
+          },
+          "createdBy": {
+            "type": "string",
+            "description": "User who created the revision."
+          },
+          "creationMethod": {
+            "type": "string",
+            "description": "How the revision was created."
+          },
+          "appliedOn": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the revision was last applied."
+          },
+          "appliedBy": {
+            "type": "string",
+            "description": "User who last applied the revision."
+          }
         }
       },
       "SyncTask": {
         "type": "object",
         "properties": {
-          "taskId": { "type": "string", "description": "Unique identifier of the sync task." },
-          "taskUrl": { "type": "string", "description": "URL to retrieve this task's status." },
+          "taskId": {
+            "type": "string",
+            "description": "Unique identifier of the sync task."
+          },
+          "taskUrl": {
+            "type": "string",
+            "description": "URL to retrieve this task's status."
+          },
           "taskState": {
             "type": "string",
-            "enum": ["IN_PROGRESS", "COMPLETE"],
+            "enum": [
+              "IN_PROGRESS",
+              "COMPLETE"
+            ],
             "description": "Current state of the task."
           },
-          "creationTime": { "type": "string", "format": "date-time", "description": "When the task was created." },
-          "result": { "$ref": "#/components/schemas/TaskResult" }
+          "creationTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the task was created."
+          },
+          "result": {
+            "$ref": "#/components/schemas/TaskResult"
+          }
         }
       },
       "TaskResult": {
         "type": "object",
         "properties": {
-          "successful": { "type": "boolean", "description": "Whether the task completed successfully." },
-          "reportFileUrl": { "type": "string", "description": "URL to download the report file (present on successful report tasks)." },
-          "error": { "$ref": "#/components/schemas/TaskError" }
+          "successful": {
+            "type": "boolean",
+            "description": "Whether the task completed successfully."
+          },
+          "reportFileUrl": {
+            "type": "string",
+            "description": "URL to download the report file (present on successful report tasks)."
+          },
+          "error": {
+            "$ref": "#/components/schemas/TaskError"
+          }
         }
       },
       "TaskError": {
         "type": "object",
         "properties": {
-          "title": { "type": "string" },
-          "messageText": { "type": "string" }
+          "title": {
+            "type": "string"
+          },
+          "messageText": {
+            "type": "string"
+          }
         }
       },
       "AppliedModel": {
         "type": "object",
         "properties": {
-          "modelId": { "type": "string" },
-          "modelName": { "type": "string", "description": "Omitted when modelDeleted is true." },
-          "workspaceId": { "type": "string", "description": "Omitted when modelDeleted is true." },
-          "appliedBy": { "type": "string" },
-          "appliedOn": { "type": "string", "format": "date-time" },
-          "appliedMethod": { "type": "string" },
-          "modelDeleted": { "type": "boolean", "description": "True if the model has been deleted." }
+          "modelId": {
+            "type": "string"
+          },
+          "modelName": {
+            "type": "string",
+            "description": "Omitted when modelDeleted is true."
+          },
+          "workspaceId": {
+            "type": "string",
+            "description": "Omitted when modelDeleted is true."
+          },
+          "appliedBy": {
+            "type": "string"
+          },
+          "appliedOn": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "appliedMethod": {
+            "type": "string"
+          },
+          "modelDeleted": {
+            "type": "boolean",
+            "description": "True if the model has been deleted."
+          }
         }
       },
       "Meta": {
         "type": "object",
-        "required": ["schema"],
+        "required": [
+          "schema"
+        ],
         "properties": {
-          "schema": { "type": "string", "description": "URL identifying the response schema." },
-          "paging": { "$ref": "#/components/schemas/Paging" }
+          "schema": {
+            "type": "string",
+            "description": "URL identifying the response schema."
+          },
+          "paging": {
+            "$ref": "#/components/schemas/Paging"
+          }
         }
       },
       "Paging": {
         "type": "object",
-        "required": ["currentPageSize", "offset", "totalSize"],
+        "required": [
+          "currentPageSize",
+          "offset",
+          "totalSize"
+        ],
         "properties": {
-          "currentPageSize": { "type": "integer" },
-          "offset": { "type": "integer" },
-          "totalSize": { "type": "integer" }
+          "currentPageSize": {
+            "type": "integer"
+          },
+          "offset": {
+            "type": "integer"
+          },
+          "totalSize": {
+            "type": "integer"
+          }
         }
       },
       "Status": {
         "type": "object",
         "properties": {
-          "code": { "type": "integer" },
-          "message": { "type": "string" }
+          "code": {
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          }
         }
       },
       "RevisionResponse": {
         "type": "object",
         "description": "When no revision exists, the response contains only meta and status — the 'revision' key is omitted.",
         "properties": {
-          "meta": { "$ref": "#/components/schemas/Meta" },
-          "status": { "$ref": "#/components/schemas/Status" },
-          "revision": { "$ref": "#/components/schemas/Revision" }
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "status": {
+            "$ref": "#/components/schemas/Status"
+          },
+          "revision": {
+            "$ref": "#/components/schemas/Revision"
+          }
         }
       },
       "RevisionListResponse": {
         "type": "object",
         "properties": {
-          "meta": { "$ref": "#/components/schemas/Meta" },
-          "status": { "$ref": "#/components/schemas/Status" },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "status": {
+            "$ref": "#/components/schemas/Status"
+          },
           "revisions": {
             "type": "array",
-            "items": { "$ref": "#/components/schemas/Revision" }
+            "items": {
+              "$ref": "#/components/schemas/Revision"
+            }
           }
         }
       },
       "SyncTaskResponse": {
         "type": "object",
         "properties": {
-          "meta": { "$ref": "#/components/schemas/Meta" },
-          "status": { "$ref": "#/components/schemas/Status" },
-          "task": { "$ref": "#/components/schemas/SyncTask" }
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "status": {
+            "$ref": "#/components/schemas/Status"
+          },
+          "task": {
+            "$ref": "#/components/schemas/SyncTask"
+          }
         }
       },
       "SyncTaskListResponse": {
         "type": "object",
         "description": "When no sync tasks exist in the last 48 hours, the response contains only meta and status — the 'tasks' key is omitted entirely rather than returning an empty array.",
         "properties": {
-          "meta": { "$ref": "#/components/schemas/Meta" },
-          "status": { "$ref": "#/components/schemas/Status" },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "status": {
+            "$ref": "#/components/schemas/Status"
+          },
           "tasks": {
             "type": "array",
-            "items": { "$ref": "#/components/schemas/SyncTask" }
+            "items": {
+              "$ref": "#/components/schemas/SyncTask"
+            }
           }
         }
       },
       "ReportTaskResponse": {
         "type": "object",
         "properties": {
-          "meta": { "$ref": "#/components/schemas/Meta" },
-          "status": { "$ref": "#/components/schemas/Status" },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "status": {
+            "$ref": "#/components/schemas/Status"
+          },
           "task": {
             "type": "object",
             "properties": {
-              "taskId": { "type": "string" },
-              "taskUrl": { "type": "string" },
+              "taskId": {
+                "type": "string"
+              },
+              "taskUrl": {
+                "type": "string"
+              },
               "taskState": {
                 "type": "string",
-                "enum": ["IN_PROGRESS", "COMPLETE"]
+                "enum": [
+                  "IN_PROGRESS",
+                  "COMPLETE"
+                ]
               },
-              "result": { "$ref": "#/components/schemas/TaskResult" }
+              "result": {
+                "$ref": "#/components/schemas/TaskResult"
+              }
             }
           }
         }
@@ -722,11 +1062,17 @@
       "AppliedModelsResponse": {
         "type": "object",
         "properties": {
-          "meta": { "$ref": "#/components/schemas/Meta" },
-          "status": { "$ref": "#/components/schemas/Status" },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "status": {
+            "$ref": "#/components/schemas/Status"
+          },
           "appliedToModels": {
             "type": "array",
-            "items": { "$ref": "#/components/schemas/AppliedModel" }
+            "items": {
+              "$ref": "#/components/schemas/AppliedModel"
+            }
           }
         }
       },
@@ -736,24 +1082,42 @@
           "summaryReport": {
             "type": "object",
             "properties": {
-              "targetRevisionId": { "type": "string" },
-              "sourceRevisionId": { "type": "string" },
+              "targetRevisionId": {
+                "type": "string"
+              },
+              "sourceRevisionId": {
+                "type": "string"
+              },
               "totals": {
                 "type": "object",
                 "properties": {
-                  "modified": { "type": "integer" },
-                  "deleted": { "type": "integer" },
-                  "created": { "type": "integer" }
+                  "modified": {
+                    "type": "integer"
+                  },
+                  "deleted": {
+                    "type": "integer"
+                  },
+                  "created": {
+                    "type": "integer"
+                  }
                 }
               },
               "differences": {
                 "type": "object",
                 "description": "Change details by category. Categories with no changes are omitted.",
                 "properties": {
-                  "lineItems": { "type": "object" },
-                  "rolesContents": { "type": "object" },
-                  "lists": { "type": "object" },
-                  "modules": { "type": "object" }
+                  "lineItems": {
+                    "type": "object"
+                  },
+                  "rolesContents": {
+                    "type": "object"
+                  },
+                  "lists": {
+                    "type": "object"
+                  },
+                  "modules": {
+                    "type": "object"
+                  }
                 }
               }
             }

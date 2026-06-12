@@ -76,8 +76,8 @@
           {
             "name": "userGuid",
             "in": "path",
-            "required": true,
             "description": "GUID of the user whose exception-user status is being changed.",
+            "required": true,
             "schema": {
               "type": "string"
             }
