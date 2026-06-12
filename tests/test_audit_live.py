@@ -51,11 +51,16 @@ SPEC_PATH = pathlib.Path(__file__).parent.parent / "audit" / "audit-openapi.json
 
 _NO_ROLE_STATUS = "FAILURE_UNAUTHORIZED_USER_ACTION"
 
+# Generous read timeout: an unfiltered GET /events pulls an unbounded result set
+# that can exceed httpx's 5s default, producing flaky ReadTimeouts unrelated to
+# the behavior under test. Applied to every client in this module.
+_REQUEST_TIMEOUT = httpx.Timeout(30.0)
+
 
 def _get_anaplan_token(username: str, password: str) -> str | None:
     """Authenticate via Basic auth and return an AnaplanAuthToken value."""
     auth_b64 = base64.b64encode(f"{username}:{password}".encode()).decode()
-    with httpx.Client() as client:
+    with httpx.Client(timeout=_REQUEST_TIMEOUT) as client:
         response = client.post(
             f"{AUTH_URL}/token/authenticate",
             headers={"Authorization": f"Basic {auth_b64}"},
@@ -126,7 +131,7 @@ def audit_token():
 
     yield token
 
-    with httpx.Client() as client:
+    with httpx.Client(timeout=_REQUEST_TIMEOUT) as client:
         client.post(
             f"{AUTH_URL}/token/logout",
             headers={"Authorization": f"AnaplanAuthToken {token}"},
@@ -145,7 +150,7 @@ def test_audit_get_events_responds(audit_token):
     for this case — confirmed via live testing 2026-06-08).
     Any other status indicates a genuine authentication failure.
     """
-    with httpx.Client() as client:
+    with httpx.Client(timeout=_REQUEST_TIMEOUT) as client:
         response = client.get(
             f"{AUDIT_BASE_URL}/events",
             headers={
@@ -183,7 +188,7 @@ def test_audit_get_events_response_has_response_key(audit_token):
     Verifies the AuditEventsResponse schema shape documented in the spec.
     Skipped if caller lacks the Tenant Auditor role (401 FAILURE_UNAUTHORIZED_USER_ACTION).
     """
-    with httpx.Client() as client:
+    with httpx.Client(timeout=_REQUEST_TIMEOUT) as client:
         response = client.get(
             f"{AUDIT_BASE_URL}/events",
             params={"intervalInHours": "1"},
@@ -214,7 +219,7 @@ def test_audit_get_events_paging_meta_shape(audit_token):
     Verifies the AuditPaging schema fields documented in the spec.
     Skipped if caller lacks the Tenant Auditor role.
     """
-    with httpx.Client() as client:
+    with httpx.Client(timeout=_REQUEST_TIMEOUT) as client:
         response = client.get(
             f"{AUDIT_BASE_URL}/events",
             params={"intervalInHours": "24"},
@@ -257,7 +262,7 @@ def test_audit_get_events_type_param_all(audit_token):
     The spec documents three enum values: all, byok, user_activity.
     A 200 or role-based 401 confirms the parameter is processed without error.
     """
-    with httpx.Client() as client:
+    with httpx.Client(timeout=_REQUEST_TIMEOUT) as client:
         response = client.get(
             f"{AUDIT_BASE_URL}/events",
             params={"type": "all", "intervalInHours": "1"},
@@ -283,7 +288,7 @@ def test_audit_post_search_responds(audit_token):
     Verifies the POST endpoint exists at the documented path and accepts the
     AuditSearchRequest schema's 'interval' field.
     """
-    with httpx.Client() as client:
+    with httpx.Client(timeout=_REQUEST_TIMEOUT) as client:
         response = client.post(
             f"{AUDIT_BASE_URL}/events/search",
             json={"interval": 1},
@@ -308,7 +313,7 @@ def test_audit_post_search_response_shape(audit_token):
 
     Skipped if caller lacks the Tenant Auditor role.
     """
-    with httpx.Client() as client:
+    with httpx.Client(timeout=_REQUEST_TIMEOUT) as client:
         response = client.post(
             f"{AUDIT_BASE_URL}/events/search",
             json={"interval": 24},
@@ -343,7 +348,7 @@ def test_audit_get_events_cef_format_probe(audit_token):
     the spec's text/plain content type declaration is accurate.
     Skipped if caller lacks the Tenant Auditor role.
     """
-    with httpx.Client() as client:
+    with httpx.Client(timeout=_REQUEST_TIMEOUT) as client:
         response = client.get(
             f"{AUDIT_BASE_URL}/events",
             params={"intervalInHours": "1"},
