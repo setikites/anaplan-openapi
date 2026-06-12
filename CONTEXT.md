@@ -88,14 +88,14 @@ Anaplan has 9 publicly documented REST APIs, each with different characteristics
 
 #### 9. Exception Users API
 - **Purpose**: Manage exception users (users who can bypass SSO enforcement)
-- **Auth**: `AnaplanApiKey` (confirmed via live testing); Bearer (service-to-service only); AnaplanAuthToken rejected for API key credentials
-- **Source of Truth**: Apiary docs + Postman collection (top-level "Exception Users" folder, 4 requests) + sample responses in `exception/README.md`
+- **Auth**: `AnaplanAuthToken` (confirmed — works with both Authentication API tokens and OAuth Authorization Code access tokens); `AnaplanApiKey` (confirmed); `Bearer` rejected with `FAILURE_BAD_HEADER` even for valid OAuth tokens
+- **Source of Truth**: Apiary docs + Postman collection (top-level "Exception Users" folder, 4 requests) + live testing (issue #51)
 - **Key Points**:
   - Requires Tenant Security Admin role
-  - Auth scheme confirmed via live testing; search contract blocked pending Tenant Security Admin role (issue #51)
+  - **Fully live-tested (issue #51)**: auth schemes, search by workspace, search by user, and PATCH invalid-op error probe all confirmed
   - Two endpoints: `PATCH` assign/unassign a user, `POST` search (by workspace or by user)
   - POST search uses `oneOf` request body — `workspaceGuid` or `userGuid` (mutually exclusive)
-  - Error response body shape modeled from Apiary descriptions; confirm field names via live testing (issue #51)
+  - Error response body confirmed: `{ "status": "...", "statusMessage": "..." }` (Apiary called it `message`; live testing shows `statusMessage`)
 
 ## Key Patterns and Variations
 
@@ -241,7 +241,7 @@ Legacy regions (us1–us7, eu1, eu2, eu4, ap1) share the older non-prefixed `api
 | ALM | ✓ | ✓ | — | Medium | Medium | hand-maintained (do not rebuild) |
 | Audit | ✓ | ✓ | — | High (events path: auth/role, event contract, filtering/pagination, CEF — issues #58–#61) | High | hand-maintained (do not rebuild) |
 | Financial Consolidation | ✓ | — | — | Low | Low | hand-maintained (do not rebuild) |
-| Exception Users | ✓ | ✓ | ✓ | Low | Low | hand-maintained (do not rebuild) |
+| Exception Users | ✓ | ✓ | ✓ | High (auth schemes, search by workspace/user, PATCH error probe — issue #51) | High | hand-maintained (do not rebuild) |
 
 ## Project Structure
 
@@ -284,11 +284,11 @@ Each API folder contains:
 
 All 9 specs now exist. Ongoing work is refinement rather than initial authoring:
 
-- **Hand-maintained specs** (Authentication, OAuth, Integration) have live tests
+- **Hand-maintained specs** (Authentication, OAuth, Integration, Audit, Exception Users) have live tests
   and must be edited by hand — do **not** re-run `scripts/build_spec.py` against
   them (see [CONTRIBUTING.md](CONTRIBUTING.md)).
-- **Bootstrap specs** (CloudWorks, SCIM, ALM, Audit, Financial Consolidation,
-  Exception Users) can be improved by adding live tests and graduating them to
+- **Bootstrap specs** (CloudWorks, SCIM, ALM, Financial Consolidation)
+  can be improved by adding live tests and graduating them to
   hand-maintained as coverage grows.
 - Record any behavior that differs from the official docs in the relevant
   `<api>/README.md` under "Discrepancies".

@@ -7,7 +7,7 @@
 | Apiary docs | ✓ | https://exceptionusersapi2.docs.apiary.io/ — primary source |
 | Local blueprint | ✓ | `sources/exception/apiary-blueprint.json` — Apiary blueprint cached locally |
 | Postman collection | ✓ | Official Anaplan Collection — top-level "Exception Users" folder, 4 requests |
-| Live testing | Partial | Auth scheme and PATCH error probe confirmed; search contract blocked (see below) |
+| Live testing | ✓ | Auth schemes, search contract (by workspace and by user), and PATCH error probe confirmed via OAuth Authorization Code grant (issue #51) |
 
 ## Purpose
 
@@ -43,15 +43,17 @@ The Exception Users API is served from `{region}.api.anaplan.com` under the `/ad
 
 ## Authentication
 
-Three schemes were probed via live testing. The `AnaplanApiKey` prefix is the correct format for Anaplan API keys; Bearer and AnaplanAuthToken are rejected for API key credentials.
+All three schemes were probed via live testing using both API key and OAuth Authorization Code credentials.
 
 | Scheme | Format | Status |
 |--------|--------|--------|
-| AnaplanApiKey | `Authorization: AnaplanApiKey auk_<region>_<value>` | **Confirmed accepted** (issue #51) — use this for API key auth |
-| AnaplanAuthToken | `Authorization: AnaplanAuthToken <token>` | Rejected (401 FAILURE_INVALID_TOKEN) when used with an API key |
-| BearerAuth | `Authorization: Bearer <token>` | Rejected (400 FAILURE_BAD_HEADER) when used with an API key; may work for OAuth service-to-service tokens |
+| AnaplanAuthToken | `Authorization: AnaplanAuthToken <token>` | **Confirmed accepted** — works with both Authentication API tokens and OAuth Authorization Code access tokens |
+| AnaplanApiKey | `Authorization: AnaplanApiKey auk_<region>_<value>` | **Confirmed accepted** — API keys accepted (issue #51) |
+| Bearer | `Authorization: Bearer <token>` | **Rejected** — returns `400 FAILURE_BAD_HEADER` even for valid OAuth tokens |
 
-The error message returned when auth fails: `FAILURE_BAD_HEADER: Request header invalid, token or apikey or Oauth service-to-service token is required`. This confirms three distinct auth methods exist; API keys use the `AnaplanApiKey` prefix, not `Bearer`.
+The error message returned when the auth header is invalid: `FAILURE_BAD_HEADER: Request header invalid, token or apikey or Oauth service-to-service token is required`.
+
+OAuth access tokens must use the `AnaplanAuthToken` prefix, not `Bearer`. This is consistent with the Audit API behavior.
 
 ## Base Path
 
@@ -85,24 +87,16 @@ Returns 204 on success. Returns 400 if `op` is invalid or missing, `workspaceGui
 
 ## Testing Coverage
 
+Live tests run with OAuth Authorization Code grant (`AnaplanAuthToken {access_token}`), Tenant Security Admin role. Run with `--live --allow-writes`.
+
 | Endpoint | Test | Result | Notes |
 |----------|------|--------|-------|
-| `POST /search` | AnaplanApiKey auth accepted | ✓ | 400 FAILURE_BAD_REQUEST (not FAILURE_BAD_HEADER) confirms auth layer accepted key |
-| `POST /search` | Bearer prefix rejected for API keys | ✓ | 400 FAILURE_BAD_HEADER confirms Bearer does not work for API key credentials |
-| `POST /search` | AnaplanAuthToken prefix rejected | ✓ | 401 FAILURE_INVALID_TOKEN |
-| `POST /search` | Search by workspace — response shape | ✗ | Blocked: API key account lacks Tenant Security Admin role (400 FAILURE_BAD_REQUEST) |
-| `POST /search` | Search by user — response shape | ✗ | Blocked: API key account lacks Tenant Security Admin role (400 FAILURE_BAD_REQUEST) |
-| `PATCH /users/{userGuid}` | Invalid `op` returns 400 | ✓ | Confirmed via live test with `op: "invalid_op"` (issue #51) |
-
-## Blocker: Tenant Security Admin role for API key account
-
-The search contract tests require the API key's account to hold the **Tenant Security Admin** role. Live testing returns `FAILURE_BAD_REQUEST: Invalid request` for both workspace and user search using `ANAPLAN_API_KEY`, indicating the key account lacks this role.
-
-**To unblock:**
-1. Grant the account associated with `ANAPLAN_API_KEY` the Tenant Security Admin role in Anaplan.
-2. Re-run `uv run --env-file .env pytest tests/test_exception_live.py --live --allow-writes`.
-
-The OAuth service-to-service blocker from issue #51 is now resolved — API keys with the `AnaplanApiKey` prefix are the preferred auth method for this API.
+| `POST /search` | AnaplanAuthToken (OAuth) accepted | ✓ | Auth confirmed; non-401, non-FAILURE_BAD_HEADER response |
+| `POST /search` | Bearer (OAuth) rejected | ✓ | 400 FAILURE_BAD_HEADER — Bearer not accepted even for valid OAuth tokens |
+| `POST /search` | AnaplanApiKey accepted | ✓ | 400 without FAILURE_BAD_HEADER confirms auth layer accepted key |
+| `POST /search` | Search by workspace — response shape | ✓ | 200 with `response` array of `{ workspaceGuid, workspaceName, users }` objects |
+| `POST /search` | Search by user — response shape | ✓ | 200 with `response` array |
+| `PATCH /users/{userGuid}` | Invalid `op` returns 400 | ✓ | `op: "invalid_op"` returns 400 as expected |
 
 ## Postman Collection
 
@@ -121,6 +115,7 @@ The collection description adds a note not present in Apiary: *"To use this API,
 
 ## Discrepancies and Notes
 
-- **Apiary documents only AnaplanAuthToken**: Live testing confirmed the Bearer scheme is also accepted. BearerAuth has been added to the spec (issue #51).
-- **Bearer requires service-to-service token**: Apiary and the Anaplan auth docs do not explicitly state this constraint. Discovered via live testing — user auth-code tokens are rejected with `FAILURE_BAD_HEADER`.
-- **Error response field names unconfirmed**: The spec's `ErrorResponse` schema uses `status` and `message` fields inferred from Apiary. The live 400 response used `status` and `statusMessage`. The spec should be updated once confirmed across both endpoints.
+- **Apiary documents only AnaplanAuthToken**: Confirmed correct. Bearer is rejected even for valid OAuth tokens (`FAILURE_BAD_HEADER`). BearerAuth was initially added to the spec but removed after live testing confirmed it is not accepted (issue #51).
+- **OAuth tokens use AnaplanAuthToken prefix**: Contrary to the OAuth 2.0 convention (`Bearer`), Anaplan's admin APIs (Exception Users, Audit) require OAuth access tokens to be sent with the `AnaplanAuthToken` prefix rather than `Bearer`.
+- **Error response uses `statusMessage` not `message`**: The live 400 response body contains `{ "status": "FAILURE_BAD_HEADER", "statusMessage": "..." }`. The spec's `ErrorResponse` schema models both fields correctly; the `message` field documented in Apiary appears to be `statusMessage` in practice.
+- **Postman "List workspaces" empty body**: The Postman collection sends `{}` for the by-user search. Live testing confirms `userGuid` is required — the empty body case is likely a Postman authoring error. The spec correctly documents `userGuid` as required for by-user search.
