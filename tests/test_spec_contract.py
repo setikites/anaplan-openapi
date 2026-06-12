@@ -27,6 +27,7 @@ SPEC_FILES = sorted(REPO_ROOT.glob("*/*-openapi.json"))
 # From CONTEXT.md: expected server URL host fragment per API directory.
 # auth.anaplan.com  → Authentication API (token generation)
 # app.anaplan.com   → OAuth 2.0 API
+# audit.anaplan.com → Audit API (dedicated global host; confirmed via live testing)
 # api.anaplan.com   → all other data-plane APIs
 SERVER_URL_PATTERNS: dict[str, str] = {
     "authentication":          "auth.anaplan.com",
@@ -34,7 +35,7 @@ SERVER_URL_PATTERNS: dict[str, str] = {
     "integration":             "api.anaplan.com",
     "scim":                    "api.anaplan.com",
     "alm":                     "api.anaplan.com",
-    "audit":                   "api.anaplan.com",
+    "audit":                   "audit.anaplan.com",
     "cloudworks":              "api.anaplan.com",
     "financial-consolidation": "fluenceapi-prod.fluence.app",
     "exception":               "api.anaplan.com",
@@ -43,9 +44,12 @@ SERVER_URL_PATTERNS: dict[str, str] = {
 # Host fragments that must NOT appear in a spec of each family.
 # Catches copy-paste where e.g. a data-plane spec accidentally carries app.anaplan.com URLs.
 _WRONG_URL_FRAGMENTS: dict[str, list[str]] = {
-    "auth.anaplan.com": ["api.anaplan.com"],
-    "app.anaplan.com":  ["auth.anaplan.com", "api.anaplan.com"],
-    "api.anaplan.com":  ["auth.anaplan.com", "app.anaplan.com"],
+    "auth.anaplan.com":  ["api.anaplan.com"],
+    "app.anaplan.com":   ["auth.anaplan.com", "api.anaplan.com"],
+    "api.anaplan.com":   ["auth.anaplan.com", "app.anaplan.com"],
+    # Audit has a dedicated host; the api.anaplan.com data-plane hosts return 404
+    # for /audit/api/1 (confirmed via live testing, issues #58–#61).
+    "audit.anaplan.com": ["api.anaplan.com"],
 }
 
 _HTTP_METHODS = frozenset(
@@ -272,11 +276,13 @@ def test_server_urls_dont_use_wrong_base(spec_path):
 # Minimum server entry count for specs that cover all 19 Anaplan regions.
 # 12 = 11 unique regional hosts + 1 shared legacy host (api.anaplan.com).
 # cloudworks is excluded until its spec reaches full regional coverage.
+# audit is excluded: it is served from a single dedicated global host
+# (audit.anaplan.com), not the regional api.anaplan.com pattern — confirmed via
+# live testing (issues #58–#61).
 _MIN_SERVER_COUNT: dict[str, int] = {
     "integration": 12,
     "alm":         12,
     "scim":        12,
-    "audit":       12,
     "exception":   12,
 }
 

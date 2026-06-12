@@ -195,8 +195,9 @@ The URL pattern varies by API type:
 | API type | URL pattern |
 |----------|-------------|
 | OAuth 2.0 API | `https://{region}.app.anaplan.com` |
-| Integration, ALM, SCIM, Audit, Exception Users, CloudWorks | `https://{region}.api.anaplan.com` |
+| Integration, ALM, SCIM, Exception Users, CloudWorks | `https://{region}.api.anaplan.com` |
 | Authentication (Auth) API | `https://{region}.auth.anaplan.com` |
+| Audit API | `https://audit.anaplan.com/audit/api/1` (single dedicated global host — **not** regional `api.anaplan.com`; confirmed via live testing) |
 
 Full regional URL table (19 regions):
 
