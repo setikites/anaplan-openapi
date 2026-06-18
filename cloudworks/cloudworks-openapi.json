@@ -1940,7 +1940,6 @@
         "schema": {
           "type": "string"
         },
-        "description": "Integration ID.",
         "example": "fe40dc5793084f7dbb685cffe6a5ad2a"
       },
       "connectionId": {
@@ -1949,8 +1948,7 @@
         "required": true,
         "schema": {
           "type": "string"
-        },
-        "description": "Connection ID."
+        }
       },
       "notificationId": {
         "name": "notificationId",
@@ -1959,7 +1957,6 @@
         "schema": {
           "type": "string"
         },
-        "description": "Notification configuration ID.",
         "example": "067d1426ac964a7cac871c87790c4555"
       },
       "runId": {
@@ -1969,7 +1966,6 @@
         "schema": {
           "type": "string"
         },
-        "description": "Run ID.",
         "example": "hy40d89893084f0dkb985cmme9i5io2a"
       },
       "integrationFlowId": {
@@ -1979,12 +1975,12 @@
         "schema": {
           "type": "string"
         },
-        "description": "Integration flow ID.",
         "example": "fe40dc5793084f7dbb685cffe6a5ad2a"
       }
     },
     "schemas": {
       "Status": {
+        "description": "Response envelope present on every successful CloudWorks operation.",
         "type": "object",
         "properties": {
           "code": {
@@ -1998,6 +1994,7 @@
         }
       },
       "ErrorStatus": {
+        "description": "Error envelope returned on 4xx/5xx responses.",
         "type": "object",
         "properties": {
           "status": {
@@ -2007,6 +2004,7 @@
                 "type": "integer"
               },
               "message": {
+                "description": "Human-readable error description.",
                 "type": "string"
               }
             }
@@ -2024,7 +2022,6 @@
         "properties": {
           "type": {
             "type": "string",
-            "description": "Job type.",
             "enum": [
               "AmazonS3ToAnaplan",
               "AnaplanToAmazonS3",
@@ -2128,12 +2125,10 @@
         "properties": {
           "name": {
             "type": "string",
-            "description": "Schedule name.",
             "example": "test schedule"
           },
           "type": {
             "type": "string",
-            "description": "Schedule type.",
             "enum": [
               "weekly",
               "daily",
@@ -2208,6 +2203,7 @@
         }
       },
       "IntegrationSummary": {
+        "description": "Summary view of an integration, returned in list responses.",
         "type": "object",
         "properties": {
           "integrationId": {
@@ -2235,9 +2231,11 @@
             "type": "string"
           },
           "latestRun": {
+            "description": "Details of the most recent run; absent if the integration has never been run.",
             "type": "object",
             "properties": {
               "triggeredBy": {
+                "description": "Display name of the user who triggered the run, or a system identifier for scheduled runs.",
                 "type": "string"
               },
               "startDate": {
@@ -2252,23 +2250,28 @@
                 "type": "boolean"
               },
               "message": {
+                "description": "Outcome message for this run, e.g. \"Success\".",
                 "type": "string"
               },
               "executionErrorCode": {
+                "description": "Error code if the run failed; null on success.",
                 "type": "string",
                 "nullable": true
               }
             }
           },
           "notificationId": {
+            "description": "ID of the notification configuration attached to this integration, if any.",
             "type": "string"
           },
           "nuxVisible": {
+            "description": "Whether this integration is visible in the CloudWorks UI.",
             "type": "boolean"
           }
         }
       },
       "IntegrationDetail": {
+        "description": "Full integration details, returned by the get-by-ID endpoint. Extends IntegrationSummary.",
         "allOf": [
           {
             "$ref": "#/components/schemas/IntegrationSummary"
@@ -2283,9 +2286,11 @@
                 "type": "string"
               },
               "version": {
+                "description": "Integration schema version; currently \"2.0\".",
                 "type": "string"
               },
               "jobs": {
+                "description": "Import/export job definitions; empty for process integrations.",
                 "type": "array",
                 "items": {
                   "$ref": "#/components/schemas/Job"
@@ -2299,12 +2304,14 @@
         ]
       },
       "RunRecord": {
+        "description": "Record of a single integration run, returned in run history responses.",
         "type": "object",
         "properties": {
           "id": {
             "type": "string"
           },
           "triggeredBy": {
+            "description": "Display name of the user who triggered the run, or a system identifier for scheduled runs.",
             "type": "string"
           },
           "lastRun": {
@@ -2323,9 +2330,11 @@
             "type": "boolean"
           },
           "message": {
+            "description": "Outcome message for this run, e.g. \"Success\".",
             "type": "string"
           },
           "executionErrorCode": {
+            "description": "Error code if the run failed; null on success.",
             "type": "string",
             "nullable": true
           }
@@ -2365,6 +2374,7 @@
             ]
           },
           "notifications": {
+            "description": "Notification rules; each entry in config maps an outcome type to the users to notify.",
             "type": "object",
             "required": [
               "config"
@@ -2376,6 +2386,7 @@
                   "type": "object",
                   "properties": {
                     "type": {
+                      "description": "The integration outcome that triggers notification: success, partial_failure, or full_failure.",
                       "type": "string",
                       "enum": [
                         "success",
@@ -2398,6 +2409,7 @@
         }
       },
       "NotificationConfig": {
+        "description": "Notification configuration as returned by the API. Mirrors NotificationRequest plus resolved user details.",
         "type": "object",
         "properties": {
           "notificationId": {
@@ -2451,6 +2463,7 @@
         }
       },
       "PagingMeta": {
+        "description": "Pagination metadata block returned with list responses.",
         "type": "object",
         "properties": {
           "paging": {
@@ -2468,6 +2481,7 @@
             }
           },
           "schema": {
+            "description": "URL to the JSON schema definition for this response type.",
             "type": "string"
           }
         }

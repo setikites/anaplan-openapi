@@ -501,3 +501,243 @@ def test_cloudworks_get_integration_flows_responds(cw_token, cw_base_url):
         "Response must have a top-level 'integrationFlows' key (matches spec schema)"
     )
     assert isinstance(body["integrationFlows"], list), "'integrationFlows' must be an array"
+
+
+# ── Fixture: first available integrationId ────────────────────────────────────
+
+@pytest.fixture(scope="module")
+def cw_first_integration(cw_token, cw_base_url):
+    """Return the first IntegrationSummary from GET /integrations, or skip if none.
+
+    Used by tests that need a real integrationId to probe /integrations/{id}
+    and /integrations/runs/{id}.
+    """
+    with httpx.Client() as client:
+        response = client.get(
+            f"{cw_base_url}/integrations",
+            params={"offset": 0, "limit": 1},
+            headers={
+                "Authorization": f"AnaplanAuthToken {cw_token}",
+                "Accept": "application/json",
+            },
+        )
+    if response.status_code != 200:
+        pytest.skip(f"GET /integrations returned {response.status_code}; cannot get integrationId")
+    integrations = response.json().get("integrations", [])
+    if not integrations:
+        pytest.skip("No integrations available in this tenant; skipping integration-detail probes")
+    return integrations[0]
+
+
+# ── GET /integrations/{integrationId} ────────────────────────────────────────
+
+@pytest.mark.live
+def test_cloudworks_get_integration_by_id_shape(cw_token, cw_base_url, cw_first_integration):
+    """GET /integrations/{integrationId} returns IntegrationDetail shape.
+
+    Observes:
+    - Which fields are present on a real IntegrationDetail response
+    - Whether 'version' is present and what value it carries
+    - Whether 'latestRun' appears and what sub-fields it contains
+    - Whether 'jobs' appears (absent for process integrations)
+
+    Findings should inform the spec's IntegrationDetail property descriptions.
+    """
+    integration_id = cw_first_integration.get("integrationId")
+    assert integration_id, "cw_first_integration must have an integrationId"
+
+    with httpx.Client() as client:
+        response = client.get(
+            f"{cw_base_url}/integrations/{integration_id}",
+            headers={
+                "Authorization": f"AnaplanAuthToken {cw_token}",
+                "Accept": "application/json",
+            },
+        )
+
+    print(f"\nGET /integrations/{integration_id}: {response.status_code}")
+    print(f"Body: {response.text[:500]}")
+    assert response.status_code == 200, (
+        f"Expected 200, got {response.status_code}. Body: {response.text[:200]}"
+    )
+
+    body = response.json()
+    assert "integration" in body or "status" in body, (
+        "Response must have at least 'integration' or 'status' key"
+    )
+    integration = body.get("integration", body)
+
+    # Observe version field
+    if "version" in integration:
+        warnings.warn(
+            f"IntegrationDetail.version = {integration['version']!r} — "
+            "update spec description to reflect observed value.",
+            UserWarning, stacklevel=2,
+        )
+    else:
+        warnings.warn(
+            "IntegrationDetail.version not present in response — "
+            "field may be absent for some integration types.",
+            UserWarning, stacklevel=2,
+        )
+
+    # Observe latestRun and its sub-fields
+    latest_run = integration.get("latestRun")
+    if latest_run:
+        warnings.warn(
+            f"IntegrationDetail.latestRun keys observed: {sorted(latest_run.keys())} — "
+            f"triggeredBy={latest_run.get('triggeredBy')!r}, "
+            f"message={latest_run.get('message')!r}, "
+            f"executionErrorCode={latest_run.get('executionErrorCode')!r}",
+            UserWarning, stacklevel=2,
+        )
+    else:
+        warnings.warn(
+            "IntegrationDetail.latestRun is absent — integration may never have run.",
+            UserWarning, stacklevel=2,
+        )
+
+    # Observe jobs field
+    if "jobs" in integration:
+        warnings.warn(
+            f"IntegrationDetail.jobs present, len={len(integration['jobs'])} — "
+            "this is an import/export integration (not process).",
+            UserWarning, stacklevel=2,
+        )
+    elif "processId" in integration:
+        warnings.warn(
+            "IntegrationDetail.jobs absent and processId present — "
+            "this is a process integration (jobs is empty for process integrations, confirmed).",
+            UserWarning, stacklevel=2,
+        )
+
+
+# ── GET /integrations/runs/{integrationId} ───────────────────────────────────
+
+@pytest.mark.live
+def test_cloudworks_get_run_history_shape(cw_token, cw_base_url, cw_first_integration):
+    """GET /integrations/runs/{integrationId} returns RunRecord shape.
+
+    Observes:
+    - The structure of RunRecord items in the history_of_runs.runs array
+    - Whether 'lastRun' is present and whether it differs from 'endDate'
+    - What 'message' and 'executionErrorCode' contain on success vs. failure
+
+    Findings should inform RunRecord property descriptions in the spec.
+    """
+    integration_id = cw_first_integration.get("integrationId")
+    assert integration_id, "cw_first_integration must have an integrationId"
+
+    with httpx.Client() as client:
+        response = client.get(
+            f"{cw_base_url}/integrations/runs/{integration_id}",
+            params={"offset": 0, "limit": 3},
+            headers={
+                "Authorization": f"AnaplanAuthToken {cw_token}",
+                "Accept": "application/json",
+            },
+        )
+
+    print(f"\nGET /integrations/runs/{integration_id}: {response.status_code}")
+    print(f"Body: {response.text[:500]}")
+    assert response.status_code == 200, (
+        f"Expected 200, got {response.status_code}. Body: {response.text[:200]}"
+    )
+
+    body = response.json()
+    history = body.get("history_of_runs", {})
+    runs = history.get("runs", [])
+
+    if not runs:
+        warnings.warn(
+            "GET /integrations/runs returned no runs — "
+            "RunRecord shape cannot be confirmed from this integration.",
+            UserWarning, stacklevel=2,
+        )
+        return
+
+    run = runs[0]
+    warnings.warn(
+        f"RunRecord keys observed: {sorted(run.keys())}",
+        UserWarning, stacklevel=2,
+    )
+
+    # The key open question: does 'lastRun' differ from 'endDate'?
+    if "lastRun" in run and "endDate" in run:
+        same = run["lastRun"] == run["endDate"]
+        warnings.warn(
+            f"RunRecord.lastRun={run['lastRun']!r}, endDate={run['endDate']!r} — "
+            f"{'same value (lastRun may be redundant)' if same else 'DIFFERENT values'}",
+            UserWarning, stacklevel=2,
+        )
+    elif "lastRun" in run:
+        warnings.warn(
+            f"RunRecord.lastRun={run['lastRun']!r} (endDate absent)",
+            UserWarning, stacklevel=2,
+        )
+
+    # Observe message and executionErrorCode
+    warnings.warn(
+        f"RunRecord.message={run.get('message')!r}, "
+        f"executionErrorCode={run.get('executionErrorCode')!r}, "
+        f"success={run.get('success')!r}, "
+        f"triggeredBy={run.get('triggeredBy')!r}",
+        UserWarning, stacklevel=2,
+    )
+
+    # Observe meta.paging.schema URL
+    schema_url = body.get("meta", {}).get("schema")
+    if schema_url:
+        warnings.warn(
+            f"PagingMeta.schema URL observed: {schema_url!r} — "
+            "use this in the spec description for PagingMeta.schema.",
+            UserWarning, stacklevel=2,
+        )
+
+
+# ── GET /integrations/notification/{notificationId} ──────────────────────────
+
+@pytest.mark.live
+def test_cloudworks_get_notification_shape(cw_token, cw_base_url, cw_first_integration):
+    """GET /integrations/notification/{notificationId} returns NotificationConfig shape.
+
+    Requires the first integration to have a notificationId. Skips otherwise.
+    Observes the full NotificationConfig structure including resolved user details.
+    """
+    notification_id = cw_first_integration.get("notificationId")
+    if not notification_id:
+        pytest.skip(
+            "First integration has no notificationId — "
+            "cannot probe GET /integrations/notification/{notificationId}"
+        )
+
+    with httpx.Client() as client:
+        response = client.get(
+            f"{cw_base_url}/integrations/notification/{notification_id}",
+            headers={
+                "Authorization": f"AnaplanAuthToken {cw_token}",
+                "Accept": "application/json",
+            },
+        )
+
+    print(f"\nGET /integrations/notification/{notification_id}: {response.status_code}")
+    print(f"Body: {response.text[:500]}")
+    assert response.status_code == 200, (
+        f"Expected 200, got {response.status_code}. Body: {response.text[:200]}"
+    )
+
+    body = response.json()
+    notifications = body.get("notifications", {})
+    warnings.warn(
+        f"NotificationConfig keys observed: {sorted(notifications.keys()) if isinstance(notifications, dict) else type(notifications).__name__}",
+        UserWarning, stacklevel=2,
+    )
+
+    config = notifications.get("config", []) if isinstance(notifications, dict) else []
+    if config:
+        entry = config[0]
+        warnings.warn(
+            f"NotificationConfig.config[0] keys: {sorted(entry.keys())}, "
+            f"type={entry.get('type')!r}, users[0]={entry.get('users', [{}])[0] if entry.get('users') else 'none'}",
+            UserWarning, stacklevel=2,
+        )

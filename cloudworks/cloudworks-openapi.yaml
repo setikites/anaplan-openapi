@@ -18,10 +18,10 @@ paths:
   /integrations/connections:
     post:
       summary: Create a connection
+      description: Create a new connection to Amazon S3, Google BigQuery, or Azure Blob Storage for use in CloudWorks integrations.
       operationId: createConnection
       tags:
       - Connections
-      description: Create a new connection to Amazon S3, Google BigQuery, or Azure Blob Storage for use in CloudWorks integrations.
       requestBody:
         required: true
         content:
@@ -227,10 +227,10 @@ paths:
           $ref: '#/components/responses/InternalServerError'
     get:
       summary: Get connections
+      description: Retrieve all connections available to the authenticated user.
       operationId: getConnections
       tags:
       - Connections
-      description: Retrieve all connections available to the authenticated user.
       responses:
         '200':
           description: List of connections.
@@ -296,10 +296,10 @@ paths:
           $ref: '#/components/responses/NotFound'
     patch:
       summary: Patch a connection
+      description: Partially update one or more fields of an existing connection.
       operationId: patchConnection
       tags:
       - Connections
-      description: Partially update one or more fields of an existing connection.
       parameters:
       - $ref: '#/components/parameters/connectionId'
       requestBody:
@@ -337,12 +337,12 @@ paths:
   /integrations:
     post:
       summary: Create an integration
-      operationId: createIntegration
-      tags:
-      - Integrations
       description: Create a new import/export integration or process integration. For process integrations, include `processId`
         in the request body. The `jobs` array is required for import/export integrations and optional (0 or more) for process
         integrations.
+      operationId: createIntegration
+      tags:
+      - Integrations
       requestBody:
         required: true
         content:
@@ -408,36 +408,36 @@ paths:
           $ref: '#/components/responses/InternalServerError'
     get:
       summary: Get all integrations
+      description: Retrieve all integrations. Returns 25 integrations if `offset` and `limit` are not provided.
       operationId: getIntegrations
       tags:
       - Integrations
-      description: Retrieve all integrations. Returns 25 integrations if `offset` and `limit` are not provided.
       parameters:
       - name: offset
         in: query
+        description: Number of items to skip. First element is 0.
         schema:
           type: integer
-        description: Number of items to skip. First element is 0.
         example: 0
       - name: limit
         in: query
+        description: Number of integrations to return.
         schema:
           type: integer
-        description: Number of integrations to return.
         example: 10
       - name: myIntegrations
         in: query
+        description: Set to `1` to return only the current user's integrations.
         schema:
           type: integer
           enum:
           - 0
           - 1
-        description: Set to `1` to return only the current user's integrations.
       - name: sortBy
         in: query
+        description: 'Sort field. Prefix with `-` for descending order. Example: `name` (ascending) or `-name` (descending).'
         schema:
           type: string
-        description: 'Sort field. Prefix with `-` for descending order. Example: `name` (ascending) or `-name` (descending).'
       responses:
         '200':
           description: List of integrations.
@@ -508,10 +508,10 @@ paths:
           $ref: '#/components/responses/NotFound'
     put:
       summary: Edit an integration
+      description: Full update of an integration or process integration. The request body replaces all editable fields.
       operationId: editIntegration
       tags:
       - Integrations
-      description: Full update of an integration or process integration. The request body replaces all editable fields.
       parameters:
       - $ref: '#/components/parameters/integrationId'
       requestBody:
@@ -578,10 +578,10 @@ paths:
       parameters:
       - name: modelId
         in: path
+        description: Anaplan model ID.
         required: true
         schema:
           type: string
-        description: Anaplan model ID.
         example: E559BFF3B1GD4RKE874P745BEL259711
       responses:
         '200':
@@ -667,11 +667,11 @@ paths:
   /integrations/{integrationId}/schedule:
     post:
       summary: Create an integration schedule
+      description: 'Create a schedule for an integration. Supports a maximum of one schedule per integration. Schedule types:
+        `weekly`, `daily`, `hourly`, `monthly_specific_day`, `monthly_relative_weekday`.'
       operationId: createSchedule
       tags:
       - Schedules
-      description: 'Create a schedule for an integration. Supports a maximum of one schedule per integration. Schedule types:
-        `weekly`, `daily`, `hourly`, `monthly_specific_day`, `monthly_relative_weekday`.'
       parameters:
       - $ref: '#/components/parameters/integrationId'
       requestBody:
@@ -741,21 +741,21 @@ paths:
   /integrations/{integrationId}/schedule/status/{status}:
     post:
       summary: Set schedule status
+      description: Enable or disable the schedule for an integration.
       operationId: setScheduleStatus
       tags:
       - Schedules
-      description: Enable or disable the schedule for an integration.
       parameters:
       - $ref: '#/components/parameters/integrationId'
       - name: status
         in: path
+        description: Desired schedule status.
         required: true
         schema:
           type: string
           enum:
           - enabled
           - disabled
-        description: Desired schedule status.
       responses:
         '200':
           $ref: '#/components/responses/SuccessStatus'
@@ -772,24 +772,24 @@ paths:
       parameters:
       - name: integrationId
         in: path
+        description: Integration ID.
         required: true
         schema:
           type: string
-        description: Integration ID.
         example: fe40dc5793084f7dbb685cffe6a5ad2a
       - name: offset
         in: query
+        description: Number of items to skip. First element is 0.
         required: true
         schema:
           type: integer
-        description: Number of items to skip. First element is 0.
         example: 0
       - name: limit
         in: query
+        description: Number of run records to return.
         required: true
         schema:
           type: integer
-        description: Number of run records to return.
         example: 2
       responses:
         '200':
@@ -1002,11 +1002,11 @@ paths:
   /integrations/run/{runId}/dumps:
     get:
       summary: Get an import error log
+      description: Retrieve the import error log (dump file) for a specific run. The response body contains a CSV-formatted
+        error log.
       operationId: getImportErrorLog
       tags:
       - Error Logs
-      description: Retrieve the import error log (dump file) for a specific run. The response body contains a CSV-formatted
-        error log.
       parameters:
       - $ref: '#/components/parameters/runId'
       responses:
@@ -1026,18 +1026,18 @@ paths:
   /integrations/run/{runId}/process/import/{actionId}/dumps:
     get:
       summary: Get a process error log
+      description: Retrieve the process import error log (dump file) for a specific run and action.
       operationId: getProcessErrorLog
       tags:
       - Error Logs
-      description: Retrieve the process import error log (dump file) for a specific run and action.
       parameters:
       - $ref: '#/components/parameters/runId'
       - name: actionId
         in: path
+        description: Anaplan action ID.
         required: true
         schema:
           type: string
-        description: Anaplan action ID.
         example: '112000000011'
       responses:
         '200':
@@ -1056,10 +1056,10 @@ paths:
   /integrationflows:
     post:
       summary: Create an integration flow
+      description: Create a new multi-step integration flow. Requires at least two enabled steps.
       operationId: createIntegrationFlow
       tags:
       - Integration Flows
-      description: Create a new multi-step integration flow. Requires at least two enabled steps.
       requestBody:
         required: true
         content:
@@ -1159,14 +1159,14 @@ paths:
       parameters:
       - name: offset
         in: query
+        description: Number of items to skip.
         schema:
           type: integer
-        description: Number of items to skip.
       - name: limit
         in: query
+        description: Number of flows to return.
         schema:
           type: integer
-        description: Number of flows to return.
       responses:
         '200':
           description: List of integration flows.
@@ -1274,7 +1274,6 @@ components:
       required: true
       schema:
         type: string
-      description: Integration ID.
       example: fe40dc5793084f7dbb685cffe6a5ad2a
     connectionId:
       name: connectionId
@@ -1282,14 +1281,12 @@ components:
       required: true
       schema:
         type: string
-      description: Connection ID.
     notificationId:
       name: notificationId
       in: path
       required: true
       schema:
         type: string
-      description: Notification configuration ID.
       example: 067d1426ac964a7cac871c87790c4555
     runId:
       name: runId
@@ -1297,7 +1294,6 @@ components:
       required: true
       schema:
         type: string
-      description: Run ID.
       example: hy40d89893084f0dkb985cmme9i5io2a
     integrationFlowId:
       name: integrationFlowId
@@ -1305,10 +1301,10 @@ components:
       required: true
       schema:
         type: string
-      description: Integration flow ID.
       example: fe40dc5793084f7dbb685cffe6a5ad2a
   schemas:
     Status:
+      description: Response envelope present on every successful CloudWorks operation.
       type: object
       properties:
         code:
@@ -1318,6 +1314,7 @@ components:
           type: string
           example: Success
     ErrorStatus:
+      description: Error envelope returned on 4xx/5xx responses.
       type: object
       properties:
         status:
@@ -1326,6 +1323,7 @@ components:
             code:
               type: integer
             message:
+              description: Human-readable error description.
               type: string
     Job:
       type: object
@@ -1337,7 +1335,6 @@ components:
       properties:
         type:
           type: string
-          description: Job type.
           enum:
           - AmazonS3ToAnaplan
           - AnaplanToAmazonS3
@@ -1411,11 +1408,9 @@ components:
       properties:
         name:
           type: string
-          description: Schedule name.
           example: test schedule
         type:
           type: string
-          description: Schedule type.
           enum:
           - weekly
           - daily
@@ -1475,6 +1470,7 @@ components:
           description: IANA timezone name.
           example: Europe/Paris
     IntegrationSummary:
+      description: Summary view of an integration, returned in list responses.
       type: object
       properties:
         integrationId:
@@ -1495,9 +1491,11 @@ components:
         modifiedBy:
           type: string
         latestRun:
+          description: Details of the most recent run; absent if the integration has never been run.
           type: object
           properties:
             triggeredBy:
+              description: Display name of the user who triggered the run, or a system identifier for scheduled runs.
               type: string
             startDate:
               type: string
@@ -1508,15 +1506,20 @@ components:
             success:
               type: boolean
             message:
+              description: Outcome message for this run, e.g. "Success".
               type: string
             executionErrorCode:
+              description: Error code if the run failed; null on success.
               type: string
               nullable: true
         notificationId:
+          description: ID of the notification configuration attached to this integration, if any.
           type: string
         nuxVisible:
+          description: Whether this integration is visible in the CloudWorks UI.
           type: boolean
     IntegrationDetail:
+      description: Full integration details, returned by the get-by-ID endpoint. Extends IntegrationSummary.
       allOf:
       - $ref: '#/components/schemas/IntegrationSummary'
       - type: object
@@ -1526,19 +1529,23 @@ components:
           modelId:
             type: string
           version:
+            description: Integration schema version; currently "2.0".
             type: string
           jobs:
+            description: Import/export job definitions; empty for process integrations.
             type: array
             items:
               $ref: '#/components/schemas/Job'
           schedule:
             $ref: '#/components/schemas/Schedule'
     RunRecord:
+      description: Record of a single integration run, returned in run history responses.
       type: object
       properties:
         id:
           type: string
         triggeredBy:
+          description: Display name of the user who triggered the run, or a system identifier for scheduled runs.
           type: string
         lastRun:
           type: string
@@ -1552,8 +1559,10 @@ components:
         success:
           type: boolean
         message:
+          description: Outcome message for this run, e.g. "Success".
           type: string
         executionErrorCode:
+          description: Error code if the run failed; null on success.
           type: string
           nullable: true
     NotificationRequest:
@@ -1582,6 +1591,7 @@ components:
           - email
           - in_app
         notifications:
+          description: Notification rules; each entry in config maps an outcome type to the users to notify.
           type: object
           required:
           - config
@@ -1592,6 +1602,7 @@ components:
                 type: object
                 properties:
                   type:
+                    description: 'The integration outcome that triggers notification: success, partial_failure, or full_failure.'
                     type: string
                     enum:
                     - success
@@ -1603,6 +1614,7 @@ components:
                     items:
                       type: string
     NotificationConfig:
+      description: Notification configuration as returned by the API. Mirrors NotificationRequest plus resolved user details.
       type: object
       properties:
         notificationId:
@@ -1637,6 +1649,7 @@ components:
                         lastName:
                           type: string
     PagingMeta:
+      description: Pagination metadata block returned with list responses.
       type: object
       properties:
         paging:
@@ -1649,6 +1662,7 @@ components:
             offset:
               type: integer
         schema:
+          description: URL to the JSON schema definition for this response type.
           type: string
   responses:
     SuccessStatus:
