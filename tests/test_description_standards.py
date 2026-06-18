@@ -68,6 +68,10 @@ _SCHEMA_MUST_HAVE_DESCRIPTION = [
     # Authentication — envelope and request-body schemas whose names alone are ambiguous
     pytest.param("authentication", ["components", "schemas", "CertPayload"],   id="auth-certpayload"),
     pytest.param("authentication", ["components", "schemas", "ValidationUrl"], id="auth-validationurl"),
+    # Financial Consolidation — non-obvious schemas (names insufficient without description)
+    pytest.param("financial-consolidation", ["components", "schemas", "WorkflowStateResponse"],   id="fc-workflowstateresponse"),
+    pytest.param("financial-consolidation", ["components", "schemas", "ODataRecord"],             id="fc-odatarecord"),
+    pytest.param("financial-consolidation", ["components", "schemas", "DimensionMembersResponse"], id="fc-dimensionmembersresponse"),
 ]
 
 
@@ -132,6 +136,26 @@ _PROPERTY_MUST_HAVE_DESCRIPTION = [
     # Authentication — CertPayload.signature needs algorithm+encoding context; tokenValue must name the correct header format
     pytest.param("authentication", ["components", "schemas", "CertPayload", "properties", "signature"],  id="auth-certpayload-signature"),
     pytest.param("authentication", ["components", "schemas", "TokenInfo", "properties", "tokenValue"],   id="auth-tokeninfo-tokenvalue"),
+    # Financial Consolidation — WorkflowStateResponse.runId: null UUID meaning is non-obvious from name alone
+    pytest.param("financial-consolidation", ["components", "schemas", "WorkflowStateResponse", "properties", "runId"],                id="fc-workflowstateresponse-runid"),
+    # Financial Consolidation — DimensionProperty: type examples and built-in flag meaning are non-obvious
+    pytest.param("financial-consolidation", ["components", "schemas", "DimensionProperty", "properties", "propertyType"],            id="fc-dimensionproperty-propertytype"),
+    pytest.param("financial-consolidation", ["components", "schemas", "DimensionProperty", "properties", "standardProperty"],        id="fc-dimensionproperty-standardproperty"),
+    # Financial Consolidation — Dimension: translations field needs language-code context
+    pytest.param("financial-consolidation", ["components", "schemas", "Dimension", "properties", "translations"],                    id="fc-dimension-translations"),
+    # Financial Consolidation — DimensionMember: non-obvious fields (path, leaf semantics, effective dates, property bag)
+    pytest.param("financial-consolidation", ["components", "schemas", "DimensionMember", "properties", "ancestors"],                 id="fc-dimensionmember-ancestors"),
+    pytest.param("financial-consolidation", ["components", "schemas", "DimensionMember", "properties", "isLeaf"],                    id="fc-dimensionmember-isleaf"),
+    pytest.param("financial-consolidation", ["components", "schemas", "DimensionMember", "properties", "startDate"],                 id="fc-dimensionmember-startdate"),
+    pytest.param("financial-consolidation", ["components", "schemas", "DimensionMember", "properties", "endDate"],                   id="fc-dimensionmember-enddate"),
+    pytest.param("financial-consolidation", ["components", "schemas", "DimensionMember", "properties", "properties"],                id="fc-dimensionmember-properties"),
+    # Financial Consolidation — User: userId is internal, userName is not the email, isDisabled has inverted-boolean semantics, email is distinct from userName
+    pytest.param("financial-consolidation", ["components", "schemas", "User", "properties", "userId"],                              id="fc-user-userid"),
+    pytest.param("financial-consolidation", ["components", "schemas", "User", "properties", "userName"],                             id="fc-user-username"),
+    pytest.param("financial-consolidation", ["components", "schemas", "User", "properties", "isDisabled"],                           id="fc-user-isdisabled"),
+    pytest.param("financial-consolidation", ["components", "schemas", "User", "properties", "email"],                                id="fc-user-email"),
+    # Financial Consolidation — UserInput: userName context needed to distinguish from email address
+    pytest.param("financial-consolidation", ["components", "schemas", "UserInput", "properties", "userName"],                        id="fc-userinput-username"),
 ]
 
 
@@ -208,6 +232,44 @@ _MUST_NOT_HAVE_DESCRIPTION = [
     pytest.param("authentication", ["components", "schemas", "TokenInfo", "properties", "tokenId"],        id="auth-tokeninfo-tokenid"),
     pytest.param("authentication", ["components", "schemas", "TokenInfo", "properties", "refreshTokenId"], id="auth-tokeninfo-refreshtokenid"),
     pytest.param("authentication", ["components", "schemas", "ErrorResponse", "properties", "status"],     id="auth-errorresponse-status"),
+    # Financial Consolidation — DimensionProperty: name, flags, processingStatus, typeInfo restate field name/type
+    pytest.param("financial-consolidation", ["components", "schemas", "DimensionProperty", "properties", "propertyName"],       id="fc-dimensionproperty-propertyname"),
+    pytest.param("financial-consolidation", ["components", "schemas", "DimensionProperty", "properties", "reportingProperty"],  id="fc-dimensionproperty-reportingproperty"),
+    pytest.param("financial-consolidation", ["components", "schemas", "DimensionProperty", "properties", "readonlyProperty"],   id="fc-dimensionproperty-readonlyproperty"),
+    pytest.param("financial-consolidation", ["components", "schemas", "DimensionProperty", "properties", "processingStatus"],   id="fc-dimensionproperty-processingstatus"),
+    pytest.param("financial-consolidation", ["components", "schemas", "DimensionProperty", "properties", "typeInfo"],           id="fc-dimensionproperty-typeinfo"),
+    # Financial Consolidation — Dimension schema and its self-evident properties
+    pytest.param("financial-consolidation", ["components", "schemas", "Dimension"],                                              id="fc-dimension-schema"),
+    pytest.param("financial-consolidation", ["components", "schemas", "Dimension", "properties", "dimensionName"],              id="fc-dimension-dimensionname"),
+    pytest.param("financial-consolidation", ["components", "schemas", "Dimension", "properties", "dimensionType"],              id="fc-dimension-dimensiontype"),
+    pytest.param("financial-consolidation", ["components", "schemas", "Dimension", "properties", "relatedDimension"],           id="fc-dimension-relateddimension"),
+    pytest.param("financial-consolidation", ["components", "schemas", "Dimension", "properties", "properties"],                 id="fc-dimension-properties"),
+    pytest.param("financial-consolidation", ["components", "schemas", "Dimension", "properties", "processingStatus"],           id="fc-dimension-processingstatus"),
+    # Financial Consolidation — DimensionProperty schema-level description restates the name
+    pytest.param("financial-consolidation", ["components", "schemas", "DimensionProperty"],                                     id="fc-dimensionproperty-schema"),
+    # Financial Consolidation — DimensionMember self-evident properties
+    pytest.param("financial-consolidation", ["components", "schemas", "DimensionMember"],                                       id="fc-dimensionmember-schema"),
+    pytest.param("financial-consolidation", ["components", "schemas", "DimensionMember", "properties", "memberName"],           id="fc-dimensionmember-membername"),
+    pytest.param("financial-consolidation", ["components", "schemas", "DimensionMember", "properties", "memberTag"],            id="fc-dimensionmember-membertag"),
+    pytest.param("financial-consolidation", ["components", "schemas", "DimensionMember", "properties", "memberCaption"],        id="fc-dimensionmember-membercaption"),
+    pytest.param("financial-consolidation", ["components", "schemas", "DimensionMember", "properties", "parentMemberName"],     id="fc-dimensionmember-parentmembername"),
+    pytest.param("financial-consolidation", ["components", "schemas", "DimensionMember", "properties", "sortOrder"],            id="fc-dimensionmember-sortorder"),
+    pytest.param("financial-consolidation", ["components", "schemas", "DimensionMember", "properties", "operator"],             id="fc-dimensionmember-operator"),
+    pytest.param("financial-consolidation", ["components", "schemas", "DimensionMember", "properties", "memberStorage"],        id="fc-dimensionmember-memberstorage"),
+    # Financial Consolidation — DimensionMembersResponse pagination fields are self-evident
+    pytest.param("financial-consolidation", ["components", "schemas", "DimensionMembersResponse", "properties", "dimensionMembers"], id="fc-dimensionmembersresponse-dimensionmembers"),
+    pytest.param("financial-consolidation", ["components", "schemas", "DimensionMembersResponse", "properties", "totalRows"],        id="fc-dimensionmembersresponse-totalrows"),
+    pytest.param("financial-consolidation", ["components", "schemas", "DimensionMembersResponse", "properties", "currentPage"],      id="fc-dimensionmembersresponse-currentpage"),
+    pytest.param("financial-consolidation", ["components", "schemas", "DimensionMembersResponse", "properties", "totalPages"],       id="fc-dimensionmembersresponse-totalpages"),
+    # Financial Consolidation — User and UserInput self-evident fields
+    pytest.param("financial-consolidation", ["components", "schemas", "User"],                                                  id="fc-user-schema"),
+    pytest.param("financial-consolidation", ["components", "schemas", "User", "properties", "fullName"],                        id="fc-user-fullname"),
+    pytest.param("financial-consolidation", ["components", "schemas", "User", "properties", "roles"],                           id="fc-user-roles"),
+    pytest.param("financial-consolidation", ["components", "schemas", "UserInput"],                                              id="fc-userinput-schema"),
+    pytest.param("financial-consolidation", ["components", "schemas", "UserInput", "properties", "fullName"],                    id="fc-userinput-fullname"),
+    pytest.param("financial-consolidation", ["components", "schemas", "UserInput", "properties", "isDisabled"],                  id="fc-userinput-isdisabled"),
+    pytest.param("financial-consolidation", ["components", "schemas", "UserInput", "properties", "email"],                       id="fc-userinput-email"),
+    pytest.param("financial-consolidation", ["components", "schemas", "UserInput", "properties", "roles"],                       id="fc-userinput-roles"),
 ]
 
 

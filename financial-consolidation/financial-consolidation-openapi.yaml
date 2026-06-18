@@ -682,11 +682,9 @@ components:
       - runId
     DimensionProperty:
       type: object
-      description: A property associated with a dimension.
       properties:
         propertyName:
           type: string
-          description: Name identifier for the property.
         propertyType:
           type: string
           description: Data type of the property (e.g. `string`, `Bit`, `list`).
@@ -695,59 +693,45 @@ components:
           description: Whether this is a standard (built-in) property.
         reportingProperty:
           type: boolean
-          description: Whether this property is used for reporting.
         readonlyProperty:
           type: boolean
-          description: Whether this property is read-only.
         processingStatus:
-          description: Current processing state of the property.
           type: integer
           nullable: true
         typeInfo:
           type: string
-          description: Additional type information for the property.
     Dimension:
       type: object
-      description: A dimension and its associated properties within a tenant or model.
       properties:
         dimensionName:
           type: string
-          description: Name of the dimension.
           example: Account
         dimensionType:
           type: string
-          description: Classification type of the dimension.
         translations:
           description: Available language translations for the dimension name.
           type: string
           nullable: true
         relatedDimension:
-          description: Reference to an associated dimension.
           type: string
           nullable: true
         properties:
           type: array
-          description: List of properties defined on this dimension.
           items:
             $ref: '#/components/schemas/DimensionProperty'
         processingStatus:
-          description: Current processing state of the dimension.
           type: integer
           nullable: true
     DimensionMember:
       type: object
-      description: A member within a dimension and its associated metadata.
       properties:
         memberName:
           type: string
-          description: Name of the member.
         memberTag:
-          description: Tag identifier for the member.
           type: string
           nullable: true
         memberCaption:
           type: string
-          description: Display caption for the member.
         ancestors:
           description: Hierarchy path from root to this member.
           type: string
@@ -757,17 +741,14 @@ components:
           description: Available translations for the member name.
           items: {}
         parentMemberName:
-          description: Name of the parent member in the hierarchy.
           type: string
           nullable: true
         sortOrder:
           type: integer
-          description: Sort sequence number for the member.
         isLeaf:
           type: boolean
           description: Whether this member is a leaf node (has no children).
         operator:
-          description: Operator value applied to the member.
           type: string
           nullable: true
         startDate:
@@ -782,7 +763,6 @@ components:
           nullable: true
         memberStorage:
           type: string
-          description: Storage type for the member.
         properties:
           type: array
           description: Name-value property pairs associated with the member.
@@ -795,18 +775,14 @@ components:
       properties:
         dimensionMembers:
           type: array
-          description: Array of dimension member objects.
           items:
             $ref: '#/components/schemas/DimensionMember'
         totalRows:
           type: integer
-          description: Total count of dimension members matching the query.
         currentPage:
           type: integer
-          description: Current page number.
         totalPages:
           type: integer
-          description: Total number of pages available.
       required:
       - dimensionMembers
       - totalRows
@@ -846,7 +822,6 @@ components:
         Periodic_Amount: null
     User:
       type: object
-      description: A user account in the Financial Consolidation tenant.
       properties:
         userId:
           type: integer
@@ -858,7 +833,6 @@ components:
           example: jdoe@fluence.app
         fullName:
           type: string
-          description: User's display name.
           example: Jane Doe
         isDisabled:
           type: boolean
@@ -873,14 +847,12 @@ components:
           type: array
           items:
             type: string
-          description: Names of roles assigned to the user.
           example:
           - Admin
           - Controller
           - Preparer
     UserInput:
       type: object
-      description: User data for create or update requests.
       properties:
         userName:
           type: string
@@ -888,22 +860,18 @@ components:
           example: asmith@fluence.app
         fullName:
           type: string
-          description: User's display name.
           example: Adam Smith
         isDisabled:
           type: boolean
-          description: Whether the account should be disabled.
           example: false
         email:
           type: string
           format: email
-          description: User's email address.
           example: asmith@acme.com
         roles:
           type: array
           items:
             type: string
-          description: Names of roles to assign to the user.
           example:
           - Admin
           - Controller

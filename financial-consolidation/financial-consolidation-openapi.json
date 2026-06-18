@@ -979,11 +979,9 @@
       },
       "DimensionProperty": {
         "type": "object",
-        "description": "A property associated with a dimension.",
         "properties": {
           "propertyName": {
-            "type": "string",
-            "description": "Name identifier for the property."
+            "type": "string"
           },
           "propertyType": {
             "type": "string",
@@ -994,36 +992,29 @@
             "description": "Whether this is a standard (built-in) property."
           },
           "reportingProperty": {
-            "type": "boolean",
-            "description": "Whether this property is used for reporting."
+            "type": "boolean"
           },
           "readonlyProperty": {
-            "type": "boolean",
-            "description": "Whether this property is read-only."
+            "type": "boolean"
           },
           "processingStatus": {
-            "description": "Current processing state of the property.",
             "type": "integer",
             "nullable": true
           },
           "typeInfo": {
-            "type": "string",
-            "description": "Additional type information for the property."
+            "type": "string"
           }
         }
       },
       "Dimension": {
         "type": "object",
-        "description": "A dimension and its associated properties within a tenant or model.",
         "properties": {
           "dimensionName": {
             "type": "string",
-            "description": "Name of the dimension.",
             "example": "Account"
           },
           "dimensionType": {
-            "type": "string",
-            "description": "Classification type of the dimension."
+            "type": "string"
           },
           "translations": {
             "description": "Available language translations for the dimension name.",
@@ -1031,19 +1022,16 @@
             "nullable": true
           },
           "relatedDimension": {
-            "description": "Reference to an associated dimension.",
             "type": "string",
             "nullable": true
           },
           "properties": {
             "type": "array",
-            "description": "List of properties defined on this dimension.",
             "items": {
               "$ref": "#/components/schemas/DimensionProperty"
             }
           },
           "processingStatus": {
-            "description": "Current processing state of the dimension.",
             "type": "integer",
             "nullable": true
           }
@@ -1051,20 +1039,16 @@
       },
       "DimensionMember": {
         "type": "object",
-        "description": "A member within a dimension and its associated metadata.",
         "properties": {
           "memberName": {
-            "type": "string",
-            "description": "Name of the member."
+            "type": "string"
           },
           "memberTag": {
-            "description": "Tag identifier for the member.",
             "type": "string",
             "nullable": true
           },
           "memberCaption": {
-            "type": "string",
-            "description": "Display caption for the member."
+            "type": "string"
           },
           "ancestors": {
             "description": "Hierarchy path from root to this member.",
@@ -1077,20 +1061,17 @@
             "items": {}
           },
           "parentMemberName": {
-            "description": "Name of the parent member in the hierarchy.",
             "type": "string",
             "nullable": true
           },
           "sortOrder": {
-            "type": "integer",
-            "description": "Sort sequence number for the member."
+            "type": "integer"
           },
           "isLeaf": {
             "type": "boolean",
             "description": "Whether this member is a leaf node (has no children)."
           },
           "operator": {
-            "description": "Operator value applied to the member.",
             "type": "string",
             "nullable": true
           },
@@ -1107,8 +1088,7 @@
             "nullable": true
           },
           "memberStorage": {
-            "type": "string",
-            "description": "Storage type for the member."
+            "type": "string"
           },
           "properties": {
             "type": "array",
@@ -1126,22 +1106,18 @@
         "properties": {
           "dimensionMembers": {
             "type": "array",
-            "description": "Array of dimension member objects.",
             "items": {
               "$ref": "#/components/schemas/DimensionMember"
             }
           },
           "totalRows": {
-            "type": "integer",
-            "description": "Total count of dimension members matching the query."
+            "type": "integer"
           },
           "currentPage": {
-            "type": "integer",
-            "description": "Current page number."
+            "type": "integer"
           },
           "totalPages": {
-            "type": "integer",
-            "description": "Total number of pages available."
+            "type": "integer"
           }
         },
         "required": [
@@ -1187,7 +1163,6 @@
       },
       "User": {
         "type": "object",
-        "description": "A user account in the Financial Consolidation tenant.",
         "properties": {
           "userId": {
             "type": "integer",
@@ -1201,7 +1176,6 @@
           },
           "fullName": {
             "type": "string",
-            "description": "User's display name.",
             "example": "Jane Doe"
           },
           "isDisabled": {
@@ -1220,7 +1194,6 @@
             "items": {
               "type": "string"
             },
-            "description": "Names of roles assigned to the user.",
             "example": [
               "Admin",
               "Controller",
@@ -1231,7 +1204,6 @@
       },
       "UserInput": {
         "type": "object",
-        "description": "User data for create or update requests.",
         "properties": {
           "userName": {
             "type": "string",
@@ -1240,18 +1212,15 @@
           },
           "fullName": {
             "type": "string",
-            "description": "User's display name.",
             "example": "Adam Smith"
           },
           "isDisabled": {
             "type": "boolean",
-            "description": "Whether the account should be disabled.",
             "example": false
           },
           "email": {
             "type": "string",
             "format": "email",
-            "description": "User's email address.",
             "example": "asmith@acme.com"
           },
           "roles": {
@@ -1259,7 +1228,6 @@
             "items": {
               "type": "string"
             },
-            "description": "Names of roles to assign to the user.",
             "example": [
               "Admin",
               "Controller",
