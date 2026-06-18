@@ -330,8 +330,7 @@
             "type": "string",
             "enum": [
               "authorization_code"
-            ],
-            "description": "Authorization Code grant type."
+            ]
           },
           "code": {
             "type": "string",
@@ -369,8 +368,7 @@
             "type": "string",
             "enum": [
               "urn:ietf:params:oauth:grant-type:device_code"
-            ],
-            "description": "Device Authorization grant type (RFC 8628)."
+            ]
           },
           "device_code": {
             "type": "string",
@@ -397,8 +395,7 @@
             "type": "string",
             "enum": [
               "refresh_token"
-            ],
-            "description": "Refresh Token grant type."
+            ]
           },
           "client_id": {
             "type": "string",
@@ -450,8 +447,7 @@
             "type": "string",
             "enum": [
               "Bearer"
-            ],
-            "description": "Token type. Always `Bearer`."
+            ]
           }
         }
       },
@@ -476,8 +472,7 @@
             "description": "OAuth 2.0 error code. `authorization_pending` and `slow_down` appear during Device Grant polling."
           },
           "error_description": {
-            "type": "string",
-            "description": "Human-readable error description."
+            "type": "string"
           },
           "error_uri": {
             "type": "string",

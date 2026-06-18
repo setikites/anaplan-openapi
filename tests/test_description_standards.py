@@ -156,6 +156,17 @@ _PROPERTY_MUST_HAVE_DESCRIPTION = [
     pytest.param("financial-consolidation", ["components", "schemas", "User", "properties", "email"],                                id="fc-user-email"),
     # Financial Consolidation — UserInput: userName context needed to distinguish from email address
     pytest.param("financial-consolidation", ["components", "schemas", "UserInput", "properties", "userName"],                        id="fc-userinput-username"),
+    # OAuth — TokenResponse: non-obvious fields whose name + type are insufficient
+    pytest.param("oauth", ["components", "schemas", "TokenResponse", "properties", "access_token"],  id="oauth-tokenresponse-access_token"),
+    pytest.param("oauth", ["components", "schemas", "TokenResponse", "properties", "refresh_token"], id="oauth-tokenresponse-refresh_token"),
+    pytest.param("oauth", ["components", "schemas", "TokenResponse", "properties", "scope"],         id="oauth-tokenresponse-scope"),
+    pytest.param("oauth", ["components", "schemas", "TokenResponse", "properties", "expires_in"],    id="oauth-tokenresponse-expires_in"),
+    # OAuth — ErrorPayload.error: device grant polling codes are not obvious from the enum alone
+    pytest.param("oauth", ["components", "schemas", "ErrorPayload", "properties", "error"],          id="oauth-errorpayload-error"),
+    # OAuth — RefreshPayload.client_secret: required vs omit distinction by grant type is non-obvious
+    pytest.param("oauth", ["components", "schemas", "RefreshPayload", "properties", "client_secret"], id="oauth-refreshpayload-client_secret"),
+    # OAuth — AuthCodePayload.code: the source of this code (redirect callback) is non-obvious
+    pytest.param("oauth", ["components", "schemas", "AuthCodePayload", "properties", "code"],         id="oauth-authcodepayload-code"),
 ]
 
 
@@ -270,6 +281,14 @@ _MUST_NOT_HAVE_DESCRIPTION = [
     pytest.param("financial-consolidation", ["components", "schemas", "UserInput", "properties", "isDisabled"],                  id="fc-userinput-isdisabled"),
     pytest.param("financial-consolidation", ["components", "schemas", "UserInput", "properties", "email"],                       id="fc-userinput-email"),
     pytest.param("financial-consolidation", ["components", "schemas", "UserInput", "properties", "roles"],                       id="fc-userinput-roles"),
+    # OAuth — grant_type: single-value enums are self-documenting; description restates the enum value (ADR 0003 §3)
+    pytest.param("oauth", ["components", "schemas", "AuthCodePayload", "properties", "grant_type"],   id="oauth-authcodepayload-grant_type"),
+    pytest.param("oauth", ["components", "schemas", "DevicePayload", "properties", "grant_type"],     id="oauth-devicepayload-grant_type"),
+    pytest.param("oauth", ["components", "schemas", "RefreshPayload", "properties", "grant_type"],    id="oauth-refreshpayload-grant_type"),
+    # OAuth — TokenResponse.token_type: enum [Bearer] already expresses the value; description restates it
+    pytest.param("oauth", ["components", "schemas", "TokenResponse", "properties", "token_type"],     id="oauth-tokenresponse-token_type"),
+    # OAuth — ErrorPayload.error_description: field name already expresses 'description of the error'
+    pytest.param("oauth", ["components", "schemas", "ErrorPayload", "properties", "error_description"], id="oauth-errorpayload-error_description"),
 ]
 
 

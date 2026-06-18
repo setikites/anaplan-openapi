@@ -31,13 +31,11 @@ servers:
   description: ID1 (Cloud - Indonesia)
 - url: https://au1a.app2.anaplan.com
   description: AU1 (Cloud - Australia)
+security: []
 paths:
   /auth/authorize:
     get:
       summary: Initiate Authorization Code Grant
-      operationId: authorizeAuthCode
-      tags:
-      - Authorization Code Grant
       description: |-
         Redirects the user's browser to the Anaplan login page to begin the Authorization Code flow. On successful authentication, the browser is redirected to `redirect_uri` with an authorization `code` query parameter. Exchange that code for tokens via `POST /oauth/token`.
 
@@ -46,43 +44,46 @@ paths:
         **Note:** This endpoint does not accept an Authorization header. Authentication occurs interactively via the browser redirect.
 
         **Implementation note:** The `anaplan-sdk` library uses `GET /auth/prelogin` (same query parameters) as its `authorization_url` instead of this endpoint. `/auth/prelogin` returns the login page HTML directly (200) whereas `/auth/authorize` returns a 302 redirect to it. Both paths are valid entry points for the Authorization Code flow.
+      operationId: authorizeAuthCode
+      tags:
+      - Authorization Code Grant
       parameters:
       - name: response_type
         in: query
-        required: true
         description: Must be `code` to initiate the Authorization Code flow.
+        required: true
         schema:
           type: string
           enum:
           - code
       - name: client_id
         in: query
-        required: true
         description: Your application's OAuth client ID, found in Anaplan Administration > OAuth.
+        required: true
         schema:
           type: string
           example: 8a89d9999f3c7099015f999d5208458a
           pattern: ^[0-9a-f]{32}$
       - name: redirect_uri
         in: query
-        required: true
         description: Callback URL. Must match the redirect URI registered for this client in Anaplan Administration.
+        required: true
         schema:
           type: string
           format: uri
           example: https://www.example.com/callback
       - name: scope
         in: query
-        required: true
         description: Space-separated list of requested scopes.
+        required: true
         schema:
           type: string
           example: openid profile email offline_access
       - name: state
         in: query
-        required: false
         description: Opaque value used to protect against CSRF attacks. The authorization server returns this value unchanged
           in the redirect.
+        required: false
         schema:
           type: string
           example: CCFKPwXcnMsQ5UAfQmPRfqyIPvpghT
@@ -103,13 +104,13 @@ paths:
   /oauth/device/code:
     post:
       summary: Request Device Authorization Code
-      operationId: requestDeviceCode
-      tags:
-      - Device Authorization Grant
       description: |-
         Starts the Device Authorization flow. The client sends its `client_id` and requested `scope`. The response contains a `device_code` (for polling) and a `user_code` the user must enter at `verification_uri` to approve access.
 
         After receiving this response, the client polls `POST /oauth/token` with `grant_type: urn:ietf:params:oauth:grant-type:device_code` at the `interval` frequency until the user approves or the code expires.
+      operationId: requestDeviceCode
+      tags:
+      - Device Authorization Grant
       requestBody:
         required: true
         content:
@@ -184,10 +185,6 @@ paths:
   /oauth/token:
     post:
       summary: Exchange Code or Refresh Token for Access Token
-      operationId: issueToken
-      tags:
-      - Authorization Code Grant
-      - Device Authorization Grant
       description: |-
         Issues access tokens, ID tokens, and refresh tokens. Supports three grant types:
 
@@ -196,6 +193,10 @@ paths:
         - **`refresh_token`**: Obtain a new access token from a valid refresh token. `client_secret` required for Authorization Code clients; omit for Device Grant clients.
 
         Refresh tokens may be rotatable (new refresh token issued on each use, 30-day rotation) or non-rotatable, depending on client configuration.
+      operationId: issueToken
+      tags:
+      - Authorization Code Grant
+      - Device Authorization Grant
       requestBody:
         required: true
         content:
@@ -242,7 +243,6 @@ components:
           type: string
           enum:
           - authorization_code
-          description: Authorization Code grant type.
         code:
           type: string
           example: M5mbhGs5Xy7f5ptGYe_Mt8Enh18bCencyV2K70VMpRVmn
@@ -272,7 +272,6 @@ components:
           type: string
           enum:
           - urn:ietf:params:oauth:grant-type:device_code
-          description: Device Authorization grant type (RFC 8628).
         device_code:
           type: string
           example: _XPkIavE7K0d-28sD6-TapQ
@@ -293,7 +292,6 @@ components:
           type: string
           enum:
           - refresh_token
-          description: Refresh Token grant type.
         client_id:
           type: string
           example: 8a89d9999f3c7099015f999d5208458a
@@ -336,7 +334,6 @@ components:
           type: string
           enum:
           - Bearer
-          description: Token type. Always `Bearer`.
     ErrorPayload:
       type: object
       required:
@@ -356,10 +353,8 @@ components:
           description: OAuth 2.0 error code. `authorization_pending` and `slow_down` appear during Device Grant polling.
         error_description:
           type: string
-          description: Human-readable error description.
         error_uri:
           type: string
           format: uri
           example: https://ma0-dev.anaplan.com/docs/clients/client-grant-types
           description: URI with more information about this error.
-security: []
