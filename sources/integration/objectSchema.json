@@ -87,7 +87,8 @@
       },
       "activeState": {
         "description": "state",
-        "type": "string"
+        "type": "string",
+        "enum": ["MAINTENANCE", "UNLOCKED", "PRODUCTION", "ARCHIVED", "PRODUCTION_MAINTENANCE", "LOCKED"]
       },
       "currentWorkspaceId": {
         "description": "workspace",

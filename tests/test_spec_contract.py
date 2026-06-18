@@ -520,6 +520,24 @@ def test_integration_spec_has_component_schemas():
 
 
 @_skip_integration
+def test_integration_model_active_state_is_enum():
+    """Model.activeState must constrain values to the confirmed set of lifecycle states."""
+    spec = _load(_INTEGRATION_SPEC)
+    active_state = (
+        spec.get("components", {})
+        .get("schemas", {})
+        .get("Model", {})
+        .get("properties", {})
+        .get("activeState", {})
+    )
+    expected = {"MAINTENANCE", "UNLOCKED", "PRODUCTION", "ARCHIVED", "PRODUCTION_MAINTENANCE", "LOCKED"}
+    actual = set(active_state.get("enum", []))
+    assert actual == expected, (
+        f"Model.activeState enum drifted from the confirmed set: {actual!r}"
+    )
+
+
+@_skip_integration
 def test_integration_response_examples_match_schemas():
     """Every response example that has a sibling schema must validate against it."""
     from schema_importer import validate_response_examples
