@@ -349,6 +349,7 @@
       },
       "CertPayload": {
         "type": "object",
+        "description": "Request body for CA Certificate authentication. Sent together with an `Authorization: CACertificate {base64_encoded_cert}` header.",
         "required": [
           "certificateChain",
           "signature"
@@ -356,11 +357,11 @@
         "properties": {
           "certificateChain": {
             "type": "string",
-            "description": "Base64 encoded certificate chain"
+            "description": "Base64-encoded certificate chain in PEM format, registered for API authentication in the Anaplan instance."
           },
           "signature": {
             "type": "string",
-            "description": "Signature payload"
+            "description": "Base64-encoded SHA512withRSA signature of the random byte string, signed with the private key for `certificateChain`."
           }
         }
       },
@@ -382,7 +383,7 @@
             "format": "uuid"
           },
           "tokenValue": {
-            "description": "Bearer token for subsequent requests.",
+            "description": "The token string. Send as `Authorization: AnaplanAuthToken {tokenValue}` on subsequent requests. Bearer format is rejected.",
             "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.example.token",
             "type": "string"
           }
@@ -406,6 +407,7 @@
         }
       },
       "ValidationUrl": {
+        "description": "Response metadata included in all successful token operations. The `validationUrl` field always points to the `GET /token/validate` endpoint.",
         "properties": {
           "validationUrl": {
             "enum": [

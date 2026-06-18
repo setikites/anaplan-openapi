@@ -65,6 +65,9 @@ _SCHEMA_MUST_HAVE_DESCRIPTION = [
     pytest.param("audit", ["components", "schemas", "AuditEventsResponse"], id="audit-auditeventsresponse"),
     pytest.param("audit", ["components", "schemas", "AuditErrorResponse"],  id="audit-auditerrorresponse"),
     pytest.param("audit", ["components", "schemas", "AuditSearchRequest"],  id="audit-auditsearchrequest"),
+    # Authentication — envelope and request-body schemas whose names alone are ambiguous
+    pytest.param("authentication", ["components", "schemas", "CertPayload"],   id="auth-certpayload"),
+    pytest.param("authentication", ["components", "schemas", "ValidationUrl"], id="auth-validationurl"),
 ]
 
 
@@ -126,6 +129,9 @@ _PROPERTY_MUST_HAVE_DESCRIPTION = [
     pytest.param("audit", ["components", "schemas", "AuditPaging", "properties", "offSet"],        id="audit-paging-offset"),
     pytest.param("audit", ["components", "schemas", "AuditPaging", "properties", "nextOffset"],    id="audit-paging-nextoffset"),
     pytest.param("audit", ["components", "schemas", "AuditPaging", "properties", "previousUrl"],   id="audit-paging-previousurl"),
+    # Authentication — CertPayload.signature needs algorithm+encoding context; tokenValue must name the correct header format
+    pytest.param("authentication", ["components", "schemas", "CertPayload", "properties", "signature"],  id="auth-certpayload-signature"),
+    pytest.param("authentication", ["components", "schemas", "TokenInfo", "properties", "tokenValue"],   id="auth-tokeninfo-tokenvalue"),
 ]
 
 
@@ -198,6 +204,10 @@ _MUST_NOT_HAVE_DESCRIPTION = [
     # Audit AuditPaging properties — field names are self-evident in a pagination context
     pytest.param("audit", ["components", "schemas", "AuditPaging", "properties", "currentPageSize"], id="audit-paging-currentpagesize"),
     pytest.param("audit", ["components", "schemas", "AuditPaging", "properties", "nextUrl"],         id="audit-paging-nexturl"),
+    # Authentication TokenInfo — uuid fields are self-evident from name + format; ErrorResponse.status enum values are self-documenting
+    pytest.param("authentication", ["components", "schemas", "TokenInfo", "properties", "tokenId"],        id="auth-tokeninfo-tokenid"),
+    pytest.param("authentication", ["components", "schemas", "TokenInfo", "properties", "refreshTokenId"], id="auth-tokeninfo-refreshtokenid"),
+    pytest.param("authentication", ["components", "schemas", "ErrorResponse", "properties", "status"],     id="auth-errorresponse-status"),
 ]
 
 
