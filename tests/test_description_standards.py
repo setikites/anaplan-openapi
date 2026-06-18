@@ -60,6 +60,11 @@ _SCHEMA_MUST_HAVE_DESCRIPTION = [
     pytest.param("alm", ["components", "schemas", "Status"],     id="alm-status"),
     pytest.param("alm", ["components", "schemas", "TaskResult"], id="alm-taskresult"),
     pytest.param("alm", ["components", "schemas", "TaskError"],  id="alm-taskerror"),
+    # Audit — envelope and metadata schemas (names alone are ambiguous or name an abstract concept)
+    pytest.param("audit", ["components", "schemas", "AuditPaging"],        id="audit-auditpaging"),
+    pytest.param("audit", ["components", "schemas", "AuditEventsResponse"], id="audit-auditeventsresponse"),
+    pytest.param("audit", ["components", "schemas", "AuditErrorResponse"],  id="audit-auditerrorresponse"),
+    pytest.param("audit", ["components", "schemas", "AuditSearchRequest"],  id="audit-auditsearchrequest"),
 ]
 
 
@@ -108,6 +113,19 @@ _PROPERTY_MUST_HAVE_DESCRIPTION = [
     # ALM — TaskError properties (title vs messageText distinction not obvious from names alone)
     pytest.param("alm", ["components", "schemas", "TaskError", "properties", "title"],       id="alm-taskerror-title"),
     pytest.param("alm", ["components", "schemas", "TaskError", "properties", "messageText"], id="alm-taskerror-messagetext"),
+    # Audit — AuditEvent properties where name + type are insufficient
+    pytest.param("audit", ["components", "schemas", "AuditEvent", "properties", "id"],                    id="audit-auditevent-id"),
+    pytest.param("audit", ["components", "schemas", "AuditEvent", "properties", "eventTypeId"],           id="audit-auditevent-eventtypeid"),
+    pytest.param("audit", ["components", "schemas", "AuditEvent", "properties", "message"],               id="audit-auditevent-message"),
+    pytest.param("audit", ["components", "schemas", "AuditEvent", "properties", "errorNumber"],           id="audit-auditevent-errornumber"),
+    pytest.param("audit", ["components", "schemas", "AuditEvent", "properties", "additionalAttributes"],  id="audit-auditevent-additionalattributes"),
+    pytest.param("audit", ["components", "schemas", "AuditEvent", "properties", "eventDate"],             id="audit-auditevent-eventdate"),
+    pytest.param("audit", ["components", "schemas", "AuditEvent", "properties", "createdDate"],           id="audit-auditevent-createddate"),
+    pytest.param("audit", ["components", "schemas", "AuditEvent", "properties", "checksum"],              id="audit-auditevent-checksum"),
+    # Audit — AuditPaging properties where conditionality or zero-based indexing is non-obvious
+    pytest.param("audit", ["components", "schemas", "AuditPaging", "properties", "offSet"],        id="audit-paging-offset"),
+    pytest.param("audit", ["components", "schemas", "AuditPaging", "properties", "nextOffset"],    id="audit-paging-nextoffset"),
+    pytest.param("audit", ["components", "schemas", "AuditPaging", "properties", "previousUrl"],   id="audit-paging-previousurl"),
 ]
 
 
@@ -170,6 +188,16 @@ _MUST_NOT_HAVE_DESCRIPTION = [
     pytest.param("alm", ["components", "schemas", "OnlineStatusRequest", "properties", "status"], id="alm-onlinestatus-status"),
     # ALM AppliedModel.modelDeleted — boolean field name is self-evident
     pytest.param("alm", ["components", "schemas", "AppliedModel", "properties", "modelDeleted"], id="alm-appliedmodel-modeldeleted"),
+    # Audit AuditEvent (schema) — 'A single audit event record.' restates the name
+    pytest.param("audit", ["components", "schemas", "AuditEvent"],                                                id="audit-auditevent-schema"),
+    # Audit AuditEvent properties — field name and type already express the meaning
+    pytest.param("audit", ["components", "schemas", "AuditEvent", "properties", "userId"],        id="audit-auditevent-userid"),
+    pytest.param("audit", ["components", "schemas", "AuditEvent", "properties", "tenantId"],      id="audit-auditevent-tenantid"),
+    pytest.param("audit", ["components", "schemas", "AuditEvent", "properties", "success"],       id="audit-auditevent-success"),
+    pytest.param("audit", ["components", "schemas", "AuditEvent", "properties", "userAgent"],     id="audit-auditevent-useragent"),
+    # Audit AuditPaging properties — field names are self-evident in a pagination context
+    pytest.param("audit", ["components", "schemas", "AuditPaging", "properties", "currentPageSize"], id="audit-paging-currentpagesize"),
+    pytest.param("audit", ["components", "schemas", "AuditPaging", "properties", "nextUrl"],         id="audit-paging-nexturl"),
 ]
 
 

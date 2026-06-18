@@ -70,9 +70,6 @@ paths:
         description: Zero-based index of the first result to return. Use with `limit` for pagination.
         schema:
           type: integer
-      security:
-      - AnaplanAuthToken: []
-      - BearerAuth: []
       responses:
         '200':
           description: Audit events retrieved successfully.
@@ -104,6 +101,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuditErrorResponse'
+      security:
+      - AnaplanAuthToken: []
+      - BearerAuth: []
   /events/search:
     post:
       summary: Search audit events
@@ -137,9 +137,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/AuditSearchRequest'
-      security:
-      - AnaplanAuthToken: []
-      - BearerAuth: []
       responses:
         '200':
           description: Audit events retrieved successfully.
@@ -171,11 +168,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuditErrorResponse'
+      security:
+      - AnaplanAuthToken: []
+      - BearerAuth: []
 components:
   schemas:
     AuditEvent:
       type: object
-      description: A single audit event record.
       properties:
         id:
           type: integer
@@ -185,10 +184,8 @@ components:
           description: Event type code (for example, `DSM-DAO0267I`, `USR-04`).
         userId:
           type: string
-          description: ID of the user who triggered the event.
         tenantId:
           type: string
-          description: ID of the tenant in which the event occurred.
         objectId:
           type: string
           description: ID of the object acted upon, if applicable.
@@ -208,7 +205,6 @@ components:
           description: Human-readable description of the event.
         success:
           type: boolean
-          description: Whether the event action succeeded.
         errorNumber:
           type: string
           description: Error code, if the action failed.
@@ -217,7 +213,6 @@ components:
           description: IP address from which the action was performed.
         userAgent:
           type: string
-          description: User agent string of the client that performed the action.
         sessionId:
           type: string
           description: Session identifier, if applicable.
@@ -253,7 +248,6 @@ components:
       properties:
         currentPageSize:
           type: integer
-          description: Number of results in the current page.
         totalSize:
           type: integer
           description: Total number of results matching the query.
@@ -265,7 +259,6 @@ components:
           description: Offset to use to retrieve the next page, if more results exist.
         nextUrl:
           type: string
-          description: URL to call to retrieve the next page of results.
         previousUrl:
           type: string
           description: URL to call to retrieve the previous page of results. Present once paging past the first page (offset

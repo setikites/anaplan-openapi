@@ -221,7 +221,6 @@
     "schemas": {
       "AuditEvent": {
         "type": "object",
-        "description": "A single audit event record.",
         "properties": {
           "id": {
             "type": "integer",
@@ -232,12 +231,10 @@
             "description": "Event type code (for example, `DSM-DAO0267I`, `USR-04`)."
           },
           "userId": {
-            "type": "string",
-            "description": "ID of the user who triggered the event."
+            "type": "string"
           },
           "tenantId": {
-            "type": "string",
-            "description": "ID of the tenant in which the event occurred."
+            "type": "string"
           },
           "objectId": {
             "type": "string",
@@ -261,8 +258,7 @@
             "description": "Human-readable description of the event."
           },
           "success": {
-            "type": "boolean",
-            "description": "Whether the event action succeeded."
+            "type": "boolean"
           },
           "errorNumber": {
             "type": "string",
@@ -273,8 +269,7 @@
             "description": "IP address from which the action was performed."
           },
           "userAgent": {
-            "type": "string",
-            "description": "User agent string of the client that performed the action."
+            "type": "string"
           },
           "sessionId": {
             "type": "string",
@@ -320,8 +315,7 @@
         ],
         "properties": {
           "currentPageSize": {
-            "type": "integer",
-            "description": "Number of results in the current page."
+            "type": "integer"
           },
           "totalSize": {
             "type": "integer",
@@ -336,8 +330,7 @@
             "description": "Offset to use to retrieve the next page, if more results exist."
           },
           "nextUrl": {
-            "type": "string",
-            "description": "URL to call to retrieve the next page of results."
+            "type": "string"
           },
           "previousUrl": {
             "type": "string",
