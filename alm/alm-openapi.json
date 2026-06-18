@@ -819,8 +819,7 @@
             "enum": [
               "online",
               "offline"
-            ],
-            "description": "Target online status for the model."
+            ]
           }
         }
       },
@@ -854,8 +853,7 @@
             "description": "ID of the source revision to apply."
           },
           "sourceModelId": {
-            "type": "string",
-            "description": "ID of the source model."
+            "type": "string"
           },
           "targetRevisionId": {
             "type": "string",
@@ -867,38 +865,31 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "string",
-            "description": "Revision identifier."
+            "type": "string"
           },
           "name": {
-            "type": "string",
-            "description": "Revision name."
+            "type": "string"
           },
           "description": {
-            "type": "string",
-            "description": "Revision description."
+            "type": "string"
           },
           "createdOn": {
             "type": "string",
-            "format": "date-time",
-            "description": "Timestamp when the revision was created."
+            "format": "date-time"
           },
           "createdBy": {
-            "type": "string",
-            "description": "User who created the revision."
+            "type": "string"
           },
           "creationMethod": {
             "type": "string",
-            "description": "How the revision was created."
+            "description": "How the revision was created (e.g. 'user', 'api')."
           },
           "appliedOn": {
             "type": "string",
-            "format": "date-time",
-            "description": "Timestamp when the revision was last applied."
+            "format": "date-time"
           },
           "appliedBy": {
-            "type": "string",
-            "description": "User who last applied the revision."
+            "type": "string"
           }
         }
       },
@@ -906,25 +897,22 @@
         "type": "object",
         "properties": {
           "taskId": {
-            "type": "string",
-            "description": "Unique identifier of the sync task."
+            "type": "string"
           },
           "taskUrl": {
             "type": "string",
-            "description": "URL to retrieve this task's status."
+            "description": "URL to poll for this task's current status."
           },
           "taskState": {
             "type": "string",
             "enum": [
               "IN_PROGRESS",
               "COMPLETE"
-            ],
-            "description": "Current state of the task."
+            ]
           },
           "creationTime": {
             "type": "string",
-            "format": "date-time",
-            "description": "When the task was created."
+            "format": "date-time"
           },
           "result": {
             "$ref": "#/components/schemas/TaskResult"
@@ -933,10 +921,10 @@
       },
       "TaskResult": {
         "type": "object",
+        "description": "Outcome of an async task. Check `successful` first; if false, `error` contains details. On successful report tasks, `reportFileUrl` is populated with a download URL.",
         "properties": {
           "successful": {
-            "type": "boolean",
-            "description": "Whether the task completed successfully."
+            "type": "boolean"
           },
           "reportFileUrl": {
             "type": "string",
@@ -949,12 +937,15 @@
       },
       "TaskError": {
         "type": "object",
+        "description": "Error details for a failed async task.",
         "properties": {
           "title": {
-            "type": "string"
+            "type": "string",
+            "description": "Short error title summarising the failure."
           },
           "messageText": {
-            "type": "string"
+            "type": "string",
+            "description": "Detailed error message body."
           }
         }
       },
@@ -983,13 +974,13 @@
             "type": "string"
           },
           "modelDeleted": {
-            "type": "boolean",
-            "description": "True if the model has been deleted."
+            "type": "boolean"
           }
         }
       },
       "Meta": {
         "type": "object",
+        "description": "Response envelope metadata. Contains the schema URL that identifies the response type and optional paging information for list responses.",
         "required": [
           "schema"
         ],
@@ -1024,12 +1015,15 @@
       },
       "Status": {
         "type": "object",
+        "description": "Anaplan API response status. The code mirrors the HTTP status code (e.g. 200, 204); the message is a human-readable outcome string (e.g. 'Success').",
         "properties": {
           "code": {
-            "type": "integer"
+            "type": "integer",
+            "description": "Numeric response code, mirrors the HTTP status code (e.g. 200, 204)."
           },
           "message": {
-            "type": "string"
+            "type": "string",
+            "description": "Human-readable outcome string, e.g. 'Success'."
           }
         }
       },

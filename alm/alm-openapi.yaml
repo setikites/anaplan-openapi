@@ -537,7 +537,6 @@ components:
           enum:
           - online
           - offline
-          description: Target online status for the model.
     RevisionRequest:
       type: object
       required:
@@ -562,7 +561,6 @@ components:
           description: ID of the source revision to apply.
         sourceModelId:
           type: string
-          description: ID of the source model.
         targetRevisionId:
           type: string
           description: ID of the target revision (current state of the target model).
@@ -571,57 +569,48 @@ components:
       properties:
         id:
           type: string
-          description: Revision identifier.
         name:
           type: string
-          description: Revision name.
         description:
           type: string
-          description: Revision description.
         createdOn:
           type: string
           format: date-time
-          description: Timestamp when the revision was created.
         createdBy:
           type: string
-          description: User who created the revision.
         creationMethod:
           type: string
-          description: How the revision was created.
+          description: How the revision was created (e.g. 'user', 'api').
         appliedOn:
           type: string
           format: date-time
-          description: Timestamp when the revision was last applied.
         appliedBy:
           type: string
-          description: User who last applied the revision.
     SyncTask:
       type: object
       properties:
         taskId:
           type: string
-          description: Unique identifier of the sync task.
         taskUrl:
           type: string
-          description: URL to retrieve this task's status.
+          description: URL to poll for this task's current status.
         taskState:
           type: string
           enum:
           - IN_PROGRESS
           - COMPLETE
-          description: Current state of the task.
         creationTime:
           type: string
           format: date-time
-          description: When the task was created.
         result:
           $ref: '#/components/schemas/TaskResult'
     TaskResult:
       type: object
+      description: Outcome of an async task. Check `successful` first; if false, `error` contains details. On successful report
+        tasks, `reportFileUrl` is populated with a download URL.
       properties:
         successful:
           type: boolean
-          description: Whether the task completed successfully.
         reportFileUrl:
           type: string
           description: URL to download the report file (present on successful report tasks).
@@ -629,11 +618,14 @@ components:
           $ref: '#/components/schemas/TaskError'
     TaskError:
       type: object
+      description: Error details for a failed async task.
       properties:
         title:
           type: string
+          description: Short error title summarising the failure.
         messageText:
           type: string
+          description: Detailed error message body.
     AppliedModel:
       type: object
       properties:
@@ -654,9 +646,10 @@ components:
           type: string
         modelDeleted:
           type: boolean
-          description: True if the model has been deleted.
     Meta:
       type: object
+      description: Response envelope metadata. Contains the schema URL that identifies the response type and optional paging
+        information for list responses.
       required:
       - schema
       properties:
@@ -680,11 +673,15 @@ components:
           type: integer
     Status:
       type: object
+      description: Anaplan API response status. The code mirrors the HTTP status code (e.g. 200, 204); the message is a human-readable
+        outcome string (e.g. 'Success').
       properties:
         code:
           type: integer
+          description: Numeric response code, mirrors the HTTP status code (e.g. 200, 204).
         message:
           type: string
+          description: Human-readable outcome string, e.g. 'Success'.
     RevisionResponse:
       type: object
       description: When no revision exists, the response contains only meta and status — the 'revision' key is omitted.

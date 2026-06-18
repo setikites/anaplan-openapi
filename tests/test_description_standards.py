@@ -55,6 +55,11 @@ _SCHEMA_MUST_HAVE_DESCRIPTION = [
     pytest.param("cloudworks", ["components", "schemas", "IntegrationDetail"],  id="cw-integrationdetail"),
     pytest.param("cloudworks", ["components", "schemas", "RunRecord"],          id="cw-runrecord"),
     pytest.param("cloudworks", ["components", "schemas", "NotificationConfig"], id="cw-notificationconfig"),
+    # ALM — envelope and metadata schemas (names alone are ambiguous)
+    pytest.param("alm", ["components", "schemas", "Meta"],       id="alm-meta"),
+    pytest.param("alm", ["components", "schemas", "Status"],     id="alm-status"),
+    pytest.param("alm", ["components", "schemas", "TaskResult"], id="alm-taskresult"),
+    pytest.param("alm", ["components", "schemas", "TaskError"],  id="alm-taskerror"),
 ]
 
 
@@ -97,6 +102,12 @@ _PROPERTY_MUST_HAVE_DESCRIPTION = [
     pytest.param("cloudworks", ["components", "schemas", "ErrorStatus", "properties", "status", "properties", "message"], id="cw-errorstatus-nested-message"),
     # CloudWorks — NotificationRequest.notifications (generic name; shape not obvious)
     pytest.param("cloudworks", ["components", "schemas", "NotificationRequest", "properties", "notifications"], id="cw-notificationrequest-notifications"),
+    # ALM — Status properties (code could be confused with HTTP status; message is ambiguous)
+    pytest.param("alm", ["components", "schemas", "Status", "properties", "code"],    id="alm-status-code"),
+    pytest.param("alm", ["components", "schemas", "Status", "properties", "message"], id="alm-status-message"),
+    # ALM — TaskError properties (title vs messageText distinction not obvious from names alone)
+    pytest.param("alm", ["components", "schemas", "TaskError", "properties", "title"],       id="alm-taskerror-title"),
+    pytest.param("alm", ["components", "schemas", "TaskError", "properties", "messageText"], id="alm-taskerror-messagetext"),
 ]
 
 
@@ -139,6 +150,26 @@ _MUST_NOT_HAVE_DESCRIPTION = [
     # CloudWorks Schedule — 'Schedule name.' and 'Schedule type.' are tautological
     pytest.param("cloudworks", ["components", "schemas", "Schedule", "properties", "name"],   id="cw-schedule-name"),
     pytest.param("cloudworks", ["components", "schemas", "Schedule", "properties", "type"],   id="cw-schedule-type"),
+    # ALM Revision — all field descriptions restate the name; name + type already say it all
+    pytest.param("alm", ["components", "schemas", "Revision", "properties", "id"],          id="alm-revision-id"),
+    pytest.param("alm", ["components", "schemas", "Revision", "properties", "name"],        id="alm-revision-name"),
+    pytest.param("alm", ["components", "schemas", "Revision", "properties", "description"], id="alm-revision-description"),
+    pytest.param("alm", ["components", "schemas", "Revision", "properties", "createdOn"],   id="alm-revision-createdon"),
+    pytest.param("alm", ["components", "schemas", "Revision", "properties", "createdBy"],   id="alm-revision-createdby"),
+    pytest.param("alm", ["components", "schemas", "Revision", "properties", "appliedOn"],   id="alm-revision-appliedon"),
+    pytest.param("alm", ["components", "schemas", "Revision", "properties", "appliedBy"],   id="alm-revision-appliedby"),
+    # ALM SyncTask — taskId is self-evident; taskState enum is self-explanatory; creationTime has format
+    pytest.param("alm", ["components", "schemas", "SyncTask", "properties", "taskId"],       id="alm-synctask-taskid"),
+    pytest.param("alm", ["components", "schemas", "SyncTask", "properties", "taskState"],    id="alm-synctask-taskstate"),
+    pytest.param("alm", ["components", "schemas", "SyncTask", "properties", "creationTime"], id="alm-synctask-creationtime"),
+    # ALM TaskResult — 'Whether the task completed successfully.' restates the boolean field name
+    pytest.param("alm", ["components", "schemas", "TaskResult", "properties", "successful"], id="alm-taskresult-successful"),
+    # ALM SyncTaskRequest — 'ID of the source model.' adds nothing over the field name
+    pytest.param("alm", ["components", "schemas", "SyncTaskRequest", "properties", "sourceModelId"], id="alm-synctaskrequest-sourcemodelid"),
+    # ALM OnlineStatusRequest.status — enum [online, offline] is self-explanatory
+    pytest.param("alm", ["components", "schemas", "OnlineStatusRequest", "properties", "status"], id="alm-onlinestatus-status"),
+    # ALM AppliedModel.modelDeleted — boolean field name is self-evident
+    pytest.param("alm", ["components", "schemas", "AppliedModel", "properties", "modelDeleted"], id="alm-appliedmodel-modeldeleted"),
 ]
 
 
