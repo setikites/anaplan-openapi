@@ -69,17 +69,6 @@
         "summary": "Assign or unassign an exception user",
         "description": "Updates the exception-user status for a user in a specific workspace. Use `op: assign` to grant exception-user access or `op: unassign` to revoke it. A caller cannot modify their own exception-user status.",
         "operationId": "patchExceptionUser",
-        "parameters": [
-          {
-            "name": "userGuid",
-            "in": "path",
-            "description": "GUID of the user whose exception-user status is being changed.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -161,7 +150,18 @@
             }
           }
         }
-      }
+      },
+      "parameters": [
+        {
+          "name": "userGuid",
+          "in": "path",
+          "description": "GUID of the user whose exception-user status is being changed.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
     },
     "/permissions/exception-users/search": {
       "post": {

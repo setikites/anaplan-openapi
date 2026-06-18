@@ -34,7 +34,12 @@ security:
 paths:
   /models/{modelId}/onlineStatus:
     parameters:
-    - $ref: '#/components/parameters/modelId'
+    - name: modelId
+      in: path
+      description: Unique identifier of the model.
+      required: true
+      schema:
+        type: string
     post:
       summary: Change a model's online status
       description: Set a model online or offline. Requires Workspace Administrator role. Returns 400 if the status value is
@@ -80,7 +85,12 @@ paths:
           description: Model is archived.
   /models/{modelId}/alm/syncableRevisions:
     parameters:
-    - $ref: '#/components/parameters/modelId'
+    - name: modelId
+      in: path
+      description: Unique identifier of the model.
+      required: true
+      schema:
+        type: string
     get:
       summary: Retrieve compatible source model revisions
       description: Returns the list of revisions from the source model that are compatible with the target model, ordered
@@ -89,8 +99,8 @@ paths:
       parameters:
       - name: sourceModelId
         in: query
-        required: true
         description: GUID of the source model whose revisions to evaluate.
+        required: true
         schema:
           type: string
       responses:
@@ -106,7 +116,12 @@ paths:
           description: Model not found or caller has no access.
   /models/{modelId}/alm/latestRevision:
     parameters:
-    - $ref: '#/components/parameters/modelId'
+    - name: modelId
+      in: path
+      description: Unique identifier of the model.
+      required: true
+      schema:
+        type: string
     get:
       summary: Retrieve latest revision
       description: Returns the most recent revision for the model, if one exists. Requires Workspace Administrator role.
@@ -124,7 +139,12 @@ paths:
           description: Model not found or caller has no access.
   /models/{modelId}/alm/revisions:
     parameters:
-    - $ref: '#/components/parameters/modelId'
+    - name: modelId
+      in: path
+      description: Unique identifier of the model.
+      required: true
+      schema:
+        type: string
     get:
       summary: Retrieve revisions in a model
       description: Returns all revisions for the model with optional date filtering and pagination. Requires Workspace Administrator
@@ -133,31 +153,31 @@ paths:
       parameters:
       - name: appliedAfter
         in: query
+        description: Filter to revisions applied on or after this date (YYYY-MM-DD).
         schema:
           type: string
           format: date
-        description: Filter to revisions applied on or after this date (YYYY-MM-DD).
       - name: appliedBefore
         in: query
+        description: Filter to revisions applied on or before this date (YYYY-MM-DD).
         schema:
           type: string
           format: date
-        description: Filter to revisions applied on or before this date (YYYY-MM-DD).
       - name: sort
         in: query
+        description: Property name to sort by. Prefix with `-` for descending order.
         schema:
           type: string
-        description: Property name to sort by. Prefix with `-` for descending order.
       - name: limit
         in: query
+        description: Maximum number of results to return.
         schema:
           type: integer
-        description: Maximum number of results to return.
       - name: offset
         in: query
+        description: Zero-based starting position for results.
         schema:
           type: integer
-        description: Zero-based starting position for results.
       responses:
         '200':
           description: Paginated list of revisions.
@@ -197,8 +217,18 @@ paths:
           description: Model is archived.
   /models/{modelId}/alm/revisions/{revisionId}/appliedToModels:
     parameters:
-    - $ref: '#/components/parameters/modelId'
-    - $ref: '#/components/parameters/revisionId'
+    - name: modelId
+      in: path
+      description: Unique identifier of the model.
+      required: true
+      schema:
+        type: string
+    - name: revisionId
+      in: path
+      description: Unique identifier of the revision.
+      required: true
+      schema:
+        type: string
     get:
       summary: Retrieve the models for a specific revision
       description: 'Returns all models that have had this revision applied. Deleted models are included with `modelDeleted:
@@ -217,7 +247,12 @@ paths:
           description: Model or revision not found.
   /models/{modelId}/alm/syncTasks:
     parameters:
-    - $ref: '#/components/parameters/modelId'
+    - name: modelId
+      in: path
+      description: Unique identifier of the model.
+      required: true
+      schema:
+        type: string
     get:
       summary: Retrieve sync tasks for a model
       description: Returns sync tasks that are in progress or completed within the last 48 hours. Up to ~20,000 results are
@@ -262,8 +297,18 @@ paths:
           description: Model is archived.
   /models/{modelId}/alm/syncTasks/{syncTaskId}:
     parameters:
-    - $ref: '#/components/parameters/modelId'
-    - $ref: '#/components/parameters/syncTaskId'
+    - name: modelId
+      in: path
+      description: Unique identifier of the model.
+      required: true
+      schema:
+        type: string
+    - name: syncTaskId
+      in: path
+      description: Unique identifier of the sync task.
+      required: true
+      schema:
+        type: string
     get:
       summary: Retrieve model sync task info
       description: 'Returns the current status and result of a sync task. Task states: `IN_PROGRESS`, `COMPLETE`. On failure,
@@ -282,7 +327,12 @@ paths:
           description: Model or sync task not found.
   /models/{modelId}/alm/comparisonReportTasks:
     parameters:
-    - $ref: '#/components/parameters/modelId'
+    - name: modelId
+      in: path
+      description: Unique identifier of the model.
+      required: true
+      schema:
+        type: string
     post:
       summary: Create a full comparison report generation task
       description: Starts an asynchronous task to generate a full comparison report between a source revision and the target
@@ -310,8 +360,18 @@ paths:
           description: Model is archived.
   /models/{modelId}/alm/comparisonReportTasks/{taskId}:
     parameters:
-    - $ref: '#/components/parameters/modelId'
-    - $ref: '#/components/parameters/taskId'
+    - name: modelId
+      in: path
+      description: Unique identifier of the model.
+      required: true
+      schema:
+        type: string
+    - name: taskId
+      in: path
+      description: Unique identifier of the report generation task.
+      required: true
+      schema:
+        type: string
     get:
       summary: Retrieve full comparison report task info
       description: Returns the status of a comparison report generation task. On success, `result.successful` is true and
@@ -330,9 +390,24 @@ paths:
           description: Model or task not found.
   /models/{modelId}/alm/comparisonReports/{targetRevisionId}/{sourceRevisionId}:
     parameters:
-    - $ref: '#/components/parameters/modelId'
-    - $ref: '#/components/parameters/targetRevisionId'
-    - $ref: '#/components/parameters/sourceRevisionId'
+    - name: modelId
+      in: path
+      description: Unique identifier of the model.
+      required: true
+      schema:
+        type: string
+    - name: targetRevisionId
+      in: path
+      description: Unique identifier of the target revision.
+      required: true
+      schema:
+        type: string
+    - name: sourceRevisionId
+      in: path
+      description: Unique identifier of the source revision.
+      required: true
+      schema:
+        type: string
     get:
       summary: Retrieve full comparison report content
       description: 'Downloads the full comparison report as a tab-separated values (TSV) file. The report is available for
@@ -353,7 +428,12 @@ paths:
           description: Report not found or has expired (reports expire after 48 hours).
   /models/{modelId}/alm/summaryReportTasks:
     parameters:
-    - $ref: '#/components/parameters/modelId'
+    - name: modelId
+      in: path
+      description: Unique identifier of the model.
+      required: true
+      schema:
+        type: string
     post:
       summary: Create a summary report generation task
       description: Starts an asynchronous task to generate a summary report between a source revision and the target model's
@@ -380,8 +460,18 @@ paths:
           description: Model is archived.
   /models/{modelId}/alm/summaryReportTasks/{taskId}:
     parameters:
-    - $ref: '#/components/parameters/modelId'
-    - $ref: '#/components/parameters/taskId'
+    - name: modelId
+      in: path
+      description: Unique identifier of the model.
+      required: true
+      schema:
+        type: string
+    - name: taskId
+      in: path
+      description: Unique identifier of the report generation task.
+      required: true
+      schema:
+        type: string
     get:
       summary: Retrieve summary report task info
       description: Returns the status of a summary report generation task. On success, `result.successful` is true and `result.reportFileUrl`
@@ -400,9 +490,24 @@ paths:
           description: Model or task not found.
   /models/{modelId}/alm/summaryReports/{targetRevisionId}/{sourceRevisionId}:
     parameters:
-    - $ref: '#/components/parameters/modelId'
-    - $ref: '#/components/parameters/targetRevisionId'
-    - $ref: '#/components/parameters/sourceRevisionId'
+    - name: modelId
+      in: path
+      description: Unique identifier of the model.
+      required: true
+      schema:
+        type: string
+    - name: targetRevisionId
+      in: path
+      description: Unique identifier of the target revision.
+      required: true
+      schema:
+        type: string
+    - name: sourceRevisionId
+      in: path
+      description: Unique identifier of the source revision.
+      required: true
+      schema:
+        type: string
     get:
       summary: Retrieve summary report content
       description: Downloads the summary report as JSON. The report is available for 48 hours after generation. Change types
@@ -421,49 +526,6 @@ paths:
         '404':
           description: Report not found or has expired (reports expire after 48 hours).
 components:
-  parameters:
-    modelId:
-      name: modelId
-      in: path
-      required: true
-      description: Unique identifier of the model.
-      schema:
-        type: string
-    revisionId:
-      name: revisionId
-      in: path
-      required: true
-      description: Unique identifier of the revision.
-      schema:
-        type: string
-    syncTaskId:
-      name: syncTaskId
-      in: path
-      required: true
-      description: Unique identifier of the sync task.
-      schema:
-        type: string
-    taskId:
-      name: taskId
-      in: path
-      required: true
-      description: Unique identifier of the report generation task.
-      schema:
-        type: string
-    targetRevisionId:
-      name: targetRevisionId
-      in: path
-      required: true
-      description: Unique identifier of the target revision.
-      schema:
-        type: string
-    sourceRevisionId:
-      name: sourceRevisionId
-      in: path
-      required: true
-      description: Unique identifier of the source revision.
-      schema:
-        type: string
   schemas:
     OnlineStatusRequest:
       type: object

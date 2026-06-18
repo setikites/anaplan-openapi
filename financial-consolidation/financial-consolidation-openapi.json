@@ -20,17 +20,17 @@
     "/odata/{tableName}": {
       "parameters": [
         {
-          "$ref": "#/components/parameters/TenantHeader"
-        },
-        {
           "name": "tableName",
           "in": "path",
-          "required": true,
           "description": "Name of the client schema staging table.",
+          "required": true,
           "schema": {
             "type": "string",
             "example": "Consolidation"
           }
+        },
+        {
+          "$ref": "#/components/parameters/TenantHeader"
         }
       ],
       "get": {
@@ -316,13 +316,10 @@
     "/process/start/{path}/{name_of_workflow}": {
       "parameters": [
         {
-          "$ref": "#/components/parameters/TenantHeader"
-        },
-        {
           "name": "path",
           "in": "path",
-          "required": true,
           "description": "Path to the workflow file in Explorer. May include nested folders separated by `/`.",
+          "required": true,
           "schema": {
             "type": "string",
             "example": "ImportsandExports"
@@ -331,12 +328,15 @@
         {
           "name": "name_of_workflow",
           "in": "path",
-          "required": true,
           "description": "Name of the workflow file in Explorer. Avoid special characters such as `?`, `&`, and `/`.",
+          "required": true,
           "schema": {
             "type": "string",
             "example": "ModelExport"
           }
+        },
+        {
+          "$ref": "#/components/parameters/TenantHeader"
         }
       ],
       "post": {
@@ -375,13 +375,10 @@
     "/process/stop/{path}/{name_of_workflow}": {
       "parameters": [
         {
-          "$ref": "#/components/parameters/TenantHeader"
-        },
-        {
           "name": "path",
           "in": "path",
-          "required": true,
           "description": "Path to the workflow file in Explorer. May include nested folders separated by `/`.",
+          "required": true,
           "schema": {
             "type": "string",
             "example": "ImportsandExports"
@@ -390,12 +387,15 @@
         {
           "name": "name_of_workflow",
           "in": "path",
-          "required": true,
           "description": "Name of the workflow file in Explorer. Avoid special characters such as `?`, `&`, and `/`.",
+          "required": true,
           "schema": {
             "type": "string",
             "example": "ModelExport"
           }
+        },
+        {
+          "$ref": "#/components/parameters/TenantHeader"
         }
       ],
       "post": {
@@ -421,13 +421,10 @@
     "/process/state/{path}/{name_of_workflow}": {
       "parameters": [
         {
-          "$ref": "#/components/parameters/TenantHeader"
-        },
-        {
           "name": "path",
           "in": "path",
-          "required": true,
           "description": "Path to the workflow file in Explorer. May include nested folders separated by `/`.",
+          "required": true,
           "schema": {
             "type": "string",
             "example": "Workflows/Other"
@@ -436,12 +433,15 @@
         {
           "name": "name_of_workflow",
           "in": "path",
-          "required": true,
           "description": "Name of the workflow file in Explorer.",
+          "required": true,
           "schema": {
             "type": "string",
             "example": "Compliance"
           }
+        },
+        {
+          "$ref": "#/components/parameters/TenantHeader"
         }
       ],
       "get": {
@@ -504,17 +504,17 @@
     "/metadata/models/{modelName}/Dimensions": {
       "parameters": [
         {
-          "$ref": "#/components/parameters/TenantHeader"
-        },
-        {
           "name": "modelName",
           "in": "path",
-          "required": true,
           "description": "The name of the model within the tenant.",
+          "required": true,
           "schema": {
             "type": "string",
             "example": "Consolidation"
           }
+        },
+        {
+          "$ref": "#/components/parameters/TenantHeader"
         }
       ],
       "get": {
@@ -570,17 +570,17 @@
     "/metadata/Dimensions/{dimensionName}": {
       "parameters": [
         {
-          "$ref": "#/components/parameters/TenantHeader"
-        },
-        {
           "name": "dimensionName",
           "in": "path",
-          "required": true,
           "description": "The name of a dimension within the tenant.",
+          "required": true,
           "schema": {
             "type": "string",
             "example": "Account"
           }
+        },
+        {
+          "$ref": "#/components/parameters/TenantHeader"
         }
       ],
       "get": {
@@ -635,17 +635,17 @@
     "/odata/batch/{tableName}": {
       "parameters": [
         {
-          "$ref": "#/components/parameters/TenantHeader"
-        },
-        {
           "name": "tableName",
           "in": "path",
-          "required": true,
           "description": "Name of the client schema staging table.",
+          "required": true,
           "schema": {
             "type": "string",
             "example": "Consolidation"
           }
+        },
+        {
+          "$ref": "#/components/parameters/TenantHeader"
         }
       ],
       "post": {
@@ -794,17 +794,17 @@
     "/users/{username}": {
       "parameters": [
         {
-          "$ref": "#/components/parameters/TenantHeader"
-        },
-        {
           "name": "username",
           "in": "path",
-          "required": true,
           "description": "Financial Consolidation app username (not the email address).",
+          "required": true,
           "schema": {
             "type": "string",
             "example": "john.doe@fluence.app"
           }
+        },
+        {
+          "$ref": "#/components/parameters/TenantHeader"
         }
       ],
       "delete": {
@@ -821,17 +821,17 @@
     "/user/{username}/roles": {
       "parameters": [
         {
-          "$ref": "#/components/parameters/TenantHeader"
-        },
-        {
           "name": "username",
           "in": "path",
-          "required": true,
           "description": "Financial Consolidation app username (not the email address).",
+          "required": true,
           "schema": {
             "type": "string",
             "example": "john.doe@fluence.app"
           }
+        },
+        {
+          "$ref": "#/components/parameters/TenantHeader"
         }
       ],
       "get": {

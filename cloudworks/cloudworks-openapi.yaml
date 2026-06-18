@@ -276,8 +276,6 @@ paths:
       operationId: editConnection
       tags:
       - Connections
-      parameters:
-      - $ref: '#/components/parameters/connectionId'
       requestBody:
         required: true
         content:
@@ -300,8 +298,6 @@ paths:
       operationId: patchConnection
       tags:
       - Connections
-      parameters:
-      - $ref: '#/components/parameters/connectionId'
       requestBody:
         required: true
         content:
@@ -323,8 +319,6 @@ paths:
       operationId: deleteConnection
       tags:
       - Connections
-      parameters:
-      - $ref: '#/components/parameters/connectionId'
       responses:
         '200':
           $ref: '#/components/responses/SuccessStatus'
@@ -334,6 +328,12 @@ paths:
           $ref: '#/components/responses/NotFound'
         '409':
           $ref: '#/components/responses/Conflict'
+    parameters:
+    - name: connectionId
+      in: path
+      required: true
+      schema:
+        type: string
   /integrations:
     post:
       summary: Create an integration
@@ -488,8 +488,6 @@ paths:
       operationId: getIntegrationById
       tags:
       - Integrations
-      parameters:
-      - $ref: '#/components/parameters/integrationId'
       responses:
         '200':
           description: Integration details.
@@ -512,8 +510,6 @@ paths:
       operationId: editIntegration
       tags:
       - Integrations
-      parameters:
-      - $ref: '#/components/parameters/integrationId'
       requestBody:
         required: true
         content:
@@ -558,8 +554,6 @@ paths:
       operationId: deleteIntegration
       tags:
       - Integrations
-      parameters:
-      - $ref: '#/components/parameters/integrationId'
       responses:
         '200':
           $ref: '#/components/responses/SuccessStatus'
@@ -569,20 +563,19 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+    parameters:
+    - name: integrationId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: fe40dc5793084f7dbb685cffe6a5ad2a
   /integrations/anaplanModels/{modelId}:
     get:
       summary: Get integrations by model ID
       operationId: getIntegrationsByModel
       tags:
       - Integrations
-      parameters:
-      - name: modelId
-        in: path
-        description: Anaplan model ID.
-        required: true
-        schema:
-          type: string
-        example: E559BFF3B1GD4RKE874P745BEL259711
       responses:
         '200':
           description: Integrations associated with the model.
@@ -601,14 +594,20 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+    parameters:
+    - name: modelId
+      in: path
+      description: Anaplan model ID.
+      required: true
+      schema:
+        type: string
+      example: E559BFF3B1GD4RKE874P745BEL259711
   /integrations/{integrationId}/run:
     post:
       summary: Run an integration
       operationId: runIntegration
       tags:
       - Integrations
-      parameters:
-      - $ref: '#/components/parameters/integrationId'
       requestBody:
         required: false
         content:
@@ -642,14 +641,19 @@ paths:
           $ref: '#/components/responses/InternalServerError'
         '503':
           $ref: '#/components/responses/ServiceUnavailable'
+    parameters:
+    - name: integrationId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: fe40dc5793084f7dbb685cffe6a5ad2a
   /integrations/{integrationId}/cancel:
     post:
       summary: Cancel a running integration
       operationId: cancelIntegration
       tags:
       - Integrations
-      parameters:
-      - $ref: '#/components/parameters/integrationId'
       responses:
         '200':
           description: Integration cancelled.
@@ -664,6 +668,13 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+    parameters:
+    - name: integrationId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: fe40dc5793084f7dbb685cffe6a5ad2a
   /integrations/{integrationId}/schedule:
     post:
       summary: Create an integration schedule
@@ -672,8 +683,6 @@ paths:
       operationId: createSchedule
       tags:
       - Schedules
-      parameters:
-      - $ref: '#/components/parameters/integrationId'
       requestBody:
         required: true
         content:
@@ -702,8 +711,6 @@ paths:
       operationId: updateSchedule
       tags:
       - Schedules
-      parameters:
-      - $ref: '#/components/parameters/integrationId'
       requestBody:
         required: true
         content:
@@ -729,8 +736,6 @@ paths:
       operationId: deleteSchedule
       tags:
       - Schedules
-      parameters:
-      - $ref: '#/components/parameters/integrationId'
       responses:
         '200':
           $ref: '#/components/responses/SuccessStatus'
@@ -738,6 +743,13 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+    parameters:
+    - name: integrationId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: fe40dc5793084f7dbb685cffe6a5ad2a
   /integrations/{integrationId}/schedule/status/{status}:
     post:
       summary: Set schedule status
@@ -745,17 +757,6 @@ paths:
       operationId: setScheduleStatus
       tags:
       - Schedules
-      parameters:
-      - $ref: '#/components/parameters/integrationId'
-      - name: status
-        in: path
-        description: Desired schedule status.
-        required: true
-        schema:
-          type: string
-          enum:
-          - enabled
-          - disabled
       responses:
         '200':
           $ref: '#/components/responses/SuccessStatus'
@@ -763,6 +764,22 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+    parameters:
+    - name: integrationId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: fe40dc5793084f7dbb685cffe6a5ad2a
+    - name: status
+      in: path
+      description: Desired schedule status.
+      required: true
+      schema:
+        type: string
+        enum:
+        - enabled
+        - disabled
   /integrations/runs/{integrationId}:
     get:
       summary: Get integration run history
@@ -770,13 +787,6 @@ paths:
       tags:
       - History
       parameters:
-      - name: integrationId
-        in: path
-        description: Integration ID.
-        required: true
-        schema:
-          type: string
-        example: fe40dc5793084f7dbb685cffe6a5ad2a
       - name: offset
         in: query
         description: Number of items to skip. First element is 0.
@@ -841,14 +851,20 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+    parameters:
+    - name: integrationId
+      in: path
+      description: Integration ID.
+      required: true
+      schema:
+        type: string
+      example: fe40dc5793084f7dbb685cffe6a5ad2a
   /integrations/runerror/{runId}:
     get:
       summary: Get integration run errors
       operationId: getRunErrors
       tags:
       - History
-      parameters:
-      - $ref: '#/components/parameters/runId'
       responses:
         '200':
           description: Run error details.
@@ -909,6 +925,13 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+    parameters:
+    - name: runId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: hy40d89893084f0dkb985cmme9i5io2a
   /integrations/notification:
     post:
       summary: Create a notification configuration
@@ -943,8 +966,6 @@ paths:
       operationId: getNotification
       tags:
       - Notifications
-      parameters:
-      - $ref: '#/components/parameters/notificationId'
       responses:
         '200':
           description: Notification configuration.
@@ -968,8 +989,6 @@ paths:
       operationId: editNotification
       tags:
       - Notifications
-      parameters:
-      - $ref: '#/components/parameters/notificationId'
       requestBody:
         required: true
         content:
@@ -990,8 +1009,6 @@ paths:
       operationId: deleteNotification
       tags:
       - Notifications
-      parameters:
-      - $ref: '#/components/parameters/notificationId'
       responses:
         '200':
           $ref: '#/components/responses/SuccessStatus'
@@ -999,6 +1016,13 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+    parameters:
+    - name: notificationId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: 067d1426ac964a7cac871c87790c4555
   /integrations/run/{runId}/dumps:
     get:
       summary: Get an import error log
@@ -1007,8 +1031,6 @@ paths:
       operationId: getImportErrorLog
       tags:
       - Error Logs
-      parameters:
-      - $ref: '#/components/parameters/runId'
       responses:
         '200':
           description: Import error log.
@@ -1023,6 +1045,13 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+    parameters:
+    - name: runId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: hy40d89893084f0dkb985cmme9i5io2a
   /integrations/run/{runId}/process/import/{actionId}/dumps:
     get:
       summary: Get a process error log
@@ -1030,15 +1059,6 @@ paths:
       operationId: getProcessErrorLog
       tags:
       - Error Logs
-      parameters:
-      - $ref: '#/components/parameters/runId'
-      - name: actionId
-        in: path
-        description: Anaplan action ID.
-        required: true
-        schema:
-          type: string
-        example: '112000000011'
       responses:
         '200':
           description: Process error log.
@@ -1053,6 +1073,20 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+    parameters:
+    - name: runId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: hy40d89893084f0dkb985cmme9i5io2a
+    - name: actionId
+      in: path
+      description: Anaplan action ID.
+      required: true
+      schema:
+        type: string
+      example: '112000000011'
   /integrationflows:
     post:
       summary: Create an integration flow
@@ -1191,8 +1225,6 @@ paths:
       operationId: editIntegrationFlow
       tags:
       - Integration Flows
-      parameters:
-      - $ref: '#/components/parameters/integrationFlowId'
       requestBody:
         required: true
         content:
@@ -1214,8 +1246,6 @@ paths:
       operationId: deleteIntegrationFlow
       tags:
       - Integration Flows
-      parameters:
-      - $ref: '#/components/parameters/integrationFlowId'
       responses:
         '200':
           $ref: '#/components/responses/SuccessStatus'
@@ -1223,14 +1253,19 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+    parameters:
+    - name: integrationFlowId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: fe40dc5793084f7dbb685cffe6a5ad2a
   /integrationflows/{integrationFlowId}/run:
     post:
       summary: Run an integration flow
       operationId: runIntegrationFlow
       tags:
       - Integration Flows
-      parameters:
-      - $ref: '#/components/parameters/integrationFlowId'
       requestBody:
         required: false
         content:
@@ -1266,42 +1301,14 @@ paths:
           $ref: '#/components/responses/NotFound'
         '409':
           $ref: '#/components/responses/Conflict'
+    parameters:
+    - name: integrationFlowId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: fe40dc5793084f7dbb685cffe6a5ad2a
 components:
-  parameters:
-    integrationId:
-      name: integrationId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: fe40dc5793084f7dbb685cffe6a5ad2a
-    connectionId:
-      name: connectionId
-      in: path
-      required: true
-      schema:
-        type: string
-    notificationId:
-      name: notificationId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: 067d1426ac964a7cac871c87790c4555
-    runId:
-      name: runId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: hy40d89893084f0dkb985cmme9i5io2a
-    integrationFlowId:
-      name: integrationFlowId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: fe40dc5793084f7dbb685cffe6a5ad2a
   schemas:
     Status:
       description: Response envelope present on every successful CloudWorks operation.

@@ -195,6 +195,62 @@ def test_security_requirements_reference_declared_schemes(spec_path):
                 )
 
 
+def _resolve_param(spec: dict, param: dict) -> dict:
+    """Resolve a parameter dict, following a local $ref if present."""
+    if "$ref" in param:
+        ref = param["$ref"]
+        if ref.startswith("#/components/parameters/"):
+            name = ref.split("/")[-1]
+            return spec.get("components", {}).get("parameters", {}).get(name, param)
+    return param
+
+
+_PATH_PARAM_RE = re.compile(r"\{(\w+)\}")
+
+
+@pytest.mark.parametrize("spec_path", SPEC_FILES, ids=lambda p: p.parent.name)
+def test_path_params_not_inside_operations(spec_path):
+    """Path parameters must be declared at path item level, not inside operations (ADR 0002)."""
+    spec = _load(spec_path)
+    violations = []
+    for path_str, method, operation in _all_operations(spec):
+        for param in operation.get("parameters", []):
+            resolved = _resolve_param(spec, param)
+            if resolved.get("in") == "path":
+                violations.append(
+                    f"{method.upper()} {path_str}: path param "
+                    f"{resolved.get('name', '?')!r} must be at path item level"
+                )
+    assert not violations, (
+        "Path parameters found inside operations (ADR 0002 — move to path item level):\n"
+        + "\n".join(f"  {v}" for v in violations)
+    )
+
+
+@pytest.mark.parametrize("spec_path", SPEC_FILES, ids=lambda p: p.parent.name)
+def test_path_items_declare_inline_path_params(spec_path):
+    """Every path with {param} segments must declare those params inline at path item level (ADR 0002)."""
+    spec = _load(spec_path)
+    violations = []
+    for path_str, path_item in spec.get("paths", {}).items():
+        expected = set(_PATH_PARAM_RE.findall(path_str))
+        if not expected:
+            continue
+        declared = {
+            p["name"]
+            for p in path_item.get("parameters", [])
+            if isinstance(p, dict) and "name" in p and p.get("in") == "path"
+        }
+        for name in sorted(expected - declared):
+            violations.append(
+                f"{path_str}: path param {name!r} not declared inline at path item level"
+            )
+    assert not violations, (
+        "Path parameters missing from path item level (ADR 0002):\n"
+        + "\n".join(f"  {v}" for v in violations)
+    )
+
+
 # ─── Cross-spec invariants ────────────────────────────────────────────────
 
 

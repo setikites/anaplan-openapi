@@ -129,8 +129,8 @@ paths:
     parameters:
     - name: id
       in: path
-      required: true
       description: Anaplan user ID.
+      required: true
       schema:
         type: string
     get:

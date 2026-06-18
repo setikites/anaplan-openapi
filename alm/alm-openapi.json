@@ -67,7 +67,13 @@
     "/models/{modelId}/onlineStatus": {
       "parameters": [
         {
-          "$ref": "#/components/parameters/modelId"
+          "name": "modelId",
+          "in": "path",
+          "description": "Unique identifier of the model.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
         }
       ],
       "post": {
@@ -138,7 +144,13 @@
     "/models/{modelId}/alm/syncableRevisions": {
       "parameters": [
         {
-          "$ref": "#/components/parameters/modelId"
+          "name": "modelId",
+          "in": "path",
+          "description": "Unique identifier of the model.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
         }
       ],
       "get": {
@@ -179,7 +191,13 @@
     "/models/{modelId}/alm/latestRevision": {
       "parameters": [
         {
-          "$ref": "#/components/parameters/modelId"
+          "name": "modelId",
+          "in": "path",
+          "description": "Unique identifier of the model.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
         }
       ],
       "get": {
@@ -209,7 +227,13 @@
     "/models/{modelId}/alm/revisions": {
       "parameters": [
         {
-          "$ref": "#/components/parameters/modelId"
+          "name": "modelId",
+          "in": "path",
+          "description": "Unique identifier of the model.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
         }
       ],
       "get": {
@@ -322,10 +346,22 @@
     "/models/{modelId}/alm/revisions/{revisionId}/appliedToModels": {
       "parameters": [
         {
-          "$ref": "#/components/parameters/modelId"
+          "name": "modelId",
+          "in": "path",
+          "description": "Unique identifier of the model.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
         },
         {
-          "$ref": "#/components/parameters/revisionId"
+          "name": "revisionId",
+          "in": "path",
+          "description": "Unique identifier of the revision.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
         }
       ],
       "get": {
@@ -355,7 +391,13 @@
     "/models/{modelId}/alm/syncTasks": {
       "parameters": [
         {
-          "$ref": "#/components/parameters/modelId"
+          "name": "modelId",
+          "in": "path",
+          "description": "Unique identifier of the model.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
         }
       ],
       "get": {
@@ -424,10 +466,22 @@
     "/models/{modelId}/alm/syncTasks/{syncTaskId}": {
       "parameters": [
         {
-          "$ref": "#/components/parameters/modelId"
+          "name": "modelId",
+          "in": "path",
+          "description": "Unique identifier of the model.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
         },
         {
-          "$ref": "#/components/parameters/syncTaskId"
+          "name": "syncTaskId",
+          "in": "path",
+          "description": "Unique identifier of the sync task.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
         }
       ],
       "get": {
@@ -457,7 +511,13 @@
     "/models/{modelId}/alm/comparisonReportTasks": {
       "parameters": [
         {
-          "$ref": "#/components/parameters/modelId"
+          "name": "modelId",
+          "in": "path",
+          "description": "Unique identifier of the model.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
         }
       ],
       "post": {
@@ -500,10 +560,22 @@
     "/models/{modelId}/alm/comparisonReportTasks/{taskId}": {
       "parameters": [
         {
-          "$ref": "#/components/parameters/modelId"
+          "name": "modelId",
+          "in": "path",
+          "description": "Unique identifier of the model.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
         },
         {
-          "$ref": "#/components/parameters/taskId"
+          "name": "taskId",
+          "in": "path",
+          "description": "Unique identifier of the report generation task.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
         }
       ],
       "get": {
@@ -533,13 +605,31 @@
     "/models/{modelId}/alm/comparisonReports/{targetRevisionId}/{sourceRevisionId}": {
       "parameters": [
         {
-          "$ref": "#/components/parameters/modelId"
+          "name": "modelId",
+          "in": "path",
+          "description": "Unique identifier of the model.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
         },
         {
-          "$ref": "#/components/parameters/targetRevisionId"
+          "name": "targetRevisionId",
+          "in": "path",
+          "description": "Unique identifier of the target revision.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
         },
         {
-          "$ref": "#/components/parameters/sourceRevisionId"
+          "name": "sourceRevisionId",
+          "in": "path",
+          "description": "Unique identifier of the source revision.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
         }
       ],
       "get": {
@@ -570,7 +660,13 @@
     "/models/{modelId}/alm/summaryReportTasks": {
       "parameters": [
         {
-          "$ref": "#/components/parameters/modelId"
+          "name": "modelId",
+          "in": "path",
+          "description": "Unique identifier of the model.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
         }
       ],
       "post": {
@@ -613,10 +709,22 @@
     "/models/{modelId}/alm/summaryReportTasks/{taskId}": {
       "parameters": [
         {
-          "$ref": "#/components/parameters/modelId"
+          "name": "modelId",
+          "in": "path",
+          "description": "Unique identifier of the model.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
         },
         {
-          "$ref": "#/components/parameters/taskId"
+          "name": "taskId",
+          "in": "path",
+          "description": "Unique identifier of the report generation task.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
         }
       ],
       "get": {
@@ -646,13 +754,31 @@
     "/models/{modelId}/alm/summaryReports/{targetRevisionId}/{sourceRevisionId}": {
       "parameters": [
         {
-          "$ref": "#/components/parameters/modelId"
+          "name": "modelId",
+          "in": "path",
+          "description": "Unique identifier of the model.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
         },
         {
-          "$ref": "#/components/parameters/targetRevisionId"
+          "name": "targetRevisionId",
+          "in": "path",
+          "description": "Unique identifier of the target revision.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
         },
         {
-          "$ref": "#/components/parameters/sourceRevisionId"
+          "name": "sourceRevisionId",
+          "in": "path",
+          "description": "Unique identifier of the source revision.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
         }
       ],
       "get": {
@@ -681,62 +807,6 @@
     }
   },
   "components": {
-    "parameters": {
-      "modelId": {
-        "name": "modelId",
-        "in": "path",
-        "required": true,
-        "description": "Unique identifier of the model.",
-        "schema": {
-          "type": "string"
-        }
-      },
-      "revisionId": {
-        "name": "revisionId",
-        "in": "path",
-        "required": true,
-        "description": "Unique identifier of the revision.",
-        "schema": {
-          "type": "string"
-        }
-      },
-      "syncTaskId": {
-        "name": "syncTaskId",
-        "in": "path",
-        "required": true,
-        "description": "Unique identifier of the sync task.",
-        "schema": {
-          "type": "string"
-        }
-      },
-      "taskId": {
-        "name": "taskId",
-        "in": "path",
-        "required": true,
-        "description": "Unique identifier of the report generation task.",
-        "schema": {
-          "type": "string"
-        }
-      },
-      "targetRevisionId": {
-        "name": "targetRevisionId",
-        "in": "path",
-        "required": true,
-        "description": "Unique identifier of the target revision.",
-        "schema": {
-          "type": "string"
-        }
-      },
-      "sourceRevisionId": {
-        "name": "sourceRevisionId",
-        "in": "path",
-        "required": true,
-        "description": "Unique identifier of the source revision.",
-        "schema": {
-          "type": "string"
-        }
-      }
-    },
     "schemas": {
       "OnlineStatusRequest": {
         "type": "object",
