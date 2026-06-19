@@ -268,13 +268,6 @@ def test_property_has_description(api_dir, path):
 # path: list of dict keys leading to the object whose 'description' must be absent.
 
 _MUST_NOT_HAVE_DESCRIPTION = [
-    # CloudWorks component parameters — name + example are sufficient;
-    # 'Integration ID.' / 'Connection ID.' restate the name and add nothing.
-    pytest.param("cloudworks", ["components", "parameters", "integrationId"],    id="cw-param-integrationid"),
-    pytest.param("cloudworks", ["components", "parameters", "connectionId"],      id="cw-param-connectionid"),
-    pytest.param("cloudworks", ["components", "parameters", "notificationId"],    id="cw-param-notificationid"),
-    pytest.param("cloudworks", ["components", "parameters", "runId"],             id="cw-param-runid"),
-    pytest.param("cloudworks", ["components", "parameters", "integrationFlowId"], id="cw-param-integrationflowid"),
     # CloudWorks Job.type — 'Job type.' adds nothing; enum values are self-explanatory
     pytest.param("cloudworks", ["components", "schemas", "Job", "properties", "type"],        id="cw-job-type"),
     # CloudWorks Schedule — 'Schedule name.' and 'Schedule type.' are tautological

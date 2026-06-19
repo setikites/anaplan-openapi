@@ -1299,7 +1299,6 @@
         {
           "name": "integrationId",
           "in": "path",
-          "description": "Integration ID.",
           "required": true,
           "schema": {
             "type": "string"
