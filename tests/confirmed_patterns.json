@@ -1,0 +1,557 @@
+[
+  {
+    "spec": "authentication",
+    "path": "/paths//token/validate/get/responses/200/content/application/json/schema/properties/userInfo/properties/userGuid",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "authentication",
+    "path": "/paths//token/validate/get/responses/200/content/application/json/schema/properties/userInfo/properties/customerGuid",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//models/{modelId}/parameters/0/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/dimensions/{dimensionId}/items/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/dimensions/{dimensionId}/items/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//models/{modelId}/views/{viewId}/dimensions/{dimensionId}/items/parameters/0/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/lists/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/lists/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/lists/{listId}/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/lists/{listId}/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//models/{modelId}/modules/parameters/0/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//models/{modelId}/modules/{moduleId}/lineItems/parameters/0/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/views/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/views/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//models/{modelId}/views/{viewId}/parameters/0/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//models/{modelId}/modules/{moduleId}/views/parameters/0/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//models/{modelId}/lineItems/parameters/0/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//models/{modelId}/lineItems/{lineItemId}/dimensions/parameters/0/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//models/{modelId}/lineItems/{lineItemId}/dimensions/{dimensionId}/items/parameters/0/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//models/{modelId}/versions/parameters/0/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/currentPeriod/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/currentPeriod/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/modelCalendar/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/modelCalendar/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/actions/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/actions/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/processes/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/processes/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/imports//parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/imports//parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/exports/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/exports/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//models/{modelId}/processes/{processId}/parameters/0/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/exports/{exportId}/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/exports/{exportId}/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/imports/{importId}/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/imports/{importId}/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//models/{modelId}/files/parameters/0/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/files/{fileId}/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/files/{fileId}/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//models/{modelId}/versions/{versionId}/switchover/parameters/0/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//models/{modelId}/currentPeriod/put/parameters/0/schema",
+    "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//models/{modelId}/currentPeriod/parameters/0/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//models/{modelId}/modelCalendar/fiscalYear/parameters/0/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//models/{modelId}/modules/{moduleId}/data/parameters/0/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/lists/{listId}/items/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/lists/{listId}/items/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests/{requestId}/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests/{requestId}/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests/{requestId}/pages/{pageNo}/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests/{requestId}/pages/{pageNo}/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//models/{modelId}/views/{viewId}/data/parameters/0/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks/0/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks/0/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/files/{fileId}/complete/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/files/{fileId}/complete/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/dump/chunks/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/dump/chunks/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/dump/chunks/0/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/dump/chunks/0/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/dump/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/dump/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/exports/{exportId}/tasks/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/exports/{exportId}/tasks/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/exports/{exportId}/tasks/{taskId}/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/exports/{exportId}/tasks/{taskId}/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks/{taskId}/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks/{taskId}/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/modules/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/modules/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/modules/{moduleId}/lineItems/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/modules/{moduleId}/lineItems/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/modules/{moduleId}/views/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/modules/{moduleId}/views/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/lineItems/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/lineItems/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/lineItems/{lineItemId}/dimensions/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/lineItems/{lineItemId}/dimensions/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/lineItems/{lineItemId}/dimensions/{dimensionId}/items/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/lineItems/{lineItemId}/dimensions/{dimensionId}/items/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/views/{viewId}/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/views/{viewId}/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//models/{modelId}/views/parameters/0/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//models/{modelId}/dimensions/{dimensionId}/items/parameters/0/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//models/{modelId}/lists/parameters/0/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//models/{modelId}/lists/{listId}/parameters/0/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/components/schemas/User/properties/id",
+    "pattern": "^[0-9a-fA-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/components/schemas/User/properties/email",
+    "pattern": "^[_A-Za-z0-9-\\\\+]+(\\\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\\\.[A-Za-z0-9]+)*(\\\\.[A-Za-z]{2,})$"
+  },
+  {
+    "spec": "integration",
+    "path": "/components/schemas/Model/properties/id",
+    "pattern": "^[0-9a-fA-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/components/schemas/Workspace/properties/id",
+    "pattern": "^[0-9a-fA-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/components/schemas/Admin/properties/email",
+    "pattern": "^[_A-Za-z0-9-\\\\+]+(\\\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\\\.[A-Za-z0-9]+)*(\\\\.[A-Za-z]{2,})$"
+  },
+  {
+    "spec": "integration",
+    "path": "/components/schemas/Visitor/properties/email",
+    "pattern": "^[_A-Za-z0-9-\\\\+]+(\\\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\\\.[A-Za-z0-9]+)*(\\\\.[A-Za-z]{2,})$"
+  },
+  {
+    "spec": "oauth",
+    "path": "/paths//auth/authorize/get/parameters/1/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "oauth",
+    "path": "/paths//oauth/device/code/post/requestBody/content/application/json/schema/properties/client_id",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "oauth",
+    "path": "/components/schemas/AuthCodePayload/properties/client_id",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "oauth",
+    "path": "/components/schemas/DevicePayload/properties/client_id",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "oauth",
+    "path": "/components/schemas/RefreshPayload/properties/client_id",
+    "pattern": "^[0-9a-f]{32}$"
+  }
+]

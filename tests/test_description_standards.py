@@ -798,6 +798,86 @@ def test_no_auth_detail_duplication():
     )
 
 
+# ─── Unconfirmed pattern constraint sweep ────────────────────────────────────
+#
+# ADR 0003 §5: a speculative pattern on an Anaplan ID field that turns out to be
+# wrong is a regression — generated validators will reject valid input.
+# Patterns are only safe once confirmed via live testing.
+#
+# Any pattern already present in the 9 specs at the time this rule was adopted
+# is grandfathered in tests/confirmed_patterns.json.  Every new pattern added to
+# a spec must be accompanied by a matching entry in that file, which serves as the
+# paper trail that live testing occurred.
+
+_CONFIRMED_PATTERNS_PATH = REPO_ROOT / "tests" / "confirmed_patterns.json"
+
+
+def _load_confirmed_patterns() -> frozenset[tuple[str, str, str]]:
+    if not _CONFIRMED_PATTERNS_PATH.exists():
+        return frozenset()
+    entries = json.loads(_CONFIRMED_PATTERNS_PATH.read_text(encoding="utf-8"))
+    return frozenset((e["spec"], e["path"], e["pattern"]) for e in entries)
+
+
+def _walk_all_patterns(spec: dict) -> list[tuple[str, str]]:
+    """Return (json_path, pattern) for every `pattern` key in the spec."""
+    results: list[tuple[str, str]] = []
+
+    def _recurse(path: str, obj: object) -> None:
+        if not isinstance(obj, dict):
+            return
+        if "pattern" in obj:
+            results.append((path, obj["pattern"]))
+        for k, v in obj.items():
+            if k == "pattern":
+                continue
+            if isinstance(v, dict):
+                _recurse(f"{path}/{k}", v)
+            elif isinstance(v, list):
+                for i, item in enumerate(v):
+                    if isinstance(item, dict):
+                        _recurse(f"{path}/{k}/{i}", item)
+
+    _recurse("", spec)
+    return results
+
+
+def test_no_unconfirmed_patterns():
+    """Every pattern constraint in the 9 specs must appear in confirmed_patterns.json (ADR 0003 §5).
+
+    A speculative pattern that turns out to be wrong causes generated validators
+    to reject valid Anaplan API responses — a silent regression.  Patterns are
+    only safe once confirmed via live testing.
+
+    To add a new pattern: run the relevant live test to confirm the constraint,
+    then add an entry to tests/confirmed_patterns.json with keys spec, path, and
+    pattern.  See ADR 0003 §5 for the full rationale.
+    """
+    confirmed = _load_confirmed_patterns()
+    violations = []
+    for api_dir in _ALL_API_DIRS:
+        spec_path = REPO_ROOT / api_dir / f"{api_dir}-openapi.json"
+        if not spec_path.exists():
+            continue
+        spec = json.loads(spec_path.read_text(encoding="utf-8"))
+        for json_path, pattern in _walk_all_patterns(spec):
+            if (api_dir, json_path, pattern) not in confirmed:
+                violations.append(
+                    f"  [{api_dir}] {json_path}\n"
+                    f"    pattern: {pattern!r}\n"
+                    f"    (ADR 0003 §5: pattern constraints must be confirmed via live "
+                    f"testing before being added to the spec.  Add an entry to "
+                    f"tests/confirmed_patterns.json with keys 'spec', 'path', and "
+                    f"'pattern' only after live-test confirmation.)"
+                )
+    assert not violations, (
+        f"{len(violations)} unconfirmed pattern constraint(s) found\n"
+        f"(ADR 0003 §5 — each entry in confirmed_patterns.json is the paper trail "
+        f"that live testing occurred; do not add entries without running the live tests):\n"
+        + "\n".join(violations)
+    )
+
+
 def test_no_tautological_descriptions():
     """No schema or property may have a description that merely restates its name (ADR 0003 §2).
 
