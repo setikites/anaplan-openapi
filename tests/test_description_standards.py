@@ -543,6 +543,143 @@ def test_cloudworks_notification_config_type_has_description():
     )
 
 
+# ─── Enum-restatement description sweep ───────────────────────────────────────
+#
+# ADR 0003 §3: an enum lists valid values; a description must explain what those
+# values *do*. If the description would only restate the enum values, omit it.
+#
+# Algorithm: a description is "purely enumerative" if
+#   (1) it contains every enum value verbatim (case-insensitive, word-boundary),
+#       AND
+#   (2) after removing the enum values, the field name, the schema name, and a set
+#       of filler words (articles, conjunctions, generic label words), nothing
+#       substantive remains.
+#
+# A description that explains behavior — even if it names the values — is not a
+# violation, because it leaves substantive tokens after stripping.
+
+_ENUM_RESTATEMENT_FILLER = frozenset({
+    "a", "an", "the", "is", "are", "be", "or", "and", "of", "in", "to",
+    "for", "type", "value", "values", "possible", "valid", "one", "following",
+    "can", "this", "field", "property", "parameter", "must", "may", "which",
+    "either", "that", "with", "by", "it", "its", "as", "at", "on", "any",
+    "these", "between", "list", "types", "kinds", "where", "used", "when",
+    "such", "each", "per", "all", "if", "s",
+})
+
+
+def _is_enum_restatement(
+    field_name: str,
+    description: str,
+    enum_values: list,
+    schema_name: str = "",
+) -> bool:
+    """Return True if description adds nothing beyond listing the enum values."""
+    if not description.strip() or not enum_values:
+        return False
+
+    def _norm(s: str) -> str:
+        s = re.sub(r"[^a-z0-9\s]", " ", s.lower())
+        return re.sub(r"\s+", " ", s).strip()
+
+    norm_desc = _norm(description)
+
+    # Criterion 1: description must contain every enum value; otherwise it cannot
+    # be a pure restatement of them.
+    for val in enum_values:
+        norm_val = _norm(str(val))
+        if not norm_val:
+            continue
+        tokens = norm_val.split()
+        pattern = r"\b" + r"\s+".join(re.escape(t) for t in tokens) + r"\b"
+        if not re.search(pattern, norm_desc):
+            return False
+
+    # Criterion 2: strip enum values (longest first), field/schema name tokens,
+    # and filler; if nothing substantive remains → violation.
+    work = norm_desc
+    for val in sorted(enum_values, key=lambda v: len(str(v)), reverse=True):
+        norm_val = _norm(str(val))
+        if norm_val:
+            tokens = norm_val.split()
+            pattern = r"\b" + r"\s+".join(re.escape(t) for t in tokens) + r"\b"
+            work = re.sub(pattern, " ", work)
+
+    for token in _normalize_name(field_name).split():
+        if token:
+            work = re.sub(r"\b" + re.escape(token) + r"\b", " ", work)
+
+    if schema_name:
+        for token in _normalize_name(schema_name).split():
+            if token:
+                work = re.sub(r"\b" + re.escape(token) + r"\b", " ", work)
+
+    remaining = [t for t in work.split() if t and t not in _ENUM_RESTATEMENT_FILLER]
+    return len(remaining) == 0
+
+
+def _walk_enum_props(path: str, obj: dict) -> Iterator[tuple[str, str, list, str]]:
+    """Yield (json_path, field_name, enum_values, description) for enum+description fields."""
+    if not isinstance(obj, dict):
+        return
+    for prop_name, prop_obj in obj.get("properties", {}).items():
+        if not isinstance(prop_obj, dict):
+            continue
+        prop_path = f"{path}/properties/{prop_name}"
+        enum_vals = prop_obj.get("enum")
+        desc = prop_obj.get("description", "")
+        if enum_vals and desc:
+            yield prop_path, prop_name, enum_vals, desc
+        yield from _walk_enum_props(prop_path, prop_obj)
+    for combiner in ("allOf", "anyOf", "oneOf"):
+        for i, sub in enumerate(obj.get(combiner, [])):
+            if isinstance(sub, dict):
+                yield from _walk_enum_props(f"{path}/{combiner}/{i}", sub)
+    if isinstance(obj.get("items"), dict):
+        yield from _walk_enum_props(f"{path}/items", obj["items"])
+
+
+def test_no_enum_restatement_descriptions():
+    """No enum field may have a description that only restates its valid values (ADR 0003 §3).
+
+    An enum lists valid values; a description must explain what those values *do*
+    or add behavioral context the enum cannot express. A description like
+    'Schedule type: weekly, daily, or hourly.' paired with enum [weekly, daily,
+    hourly] adds nothing and must be omitted.
+
+    A description that maps values to behavior — even if it names the values — is
+    not a violation: 'assign grants access; unassign revokes it.' passes because
+    'grants' and 'revokes' remain after stripping.
+    """
+    violations = []
+    for api_dir in _ALL_API_DIRS:
+        spec_path = REPO_ROOT / api_dir / f"{api_dir}-openapi.json"
+        if not spec_path.exists():
+            continue
+        spec = json.loads(spec_path.read_text(encoding="utf-8"))
+        schemas = spec.get("components", {}).get("schemas", {})
+        for schema_name, schema_obj in schemas.items():
+            if not isinstance(schema_obj, dict):
+                continue
+            for json_path, field_name, enum_vals, description in _walk_enum_props(
+                f"components/schemas/{schema_name}", schema_obj
+            ):
+                if _is_enum_restatement(field_name, description, enum_vals, schema_name):
+                    violations.append(
+                        f"  [{api_dir}] {json_path}\n"
+                        f"    enum:        {enum_vals!r}\n"
+                        f"    description: {description!r}\n"
+                        f"    (ADR 0003 §3: enum descriptions must explain what values do, "
+                        f"not merely list them)"
+                    )
+    assert not violations, (
+        f"{len(violations)} enum-restatement description(s) found\n"
+        f"(ADR 0003 §3 — a description paired with an enum must explain what the values "
+        f"do, not merely list them):\n"
+        + "\n".join(violations)
+    )
+
+
 # ─── Tautological description sweep ───────────────────────────────────────────
 #
 # ADR 0003 §2: a description must earn its place. A description that merely
