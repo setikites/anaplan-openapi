@@ -755,6 +755,56 @@ def _walk_obj(path: str, obj: dict) -> Iterator[tuple[str, str, str]]:
         yield from _walk_obj(f"{path}/items", items)
 
 
+def _scheme_description_sentences(desc: str, min_len: int = 40) -> list[str]:
+    """Extract sentences from a scheme description that are long enough to be distinctive."""
+    sentences = re.split(r"(?<=[.!?])\s+", desc.strip())
+    return [s.strip() for s in sentences if len(s.strip()) >= min_len]
+
+
+def test_no_auth_detail_duplication():
+    """info.description must not reproduce auth detail already in securitySchemes (ADR 0003 §4).
+
+    securitySchemes is the single authoritative location for auth scheme detail.
+    info.description may contain a one-line summary per scheme and cross-cutting
+    behavioral notes, but must not repeat the full header format, token type,
+    or accepted-values detail that already lives in securitySchemes.
+    """
+    violations = []
+    for api_dir in _ALL_API_DIRS:
+        spec_path = REPO_ROOT / api_dir / f"{api_dir}-openapi.json"
+        if not spec_path.exists():
+            continue
+        spec = json.loads(spec_path.read_text(encoding="utf-8"))
+        info_desc = spec.get("info", {}).get("description", "")
+        if not info_desc:
+            continue
+        schemes = spec.get("components", {}).get("securitySchemes", {})
+        if not schemes:
+            continue
+        for scheme_name, scheme_obj in schemes.items():
+            scheme_desc = scheme_obj.get("description", "")
+            if not scheme_desc:
+                continue
+            for sentence in _scheme_description_sentences(scheme_desc):
+                if sentence.lower() in info_desc.lower():
+                    violations.append(
+                        f"  [{api_dir}] securitySchemes/{scheme_name}: info.description "
+                        f"contains verbatim sentence from scheme description:\n"
+                        f"    {sentence!r}\n"
+                        f"    (ADR 0003 §4: securitySchemes is the single authoritative "
+                        f"location for auth scheme detail; info.description may only "
+                        f"contain a one-line summary per scheme and cross-cutting "
+                        f"behavioral notes)"
+                    )
+    assert not violations, (
+        f"{len(violations)} auth-detail duplication(s) found in info.description\n"
+        f"(ADR 0003 §4 — full auth detail belongs exclusively in securitySchemes; "
+        f"info.description may have a one-line summary per scheme and cross-cutting "
+        f"behavioral notes only):\n"
+        + "\n".join(violations)
+    )
+
+
 def test_no_tautological_descriptions():
     """No schema or property may have a description that merely restates its name (ADR 0003 §2).
 
