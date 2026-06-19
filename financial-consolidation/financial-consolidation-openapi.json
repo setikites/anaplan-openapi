@@ -836,7 +836,7 @@
       ],
       "get": {
         "summary": "List roles for a user",
-        "description": "Retrieve the roles assigned to a specific user. Supports automation workflows such as cloning user roles during onboarding.\n\nNote: This endpoint uses the singular `/user` prefix (not `/users`), which is an inconsistency in the API design confirmed by the source documentation.",
+        "description": "Retrieve the roles assigned to a specific user. Supports automation workflows such as cloning user roles during onboarding.\n\nNote: This endpoint uses the singular `/user` prefix (not `/users`), which is an inconsistency in the API design.",
         "operationId": "listUserRoles",
         "responses": {
           "200": {
@@ -862,7 +862,7 @@
       },
       "put": {
         "summary": "Assign roles to a user",
-        "description": "Assign new roles to a user. The response is additive — it returns all roles assigned to the user including both existing and newly assigned roles.\n\nNote: This endpoint uses the singular `/user` prefix (not `/users`), which is an inconsistency in the API design confirmed by the source documentation.",
+        "description": "Assign new roles to a user. The response is additive — it returns all roles assigned to the user including both existing and newly assigned roles.\n\nNote: This endpoint uses the singular `/user` prefix (not `/users`), which is an inconsistency in the API design.",
         "operationId": "assignUserRoles",
         "requestBody": {
           "required": true,
@@ -905,7 +905,7 @@
       },
       "delete": {
         "summary": "Unassign a role from a user",
-        "description": "Remove a single role from a user. The request body is a JSON string (not an array) containing the role name to revoke.\n\nNote: This endpoint uses the singular `/user` prefix (not `/users`), which is an inconsistency in the API design confirmed by the source documentation.",
+        "description": "Remove a single role from a user. The request body is a JSON string (not an array) containing the role name to revoke.\n\nNote: This endpoint uses the singular `/user` prefix (not `/users`), which is an inconsistency in the API design.",
         "operationId": "unassignUserRole",
         "requestBody": {
           "required": true,

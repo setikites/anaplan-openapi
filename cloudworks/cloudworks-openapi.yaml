@@ -5,9 +5,9 @@ info:
   description: |-
     The Anaplan CloudWorks API enables you to create your own connections and integrations with Anaplan CloudWorks, supporting data movement between cloud storage services (Amazon S3, Google BigQuery, Azure Blob Storage) and Anaplan models.
 
-    **Base URL**: Both `https://api.cloudworks.anaplan.com/2/0/` and `https://api.anaplan.com/cloudworks/2/0/` were confirmed active in live testing (June 2026). The `api.cloudworks.anaplan.com` form matches Apiary curl examples and is listed first. Both `AnaplanAuthToken` and `Bearer` (with an AnaplanAuthToken value) are accepted.
+    **Base URL**: Both `https://api.cloudworks.anaplan.com/2/0/` and `https://api.anaplan.com/cloudworks/2/0/` are active. The `api.cloudworks.anaplan.com` form is listed first. Both `AnaplanAuthToken` and `Bearer` (with an AnaplanAuthToken value) are accepted.
 
-    **Date and time formats used across this API (confirmed from live data, June 2026):**
+    **Date and time formats used across this API:**
     - `startDate` / `endDate` on run records: ISO 8601 UTC with milliseconds — `YYYY-MM-DDTHH:MM:SS.sssZ`
     - `lastRun` on run records: Unix timestamp integer (seconds since epoch)
     - `createdDate` / `modifiedDate` on integration flow steps: space-separated timestamp with timezone — `YYYY-MM-DD HH:MM:SS.uuuuuu+00:00`
@@ -19,9 +19,9 @@ info:
     - `processId`, `actionId`, `fileId`: numeric string, e.g. `"118000000114"`
 servers:
 - url: https://api.cloudworks.anaplan.com/2/0
-  description: CloudWorks API (confirmed active in live testing June 2026)
+  description: CloudWorks API primary base URL
 - url: https://api.anaplan.com/cloudworks/2/0
-  description: Alternative base URL (also confirmed active in live testing June 2026)
+  description: CloudWorks API alternative base URL
 security:
 - AnaplanAuthToken: []
 - BearerAuth: []

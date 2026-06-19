@@ -93,6 +93,10 @@ Expected skips:
 
 _Document differences between Apiary docs, Postman collection, and live API behavior here as they are discovered._
 
+### `GET /2/0/models/{modelId}/files/{fileId}` requires Workspace Administrator
+
+Returns 404 for standard Integration API users. Individual file metadata is only accessible to Workspace Administrators; all other callers should use `GET /2/0/models/{modelId}/files` (the full file list endpoint).
+
 ### `GET /2/0/workspaces/{workspaceId}` returns 404 for non-admins
 
 Live testing shows this endpoint returns `404 Resource not found` even when the workspace appears in `GET /workspaces`. The endpoint likely requires **Workspace Administrator** role. The spec documents both 200 and 404 responses; the live test accepts 404 with a warning rather than failing.

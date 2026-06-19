@@ -3,7 +3,7 @@
   "info": {
     "title": "Anaplan Exception Users API",
     "version": "1.0.0",
-    "description": "Manage exception users — users who can bypass SSO enforcement — in Anaplan workspaces. Requires the Tenant Security Admin role.\n\nTwo authentication schemes are accepted (confirmed via live testing):\n- **AnaplanAuthToken** — token obtained via the Authentication API (username/password or CA certificate), or an OAuth Authorization Code access token passed with the `AnaplanAuthToken` prefix.\n- **AnaplanApiKey** — Anaplan API key (`AnaplanApiKey auk_<region>_<value>`).\n\nNote: the `Bearer` prefix is rejected with `FAILURE_BAD_HEADER` even for valid OAuth tokens."
+    "description": "Manage exception users — users who can bypass SSO enforcement — in Anaplan workspaces. Requires the Tenant Security Admin role.\n\nTwo authentication schemes are accepted:\n- **AnaplanAuthToken** — token obtained via the Authentication API (username/password or CA certificate), or an OAuth Authorization Code access token passed with the `AnaplanAuthToken` prefix.\n- **AnaplanApiKey** — Anaplan API key (`AnaplanApiKey auk_<region>_<value>`).\n\nNote: the `Bearer` prefix is rejected with `FAILURE_BAD_HEADER` even for valid OAuth tokens."
   },
   "servers": [
     {
@@ -281,7 +281,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "Anaplan API key authentication. Header value format: `AnaplanApiKey auk_<region>_<value>`. Confirmed accepted via live testing. API keys satisfy the service-to-service requirement."
+        "description": "Anaplan API key authentication. Header value format: `AnaplanApiKey auk_<region>_<value>`. API keys satisfy the service-to-service requirement."
       },
       "AnaplanAuthToken": {
         "type": "apiKey",

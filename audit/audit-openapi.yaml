@@ -6,8 +6,8 @@ info:
     available in JSON or Common Event Format (CEF) via the `Accept` header. Requires the Tenant Auditor role.
 servers:
 - url: https://audit.anaplan.com/audit/api/1
-  description: Production base URL — Apiary-confirmed and live-tested. The Audit API is served only from this dedicated host;
-    the regional api.anaplan.com data-plane hosts return 404 for /audit/api/1.
+  description: Production base URL. The Audit API is served only from this dedicated host; the regional api.anaplan.com data-plane
+    hosts return 404 for /audit/api/1.
 paths:
   /events:
     get:
@@ -23,11 +23,11 @@ paths:
       - name: type
         in: query
         description: 'Type of events to return. Each value filters to events whose `eventTypeId` carries a matching prefix.
-          Confirmed via live testing: `all` (every event), `user_activity` (`USR-*`), `access_control` (`AUTHZ-*`), `int`
-          (integrations, `INT-*`), `conn_mgmt` (connection / SAML management, `CONN-*`), `comment` (`COMMENT-*`), `byok` (Bring
-          Your Own Key encryption), `plan_iq` (PlanIQ), and `forecaster`. A `workflow` category also exists for the Workflow
-          product but could not be confirmed on the test tenant (product not enabled), so it is omitted from the enum. Note:
-          the enum is not enforced server-side — an unrecognised value is treated as `all` rather than rejected.'
+          Accepted values: `all` (every event), `user_activity` (`USR-*`), `access_control` (`AUTHZ-*`), `int` (integrations,
+          `INT-*`), `conn_mgmt` (connection / SAML management, `CONN-*`), `comment` (`COMMENT-*`), `byok` (Bring Your Own
+          Key encryption), `plan_iq` (PlanIQ), and `forecaster`. A `workflow` category exists for the Workflow product but
+          is omitted from the enum (product not enabled on the test tenant). The enum is not enforced server-side — an unrecognised
+          value is treated as `all` rather than rejected.'
         schema:
           type: string
           enum:
@@ -61,8 +61,8 @@ paths:
           maximum: 720
       - name: limit
         in: query
-        description: Maximum number of results to return per page. The documentation states a cap of 10000, but live testing
-          showed the server does not enforce it — larger limits are honored and return more than 10000 records.
+        description: Maximum number of results to return per page. The documented cap of 10000 is not enforced server-side
+          — larger limits are honored and return more than 10000 records.
         schema:
           type: integer
       - name: offset
@@ -119,7 +119,7 @@ paths:
         in: query
         description: 'Type of events to return. Same vocabulary as the `type` filter on `GET /events` (each value matches
           an `eventTypeId` prefix): `all`, `user_activity`, `access_control`, `int`, `conn_mgmt`, `comment`, `byok`, `plan_iq`,
-          `forecaster`. The values were confirmed against `GET /events`; the enum is not enforced server-side.'
+          `forecaster`. The enum is not enforced server-side.'
         schema:
           type: string
           enum:
@@ -236,8 +236,8 @@ components:
           description: Time zone of `createdDate` (for example, `UTC`).
         checksum:
           type: string
-          description: Checksum for verifying event record integrity. Returned as a numeric string (live testing showed a
-            short integer value, not a SHA-256 hash).
+          description: Checksum for verifying event record integrity. Returned as a short numeric string (e.g. `"1118902891"`),
+            not a SHA-256 hash.
     AuditPaging:
       type: object
       description: Pagination metadata included in audit event list responses.

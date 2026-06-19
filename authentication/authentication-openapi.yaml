@@ -92,7 +92,7 @@ paths:
       description: |-
         Extends the session for an existing AnaplanAuthToken. Tokens expire after 35 minutes; call this endpoint before expiry to maintain a session without re-authenticating.
 
-        **Note:** Live testing shows the response returns the same `tokenValue` — the token string itself does not change, but its internal expiration is reset.
+        The response returns the same `tokenValue` — the token string itself does not change, but its internal expiration is reset.
       tags:
       - Authentication
       - Other Authentication Actions

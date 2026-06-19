@@ -2,32 +2,9 @@ openapi: 3.0.0
 info:
   title: Official Anaplan Collection
   version: 1.0.0
-  description: |-
-    **Welcome to the Anaplan Integration v2 Official Postman Collection**
-
-    **Organization**
-
-    > This collection is organized into
-    > logical groupings of requests. There are several common sequences of requests to achieve an outcome in Anaplan. The folders ending in "Flow" contain redundant requests organized sequentially.
-
-    **Variables**
-
-    > Collection level variables. These are set at the
-    > collection level and are available within each request. These include elements
-    > such as base URLs, model Id and workspace Id. Be sure to click "Save" when changing collection level variables.
-
-    > Request specific variables. For variables
-    > specific to a request, we have provided an array in the pre-request script area
-    > for you to enter in request specific variables. These will be set prior to the
-    > request running.
-
-    **Authentication**
-
-    > There are three methods provided to
-    > authenticate into Anaplan. Once authenticated a Tests script sets the value of
-    > the generated token to a variable named “anaplan_auth_token”. You may choose to
-    > enter in username/password combination or conversely choose to generate CA
-    > certificate signed string and public key combination.
+  description: 'The Anaplan Integration API v2 provides REST endpoints for programmatic access to Anaplan resources: workspaces,
+    models, files, imports, exports, processes, actions, lists, and modules. Use this API to automate data movement and model
+    operations.'
 servers:
 - url: https://api.anaplan.com/2/0
   description: US1, US2, US5, US7, EU1, EU2, EU4, AP1
@@ -433,8 +410,8 @@ paths:
   /workspaces/{workspaceId}/models:
     get:
       summary: List workspace models
-      description: 'Returns models accessible to the calling user within the specified workspace. The response shape is identical
-        to `GET /2/0/models` but filtered to models within the given workspace. Confirmed via live testing (issue #25).'
+      description: Returns models accessible to the calling user within the specified workspace. The response shape is identical
+        to `GET /2/0/models` but filtered to models within the given workspace.
       tags:
       - General Workspace & Model Metadata
       responses:
@@ -3411,10 +3388,9 @@ paths:
           description: 'TODO: document response'
     get:
       summary: Get file metadata
-      description: |-
-        Returns metadata for a specific file in the model.
-
-        **Note:** Live testing shows this endpoint returns 404 for standard Integration API users. Individual file metadata is only available via  (the full list). See integration/README.md discrepancies.
+      description: Returns metadata for a specific file in the model. Requires Workspace Administrator access; standard Integration
+        API users receive 404. Individual file metadata is also accessible via the full file list endpoint. See integration/README.md
+        for details.
       tags:
       - Model Metadata
       - File Metadata

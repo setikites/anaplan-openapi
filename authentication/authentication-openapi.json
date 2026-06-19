@@ -142,7 +142,7 @@
     "/token/refresh": {
       "post": {
         "summary": "Refresh Authentication Token",
-        "description": "Extends the session for an existing AnaplanAuthToken. Tokens expire after 35 minutes; call this endpoint before expiry to maintain a session without re-authenticating.\n\n**Note:** Live testing shows the response returns the same `tokenValue` — the token string itself does not change, but its internal expiration is reset.",
+        "description": "Extends the session for an existing AnaplanAuthToken. Tokens expire after 35 minutes; call this endpoint before expiry to maintain a session without re-authenticating.\n\nThe response returns the same `tokenValue` — the token string itself does not change, but its internal expiration is reset.",
         "tags": [
           "Authentication",
           "Other Authentication Actions"

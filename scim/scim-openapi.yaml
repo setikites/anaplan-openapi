@@ -247,8 +247,7 @@ paths:
                 $ref: '#/components/schemas/ScimError'
     delete:
       summary: Delete user
-      description: 'Deletes a user by their Anaplan ID. Not documented in the Apiary source but confirmed present via live
-        testing (issue #43): DELETE returns 403 (not 405) when the caller lacks USER_ADMIN role, proving the endpoint is implemented.'
+      description: Deletes a user by their Anaplan ID. DELETE returns 403 (not 405) when the caller lacks USER_ADMIN role.
       operationId: deleteUser
       responses:
         '204':

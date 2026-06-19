@@ -3,7 +3,7 @@
   "info": {
     "title": "Official Anaplan Collection",
     "version": "1.0.0",
-    "description": "**Welcome to the Anaplan Integration v2 Official Postman Collection**\n\n**Organization**\n\n> This collection is organized into  \n> logical groupings of requests. There are several common sequences of requests to achieve an outcome in Anaplan. The folders ending in \"Flow\" contain redundant requests organized sequentially.\n\n**Variables**\n\n> Collection level variables. These are set at the  \n> collection level and are available within each request. These include elements  \n> such as base URLs, model Id and workspace Id. Be sure to click \"Save\" when changing collection level variables.\n\n> Request specific variables. For variables  \n> specific to a request, we have provided an array in the pre-request script area  \n> for you to enter in request specific variables. These will be set prior to the  \n> request running.\n\n**Authentication**\n\n> There are three methods provided to  \n> authenticate into Anaplan. Once authenticated a Tests script sets the value of  \n> the generated token to a variable named “anaplan_auth_token”. You may choose to  \n> enter in username/password combination or conversely choose to generate CA  \n> certificate signed string and public key combination."
+    "description": "The Anaplan Integration API v2 provides REST endpoints for programmatic access to Anaplan resources: workspaces, models, files, imports, exports, processes, actions, lists, and modules. Use this API to automate data movement and model operations."
   },
   "servers": [
     {
@@ -464,7 +464,7 @@
     "/workspaces/{workspaceId}/models": {
       "get": {
         "summary": "List workspace models",
-        "description": "Returns models accessible to the calling user within the specified workspace. The response shape is identical to `GET /2/0/models` but filtered to models within the given workspace. Confirmed via live testing (issue #25).",
+        "description": "Returns models accessible to the calling user within the specified workspace. The response shape is identical to `GET /2/0/models` but filtered to models within the given workspace.",
         "tags": [
           "General Workspace & Model Metadata"
         ],
@@ -3087,7 +3087,7 @@
       },
       "get": {
         "summary": "Get file metadata",
-        "description": "Returns metadata for a specific file in the model.\n\n**Note:** Live testing shows this endpoint returns 404 for standard Integration API users. Individual file metadata is only available via  (the full list). See integration/README.md discrepancies.",
+        "description": "Returns metadata for a specific file in the model. Requires Workspace Administrator access; standard Integration API users receive 404. Individual file metadata is also accessible via the full file list endpoint. See integration/README.md for details.",
         "tags": [
           "Model Metadata",
           "File Metadata"

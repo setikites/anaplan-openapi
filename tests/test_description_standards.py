@@ -878,6 +878,98 @@ def test_no_unconfirmed_patterns():
     )
 
 
+# ─── Confirmed-history provenance note sweep ─────────────────────────────────
+#
+# ADR 0003 §6: once a field name or value is confirmed via live testing, any
+# provenance note ("Apiary called this X; confirmed via live testing is Y",
+# "live testing showed Z") must move to api/README.md under "Discrepancies".
+# Only unconfirmed-field warnings ("not yet validated via live testing") may
+# remain in descriptions.
+#
+# This sweep covers the full JSON tree — info, servers, paths, parameters,
+# responses, securitySchemes, and component schemas — not just schemas.
+#
+# Case-sensitive patterns for proper nouns so that lowercase occurrences in
+# cross-reference URLs (apiary.io, postman.com) are not flagged.
+
+def _walk_all_descriptions(obj: object, path: str = "") -> Iterator[tuple[str, str]]:
+    """Yield (json_path, description_text) for every 'description' string in the spec."""
+    if isinstance(obj, dict):
+        for key, value in obj.items():
+            child_path = f"{path}/{key}" if path else key
+            if key == "description" and isinstance(value, str):
+                yield child_path, value
+            else:
+                yield from _walk_all_descriptions(value, child_path)
+    elif isinstance(obj, list):
+        for i, item in enumerate(obj):
+            yield from _walk_all_descriptions(item, f"{path}/{i}")
+
+
+_PROVENANCE_NOUN_PATTERNS: list[tuple[re.Pattern, str]] = [
+    (re.compile(r"\bApiary\b"), "Apiary"),
+    (re.compile(r"\bPostman\b"), "Postman"),
+]
+
+_PROVENANCE_PHRASE_PATTERNS: list[tuple[re.Pattern, str]] = [
+    (re.compile(r"\bconfirmed\b", re.IGNORECASE), "confirmed"),
+    (re.compile(r"\blive\s+test(?:ing|ed)\b", re.IGNORECASE), "live testing"),
+    (re.compile(r"\bpreviously\s+called\b", re.IGNORECASE), "previously called"),
+]
+
+_PROVENANCE_NEGATION = re.compile(
+    r"\b(?:not|n't|never|hasn't|haven't)\b", re.IGNORECASE
+)
+_NEGATION_WINDOW = 50
+
+
+def _find_provenance_phrase(description: str) -> str | None:
+    """Return the first confirmed-history phrase found, or None if none found."""
+    for pattern, label in _PROVENANCE_NOUN_PATTERNS:
+        if pattern.search(description):
+            return label
+    for pattern, label in _PROVENANCE_PHRASE_PATTERNS:
+        for match in pattern.finditer(description):
+            window = description[max(0, match.start() - _NEGATION_WINDOW):match.start()]
+            if not _PROVENANCE_NEGATION.search(window):
+                return f"{label} (matched {match.group()!r})"
+    return None
+
+
+def test_no_confirmed_history_provenance_notes():
+    """No description may contain confirmed-history provenance notes (ADR 0003 §6).
+
+    Once a field name or value is confirmed via live testing, the provenance note
+    must move to api/README.md under 'Discrepancies'. Only unconfirmed-field
+    warnings ('Field name unconfirmed — not yet validated via live testing') may
+    remain in descriptions.
+
+    Failure messages include: spec name, JSON path, matching phrase, and a
+    citation of ADR 0003 §6 with instruction to move the note to the README.
+    """
+    violations = []
+    for api_dir in _ALL_API_DIRS:
+        spec_path = REPO_ROOT / api_dir / f"{api_dir}-openapi.json"
+        if not spec_path.exists():
+            continue
+        spec = json.loads(spec_path.read_text(encoding="utf-8"))
+        for json_path, description in _walk_all_descriptions(spec):
+            phrase = _find_provenance_phrase(description)
+            if phrase is not None:
+                violations.append(
+                    f"  [{api_dir}] {json_path}\n"
+                    f"    matched: {phrase!r}\n"
+                    f"    (ADR 0003 §6: confirmed-history provenance notes belong in "
+                    f"{api_dir}/README.md under 'Discrepancies', not in descriptions)"
+                )
+    assert not violations, (
+        f"{len(violations)} confirmed-history provenance note(s) found in descriptions\n"
+        f"(ADR 0003 §6 — once a field name or value is confirmed via live testing, "
+        f"the provenance note must move to api/README.md under 'Discrepancies'):\n"
+        + "\n".join(violations)
+    )
+
+
 def test_no_tautological_descriptions():
     """No schema or property may have a description that merely restates its name (ADR 0003 §2).
 

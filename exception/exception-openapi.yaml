@@ -5,7 +5,7 @@ info:
   description: |-
     Manage exception users — users who can bypass SSO enforcement — in Anaplan workspaces. Requires the Tenant Security Admin role.
 
-    Two authentication schemes are accepted (confirmed via live testing):
+    Two authentication schemes are accepted:
     - **AnaplanAuthToken** — token obtained via the Authentication API (username/password or CA certificate), or an OAuth Authorization Code access token passed with the `AnaplanAuthToken` prefix.
     - **AnaplanApiKey** — Anaplan API key (`AnaplanApiKey auk_<region>_<value>`).
 
@@ -180,8 +180,8 @@ components:
       type: apiKey
       in: header
       name: Authorization
-      description: 'Anaplan API key authentication. Header value format: `AnaplanApiKey auk_<region>_<value>`. Confirmed accepted
-        via live testing. API keys satisfy the service-to-service requirement.'
+      description: 'Anaplan API key authentication. Header value format: `AnaplanApiKey auk_<region>_<value>`. API keys satisfy
+        the service-to-service requirement.'
     AnaplanAuthToken:
       type: apiKey
       in: header

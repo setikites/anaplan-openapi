@@ -797,4 +797,4 @@ components:
     BearerAuth:
       type: http
       scheme: bearer
-      description: Bearer token auth. Confirmed interchangeable with AnaplanAuthToken on ALM (live testing 2026-06-09).
+      description: Bearer token auth, interchangeable with AnaplanAuthToken on ALM.
