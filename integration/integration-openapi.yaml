@@ -7703,10 +7703,8 @@ components:
                 description: Category value
                 type: string
               categoryId:
-                description: Category Id
                 type: string
               categoryName:
-                description: Category name
                 enum:
                 - App
                 - Environment
@@ -7760,10 +7758,8 @@ components:
                 description: Category value
                 type: string
               categoryId:
-                description: Category Id
                 type: string
               categoryName:
-                description: Category name
                 enum:
                 - App
                 - Environment

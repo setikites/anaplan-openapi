@@ -12,6 +12,8 @@ below — no new test functions needed.
 """
 
 import json
+import re
+from collections.abc import Iterator
 from pathlib import Path
 
 import pytest
@@ -538,4 +540,120 @@ def test_cloudworks_notification_config_type_has_description():
         "NotificationRequest.notifications.config[].type must have a description "
         "explaining that each entry triggers a notification on that outcome "
         "(ADR 0003 §3: enum descriptions explain behavior, not just values)"
+    )
+
+
+# ─── Tautological description sweep ───────────────────────────────────────────
+#
+# ADR 0003 §2: a description must earn its place. A description that merely
+# restates the field or schema name is worse than no description — it trains
+# readers to ignore descriptions, obscuring the ones that genuinely add value.
+#
+# This test sweeps all 9 specs automatically. No manual table entries needed.
+
+_ALL_API_DIRS = [
+    "alm",
+    "audit",
+    "authentication",
+    "cloudworks",
+    "exception",
+    "financial-consolidation",
+    "integration",
+    "oauth",
+    "scim",
+]
+
+
+def _normalize_name(name: str) -> str:
+    """Convert camelCase/PascalCase/snake_case to lowercase space-separated words."""
+    name = name.replace("_", " ").replace("-", " ")
+    name = re.sub(r"([a-z\d])([A-Z])", r"\1 \2", name)
+    name = re.sub(r"([A-Z]+)([A-Z][a-z])", r"\1 \2", name)
+    return " ".join(name.lower().split())
+
+
+def _normalize_desc(description: str) -> str:
+    """Strip trailing period(s) and whitespace, lowercase."""
+    return description.rstrip(".\t\n ").lower().strip()
+
+
+def _is_tautological(field_name: str, description: str) -> bool:
+    """Return True if description is a trivial restatement of field_name."""
+    if not description.strip():
+        return False
+    norm_name = _normalize_name(field_name)
+    norm_desc = _normalize_desc(description)
+    if norm_desc == norm_name:
+        return True
+    # Trivial plural
+    if norm_desc == norm_name + "s":
+        return True
+    # Leading article stripped
+    for article in ("the ", "a ", "an "):
+        if norm_desc.startswith(article):
+            stripped = norm_desc[len(article):]
+            if stripped == norm_name or stripped == norm_name + "s":
+                return True
+    return False
+
+
+def _walk_obj(path: str, obj: dict) -> Iterator[tuple[str, str, str]]:
+    """Recursively yield (json_path, field_name, description) for all properties."""
+    if not isinstance(obj, dict):
+        return
+    for prop_name, prop_obj in obj.get("properties", {}).items():
+        if not isinstance(prop_obj, dict):
+            continue
+        prop_path = f"{path}/properties/{prop_name}"
+        desc = prop_obj.get("description", "")
+        if desc:
+            yield prop_path, prop_name, desc
+        yield from _walk_obj(prop_path, prop_obj)
+    for combiner in ("allOf", "anyOf", "oneOf"):
+        for i, sub in enumerate(obj.get(combiner, [])):
+            if isinstance(sub, dict):
+                yield from _walk_obj(f"{path}/{combiner}/{i}", sub)
+    items = obj.get("items")
+    if isinstance(items, dict):
+        yield from _walk_obj(f"{path}/items", items)
+
+
+def test_no_tautological_descriptions():
+    """No schema or property may have a description that merely restates its name (ADR 0003 §2).
+
+    A tautological description ('Integration ID.', 'Job type.') is worse than
+    no description: it trains readers — both human and LLM — to ignore all
+    descriptions, obscuring the ones that genuinely add value.
+    """
+    violations = []
+    for api_dir in _ALL_API_DIRS:
+        spec_path = REPO_ROOT / api_dir / f"{api_dir}-openapi.json"
+        if not spec_path.exists():
+            continue
+        spec = json.loads(spec_path.read_text(encoding="utf-8"))
+        schemas = spec.get("components", {}).get("schemas", {})
+        for schema_name, schema_obj in schemas.items():
+            if not isinstance(schema_obj, dict):
+                continue
+            # Schema-level description vs schema name
+            desc = schema_obj.get("description", "")
+            if desc and _is_tautological(schema_name, desc):
+                violations.append(
+                    f"  [{api_dir}] components/schemas/{schema_name}: "
+                    f"schema description restates its name — {desc!r} (ADR 0003 §2)"
+                )
+            # Property-level descriptions vs property names (recursive)
+            for json_path, field_name, description in _walk_obj(
+                f"components/schemas/{schema_name}", schema_obj
+            ):
+                if _is_tautological(field_name, description):
+                    violations.append(
+                        f"  [{api_dir}] {json_path}: "
+                        f"description of {field_name!r} restates its name — "
+                        f"{description!r} (ADR 0003 §2)"
+                    )
+    assert not violations, (
+        f"{len(violations)} tautological description(s) found "
+        f"(ADR 0003 §2 — a description must say something the field name does not):\n"
+        + "\n".join(violations)
     )

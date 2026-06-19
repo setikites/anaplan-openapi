@@ -6264,11 +6264,9 @@
                   "type": "string"
                 },
                 "categoryId": {
-                  "description": "Category Id",
                   "type": "string"
                 },
                 "categoryName": {
-                  "description": "Category name",
                   "enum": [
                     "App",
                     "Environment",
@@ -6346,11 +6344,9 @@
                   "type": "string"
                 },
                 "categoryId": {
-                  "description": "Category Id",
                   "type": "string"
                 },
                 "categoryName": {
-                  "description": "Category name",
                   "enum": [
                     "App",
                     "Environment",
