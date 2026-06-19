@@ -72,6 +72,10 @@ _SCHEMA_MUST_HAVE_DESCRIPTION = [
     pytest.param("financial-consolidation", ["components", "schemas", "WorkflowStateResponse"],   id="fc-workflowstateresponse"),
     pytest.param("financial-consolidation", ["components", "schemas", "ODataRecord"],             id="fc-odatarecord"),
     pytest.param("financial-consolidation", ["components", "schemas", "DimensionMembersResponse"], id="fc-dimensionmembersresponse"),
+    # SCIM — envelope and protocol schemas whose names alone are insufficient for a consumer
+    pytest.param("scim", ["components", "schemas", "ListResponse"], id="scim-listresponse"),
+    pytest.param("scim", ["components", "schemas", "ScimError"],    id="scim-scimerror"),
+    pytest.param("scim", ["components", "schemas", "PatchOp"],      id="scim-patchop"),
 ]
 
 
@@ -167,6 +171,11 @@ _PROPERTY_MUST_HAVE_DESCRIPTION = [
     pytest.param("oauth", ["components", "schemas", "RefreshPayload", "properties", "client_secret"], id="oauth-refreshpayload-client_secret"),
     # OAuth — AuthCodePayload.code: the source of this code (redirect callback) is non-obvious
     pytest.param("oauth", ["components", "schemas", "AuthCodePayload", "properties", "code"],         id="oauth-authcodepayload-code"),
+    # SCIM — schemas fields are SCIM protocol fields (URN arrays); their purpose is not self-evident from name alone
+    pytest.param("scim", ["components", "schemas", "User", "properties", "schemas"],         id="scim-user-schemas"),
+    pytest.param("scim", ["components", "schemas", "ListResponse", "properties", "schemas"], id="scim-listresponse-schemas"),
+    pytest.param("scim", ["components", "schemas", "ScimError", "properties", "schemas"],    id="scim-scimerror-schemas"),
+    pytest.param("scim", ["components", "schemas", "PatchOp", "properties", "schemas"],      id="scim-patchop-schemas"),
 ]
 
 
@@ -289,6 +298,15 @@ _MUST_NOT_HAVE_DESCRIPTION = [
     pytest.param("oauth", ["components", "schemas", "TokenResponse", "properties", "token_type"],     id="oauth-tokenresponse-token_type"),
     # OAuth — ErrorPayload.error_description: field name already expresses 'description of the error'
     pytest.param("oauth", ["components", "schemas", "ErrorPayload", "properties", "error_description"], id="oauth-errorpayload-error_description"),
+    # SCIM User.name sub-fields — familyName/givenName restate the field name; name + type is sufficient
+    pytest.param("scim", ["components", "schemas", "User", "properties", "name", "properties", "familyName"], id="scim-user-name-familyname"),
+    pytest.param("scim", ["components", "schemas", "User", "properties", "name", "properties", "givenName"],  id="scim-user-name-givenname"),
+    # SCIM User.emails.items.primary — boolean field name is self-evident in an emails array context
+    pytest.param("scim", ["components", "schemas", "User", "properties", "emails", "items", "properties", "primary"], id="scim-user-emails-primary"),
+    # SCIM User.meta — "Resource metadata." restates the field name
+    pytest.param("scim", ["components", "schemas", "User", "properties", "meta"], id="scim-user-meta"),
+    # SCIM PatchOp.Operations.items.op — "Operation type." restates the name; enum [add, remove, replace] is self-documenting
+    pytest.param("scim", ["components", "schemas", "PatchOp", "properties", "Operations", "items", "properties", "op"], id="scim-patchop-op"),
 ]
 
 

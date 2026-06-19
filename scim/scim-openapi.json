@@ -661,6 +661,7 @@
         "properties": {
           "schemas": {
             "type": "array",
+            "description": "List of SCIM schema URNs that declare the resource type. For the Anaplan User resource, include `urn:ietf:params:scim:schemas:core:2.0:User`.",
             "items": {
               "type": "string"
             }
@@ -688,12 +689,10 @@
             ],
             "properties": {
               "familyName": {
-                "type": "string",
-                "description": "Family name of the user."
+                "type": "string"
               },
               "givenName": {
-                "type": "string",
-                "description": "Given name of the user."
+                "type": "string"
               },
               "formatted": {
                 "type": "string",
@@ -727,7 +726,6 @@
                 },
                 "primary": {
                   "type": "boolean",
-                  "description": "Indicates the primary email address.",
                   "readOnly": true
                 }
               }
@@ -749,7 +747,7 @@
                 },
                 "type": {
                   "type": "string",
-                  "description": "The type of entitlement.",
+                  "description": "Entitlement grouping format. `WORKSPACE` — one object per workspace (use this when writing); `WORKSPACE_IDS` — single object whose `value` is a comma-delimited list of workspace GUIDs; `WORKSPACE_NAMES` — single object whose `value` is a comma-delimited list of workspace names. Responses typically include all three variants for the same workspace set.",
                   "enum": [
                     "WORKSPACE",
                     "WORKSPACE_IDS",
@@ -767,7 +765,6 @@
           },
           "meta": {
             "type": "object",
-            "description": "Resource metadata.",
             "properties": {
               "resourceType": {
                 "type": "string"
@@ -789,6 +786,7 @@
         "properties": {
           "schemas": {
             "type": "array",
+            "description": "List of SCIM schema URNs declaring the envelope type; always `[\"urn:ietf:params:scim:api:messages:2.0:ListResponse\"]`.",
             "items": {
               "type": "string"
             }
@@ -823,6 +821,7 @@
         "properties": {
           "schemas": {
             "type": "array",
+            "description": "List of SCIM schema URNs declaring the error type; always `[\"urn:ietf:params:scim:api:messages:2.0:Error\"]`.",
             "items": {
               "type": "string"
             }
@@ -851,6 +850,7 @@
         "properties": {
           "schemas": {
             "type": "array",
+            "description": "List of SCIM schema URNs declaring the patch request type; must include `urn:ietf:params:scim:api:messages:2.0:PatchOp`.",
             "items": {
               "type": "string"
             }
@@ -866,7 +866,6 @@
               "properties": {
                 "op": {
                   "type": "string",
-                  "description": "Operation type.",
                   "enum": [
                     "add",
                     "remove",
