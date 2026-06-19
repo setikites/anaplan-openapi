@@ -10,24 +10,23 @@
 
 ## Authentication
 
-Apiary docs declare `AnaplanAuthToken` as the required scheme:
+**Confirmed (live testing June 2026)**: Both `AnaplanAuthToken` and `Bearer` (using an AnaplanAuthToken value) are accepted:
 
 ```
 Authorization: AnaplanAuthToken {token}
+Authorization: Bearer {token}
 ```
 
-**Unconfirmed — pending live testing.** The Integration API accepts both `AnaplanAuthToken` and `Bearer` token; whether CloudWorks does the same is unknown.
+## Base URL (Confirmed)
 
-## Base URL (Open Question)
+Both base URLs respond with 200 (live-tested June 2026):
 
-Two conflicting patterns have been identified — live testing is needed to determine which is correct:
+| Source | Base URL | Status |
+|--------|----------|--------|
+| Apiary docs | `https://api.cloudworks.anaplan.com/2/0/` | ✅ Active |
+| Apiary production URL field | `https://api.anaplan.com/cloudworks/2/0/` | ✅ Also active |
 
-| Source | Base URL |
-|--------|----------|
-| Apiary docs | `https://api.cloudworks.anaplan.com/2/0/` |
-| CONTEXT.md regional pattern | `https://{region}.api.anaplan.com` (same pattern as Integration, ALM, SCIM, Audit, Exception Users) |
-
-The spec's `servers[]` array uses `https://api.cloudworks.anaplan.com` per Apiary. If live testing confirms the standard regional pattern applies, update `servers[]` to match the other API specs and note the resolution here.
+The `api.cloudworks.anaplan.com` form is listed first in `servers[]` as it matches Apiary curl examples. Set `ANAPLAN_CLOUDWORKS_BASE_URL=https://api.cloudworks.anaplan.com/2/0` in `.env` to skip the probe.
 
 ## Resource Groups
 
@@ -47,9 +46,40 @@ The CloudWorks API exposes seven resource groups:
 
 Canonical lifecycle and confidence are in the [confidence table in CONTEXT.md](../CONTEXT.md#confidence-table).
 
-Note: a live test scaffold exists (`tests/test_cloudworks_live.py`), but key behaviors (auth scheme, server URL) remain unconfirmed pending live testing — see the notes above.
+Live tests run against real tenant data (June 2026). All previously-open questions on auth, base URL, connection shapes, integration shapes, run history, notifications, and integration flows are now confirmed — see the Discoveries section below.
 
-## Discovered Discrepancies
+## Discoveries from Live Testing (June 2026)
+
+### General — confirmed shapes
+
+| Observation | Confirmed |
+|---|---|
+| `integrationType` field in IntegrationSummary: enum `"Process"`, `"Export"`, `"Import"` | ✅ |
+| `triggerSource` in `latestRun` and RunRecord: `"scheduled"`, `"manual"`, `"scheduled_inf"`, `"manual_inf"`, `"nux_dashboard"` | ✅ |
+| `executionErrorCode` is an integer (not string), null on success | ✅ |
+| Known `executionErrorCode` values: `12` (import data-type mismatch), `35`, `38` (partial success), `39` | ✅ |
+| `RunRecord.lastRun` is a Unix timestamp integer (not ISO 8601) | ✅ |
+| `RunRecord.traceId` present on all run records | ✅ |
+| IntegrationSummary includes `schedule`, `modelId`, `workspaceId` | ✅ |
+| `integrationId`, `workspaceId`, `notificationId`, `connectionId`, run `id`, `traceId`, `userGuid`: 32-char **lowercase** hex | ✅ |
+| `modelId`: 32-char **uppercase** hex (the only uppercase ID in the API) | ✅ |
+| `processId`, `actionId`, `fileId`: numeric string, e.g. `"118000000114"` | ✅ |
+| `startDate`/`endDate` on runs: ISO 8601 UTC milliseconds — `YYYY-MM-DDTHH:MM:SS.sssZ` | ✅ |
+| `createdDate`/`modifiedDate` on flow steps: space-separated — `YYYY-MM-DD HH:MM:SS.uuuuuu+00:00` | ✅ |
+| `schedule.status` enum: `"Active"`, `"Inactive"` | ✅ |
+| ConnectionSummary includes `authMethod`, `integrationErrorCode`, `workspaceId` at root level | ✅ |
+| `authMethod` appears in camelCase in GET responses; `auth_method` in snake_case in create/update requests | ✅ |
+| GET /integrations meta includes `tenantCurrentCount` and `tenantMaxAllowed` | ✅ |
+| IntegrationFlowSummary uses `id` (not `integrationFlowId`) | ✅ |
+| IntegrationFlowSummary includes `stepsCount` | ✅ |
+| GET /integrationflows/{id} is a valid endpoint (not documented in Apiary) | ✅ |
+| IntegrationFlowDetail steps have `referrer`, `name`, `type`, `dependsOn`, `isSkipped`, `exceptionBehavior`, `latestRun` | ✅ |
+| Job sources and targets both include `connectionName`, `isConnectionDeleted`, `bucketName` (GET responses) | ✅ |
+| `connection.status` is integer: 1=active, 0=error | ✅ |
+| `integrationErrorCode` = 46 observed for a connection with status=0 | ✅ |
+| `schedule.type` observed: `"hourly"`, `"weekly"` | ✅ (monthly not observed in this tenant) |
+| GET /integrations/anaplanModels/{modelId}: returns HTML 404 from nginx — likely deprecated | ⚠️ |
+| GET /integrations/runerror/{runId}: returns `"runs": {}` (empty object, not array) when no errors | ⚠️ |
 
 ### Azure Blob Storage: `auth_method` is now required (undocumented)
 

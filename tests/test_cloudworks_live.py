@@ -367,7 +367,7 @@ def test_cloudworks_azure_blob_auth_method_required_probe(cw_token, cw_base_url)
         },
     }
 
-    with httpx.Client() as client:
+    with httpx.Client(timeout=30) as client:
         response = client.post(
             f"{cw_base_url}/integrations/connections",
             json=probe_body,
@@ -420,17 +420,22 @@ def test_cloudworks_azure_blob_auth_method_required_probe(cw_token, cw_base_url)
 
 @pytest.mark.live
 def test_cloudworks_get_integrations_responds(cw_token, cw_base_url):
-    """GET /integrations returns 200."""
-    with httpx.Client() as client:
+    """GET /integrations with pagination params returns 200.
+
+    Pagination params are required in large tenants — calling without offset/limit
+    can time out when the tenant has hundreds of integrations.
+    """
+    with httpx.Client(timeout=30) as client:
         response = client.get(
             f"{cw_base_url}/integrations",
+            params={"offset": 0, "limit": 10},
             headers={
                 "Authorization": f"AnaplanAuthToken {cw_token}",
                 "Accept": "application/json",
             },
         )
 
-    print(f"\nGET /integrations: {response.status_code}")
+    print(f"\nGET /integrations?offset=0&limit=10: {response.status_code}")
     print(f"Body: {response.text[:300]}")
     assert response.status_code == 200, (
         f"Expected 200, got {response.status_code}. Body: {response.text[:200]}"
@@ -510,9 +515,10 @@ def cw_first_integration(cw_token, cw_base_url):
     """Return the first IntegrationSummary from GET /integrations, or skip if none.
 
     Used by tests that need a real integrationId to probe /integrations/{id}
-    and /integrations/runs/{id}.
+    and /integrations/runs/{id}. Uses a 30-second timeout because large tenants
+    are slow to respond even with limit=1.
     """
-    with httpx.Client() as client:
+    with httpx.Client(timeout=30) as client:
         response = client.get(
             f"{cw_base_url}/integrations",
             params={"offset": 0, "limit": 1},
@@ -567,47 +573,42 @@ def test_cloudworks_get_integration_by_id_shape(cw_token, cw_base_url, cw_first_
     )
     integration = body.get("integration", body)
 
-    # Observe version field
-    if "version" in integration:
-        warnings.warn(
-            f"IntegrationDetail.version = {integration['version']!r} — "
-            "update spec description to reflect observed value.",
-            UserWarning, stacklevel=2,
-        )
-    else:
-        warnings.warn(
-            "IntegrationDetail.version not present in response — "
-            "field may be absent for some integration types.",
-            UserWarning, stacklevel=2,
+    # version field — confirmed "2.0" in live testing
+    assert integration.get("version") == "2.0", (
+        f"IntegrationDetail.version expected '2.0', got {integration.get('version')!r}"
+    )
+
+    # integrationType — confirmed enum in live testing
+    int_type = integration.get("integrationType")
+    if int_type is not None:
+        assert int_type in ("Process", "Export", "Import"), (
+            f"IntegrationDetail.integrationType {int_type!r} is not a known enum value"
         )
 
-    # Observe latestRun and its sub-fields
+    # latestRun — check triggerSource enum
     latest_run = integration.get("latestRun")
     if latest_run:
+        trigger = latest_run.get("triggerSource")
+        if trigger is not None:
+            assert trigger in ("scheduled", "manual", "scheduled_inf"), (
+                f"latestRun.triggerSource {trigger!r} is not a known enum value"
+            )
         warnings.warn(
-            f"IntegrationDetail.latestRun keys observed: {sorted(latest_run.keys())} — "
-            f"triggeredBy={latest_run.get('triggeredBy')!r}, "
-            f"message={latest_run.get('message')!r}, "
-            f"executionErrorCode={latest_run.get('executionErrorCode')!r}",
-            UserWarning, stacklevel=2,
-        )
-    else:
-        warnings.warn(
-            "IntegrationDetail.latestRun is absent — integration may never have run.",
+            f"IntegrationDetail.latestRun keys: {sorted(latest_run.keys())}, "
+            f"triggerSource={trigger!r}, executionErrorCode={latest_run.get('executionErrorCode')!r}",
             UserWarning, stacklevel=2,
         )
 
-    # Observe jobs field
+    # jobs field — absent for Process, present for Export/Import
     if "jobs" in integration:
         warnings.warn(
             f"IntegrationDetail.jobs present, len={len(integration['jobs'])} — "
-            "this is an import/export integration (not process).",
+            f"integrationType={int_type!r}",
             UserWarning, stacklevel=2,
         )
-    elif "processId" in integration:
+    elif integration.get("processId"):
         warnings.warn(
-            "IntegrationDetail.jobs absent and processId present — "
-            "this is a process integration (jobs is empty for process integrations, confirmed).",
+            "IntegrationDetail.jobs absent and processId present — Process integration confirmed.",
             UserWarning, stacklevel=2,
         )
 
@@ -657,40 +658,31 @@ def test_cloudworks_get_run_history_shape(cw_token, cw_base_url, cw_first_integr
         return
 
     run = runs[0]
+
+    # lastRun is a Unix timestamp integer (confirmed in live testing)
+    assert isinstance(run.get("lastRun"), int), (
+        f"RunRecord.lastRun expected integer Unix timestamp, got {run.get('lastRun')!r}"
+    )
+
+    # triggerSource enum — confirmed values: scheduled, manual, scheduled_inf
+    trigger = run.get("triggerSource")
+    if trigger is not None:
+        assert trigger in ("scheduled", "manual", "scheduled_inf"), (
+            f"RunRecord.triggerSource {trigger!r} is not a known enum value"
+        )
+
     warnings.warn(
-        f"RunRecord keys observed: {sorted(run.keys())}",
+        f"RunRecord keys: {sorted(run.keys())}, "
+        f"lastRun={run.get('lastRun')!r} (Unix timestamp), "
+        f"triggerSource={trigger!r}, "
+        f"executionErrorCode={run.get('executionErrorCode')!r}",
         UserWarning, stacklevel=2,
     )
 
-    # The key open question: does 'lastRun' differ from 'endDate'?
-    if "lastRun" in run and "endDate" in run:
-        same = run["lastRun"] == run["endDate"]
-        warnings.warn(
-            f"RunRecord.lastRun={run['lastRun']!r}, endDate={run['endDate']!r} — "
-            f"{'same value (lastRun may be redundant)' if same else 'DIFFERENT values'}",
-            UserWarning, stacklevel=2,
-        )
-    elif "lastRun" in run:
-        warnings.warn(
-            f"RunRecord.lastRun={run['lastRun']!r} (endDate absent)",
-            UserWarning, stacklevel=2,
-        )
-
-    # Observe message and executionErrorCode
-    warnings.warn(
-        f"RunRecord.message={run.get('message')!r}, "
-        f"executionErrorCode={run.get('executionErrorCode')!r}, "
-        f"success={run.get('success')!r}, "
-        f"triggeredBy={run.get('triggeredBy')!r}",
-        UserWarning, stacklevel=2,
-    )
-
-    # Observe meta.paging.schema URL
     schema_url = body.get("meta", {}).get("schema")
     if schema_url:
         warnings.warn(
-            f"PagingMeta.schema URL observed: {schema_url!r} — "
-            "use this in the spec description for PagingMeta.schema.",
+            f"PagingMeta.schema URL: {schema_url!r}",
             UserWarning, stacklevel=2,
         )
 

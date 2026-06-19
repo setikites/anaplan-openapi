@@ -2,15 +2,39 @@ openapi: 3.0.0
 info:
   title: Anaplan CloudWorks API
   version: 2.0.0
-  description: |-
-    The Anaplan CloudWorks API enables you to create your own connections and integrations with Anaplan CloudWorks, supporting data movement between cloud storage services (Amazon S3, Google BigQuery, Azure Blob Storage) and Anaplan models.
+  description: 'The Anaplan CloudWorks API enables you to create your own connections and integrations with Anaplan CloudWorks,
+    supporting data movement between cloud storage services (Amazon S3, Google BigQuery, Azure Blob Storage) and Anaplan models.
 
-    **Base URL note**: Apiary curl examples consistently use `https://api.cloudworks.anaplan.com/2/0/`. The Apiary production URL field references `https://api.anaplan.com/cloudworks/2/0/`. Live testing is needed to confirm which is canonical. See `cloudworks/README.md`.
+
+    **Base URL**: Both `https://api.cloudworks.anaplan.com/2/0/` and `https://api.anaplan.com/cloudworks/2/0/` were confirmed
+    active in live testing (June 2026). The `api.cloudworks.anaplan.com` form matches Apiary curl examples and is listed first.
+    Both `AnaplanAuthToken` and `Bearer` (with an AnaplanAuthToken value) are accepted.
+
+
+    **Date and time formats used across this API (confirmed from live data, June 2026):**
+
+    - `startDate` / `endDate` on run records: ISO 8601 UTC with milliseconds — `YYYY-MM-DDTHH:MM:SS.sssZ`
+
+    - `lastRun` on run records: Unix timestamp integer (seconds since epoch)
+
+    - `createdDate` / `modifiedDate` on integration flow steps: space-separated timestamp with timezone — `YYYY-MM-DD HH:MM:SS.uuuuuu+00:00`
+
+    - `schedule.nextScheduleDate` and similar date-only fields: ISO 8601 date — `YYYY-MM-DD`
+
+
+    **ID formats used across this API:**
+
+    - Most entity IDs (`integrationId`, `connectionId`, `workspaceId`, `notificationId`, flow `id`, run `id`, `traceId`, `userGuid`):
+    32-character lowercase hex
+
+    - `modelId`: 32-character **uppercase** hex (the only uppercase ID in the API)
+
+    - `processId`, `actionId`, `fileId`: numeric string, e.g. `"118000000114"`'
 servers:
 - url: https://api.cloudworks.anaplan.com/2/0
-  description: CloudWorks API (per Apiary curl examples — canonical pending live testing)
+  description: CloudWorks API (confirmed active in live testing June 2026)
 - url: https://api.anaplan.com/cloudworks/2/0
-  description: Alternative base URL (per Apiary production URL field — open question)
+  description: Alternative base URL (also confirmed active in live testing June 2026)
 security:
 - AnaplanAuthToken: []
 - BearerAuth: []
@@ -256,6 +280,9 @@ paths:
                           - AzureBlob
                         body:
                           type: object
+                          description: Connection-type-specific fields. For AzureBlob includes `name`, `storageAccountName`,
+                            `containerName`, and `authMethod` (camelCase in response, contrasting with snake_case `auth_method`
+                            in create/update requests).
                         creationDate:
                           type: string
                           format: date-time
@@ -267,7 +294,23 @@ paths:
                         modifiedBy:
                           type: string
                         status:
+                          description: 'Connection health: 1 = active, 0 = error.'
                           type: integer
+                        integrationErrorCode:
+                          description: Error code set when `status` is 0; null when the connection is healthy.
+                          type: integer
+                          nullable: true
+                        workspaceId:
+                          description: Anaplan workspace ID for restricted-user connections; null for unrestricted connections.
+                          type: string
+                          nullable: true
+                        authMethod:
+                          description: Authentication method used by this connection (denormalized from `body.authMethod`).
+                            `"SAS-based"` for SAS-token connections; null for connections created before this field was introduced.
+                          type: string
+                          nullable: true
+                  meta:
+                    $ref: '#/components/schemas/PagingMeta'
         '403':
           $ref: '#/components/responses/Forbidden'
   /integrations/connections/{connectionId}:
@@ -479,7 +522,7 @@ paths:
                     currentPageSize: 1
                     totalSize: 1
                     offset: 0
-                  schema: https://api.anaplan.com/cloudworks/2/0/integrations/objects/integrations
+                  schema: https://api.cloudworks.anaplan.com/1/0/integrations/objects/integrations
         '403':
           $ref: '#/components/responses/Forbidden'
   /integrations/{integrationId}:
@@ -573,6 +616,8 @@ paths:
   /integrations/anaplanModels/{modelId}:
     get:
       summary: Get integrations by model ID
+      description: '**Note (live-tested June 2026):** This endpoint returned an HTML 404 from nginx on a live tenant. It may
+        be deprecated or require a specific modelId format. Use with caution.'
       operationId: getIntegrationsByModel
       tags:
       - Integrations
@@ -818,6 +863,19 @@ paths:
                         type: string
                       name:
                         type: string
+                      integrationType:
+                        description: Integration type.
+                        type: string
+                        enum:
+                        - Process
+                        - Export
+                        - Import
+                      processId:
+                        description: Anaplan process ID; present only for Process integrations.
+                        type: string
+                      version:
+                        description: Integration schema version; currently "2.0".
+                        type: string
                       schedule:
                         type: object
                         nullable: true
@@ -876,6 +934,9 @@ paths:
                   status:
                     $ref: '#/components/schemas/Status'
                   runs:
+                    description: Array of error records when errors exist. **Note (live-tested June 2026):** Returns `{}`
+                      (empty object, not empty array) when the run completed without errors. Treat both `{}` and `[]` as "no
+                      errors".
                     type: array
                     items:
                       type: object
@@ -1214,12 +1275,35 @@ paths:
                   integrationFlows:
                     type: array
                     items:
-                      type: object
+                      $ref: '#/components/schemas/IntegrationFlowSummary'
                   meta:
                     $ref: '#/components/schemas/PagingMeta'
         '403':
           $ref: '#/components/responses/Forbidden'
   /integrationflows/{integrationFlowId}:
+    get:
+      summary: Get an integration flow by ID
+      operationId: getIntegrationFlowById
+      tags:
+      - Integration Flows
+      responses:
+        '200':
+          description: Integration flow details including all step definitions.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    $ref: '#/components/schemas/Status'
+                  integrationFlow:
+                    $ref: '#/components/schemas/IntegrationFlowDetail'
+                  meta:
+                    $ref: '#/components/schemas/PagingMeta'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
     put:
       summary: Edit an integration flow
       operationId: editIntegrationFlow
@@ -1363,11 +1447,26 @@ components:
                 - Anaplan
               connectionId:
                 type: string
+                description: 32-character lowercase hex connection ID. Present when source is a cloud storage type.
               file:
                 type: string
+                description: File path within the cloud storage container.
               table:
                 type: string
+                description: BigQuery table name. Present when source is GoogleBigQuery.
               actionId:
+                type: string
+                description: Numeric string Anaplan action ID. Present when source is Anaplan.
+              connectionName:
+                description: Display name of the connection (read-only, present in GET responses).
+                type: string
+              isConnectionDeleted:
+                description: True if the referenced connection has been deleted (read-only, present in GET responses).
+                type: boolean
+              bucketName:
+                description: Container or bucket name for the cloud storage connection (read-only, present in GET responses).
+                  Named `bucketName` regardless of connection type — represents the Azure Blob container name for AzureBlob
+                  connections.
                 type: string
         targets:
           type: array
@@ -1393,6 +1492,16 @@ components:
                 type: string
               overwrite:
                 type: boolean
+              connectionName:
+                description: Display name of the connection (read-only, present in GET responses).
+                type: string
+              isConnectionDeleted:
+                description: True if the referenced connection has been deleted (read-only, present in GET responses).
+                type: boolean
+              bucketName:
+                description: Container or bucket name for the cloud storage connection (read-only, present in GET responses).
+                  Named `bucketName` regardless of connection type.
+                type: string
         mapping:
           type: array
           description: Column mapping for BigQuery exports.
@@ -1476,17 +1585,40 @@ components:
           type: string
           description: IANA timezone name.
           example: Europe/Paris
+        status:
+          description: Schedule enabled/disabled state. Present in GET responses; not required in create/update requests.
+          type: string
+          enum:
+          - Active
+          - Inactive
     IntegrationSummary:
       description: Summary view of an integration, returned in list responses.
       type: object
       properties:
         integrationId:
           type: string
+          description: 32-character lowercase hex string uniquely identifying this integration.
+          example: fe40dc5793084f7dbb685cffe6a5ad2a
         name:
           type: string
+        integrationType:
+          description: Integration type.
+          type: string
+          enum:
+          - Process
+          - Export
+          - Import
         processId:
           type: string
-          description: Present for process integrations.
+          description: Anaplan process ID (numeric string, e.g. `"118000000114"`); present only for `Process` integrations.
+        workspaceId:
+          type: string
+          description: 32-character lowercase hex Anaplan workspace ID.
+        modelId:
+          type: string
+          description: '32-character **uppercase** hex Anaplan model ID. Note: `modelId` is the only ID field in CloudWorks
+            that uses uppercase hex.'
+          example: E559BFF3B1GD4RKE874P745BEL259711
         createdBy:
           type: string
         creationDate:
@@ -1502,29 +1634,49 @@ components:
           type: object
           properties:
             triggeredBy:
-              description: Display name of the user who triggered the run, or a system identifier for scheduled runs.
+              description: Display name of the user who triggered the run.
               type: string
             startDate:
+              description: 'ISO 8601 UTC datetime when the run started. Format: `YYYY-MM-DDTHH:MM:SS.sssZ`.'
               type: string
               format: date-time
+              example: '2026-06-19T01:30:16.000Z'
             endDate:
+              description: 'ISO 8601 UTC datetime when the run ended. Format: `YYYY-MM-DDTHH:MM:SS.sssZ`.'
               type: string
               format: date-time
+              example: '2026-06-19T01:31:21.000Z'
             success:
               type: boolean
             message:
-              description: Outcome message for this run, e.g. "Success".
+              description: 'Outcome message. Common values: `"Success"`, `"Cancelled"`, `"Process failed"`, `"Anaplan model
+                was deleted"`. Partial-success imports include row counts in this field even when `success` is `true`.'
               type: string
             executionErrorCode:
-              description: Error code if the run failed; null on success.
-              type: string
+              description: 'Numeric error code. Null on full success. Known values: `12` (import data-type mismatch), `35`,
+                `38` (partial success), `39`.'
+              type: integer
               nullable: true
+            triggerSource:
+              description: What triggered this run. `scheduled` = integration's own schedule; `manual` = user-initiated from
+                the CloudWorks UI or API; `scheduled_inf` = triggered by an integration flow's schedule; `manual_inf` = manually
+                triggered from within an integration flow; `nux_dashboard` = triggered from the CloudWorks NUX dashboard.
+              type: string
+              enum:
+              - scheduled
+              - manual
+              - scheduled_inf
+              - manual_inf
+              - nux_dashboard
         notificationId:
-          description: ID of the notification configuration attached to this integration, if any.
+          description: 32-character lowercase hex ID of the notification configuration attached to this integration, if any.
           type: string
         nuxVisible:
           description: Whether this integration is visible in the CloudWorks UI.
           type: boolean
+        schedule:
+          description: Active schedule for this integration, if one has been configured.
+          $ref: '#/components/schemas/Schedule'
     IntegrationDetail:
       description: Full integration details, returned by the get-by-ID endpoint. Extends IntegrationSummary.
       allOf:
@@ -1551,27 +1703,46 @@ components:
       properties:
         id:
           type: string
+          description: 32-character lowercase hex run ID.
         triggeredBy:
-          description: Display name of the user who triggered the run, or a system identifier for scheduled runs.
+          description: Display name of the user who triggered the run.
           type: string
         lastRun:
-          type: string
-          format: date-time
+          type: integer
+          description: 'Unix timestamp (seconds since epoch) of when this run ended. Duplicates `endDate` in epoch form. Example:
+            `1781832681`.'
         startDate:
+          description: 'ISO 8601 UTC datetime when the run started. Format: `YYYY-MM-DDTHH:MM:SS.sssZ`.'
           type: string
           format: date-time
+          example: '2026-06-19T01:30:16.000Z'
         endDate:
+          description: 'ISO 8601 UTC datetime when the run ended. Format: `YYYY-MM-DDTHH:MM:SS.sssZ`.'
           type: string
           format: date-time
+          example: '2026-06-19T01:31:21.000Z'
         success:
           type: boolean
         message:
-          description: Outcome message for this run, e.g. "Success".
+          description: 'Outcome message. Common values: `"Success"`, `"Cancelled"`, `"Process failed"`, `"Anaplan model was
+            deleted"`. Partial-success imports include row counts here even when `success` is `true`.'
           type: string
         executionErrorCode:
-          description: Error code if the run failed; null on success.
-          type: string
+          description: 'Numeric error code. Null on full success. Known values: `12` (import data-type mismatch), `35`, `38`
+            (partial success), `39`.'
+          type: integer
           nullable: true
+        traceId:
+          description: 32-character lowercase hex trace identifier, useful for support diagnostics.
+          type: string
+        triggerSource:
+          description: 'What caused this run: `scheduled` (integration''s own schedule), `manual` (user-initiated), or `scheduled_inf`
+            (triggered by an integration flow schedule).'
+          type: string
+          enum:
+          - scheduled
+          - manual
+          - scheduled_inf
     NotificationRequest:
       type: object
       required:
@@ -1668,9 +1839,163 @@ components:
               type: integer
             offset:
               type: integer
+        tenantCurrentCount:
+          description: Total number of integrations (including integration flows) in the tenant. Present in GET /integrations
+            responses.
+          type: integer
+        tenantMaxAllowed:
+          description: Maximum number of integrations allowed for this tenant. Present in GET /integrations responses.
+          type: integer
         schema:
           description: URL to the JSON schema definition for this response type.
           type: string
+    IntegrationFlowSummary:
+      description: Summary view of an integration flow, returned in the GET /integrationflows list response.
+      type: object
+      properties:
+        id:
+          description: Unique identifier for the integration flow.
+          type: string
+        name:
+          type: string
+        createdBy:
+          type: string
+        creationDate:
+          type: string
+          format: date-time
+        modificationDate:
+          type: string
+          format: date-time
+        modifiedBy:
+          type: string
+        nuxVisible:
+          description: Whether this integration flow is visible in the CloudWorks UI.
+          type: boolean
+        stepsCount:
+          description: Number of steps defined in this integration flow.
+          type: integer
+        latestRun:
+          description: Details of the most recent run; absent if the flow has never been run.
+          type: object
+          properties:
+            triggeredBy:
+              type: string
+            startDate:
+              type: string
+              format: date-time
+            endDate:
+              type: string
+              format: date-time
+            success:
+              type: boolean
+            message:
+              type: string
+            executionErrorCode:
+              type: integer
+              nullable: true
+            triggerSource:
+              type: string
+              enum:
+              - scheduled
+              - manual
+              - scheduled_inf
+        schedule:
+          description: Active schedule for this integration flow, if configured.
+          $ref: '#/components/schemas/Schedule'
+    IntegrationFlowDetail:
+      description: Full integration flow details including all step definitions. Returned by GET /integrationflows/{id}.
+      allOf:
+      - $ref: '#/components/schemas/IntegrationFlowSummary'
+      - type: object
+        properties:
+          version:
+            description: Schema version; currently "2.0".
+            type: string
+            example: '2.0'
+          steps:
+            description: Ordered step definitions for this integration flow.
+            type: array
+            items:
+              type: object
+              properties:
+                referrer:
+                  description: The integration ID referenced by this step.
+                  type: string
+                name:
+                  description: Display name of the referenced integration.
+                  type: string
+                type:
+                  description: Integration type of the referenced integration.
+                  type: string
+                  enum:
+                  - Process
+                  - Export
+                  - Import
+                createdBy:
+                  type: string
+                createdDate:
+                  description: 'Creation timestamp. Format: ''YYYY-MM-DD HH:MM:SS.ffffff+00:00'' (not ISO 8601).'
+                  type: string
+                modifiedDate:
+                  description: Last modification timestamp. Same format as createdDate.
+                  type: string
+                modifiedBy:
+                  type: string
+                  nullable: true
+                modelId:
+                  type: string
+                workspaceId:
+                  type: string
+                dependsOn:
+                  description: referrer IDs of steps that must complete before this step runs. Empty array for the first step.
+                  type: array
+                  items:
+                    type: string
+                isSkipped:
+                  description: When true, this step is excluded from the next run.
+                  type: boolean
+                exceptionBehavior:
+                  description: Defines flow behavior when this step fails or partially succeeds.
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        enum:
+                        - failure
+                        - partial_success
+                      strategy:
+                        type: string
+                        enum:
+                        - stop
+                        - continue
+                latestRun:
+                  description: Details of the most recent run for this specific step.
+                  type: object
+                  properties:
+                    triggeredBy:
+                      type: string
+                    startDate:
+                      type: string
+                      format: date-time
+                    endDate:
+                      type: string
+                      format: date-time
+                    success:
+                      type: boolean
+                    message:
+                      type: string
+                    executionErrorCode:
+                      description: Error code if the step failed; null on success. Code 38 indicates partial success.
+                      type: integer
+                      nullable: true
+                    triggerSource:
+                      type: string
+                      enum:
+                      - scheduled
+                      - manual
+                      - scheduled_inf
   responses:
     SuccessStatus:
       description: Operation successful.
@@ -1700,8 +2025,8 @@ components:
           schema:
             $ref: '#/components/schemas/ErrorStatus'
     Conflict:
-      description: 'Conflict. Common causes: integration already running (409); total integrations exceeded limit of 500 (409);
-        resource is being referenced (409).'
+      description: 'Conflict. Common causes: integration already running (409); tenant integration count exceeded (409); resource
+        is being referenced (409).'
       content:
         application/json:
           schema:
