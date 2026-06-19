@@ -76,6 +76,8 @@ _SCHEMA_MUST_HAVE_DESCRIPTION = [
     pytest.param("scim", ["components", "schemas", "ListResponse"], id="scim-listresponse"),
     pytest.param("scim", ["components", "schemas", "ScimError"],    id="scim-scimerror"),
     pytest.param("scim", ["components", "schemas", "PatchOp"],      id="scim-patchop"),
+    # Exception — ExceptionUserSearchRequest: oneOf semantics and exactly-one constraint not conveyed by name alone
+    pytest.param("exception", ["components", "schemas", "ExceptionUserSearchRequest"], id="exc-exceptionusersearchrequest"),
 ]
 
 
@@ -176,6 +178,18 @@ _PROPERTY_MUST_HAVE_DESCRIPTION = [
     pytest.param("scim", ["components", "schemas", "ListResponse", "properties", "schemas"], id="scim-listresponse-schemas"),
     pytest.param("scim", ["components", "schemas", "ScimError", "properties", "schemas"],    id="scim-scimerror-schemas"),
     pytest.param("scim", ["components", "schemas", "PatchOp", "properties", "schemas"],      id="scim-patchop-schemas"),
+    # Exception — ExceptionUserPatchRequest.op: enum behavior (grant/revoke) non-obvious from values alone (ADR 0003 §3)
+    pytest.param("exception", ["components", "schemas", "ExceptionUserPatchRequest", "properties", "op"],             id="exc-patchrequest-op"),
+    # Exception — ExceptionUserPatchRequest.workspaceGuid: SSO-enabled constraint not derivable from name + type
+    pytest.param("exception", ["components", "schemas", "ExceptionUserPatchRequest", "properties", "workspaceGuid"],  id="exc-patchrequest-workspaceguid"),
+    # Exception — ExceptionUserSearchByWorkspaceRequest.workspaceGuid: "including visitors" behavior is non-obvious
+    pytest.param("exception", ["components", "schemas", "ExceptionUserSearchByWorkspaceRequest", "properties", "workspaceGuid"], id="exc-searchbyworkspace-workspaceguid"),
+    # Exception — ExceptionUserSearchByUserRequest.userGuid: visitor-exclusion behavior is non-obvious from name alone
+    pytest.param("exception", ["components", "schemas", "ExceptionUserSearchByUserRequest", "properties", "userGuid"],           id="exc-searchbyuser-userguid"),
+    # Exception — ErrorResponse.status: machine-readable error code (FAILURE_BAD_HEADER etc.) not obvious from name
+    pytest.param("exception", ["components", "schemas", "ErrorResponse", "properties", "status"],        id="exc-errorresponse-status"),
+    # Exception — ErrorResponse.statusMessage: distinguishes human-readable text from the machine-readable status code
+    pytest.param("exception", ["components", "schemas", "ErrorResponse", "properties", "statusMessage"], id="exc-errorresponse-statusmessage"),
 ]
 
 
@@ -307,6 +321,15 @@ _MUST_NOT_HAVE_DESCRIPTION = [
     pytest.param("scim", ["components", "schemas", "User", "properties", "meta"], id="scim-user-meta"),
     # SCIM PatchOp.Operations.items.op — "Operation type." restates the name; enum [add, remove, replace] is self-documenting
     pytest.param("scim", ["components", "schemas", "PatchOp", "properties", "Operations", "items", "properties", "op"], id="scim-patchop-op"),
+    # Exception — ExceptionUserWorkspaceResult properties: field names are self-evident in a workspace-result context
+    pytest.param("exception", ["components", "schemas", "ExceptionUserWorkspaceResult", "properties", "workspaceGuid"], id="exc-workspaceresult-workspaceguid"),
+    pytest.param("exception", ["components", "schemas", "ExceptionUserWorkspaceResult", "properties", "workspaceName"], id="exc-workspaceresult-workspacename"),
+    pytest.param("exception", ["components", "schemas", "ExceptionUserWorkspaceResult", "properties", "users"],         id="exc-workspaceresult-users"),
+    # Exception — ExceptionUser properties: userGuid and email (format:email) are self-evident from name + type
+    pytest.param("exception", ["components", "schemas", "ExceptionUser", "properties", "userGuid"], id="exc-exceptionuser-userguid"),
+    pytest.param("exception", ["components", "schemas", "ExceptionUser", "properties", "email"],    id="exc-exceptionuser-email"),
+    # Exception — ErrorResponse schema: the name is self-evident; provenance note belongs in README not the description
+    pytest.param("exception", ["components", "schemas", "ErrorResponse"], id="exc-errorresponse-schema"),
 ]
 
 

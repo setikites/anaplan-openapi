@@ -85,6 +85,17 @@ Request body requires `op` (`"assign"` or `"unassign"`) and `workspaceGuid`. The
 
 Returns 204 on success. Returns 400 if `op` is invalid or missing, `workspaceGuid` is invalid, or the workspace is not SSO-enabled.
 
+## ADR 0003 Sweep (issue #89)
+
+The Exception Users API exposes no GET endpoints — all paths are write or search operations (POST and PATCH). There are no read-only paths to exercise in Phase 1. All live testing listed below was completed in issue #51.
+
+Descriptions removed as tautological (ADR 0003 §2):
+- `ExceptionUserWorkspaceResult.workspaceGuid`, `.workspaceName`, `.users` — self-evident from field name in context
+- `ExceptionUser.userGuid`, `.email` — self-evident; `email` has `format: email`
+- `ErrorResponse` schema-level description — name is self-evident; provenance note moved here (see Discrepancies below)
+
+`ErrorResponse.statusMessage` description cleaned: provenance note removed (already documented in Discrepancies); description updated to clarify the human-readable vs. machine-readable distinction.
+
 ## Testing Coverage
 
 Live tests run with OAuth Authorization Code grant (`AnaplanAuthToken {access_token}`), Tenant Security Admin role. Run with `--live --allow-writes`.

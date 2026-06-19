@@ -363,19 +363,16 @@
         "type": "object",
         "properties": {
           "workspaceGuid": {
-            "type": "string",
-            "description": "GUID of the workspace."
+            "type": "string"
           },
           "workspaceName": {
-            "type": "string",
-            "description": "Display name of the workspace."
+            "type": "string"
           },
           "users": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ExceptionUser"
-            },
-            "description": "Exception users in this workspace."
+            }
           }
         }
       },
@@ -383,19 +380,16 @@
         "type": "object",
         "properties": {
           "userGuid": {
-            "type": "string",
-            "description": "GUID of the exception user."
+            "type": "string"
           },
           "email": {
             "type": "string",
-            "format": "email",
-            "description": "Email address of the exception user."
+            "format": "email"
           }
         }
       },
       "ErrorResponse": {
         "type": "object",
-        "description": "Error response body. Field names confirmed via live testing (issue #51).",
         "properties": {
           "status": {
             "type": "string",
@@ -403,7 +397,7 @@
           },
           "statusMessage": {
             "type": "string",
-            "description": "Human-readable error description. Note: Apiary documented this field as `message`; the confirmed field name from live testing is `statusMessage`."
+            "description": "Human-readable error description. Distinguishes this narrative text from the machine-readable `status` code."
           }
         }
       }
