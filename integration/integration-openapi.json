@@ -6189,59 +6189,46 @@
         "type": "object"
       },
       "User": {
-        "description": "user",
         "type": "object",
         "properties": {
           "id": {
-            "description": "id",
             "type": "string"
           },
           "firstName": {
-            "description": "first name",
             "type": "string"
           },
           "lastName": {
-            "description": "last name",
             "type": "string"
           },
           "email": {
-            "description": "email",
             "type": "string",
             "pattern": "^[_A-Za-z0-9-\\\\+]+(\\\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\\\.[A-Za-z0-9]+)*(\\\\.[A-Za-z]{2,})$"
           },
           "active": {
-            "description": "active",
             "type": "boolean"
           },
           "lastLoginDate": {
-            "description": "last login",
             "type": "string",
             "format": "date-time"
           },
           "emailOptIn": {
-            "description": "email opt in",
             "type": "boolean"
           },
           "customerId": {
-            "description": "customer id",
             "type": "string"
           }
         }
       },
       "Model": {
-        "description": "model",
         "type": "object",
         "properties": {
           "id": {
-            "description": "id",
             "type": "string"
           },
           "name": {
-            "description": "name",
             "type": "string"
           },
           "activeState": {
-            "description": "state",
             "type": "string",
             "enum": [
               "MAINTENANCE",
@@ -6253,15 +6240,12 @@
             ]
           },
           "currentWorkspaceId": {
-            "description": "workspace",
             "type": "string"
           },
           "currentWorkspaceName": {
-            "description": "workspace",
             "type": "string"
           },
           "modelUrl": {
-            "description": "model url",
             "type": "string"
           },
           "categoryValues": {
@@ -6297,67 +6281,52 @@
             "maxItems": 5
           },
           "isoCreationDate": {
-            "description": "isoCreationDate",
             "type": "string"
           },
           "lastModified": {
-            "description": "lastModified",
             "type": "string"
           },
           "lastModifiedByUserGuid": {
-            "description": "lastModifiedByUserGuid",
             "type": "string"
           },
           "lastSavedSerialNumber": {
-            "description": "lastSavedSerialNumber",
             "type": "string"
           },
           "memoryUsage": {
-            "description": "memoryUsage",
             "type": "number"
           },
           "modelTransactionRunning": {
-            "description": "modelTransactionRunning",
             "type": "boolean"
           }
         }
       },
       "Workspace": {
-        "description": "workspace",
         "type": "object",
         "properties": {
           "id": {
-            "description": "id",
             "type": "string"
           },
           "name": {
-            "description": "name",
             "type": "string"
           },
           "active": {
-            "description": "active",
             "type": "boolean"
           },
           "sizeAllowance": {
-            "description": "size allowance",
             "type": "integer"
           },
           "currentSize": {
-            "description": "current size",
             "type": "integer"
           }
         }
       },
       "Category": {
-        "description": "category",
         "type": "object",
         "properties": {
           "id": {
-            "description": "id",
             "type": "string"
           },
           "name": {
-            "description": "name",
             "type": "string"
           },
           "categoryValues": {
@@ -6395,87 +6364,68 @@
         }
       },
       "CategoryValue": {
-        "description": "categoryValue",
         "type": "object",
         "properties": {
           "id": {
-            "description": "id",
             "type": "string"
           },
           "attribute": {
-            "description": "name",
             "type": "string"
           },
           "categoryId": {
-            "description": "category id",
             "type": "string"
           },
           "categoryName": {
-            "description": "category name",
             "type": "string"
           },
           "customerId": {
-            "description": "customer id",
             "type": "string"
           }
         }
       },
       "Admin": {
-        "description": "admin",
         "type": "object",
         "properties": {
           "firstName": {
-            "description": "first name",
             "type": "string"
           },
           "lastName": {
-            "description": "last name",
             "type": "string"
           },
           "email": {
-            "description": "email",
             "type": "string",
             "pattern": "^[_A-Za-z0-9-\\\\+]+(\\\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\\\.[A-Za-z0-9]+)*(\\\\.[A-Za-z]{2,})$"
           },
           "active": {
-            "description": "active",
             "type": "boolean"
           },
           "otherWorkspaces": {
-            "description": "other workspaces",
             "type": "array"
           }
         }
       },
       "Visitor": {
-        "description": "visitor",
         "type": "object",
         "properties": {
           "firstName": {
-            "description": "first name",
             "type": "string"
           },
           "lastName": {
-            "description": "last name",
             "type": "string"
           },
           "email": {
-            "description": "email",
             "type": "string",
             "pattern": "^[_A-Za-z0-9-\\\\+]+(\\\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\\\.[A-Za-z0-9]+)*(\\\\.[A-Za-z]{2,})$"
           },
           "active": {
-            "description": "active",
             "type": "boolean"
           },
           "otherWorkspaces": {
-            "description": "other workspaces",
             "type": "array"
           }
         }
       },
       "Module": {
-        "description": "A module in an Anaplan model",
         "properties": {
           "code": {
             "type": "string"
@@ -6489,7 +6439,6 @@
         }
       },
       "View": {
-        "description": "A view in an Anaplan model",
         "properties": {
           "code": {
             "type": "string"
@@ -6506,7 +6455,6 @@
         }
       },
       "Dimension": {
-        "description": "A dimension in an Anaplan model",
         "properties": {
           "code": {
             "type": "string"
@@ -6520,18 +6468,16 @@
         }
       },
       "CurrentPeriod": {
-        "description": "About current Period",
         "properties": {}
       },
       "Process": {
-        "description": "Metadata about a process",
         "properties": {}
       },
       "ModelCalendar": {
-        "description": "About model calendar",
         "properties": {
           "calendarType": {
-            "type": "string"
+            "type": "string",
+            "description": "Calendar model used in this model, e.g. 'Calendar Months' or '4-4-5'. Determines the period hierarchy and week-based options."
           },
           "currentPeriod": {
             "properties": {
@@ -6545,7 +6491,8 @@
             "type": "object"
           },
           "extraWeekMonth": {
-            "type": "integer"
+            "type": "integer",
+            "description": "For 4-4-5 calendars, the month index (1–12) that receives the extra week in a 53-week year."
           },
           "fiscalYear": {
             "properties": {
@@ -6605,11 +6552,9 @@
         }
       },
       "WriteCellDataResponse": {
-        "description": "writeCellDataResponse",
         "type": "object",
         "properties": {
           "numberOfCellsChanged": {
-            "description": "numberOfCellsChanged",
             "type": "number"
           },
           "failures": {
@@ -6636,7 +6581,6 @@
         }
       },
       "List": {
-        "description": "A list in an Anaplan model",
         "properties": {
           "code": {
             "type": "string"
@@ -6668,10 +6612,12 @@
             "type": "string"
           },
           "isActual": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Whether this version holds actual (historical) data rather than forecast data."
           },
           "isCurrent": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Whether this is the currently active version, i.e. the version whose data covers the current period."
           },
           "name": {
             "type": "string"
@@ -6871,7 +6817,7 @@
         }
       },
       "ListReadRequest": {
-        "description": "A task tracking the execution of a export",
+        "description": "Result record for a large-list read operation. Tracks the asynchronous read state and provides a URL for downloading the data once it is ready.",
         "properties": {
           "availablePages": {
             "type": "integer"
@@ -6900,7 +6846,7 @@
         }
       },
       "ViewReadRequest": {
-        "description": "A task tracking the execution of a export",
+        "description": "Result record for a large-view read operation. Tracks the asynchronous read state and provides a URL for downloading the data once it is ready.",
         "properties": {
           "availablePages": {
             "type": "integer"
@@ -6933,7 +6879,6 @@
         "properties": {}
       },
       "SummaryReport": {
-        "description": "A summary report",
         "properties": {}
       },
       "BulkDeleteModels": {
@@ -6969,7 +6914,6 @@
         }
       },
       "Dashboard": {
-        "description": "A dashboard in an Anaplan model",
         "properties": {
           "code": {
             "type": "string"
@@ -6983,7 +6927,6 @@
         }
       },
       "DimensionItem": {
-        "description": "A dimension item in an Anaplan model",
         "properties": {
           "code": {
             "type": "string"
@@ -7026,7 +6969,6 @@
         }
       },
       "Export": {
-        "description": "An export in an Anaplan model",
         "properties": {
           "code": {
             "type": "string"
@@ -7043,7 +6985,6 @@
         }
       },
       "ExportMetadata": {
-        "description": "Metadata about an export",
         "properties": {
           "columnCount": {
             "type": "integer"
@@ -7120,13 +7061,15 @@
             "type": "string"
           },
           "firstDataRow": {
-            "type": "integer"
+            "type": "integer",
+            "description": "1-based row number of the first data row; rows before this (above the header) are skipped on import."
           },
           "format": {
             "type": "string"
           },
           "headerRow": {
-            "type": "integer"
+            "type": "integer",
+            "description": "1-based row number of the column-header row in a delimited file."
           },
           "id": {
             "type": "string"
@@ -7138,7 +7081,8 @@
             "type": "string"
           },
           "origin": {
-            "type": "string"
+            "type": "string",
+            "description": "Source type of the file: 'NATIVE_ANAPLAN' for Anaplan-owned files (e.g. export outputs), 'FILE_BASED' for externally uploaded import sources."
           },
           "separator": {
             "type": "string"
@@ -7146,7 +7090,6 @@
         }
       },
       "HistoryReadRequest": {
-        "description": "A history read request in an Anaplan model",
         "properties": {
           "requestId": {
             "type": "string"
@@ -7166,7 +7109,6 @@
         }
       },
       "Import": {
-        "description": "An import in an Anaplan model",
         "properties": {
           "code": {
             "type": "string"
@@ -7252,7 +7194,6 @@
         }
       },
       "LineItem": {
-        "description": "A line item in an Anaplan model",
         "properties": {
           "appliesTo": {
             "type": "array"
@@ -7368,7 +7309,6 @@
         }
       },
       "ListItem": {
-        "description": "A list item in an Anaplan model",
         "properties": {
           "code": {
             "type": "string"
@@ -7411,7 +7351,6 @@
         }
       },
       "Period": {
-        "description": "A period of time in the model",
         "properties": {
           "date": {
             "type": "string"
@@ -7441,7 +7380,8 @@
             "description": "Execution progress as a fraction (0.0–1.0); typically 1.0 on completion"
           },
           "result": {
-            "$ref": "#/components/schemas/TaskResult"
+            "$ref": "#/components/schemas/TaskResult",
+            "description": "Task result object, populated after the task reaches a terminal state (COMPLETE or CANCELLED). Absent while the task is NOT_STARTED or IN_PROGRESS."
           },
           "taskId": {
             "type": "string"
@@ -7488,7 +7428,8 @@
             "type": "string"
           },
           "failureDumpAvailable": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Whether a failure dump file was generated for this task. When true, the dump can be downloaded via the failure dump endpoint for this object type."
           },
           "nestedResults": {
             "items": {
@@ -7497,10 +7438,12 @@
             "type": "array"
           },
           "objectId": {
-            "type": "string"
+            "type": "string",
+            "description": "Numeric ID of the Anaplan object (import, export, process, or action) that this task executed against."
           },
           "objectName": {
-            "type": "string"
+            "type": "string",
+            "description": "Display name of the Anaplan object that this task executed against."
           },
           "startTime": {
             "type": "string"
@@ -7530,24 +7473,29 @@
         }
       },
       "Status": {
+        "description": "Response status object present in every Anaplan API response envelope. `code` is the Anaplan-specific status code (not the HTTP status code); `message` is the human-readable outcome.",
         "type": "object",
         "properties": {
           "code": {
-            "type": "integer"
+            "type": "integer",
+            "description": "Anaplan API status code for this response (e.g. 200 for success, 403 for forbidden). Distinct from the HTTP status code."
           },
           "message": {
-            "type": "string"
+            "type": "string",
+            "description": "Human-readable description of the status outcome, e.g. 'Success' or 'Not Found'."
           }
         }
       },
       "Meta": {
+        "description": "Response metadata envelope present in paginated Anaplan API responses. `schema` is a URL to the JSON schema definition for the response body; `paging` holds cursor-based navigation state.",
         "type": "object",
         "required": [
           "schema"
         ],
         "properties": {
           "schema": {
-            "type": "string"
+            "type": "string",
+            "description": "URL to the JSON schema definition for this response body. A URL string, not an inline JSON Schema object."
           },
           "paging": {
             "$ref": "#/components/schemas/Paging"

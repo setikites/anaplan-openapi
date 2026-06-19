@@ -164,3 +164,23 @@ Two paths absent from the original spec were probed via live testing:
 - `GET /models/{modelId}`: response key is `model` (singular object) ✓
 - `GET /workspaces/{workspaceId}/models`: response key is `models` (array), identical shape to `GET /models` ✓
 - `GET /workspaces/{workspaceId}`: not confirmed (returns 404 — see above)
+
+## ADR 0003 Description Sweep (issue #90)
+
+Applied ADR 0003 description standards to `integration-openapi.json` (2026-06-18).
+
+**Removed** tautological schema-level descriptions (`"user"`, `"model"`, `"workspace"`, etc.) and tautological property descriptions that literally copy the field name (e.g. `User.id: "id"`, `Model.name: "name"`).
+
+**Fixed** incorrect schema descriptions on `ListReadRequest` and `ViewReadRequest`, which incorrectly said "A task tracking the execution of a export" — these schemas track list/view read operations, not exports.
+
+**Added** descriptions to:
+- `Status` and `Meta` schemas (envelope names alone do not convey their purpose)
+- `ModelCalendar.calendarType` and `extraWeekMonth` (calendar model type and 4-4-5 extra week placement are non-obvious)
+- `Version.isActual` and `isCurrent` (actual-vs-forecast and current-version semantics)
+- `File.firstDataRow`, `headerRow`, `origin` (row indexing and source type require context)
+- `Task.result` (conditionally absent until terminal state — non-obvious from name alone)
+- `TaskResult.failureDumpAvailable`, `objectId`, `objectName` (dump availability and which object was processed)
+- `Meta.schema` (a URL, not a JSON Schema object)
+- `Status.code` and `message` (Anaplan-specific code distinct from HTTP status)
+
+**Fixed** encoding: `Task.progress` description had a mojibaked en-dash (`â€"` → `–`).
