@@ -328,22 +328,22 @@ def test_get_model(integration_token):
 # Add sort-only paths to _ALL_SORT_PATHS only.
 
 _SEARCH_SORT_PATHS = [
-    pytest.param("/2/0/workspaces", "workspaces", "name",  "name",      id="workspaces"),
-    pytest.param("/2/0/models",     "models",     "name",  "name",      id="models"),
-    pytest.param("/2/0/users",      "users",      "email", "firstName", id="users"),
+    pytest.param("/workspaces", "workspaces", "name",  "name",      id="workspaces"),
+    pytest.param("/models",     "models",     "name",  "name",      id="models"),
+    pytest.param("/users",      "users",      "email", "firstName", id="users"),
 ]
 
 _ALL_SORT_PATHS = [
     # search+sort paths (also in _SEARCH_SORT_PATHS)
-    pytest.param("/2/0/workspaces",                                                  "workspaces", "name",      id="workspaces"),
-    pytest.param("/2/0/models",                                                      "models",     "name",      id="models"),
-    pytest.param("/2/0/users",                                                       "users",      "firstName", id="users"),
+    pytest.param("/workspaces",                                                  "workspaces", "name",      id="workspaces"),
+    pytest.param("/models",                                                      "models",     "name",      id="models"),
+    pytest.param("/users",                                                       "users",      "firstName", id="users"),
     # sort-only paths
-    pytest.param(f"/2/0/models/{MODEL_ID}/files",                                    "files",      "name",      id="files"),
-    pytest.param(f"/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/actions",        "actions",    "name",      id="actions"),
-    pytest.param(f"/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/processes",      "processes",  "name",      id="processes"),
-    pytest.param(f"/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/imports/",       "imports",    "name",      id="imports"),
-    pytest.param(f"/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/exports",        "exports",    "name",      id="exports"),
+    pytest.param(f"/models/{MODEL_ID}/files",                                    "files",      "name",      id="files"),
+    pytest.param(f"/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/actions",        "actions",    "name",      id="actions"),
+    pytest.param(f"/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/processes",      "processes",  "name",      id="processes"),
+    pytest.param(f"/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/imports/",       "imports",    "name",      id="imports"),
+    pytest.param(f"/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/exports",        "exports",    "name",      id="exports"),
 ]
 
 
@@ -539,7 +539,7 @@ def test_auth_scheme_probe(integration_token):
     findings = []
 
     with httpx.Client() as client:
-        for endpoint in ["/2/0/users/me", "/2/0/workspaces", "/2/0/models"]:
+        for endpoint in ["/users/me", "/workspaces", "/models"]:
             url = f"{API_URL}{endpoint}"
             anaplan_r = client.get(
                 url, headers={"Authorization": f"AnaplanAuthToken {integration_token}"}

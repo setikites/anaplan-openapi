@@ -7651,6 +7651,7 @@ components:
       properties:
         id:
           type: string
+          pattern: ^[0-9a-fA-F]{32}$
         firstName:
           type: string
         lastName:
@@ -7672,6 +7673,7 @@ components:
       properties:
         id:
           type: string
+          pattern: ^[0-9a-fA-F]{32}$
         name:
           type: string
         activeState:
@@ -7730,6 +7732,7 @@ components:
       properties:
         id:
           type: string
+          pattern: ^[0-9a-fA-F]{32}$
         name:
           type: string
         active:
@@ -7816,6 +7819,7 @@ components:
           type: string
         id:
           type: string
+          description: 12-digit numeric identifier. The prefix 102 marks this as a module.
         name:
           type: string
     View:
@@ -7824,6 +7828,8 @@ components:
           type: string
         id:
           type: string
+          description: 12- or 13-digit numeric identifier. Default views share the module prefix 102; named saved views use
+            higher-range prefixes (up to 13 digits).
         moduleId:
           type: string
         name:
@@ -7837,9 +7843,24 @@ components:
         name:
           type: string
     CurrentPeriod:
-      properties: {}
+      properties:
+        calendarType:
+          type: string
+        lastDay:
+          type: string
+        periodText:
+          type: string
+          description: Human-readable label for the current period (e.g. 'Jan 24'). Empty string when no current period is
+            set.
     Process:
-      properties: {}
+      properties:
+        code:
+          type: string
+        id:
+          type: string
+          description: 12-digit numeric identifier. The prefix 118 marks this as a process.
+        name:
+          type: string
     ModelCalendar:
       properties:
         calendarType:
@@ -7918,6 +7939,7 @@ components:
           type: string
         id:
           type: string
+          description: 12-digit numeric identifier. The prefix 101 marks this as a list.
         name:
           type: string
     Version:
@@ -8127,7 +8149,10 @@ components:
           type: string
         id:
           type: string
+          description: 12-digit numeric identifier. The prefix 117 marks this as an action.
         name:
+          type: string
+        actionType:
           type: string
     Chunk:
       description: A unit of partial file content
@@ -8144,6 +8169,7 @@ components:
           type: string
         id:
           type: string
+          description: 12-digit numeric identifier. The prefix 115 marks this as a dashboard.
         name:
           type: string
     DimensionItem:
@@ -8180,9 +8206,24 @@ components:
           type: string
         exportType:
           type: string
+          description: Shape and scope of the exported data.
+          enum:
+          - AUDIT_LOG
+          - GRID_CURRENT_PAGE
+          - TABULAR_ALL_LINE_ITEMS
+          - TABULAR_CURRENT_LINE_ITEM
+          - TABULAR_MULTI_COLUMN
         id:
           type: string
+          description: 12-digit numeric identifier. The prefix 116 marks this as an export definition; the export output file
+            shares this same ID.
         name:
+          type: string
+        encoding:
+          type: string
+        exportFormat:
+          type: string
+        layout:
           type: string
     ExportMetadata:
       properties:
@@ -8227,6 +8268,8 @@ components:
           type: integer
         separator:
           type: string
+        layout:
+          type: string
     File:
       description: A file associated with an import data source, import failure dump, or export
       properties:
@@ -8240,9 +8283,11 @@ components:
           type: string
         encoding:
           type: string
+          description: 'Character encoding of the file. Observed values: ISO-8859-1, UTF-16LE, UTF-8.'
         firstDataRow:
           type: integer
-          description: 1-based row number of the first data row; rows before this (above the header) are skipped on import.
+          description: Row number of the first data row. 0 means no data rows are configured; otherwise 1-based (row 1 = first
+            row of the file).
         format:
           type: string
         headerRow:
@@ -8250,6 +8295,8 @@ components:
           description: 1-based row number of the column-header row in a delimited file.
         id:
           type: string
+          description: 12-digit numeric identifier. Import source files use the prefix 113; export output files use 116, matching
+            their parent export's ID.
         language:
           type: string
         name:
@@ -8279,6 +8326,7 @@ components:
           type: string
         id:
           type: string
+          description: 12-digit numeric identifier. The prefix 112 marks this as an import definition.
         importDataSource:
           properties:
             importDataSourceId:
@@ -8296,6 +8344,12 @@ components:
           type: string
         importType:
           type: string
+          description: Category of data the import processes.
+          enum:
+          - HIERARCHY_DATA
+          - LINE_ITEM_DEFINITION
+          - MODULE_DATA
+          - USERS
         name:
           type: string
     ImportMetadata:
@@ -8306,7 +8360,10 @@ components:
           description: Display name of the import definition
         type:
           type: string
-          description: Import type (e.g. FILE, MODEL, USERS, HIERARCHY_DATA, MODULE_DATA)
+          description: 'Data source type for this import: ''FILE'' for file-based imports, ''MODEL'' for model-to-model imports.'
+          enum:
+          - FILE
+          - MODEL
         source:
           type: object
           description: Source file configuration for file-based imports

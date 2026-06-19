@@ -184,3 +184,74 @@ Applied ADR 0003 description standards to `integration-openapi.json` (2026-06-18
 - `Status.code` and `message` (Anaplan-specific code distinct from HTTP status)
 
 **Fixed** encoding: `Task.progress` description had a mojibaked en-dash (`â€"` → `–`).
+
+## Live Probe Findings (issue #90 Phase 1)
+
+Probed all GET endpoints against the live Integration API (2026-06-18) using `scripts/probe_integration_responses.py` and `scripts/probe_id_patterns.py`. Sample sizes: 5,000 users, 3,810 models, 100 workspaces, 836 imports, 104 exports, 18 actions, 120 processes, 450 files, 223 lists, 983 modules, 1,533 views, 32 dashboards.
+
+### ID Format by Object Type
+
+Anaplan uses two distinct ID families in the Integration API:
+
+**32-character hexadecimal** (users, workspaces, models):
+
+| Type | Format | Example |
+|------|--------|---------|
+| User | 32-char hex, lowercase | `8a868cdb8b7841a2018bf2c183307cd7` |
+| Workspace | 32-char hex, lowercase | `8a8194824045c4240140750bf15a5574` |
+| Model | 32-char hex, uppercase | `173564909BDC4A2CBC803B486AC7B4A8` |
+
+**12-digit numeric with type prefix** (all model-level objects):
+
+| Type | Prefix | Example | Notes |
+|------|--------|---------|-------|
+| List | 101 | `101000000203` | |
+| Module | 102 | `102000001442` | |
+| Import | 112 | `112000000017` | |
+| File (upload) | 113 | `113000000000` | Import source files |
+| Dashboard | 115 | `115000000009` | |
+| Export / export file | 116 | `116000000001` | Export ID = export output file ID |
+| Action | 117 | `117000000020` | |
+| Process | 118 | `118000000144` | |
+
+Views: 12 digits (prefix 102–922 for module default views) or 13 digits (prefix 1,012–4,296 for named saved views).
+
+Line items do not have an `id` field; `code` is their primary key.
+
+### Confirmed Enum Values
+
+| Field | Confirmed values |
+|-------|----------------|
+| `Import.importType` | `HIERARCHY_DATA`, `LINE_ITEM_DEFINITION`, `MODULE_DATA`, `USERS` |
+| `Export.exportType` | `AUDIT_LOG`, `GRID_CURRENT_PAGE`, `TABULAR_ALL_LINE_ITEMS`, `TABULAR_CURRENT_LINE_ITEM`, `TABULAR_MULTI_COLUMN` |
+| `ImportMetadata.type` | `FILE` (file-based source), `MODEL` (model-to-model) |
+| `File.encoding` | `ISO-8859-1`, `UTF-16LE`, `UTF-8` |
+| `File.separator` | `` (none), `\t` (tab), `,` (comma) |
+| `File.delimiter` | `` (none), `"` (double-quote) |
+| `File.format` | `txt` |
+
+### Fields Absent from Live Responses
+
+These fields are defined in the spec but were never returned by the live API across all probe samples. Descriptions are retained as they appear in Apiary/Postman documentation, but the fields cannot be confirmed as currently active.
+
+| Field | Probe sample size |
+|-------|-------------------|
+| `File.origin` | 450 files — 0 occurrences |
+| `File.country` | 450 files — 0 occurrences |
+| `File.language` | 450 files — 0 occurrences |
+| `Workspace.currentSize` | 100 workspaces — 0 occurrences |
+| `ModelCalendar.extraWeekMonth` | 1 model calendar (Calendar Months type) — not applicable |
+
+`ModelCalendar.extraWeekMonth` is specific to 4-4-5 calendar models. The probed model uses Calendar Months; the field appears for 4-4-5 models only.
+
+### Schema Additions from Probe
+
+Fields observed in live responses that were missing from the spec:
+
+| Schema | Added fields |
+|--------|-------------|
+| `Export` (list item) | `encoding`, `exportFormat`, `layout` |
+| `ExportMetadata` | `layout` |
+| `Action` | `actionType` (observed: `DELETE_BY_SELECTION`) |
+| `Process` | `code`, `id`, `name` (schema was empty) |
+| `CurrentPeriod` | `calendarType`, `lastDay`, `periodText` (schema was empty) |

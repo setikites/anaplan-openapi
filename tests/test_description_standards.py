@@ -216,6 +216,26 @@ _PROPERTY_MUST_HAVE_DESCRIPTION = [
     # Integration — Status: code is Anaplan-specific (not HTTP); message is the human-readable outcome
     pytest.param("integration", ["components", "schemas", "Status", "properties", "code"],    id="int-status-code"),
     pytest.param("integration", ["components", "schemas", "Status", "properties", "message"], id="int-status-message"),
+    # Integration — numeric IDs: 12-digit type-prefixed strings; format is non-obvious from name + type alone
+    pytest.param("integration", ["components", "schemas", "Import",    "properties", "id"], id="int-import-id"),
+    pytest.param("integration", ["components", "schemas", "Export",    "properties", "id"], id="int-export-id"),
+    pytest.param("integration", ["components", "schemas", "Action",    "properties", "id"], id="int-action-id"),
+    pytest.param("integration", ["components", "schemas", "Process",   "properties", "id"], id="int-process-id"),
+    pytest.param("integration", ["components", "schemas", "File",      "properties", "id"], id="int-file-id"),
+    pytest.param("integration", ["components", "schemas", "List",      "properties", "id"], id="int-list-id"),
+    pytest.param("integration", ["components", "schemas", "Module",    "properties", "id"], id="int-module-id"),
+    pytest.param("integration", ["components", "schemas", "Dashboard", "properties", "id"], id="int-dashboard-id"),
+    pytest.param("integration", ["components", "schemas", "View",      "properties", "id"], id="int-view-id"),
+    # Integration — File: encoding observed values (ISO-8859-1, UTF-16LE, UTF-8) non-obvious
+    pytest.param("integration", ["components", "schemas", "File", "properties", "encoding"], id="int-file-encoding"),
+    # Integration — CurrentPeriod.periodText: human-readable label, empty string when unset
+    pytest.param("integration", ["components", "schemas", "CurrentPeriod", "properties", "periodText"], id="int-currentperiod-periodtext"),
+    # Integration — Import.importType: confirmed enum values non-obvious
+    pytest.param("integration", ["components", "schemas", "Import", "properties", "importType"], id="int-import-importtype"),
+    # Integration — Export.exportType: confirmed enum values non-obvious
+    pytest.param("integration", ["components", "schemas", "Export", "properties", "exportType"], id="int-export-exporttype"),
+    # Integration — ImportMetadata.type: distinguishes source type (FILE/MODEL) from import content type
+    pytest.param("integration", ["components", "schemas", "ImportMetadata", "properties", "type"], id="int-importmetadata-type"),
 ]
 
 
