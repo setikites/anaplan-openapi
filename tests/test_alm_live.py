@@ -4,8 +4,9 @@ Live API integration tests for the Anaplan ALM API.
 Probes read-only ALM endpoints to verify that:
 - The spec's documented paths and response shapes match the real API.
 - The AnaplanAuthToken security scheme is accepted.
-- Whether Bearer token is also accepted (unconfirmed per alm/README.md).
+- Whether Bearer token is also accepted (confirmed per alm/README.md).
 - The standard response envelope (meta, status) is returned.
+- ID fields match their documented format patterns.
 
 Run with:
     uv run --env-file .env pytest tests/test_alm_live.py --live
@@ -16,9 +17,9 @@ Credentials are read from .env at the repo root. Required variables:
 
 Optional variables:
     ANAPLAN_WORKSPACE_ID      - workspace ID for ALM endpoint tests
-                                (default: 8a868cdb8b7841a2018beedb91d644d7)
+                                (default: 8a868cd87b46bdb3017bd10aa5c31a6e)
     ANAPLAN_MODEL_ID          - model ID for ALM endpoint tests
-                                (default: 0939A1C8E7FB46799372EC24A72FE93B)
+                                (default: B1A963FFC71D4DC69DC2C087824BE619)
     ANAPLAN_ALM_BASE_URL      - override ALM base URL
                                 (default: https://api.anaplan.com/2/0)
     ANAPLAN_OAUTH_ACCESS_TOKEN - pre-obtained OAuth Bearer token for Bearer probe
@@ -33,6 +34,7 @@ Notes on expected responses for read endpoints:
 import base64
 import os
 import pathlib
+import re
 import warnings
 
 import httpx
@@ -42,8 +44,11 @@ ALM_BASE_URL = os.getenv(
     "ANAPLAN_ALM_BASE_URL", "https://api.anaplan.com/2/0"
 ).rstrip("/")
 AUTH_URL = "https://auth.anaplan.com"
-WORKSPACE_ID = os.getenv("ANAPLAN_WORKSPACE_ID", "8a868cdb8b7841a2018beedb91d644d7") # EBP Administration TEST
-MODEL_ID = os.getenv("ANAPLAN_MODEL_ID", "0939A1C8E7FB46799372EC24A72FE93B") # EBP Request TEST
+WORKSPACE_ID = os.getenv("ANAPLAN_WORKSPACE_ID", "8a868cd87b46bdb3017bd10aa5c31a6e")  # EBP Administration DEV
+MODEL_ID = os.getenv("ANAPLAN_MODEL_ID", "B1A963FFC71D4DC69DC2C087824BE619")  # EBP Request DEV
+
+_HEX32_UPPER = re.compile(r"^[0-9A-F]{32}$")
+_HEX32_LOWER = re.compile(r"^[0-9a-f]{32}$")
 SPEC_PATH = pathlib.Path(__file__).parent.parent / "alm" / "alm-openapi.json"
 
 _TOKEN_ACCEPTED_STATUSES = (200, 403, 404)
@@ -226,7 +231,11 @@ def test_alm_latest_revision_envelope_shape(alm_token):
     """GET /models/{modelId}/alm/latestRevision response must match the documented envelope.
 
     Verifies the RevisionResponse schema: meta.schema, status.code, and optionally
-    a top-level 'revision' key.
+    a top-level 'revisions' array.
+
+    Confirmed (live testing 2026-06-22): the endpoint returns 'revisions' (plural array)
+    containing exactly one item when a revision exists, not 'revision' (singular object).
+
     Skipped if caller lacks Workspace Administrator role (403) or model not found (404).
     """
     with httpx.Client() as client:
@@ -254,16 +263,22 @@ def test_alm_latest_revision_envelope_shape(alm_token):
     assert "status" in body, "Response must have a top-level 'status' key"
     assert "code" in body["status"], "status must contain a 'code' field"
 
-    if "revision" not in body:
+    if "revisions" not in body:
         warnings.warn(
-            "GET /latestRevision returned 200 but no 'revision' key — "
+            "GET /latestRevision returned 200 but no 'revisions' key — "
             "model may have no revisions yet; RevisionResponse shape cannot be fully confirmed.",
             UserWarning,
             stacklevel=2,
         )
     else:
-        revision = body["revision"]
+        revisions = body["revisions"]
+        assert isinstance(revisions, list), "'revisions' must be an array"
+        assert len(revisions) > 0, "'revisions' must not be empty when present"
+        revision = revisions[0]
         assert "id" in revision, "revision must have an 'id' field"
+        assert _HEX32_UPPER.match(revision["id"]), (
+            f"revision.id {revision['id']!r} does not match ^[0-9A-F]{{32}}$"
+        )
 
 
 # ── GET /models/{modelId}/alm/revisions ──────────────────────────────────────
@@ -326,6 +341,13 @@ def test_alm_get_revisions_response_shape(alm_token):
         "Response must have a top-level 'revisions' key (RevisionListResponse schema)"
     )
     assert isinstance(body["revisions"], list), "'revisions' must be an array"
+
+    for i, rev in enumerate(body["revisions"]):
+        assert "id" in rev, f"revisions[{i}] missing 'id'"
+        assert _HEX32_UPPER.match(rev["id"]), (
+            f"revisions[{i}].id {rev['id']!r} does not match ^[0-9A-F]{{32}}$ "
+            "(Revision.id: 32-character uppercase hex string)"
+        )
 
     paging = body.get("meta", {}).get("paging")
     if paging is not None:
@@ -433,6 +455,10 @@ def test_alm_get_sync_tasks_response_shape(alm_token):
 
     for i, task in enumerate(body["tasks"]):
         assert "taskId" in task, f"tasks[{i}] missing 'taskId'"
+        assert _HEX32_UPPER.match(task["taskId"]), (
+            f"tasks[{i}].taskId {task['taskId']!r} does not match ^[0-9A-F]{{32}}$ "
+            "(SyncTask.taskId: 32-character uppercase hex string)"
+        )
         assert "taskState" in task, f"tasks[{i}] missing 'taskState'"
         assert task["taskState"] in ("IN_PROGRESS", "COMPLETE"), (
             f"tasks[{i}].taskState {task['taskState']!r} is not a documented enum value"
@@ -476,3 +502,96 @@ def test_alm_get_syncable_revisions_requires_source_model_id(alm_token):
         f"Expected 400 or 422 when sourceModelId is omitted, got {status}. "
         "The spec marks sourceModelId as required — verify this is correct."
     )
+
+
+# ── ID format patterns (confirmed 2026-06-22 via live probe) ──────────────────
+
+@pytest.mark.live
+def test_alm_revision_id_format(alm_token):
+    """revision.id values must match ^[0-9A-F]{32}$ (32-character uppercase hex string).
+
+    Confirmed from live probe: revisions.id examples include
+    B2F53569C61A488188D2C9B42CA7FC31, A1B5A93A76794CE28A2215CF8D767838.
+    Skipped if caller lacks role (403), model not found (404), or no revisions exist.
+    """
+    with httpx.Client() as client:
+        response = client.get(
+            f"{ALM_BASE_URL}/models/{MODEL_ID}/alm/revisions",
+            params={"limit": 5, "offset": 0},
+            headers={
+                "Authorization": f"AnaplanAuthToken {alm_token}",
+                "Accept": "application/json",
+            },
+        )
+
+    if response.status_code in (403, 404):
+        pytest.skip(f"Cannot verify ID format (status {response.status_code})")
+
+    assert response.status_code == 200
+    revisions = response.json().get("revisions", [])
+    if not revisions:
+        pytest.skip("No revisions in model; cannot verify ID format")
+
+    for i, rev in enumerate(revisions):
+        rid = rev.get("id", "")
+        assert _HEX32_UPPER.match(rid), (
+            f"revisions[{i}].id {rid!r} does not match ^[0-9A-F]{{32}}$ "
+            "(Revision.id: 32-character uppercase hex string)"
+        )
+
+
+@pytest.mark.live
+def test_alm_applied_to_models_id_formats(alm_token):
+    """appliedToModels.modelId and workspaceId must match their documented patterns.
+
+    Confirmed from live probe:
+    - modelId: ^[0-9A-F]{32}$ (uppercase hex, e.g. B1A963FFC71D4DC69DC2C087824BE619)
+    - workspaceId: ^[0-9a-f]{32}$ (lowercase hex, e.g. 8a868cd87b46bdb3017bd10aa5c31a6e)
+
+    Skipped if no revisions are available to probe.
+    """
+    with httpx.Client() as client:
+        rev_resp = client.get(
+            f"{ALM_BASE_URL}/models/{MODEL_ID}/alm/revisions",
+            params={"limit": 1, "offset": 0},
+            headers={
+                "Authorization": f"AnaplanAuthToken {alm_token}",
+                "Accept": "application/json",
+            },
+        )
+
+    if rev_resp.status_code in (403, 404):
+        pytest.skip(f"Cannot get revisions (status {rev_resp.status_code})")
+    revisions = rev_resp.json().get("revisions", [])
+    if not revisions:
+        pytest.skip("No revisions available to probe appliedToModels")
+
+    revision_id = revisions[0]["id"]
+
+    with httpx.Client() as client:
+        response = client.get(
+            f"{ALM_BASE_URL}/models/{MODEL_ID}/alm/revisions/{revision_id}/appliedToModels",
+            headers={
+                "Authorization": f"AnaplanAuthToken {alm_token}",
+                "Accept": "application/json",
+            },
+        )
+
+    if response.status_code in (403, 404):
+        pytest.skip(f"Cannot verify appliedToModels (status {response.status_code})")
+
+    assert response.status_code == 200
+    applied = response.json().get("appliedToModels", [])
+    print(f"\nappliedToModels count: {len(applied)}")
+
+    for i, entry in enumerate(applied):
+        mid = entry.get("modelId", "")
+        wid = entry.get("workspaceId", "")
+        if mid:
+            assert _HEX32_UPPER.match(mid), (
+                f"appliedToModels[{i}].modelId {mid!r} does not match ^[0-9A-F]{{32}}$"
+            )
+        if wid:
+            assert _HEX32_LOWER.match(wid), (
+                f"appliedToModels[{i}].workspaceId {wid!r} does not match ^[0-9a-f]{{32}}$"
+            )

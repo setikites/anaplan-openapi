@@ -69,10 +69,11 @@
         {
           "name": "modelId",
           "in": "path",
-          "description": "Unique identifier of the model.",
+          "description": "Model identifier (32-character uppercase hex string).",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           }
         }
       ],
@@ -146,10 +147,11 @@
         {
           "name": "modelId",
           "in": "path",
-          "description": "Unique identifier of the model.",
+          "description": "Model identifier (32-character uppercase hex string).",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           }
         }
       ],
@@ -161,10 +163,11 @@
           {
             "name": "sourceModelId",
             "in": "query",
-            "description": "GUID of the source model whose revisions to evaluate.",
+            "description": "Model identifier (32-character uppercase hex string) of the source model whose revisions to evaluate.",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "string",
+              "pattern": "^[0-9A-F]{32}$"
             }
           }
         ],
@@ -193,10 +196,11 @@
         {
           "name": "modelId",
           "in": "path",
-          "description": "Unique identifier of the model.",
+          "description": "Model identifier (32-character uppercase hex string).",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           }
         }
       ],
@@ -229,10 +233,11 @@
         {
           "name": "modelId",
           "in": "path",
-          "description": "Unique identifier of the model.",
+          "description": "Model identifier (32-character uppercase hex string).",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           }
         }
       ],
@@ -348,19 +353,21 @@
         {
           "name": "modelId",
           "in": "path",
-          "description": "Unique identifier of the model.",
+          "description": "Model identifier (32-character uppercase hex string).",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           }
         },
         {
           "name": "revisionId",
           "in": "path",
-          "description": "Unique identifier of the revision.",
+          "description": "Revision identifier (32-character uppercase hex string).",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           }
         }
       ],
@@ -393,10 +400,11 @@
         {
           "name": "modelId",
           "in": "path",
-          "description": "Unique identifier of the model.",
+          "description": "Model identifier (32-character uppercase hex string).",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           }
         }
       ],
@@ -468,19 +476,21 @@
         {
           "name": "modelId",
           "in": "path",
-          "description": "Unique identifier of the model.",
+          "description": "Model identifier (32-character uppercase hex string).",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           }
         },
         {
           "name": "syncTaskId",
           "in": "path",
-          "description": "Unique identifier of the sync task.",
+          "description": "Sync task identifier (32-character uppercase hex string).",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           }
         }
       ],
@@ -513,10 +523,11 @@
         {
           "name": "modelId",
           "in": "path",
-          "description": "Unique identifier of the model.",
+          "description": "Model identifier (32-character uppercase hex string).",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           }
         }
       ],
@@ -562,19 +573,21 @@
         {
           "name": "modelId",
           "in": "path",
-          "description": "Unique identifier of the model.",
+          "description": "Model identifier (32-character uppercase hex string).",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           }
         },
         {
           "name": "taskId",
           "in": "path",
-          "description": "Unique identifier of the report generation task.",
+          "description": "Report task identifier (32-character uppercase hex string).",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           }
         }
       ],
@@ -607,28 +620,31 @@
         {
           "name": "modelId",
           "in": "path",
-          "description": "Unique identifier of the model.",
+          "description": "Model identifier (32-character uppercase hex string).",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           }
         },
         {
           "name": "targetRevisionId",
           "in": "path",
-          "description": "Unique identifier of the target revision.",
+          "description": "Target revision identifier (32-character uppercase hex string).",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           }
         },
         {
           "name": "sourceRevisionId",
           "in": "path",
-          "description": "Unique identifier of the source revision.",
+          "description": "Source revision identifier (32-character uppercase hex string).",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           }
         }
       ],
@@ -662,10 +678,11 @@
         {
           "name": "modelId",
           "in": "path",
-          "description": "Unique identifier of the model.",
+          "description": "Model identifier (32-character uppercase hex string).",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           }
         }
       ],
@@ -711,19 +728,21 @@
         {
           "name": "modelId",
           "in": "path",
-          "description": "Unique identifier of the model.",
+          "description": "Model identifier (32-character uppercase hex string).",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           }
         },
         {
           "name": "taskId",
           "in": "path",
-          "description": "Unique identifier of the report generation task.",
+          "description": "Report task identifier (32-character uppercase hex string).",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           }
         }
       ],
@@ -756,28 +775,31 @@
         {
           "name": "modelId",
           "in": "path",
-          "description": "Unique identifier of the model.",
+          "description": "Model identifier (32-character uppercase hex string).",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           }
         },
         {
           "name": "targetRevisionId",
           "in": "path",
-          "description": "Unique identifier of the target revision.",
+          "description": "Target revision identifier (32-character uppercase hex string).",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           }
         },
         {
           "name": "sourceRevisionId",
           "in": "path",
-          "description": "Unique identifier of the source revision.",
+          "description": "Source revision identifier (32-character uppercase hex string).",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           }
         }
       ],
@@ -850,14 +872,17 @@
         "properties": {
           "sourceRevisionId": {
             "type": "string",
-            "description": "ID of the source revision to apply."
+            "pattern": "^[0-9A-F]{32}$",
+            "description": "Source revision identifier (32-character uppercase hex string)."
           },
           "sourceModelId": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
           "targetRevisionId": {
             "type": "string",
-            "description": "ID of the target revision (current state of the target model)."
+            "pattern": "^[0-9A-F]{32}$",
+            "description": "Target revision identifier (32-character uppercase hex string)."
           }
         }
       },
@@ -865,7 +890,8 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
           "name": {
             "type": "string"
@@ -897,7 +923,8 @@
         "type": "object",
         "properties": {
           "taskId": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
           },
           "taskUrl": {
             "type": "string",
@@ -953,7 +980,9 @@
         "type": "object",
         "properties": {
           "modelId": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$",
+            "description": "Model identifier (32-character uppercase hex string). Omitted when modelDeleted is true."
           },
           "modelName": {
             "type": "string",
@@ -961,7 +990,8 @@
           },
           "workspaceId": {
             "type": "string",
-            "description": "Omitted when modelDeleted is true."
+            "pattern": "^[0-9a-f]{32}$",
+            "description": "Workspace identifier (32-character lowercase hex string). Omitted when modelDeleted is true."
           },
           "appliedBy": {
             "type": "string"
@@ -1029,7 +1059,7 @@
       },
       "RevisionResponse": {
         "type": "object",
-        "description": "When no revision exists, the response contains only meta and status — the 'revision' key is omitted.",
+        "description": "Response for the latestRevision endpoint. When no revision exists, the response contains only meta and status — the 'revisions' key is omitted. When a revision exists, 'revisions' contains exactly one item.",
         "properties": {
           "meta": {
             "$ref": "#/components/schemas/Meta"
@@ -1037,8 +1067,11 @@
           "status": {
             "$ref": "#/components/schemas/Status"
           },
-          "revision": {
-            "$ref": "#/components/schemas/Revision"
+          "revisions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Revision"
+            }
           }
         }
       },
@@ -1104,7 +1137,9 @@
             "type": "object",
             "properties": {
               "taskId": {
-                "type": "string"
+                "type": "string",
+                "pattern": "^[0-9A-F]{32}$",
+                "description": "Report task identifier (32-character uppercase hex string)."
               },
               "taskUrl": {
                 "type": "string"
@@ -1147,10 +1182,14 @@
             "type": "object",
             "properties": {
               "targetRevisionId": {
-                "type": "string"
+                "type": "string",
+                "pattern": "^[0-9A-F]{32}$",
+                "description": "Target revision identifier (32-character uppercase hex string)."
               },
               "sourceRevisionId": {
-                "type": "string"
+                "type": "string",
+                "pattern": "^[0-9A-F]{32}$",
+                "description": "Source revision identifier (32-character uppercase hex string)."
               },
               "totals": {
                 "type": "object",

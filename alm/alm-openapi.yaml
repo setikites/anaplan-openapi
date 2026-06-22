@@ -36,10 +36,11 @@ paths:
     parameters:
     - name: modelId
       in: path
-      description: Unique identifier of the model.
+      description: Model identifier (32-character uppercase hex string).
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
     post:
       summary: Change a model's online status
       description: Set a model online or offline. Requires Workspace Administrator role. Returns 400 if the status value is
@@ -87,10 +88,11 @@ paths:
     parameters:
     - name: modelId
       in: path
-      description: Unique identifier of the model.
+      description: Model identifier (32-character uppercase hex string).
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
     get:
       summary: Retrieve compatible source model revisions
       description: Returns the list of revisions from the source model that are compatible with the target model, ordered
@@ -99,10 +101,11 @@ paths:
       parameters:
       - name: sourceModelId
         in: query
-        description: GUID of the source model whose revisions to evaluate.
+        description: Model identifier (32-character uppercase hex string) of the source model whose revisions to evaluate.
         required: true
         schema:
           type: string
+          pattern: ^[0-9A-F]{32}$
       responses:
         '200':
           description: List of compatible source model revisions.
@@ -118,10 +121,11 @@ paths:
     parameters:
     - name: modelId
       in: path
-      description: Unique identifier of the model.
+      description: Model identifier (32-character uppercase hex string).
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
     get:
       summary: Retrieve latest revision
       description: Returns the most recent revision for the model, if one exists. Requires Workspace Administrator role.
@@ -141,10 +145,11 @@ paths:
     parameters:
     - name: modelId
       in: path
-      description: Unique identifier of the model.
+      description: Model identifier (32-character uppercase hex string).
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
     get:
       summary: Retrieve revisions in a model
       description: Returns all revisions for the model with optional date filtering and pagination. Requires Workspace Administrator
@@ -219,16 +224,18 @@ paths:
     parameters:
     - name: modelId
       in: path
-      description: Unique identifier of the model.
+      description: Model identifier (32-character uppercase hex string).
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
     - name: revisionId
       in: path
-      description: Unique identifier of the revision.
+      description: Revision identifier (32-character uppercase hex string).
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
     get:
       summary: Retrieve the models for a specific revision
       description: 'Returns all models that have had this revision applied. Deleted models are included with `modelDeleted:
@@ -249,10 +256,11 @@ paths:
     parameters:
     - name: modelId
       in: path
-      description: Unique identifier of the model.
+      description: Model identifier (32-character uppercase hex string).
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
     get:
       summary: Retrieve sync tasks for a model
       description: Returns sync tasks that are in progress or completed within the last 48 hours. Up to ~20,000 results are
@@ -299,16 +307,18 @@ paths:
     parameters:
     - name: modelId
       in: path
-      description: Unique identifier of the model.
+      description: Model identifier (32-character uppercase hex string).
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
     - name: syncTaskId
       in: path
-      description: Unique identifier of the sync task.
+      description: Sync task identifier (32-character uppercase hex string).
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
     get:
       summary: Retrieve model sync task info
       description: 'Returns the current status and result of a sync task. Task states: `IN_PROGRESS`, `COMPLETE`. On failure,
@@ -329,10 +339,11 @@ paths:
     parameters:
     - name: modelId
       in: path
-      description: Unique identifier of the model.
+      description: Model identifier (32-character uppercase hex string).
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
     post:
       summary: Create a full comparison report generation task
       description: Starts an asynchronous task to generate a full comparison report between a source revision and the target
@@ -362,16 +373,18 @@ paths:
     parameters:
     - name: modelId
       in: path
-      description: Unique identifier of the model.
+      description: Model identifier (32-character uppercase hex string).
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
     - name: taskId
       in: path
-      description: Unique identifier of the report generation task.
+      description: Report task identifier (32-character uppercase hex string).
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
     get:
       summary: Retrieve full comparison report task info
       description: Returns the status of a comparison report generation task. On success, `result.successful` is true and
@@ -392,22 +405,25 @@ paths:
     parameters:
     - name: modelId
       in: path
-      description: Unique identifier of the model.
+      description: Model identifier (32-character uppercase hex string).
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
     - name: targetRevisionId
       in: path
-      description: Unique identifier of the target revision.
+      description: Target revision identifier (32-character uppercase hex string).
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
     - name: sourceRevisionId
       in: path
-      description: Unique identifier of the source revision.
+      description: Source revision identifier (32-character uppercase hex string).
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
     get:
       summary: Retrieve full comparison report content
       description: 'Downloads the full comparison report as a tab-separated values (TSV) file. The report is available for
@@ -430,10 +446,11 @@ paths:
     parameters:
     - name: modelId
       in: path
-      description: Unique identifier of the model.
+      description: Model identifier (32-character uppercase hex string).
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
     post:
       summary: Create a summary report generation task
       description: Starts an asynchronous task to generate a summary report between a source revision and the target model's
@@ -462,16 +479,18 @@ paths:
     parameters:
     - name: modelId
       in: path
-      description: Unique identifier of the model.
+      description: Model identifier (32-character uppercase hex string).
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
     - name: taskId
       in: path
-      description: Unique identifier of the report generation task.
+      description: Report task identifier (32-character uppercase hex string).
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
     get:
       summary: Retrieve summary report task info
       description: Returns the status of a summary report generation task. On success, `result.successful` is true and `result.reportFileUrl`
@@ -492,22 +511,25 @@ paths:
     parameters:
     - name: modelId
       in: path
-      description: Unique identifier of the model.
+      description: Model identifier (32-character uppercase hex string).
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
     - name: targetRevisionId
       in: path
-      description: Unique identifier of the target revision.
+      description: Target revision identifier (32-character uppercase hex string).
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
     - name: sourceRevisionId
       in: path
-      description: Unique identifier of the source revision.
+      description: Source revision identifier (32-character uppercase hex string).
       required: true
       schema:
         type: string
+        pattern: ^[0-9A-F]{32}$
     get:
       summary: Retrieve summary report content
       description: Downloads the summary report as JSON. The report is available for 48 hours after generation. Change types
@@ -558,17 +580,21 @@ components:
       properties:
         sourceRevisionId:
           type: string
-          description: ID of the source revision to apply.
+          pattern: ^[0-9A-F]{32}$
+          description: Source revision identifier (32-character uppercase hex string).
         sourceModelId:
           type: string
+          pattern: ^[0-9A-F]{32}$
         targetRevisionId:
           type: string
-          description: ID of the target revision (current state of the target model).
+          pattern: ^[0-9A-F]{32}$
+          description: Target revision identifier (32-character uppercase hex string).
     Revision:
       type: object
       properties:
         id:
           type: string
+          pattern: ^[0-9A-F]{32}$
         name:
           type: string
         description:
@@ -591,6 +617,7 @@ components:
       properties:
         taskId:
           type: string
+          pattern: ^[0-9A-F]{32}$
         taskUrl:
           type: string
           description: URL to poll for this task's current status.
@@ -631,12 +658,15 @@ components:
       properties:
         modelId:
           type: string
+          pattern: ^[0-9A-F]{32}$
+          description: Model identifier (32-character uppercase hex string). Omitted when modelDeleted is true.
         modelName:
           type: string
           description: Omitted when modelDeleted is true.
         workspaceId:
           type: string
-          description: Omitted when modelDeleted is true.
+          pattern: ^[0-9a-f]{32}$
+          description: Workspace identifier (32-character lowercase hex string). Omitted when modelDeleted is true.
         appliedBy:
           type: string
         appliedOn:
@@ -684,14 +714,17 @@ components:
           description: Human-readable outcome string, e.g. 'Success'.
     RevisionResponse:
       type: object
-      description: When no revision exists, the response contains only meta and status — the 'revision' key is omitted.
+      description: Response for the latestRevision endpoint. When no revision exists, the response contains only meta and
+        status — the 'revisions' key is omitted. When a revision exists, 'revisions' contains exactly one item.
       properties:
         meta:
           $ref: '#/components/schemas/Meta'
         status:
           $ref: '#/components/schemas/Status'
-        revision:
-          $ref: '#/components/schemas/Revision'
+        revisions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Revision'
     RevisionListResponse:
       type: object
       properties:
@@ -737,6 +770,8 @@ components:
           properties:
             taskId:
               type: string
+              pattern: ^[0-9A-F]{32}$
+              description: Report task identifier (32-character uppercase hex string).
             taskUrl:
               type: string
             taskState:
@@ -765,8 +800,12 @@ components:
           properties:
             targetRevisionId:
               type: string
+              pattern: ^[0-9A-F]{32}$
+              description: Target revision identifier (32-character uppercase hex string).
             sourceRevisionId:
               type: string
+              pattern: ^[0-9A-F]{32}$
+              description: Source revision identifier (32-character uppercase hex string).
             totals:
               type: object
               properties:

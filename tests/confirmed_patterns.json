@@ -553,5 +553,165 @@
     "spec": "oauth",
     "path": "/components/schemas/RefreshPayload/properties/client_id",
     "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "alm",
+    "path": "/paths//models/{modelId}/onlineStatus/parameters/0/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "alm",
+    "path": "/paths//models/{modelId}/alm/syncableRevisions/parameters/0/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "alm",
+    "path": "/paths//models/{modelId}/alm/syncableRevisions/get/parameters/0/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "alm",
+    "path": "/paths//models/{modelId}/alm/latestRevision/parameters/0/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "alm",
+    "path": "/paths//models/{modelId}/alm/revisions/parameters/0/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "alm",
+    "path": "/paths//models/{modelId}/alm/revisions/{revisionId}/appliedToModels/parameters/0/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "alm",
+    "path": "/paths//models/{modelId}/alm/revisions/{revisionId}/appliedToModels/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "alm",
+    "path": "/paths//models/{modelId}/alm/syncTasks/parameters/0/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "alm",
+    "path": "/paths//models/{modelId}/alm/syncTasks/{syncTaskId}/parameters/0/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "alm",
+    "path": "/paths//models/{modelId}/alm/syncTasks/{syncTaskId}/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "alm",
+    "path": "/paths//models/{modelId}/alm/comparisonReportTasks/parameters/0/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "alm",
+    "path": "/paths//models/{modelId}/alm/comparisonReportTasks/{taskId}/parameters/0/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "alm",
+    "path": "/paths//models/{modelId}/alm/comparisonReportTasks/{taskId}/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "alm",
+    "path": "/paths//models/{modelId}/alm/comparisonReports/{targetRevisionId}/{sourceRevisionId}/parameters/0/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "alm",
+    "path": "/paths//models/{modelId}/alm/comparisonReports/{targetRevisionId}/{sourceRevisionId}/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "alm",
+    "path": "/paths//models/{modelId}/alm/comparisonReports/{targetRevisionId}/{sourceRevisionId}/parameters/2/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "alm",
+    "path": "/paths//models/{modelId}/alm/summaryReportTasks/parameters/0/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "alm",
+    "path": "/paths//models/{modelId}/alm/summaryReportTasks/{taskId}/parameters/0/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "alm",
+    "path": "/paths//models/{modelId}/alm/summaryReportTasks/{taskId}/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "alm",
+    "path": "/paths//models/{modelId}/alm/summaryReports/{targetRevisionId}/{sourceRevisionId}/parameters/0/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "alm",
+    "path": "/paths//models/{modelId}/alm/summaryReports/{targetRevisionId}/{sourceRevisionId}/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "alm",
+    "path": "/paths//models/{modelId}/alm/summaryReports/{targetRevisionId}/{sourceRevisionId}/parameters/2/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "alm",
+    "path": "/components/schemas/SyncTaskRequest/properties/sourceRevisionId",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "alm",
+    "path": "/components/schemas/SyncTaskRequest/properties/sourceModelId",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "alm",
+    "path": "/components/schemas/SyncTaskRequest/properties/targetRevisionId",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "alm",
+    "path": "/components/schemas/Revision/properties/id",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "alm",
+    "path": "/components/schemas/SyncTask/properties/taskId",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "alm",
+    "path": "/components/schemas/AppliedModel/properties/modelId",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "alm",
+    "path": "/components/schemas/AppliedModel/properties/workspaceId",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "alm",
+    "path": "/components/schemas/ReportTaskResponse/properties/task/properties/taskId",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "alm",
+    "path": "/components/schemas/SummaryReportResponse/properties/summaryReport/properties/targetRevisionId",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "alm",
+    "path": "/components/schemas/SummaryReportResponse/properties/summaryReport/properties/sourceRevisionId",
+    "pattern": "^[0-9A-F]{32}$"
   }
 ]
