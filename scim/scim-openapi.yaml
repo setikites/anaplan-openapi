@@ -43,9 +43,10 @@ paths:
       parameters:
       - name: filter
         in: query
-        description: SCIM filter expression (e.g. `userName eq "john@example.com"`).
+        description: SCIM filter expression.
         schema:
           type: string
+          example: userName eq "john@example.com"
       - name: startIndex
         in: query
         description: 1-based index of the first result in the current set of list results.
@@ -475,9 +476,11 @@ components:
               value:
                 type: string
                 description: The target resource ID of the entitlement (e.g. a workspace ID).
+                example: 8a81b09c7da2421f017da9c9742b3a44
               display:
                 type: string
                 description: Human-readable name of the entitlement (e.g. a workspace name).
+                example: Sales Planning
               type:
                 type: string
                 description: Entitlement grouping format. `WORKSPACE` — one object per workspace (use this when writing);
@@ -545,7 +548,8 @@ components:
           description: Human-readable error message.
         scimType:
           type: string
-          description: SCIM-specific error type (e.g. `invalidValue`, `uniqueness`).
+          description: SCIM-specific error type.
+          example: invalidValue
     PatchOp:
       type: object
       description: SCIM PATCH request body (RFC 7644 §3.5.2).

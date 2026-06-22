@@ -76,9 +76,10 @@
           {
             "name": "filter",
             "in": "query",
-            "description": "SCIM filter expression (e.g. `userName eq \"john@example.com\"`).",
+            "description": "SCIM filter expression.",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "example": "userName eq \"john@example.com\""
             }
           },
           {
@@ -741,11 +742,13 @@
               "properties": {
                 "value": {
                   "type": "string",
-                  "description": "The target resource ID of the entitlement (e.g. a workspace ID)."
+                  "description": "The target resource ID of the entitlement (e.g. a workspace ID).",
+                  "example": "8a81b09c7da2421f017da9c9742b3a44"
                 },
                 "display": {
                   "type": "string",
-                  "description": "Human-readable name of the entitlement (e.g. a workspace name)."
+                  "description": "Human-readable name of the entitlement (e.g. a workspace name).",
+                  "example": "Sales Planning"
                 },
                 "type": {
                   "type": "string",
@@ -838,7 +841,8 @@
           },
           "scimType": {
             "type": "string",
-            "description": "SCIM-specific error type (e.g. `invalidValue`, `uniqueness`)."
+            "description": "SCIM-specific error type.",
+            "example": "invalidValue"
           }
         }
       },
