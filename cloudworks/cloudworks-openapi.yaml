@@ -16,7 +16,7 @@ info:
     **ID formats used across this API:**
     - Most entity IDs (`integrationId`, `connectionId`, `workspaceId`, `notificationId`, flow `id`, run `id`, `traceId`, `userGuid`): 32-character lowercase hex
     - `modelId`: 32-character **uppercase** hex (the only uppercase ID in the API)
-    - `processId`, `actionId`, `fileId`: numeric string, e.g. `"118000000114"`
+    - `processId`, `actionId`, `fileId`: numeric string
 servers:
 - url: https://api.cloudworks.anaplan.com/2/0
   description: CloudWorks API primary base URL

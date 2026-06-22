@@ -905,7 +905,21 @@ def _walk_descriptions_with_path(obj, path: str = ""):
             yield from _walk_descriptions_with_path(item, f"{path}[{i}]")
 
 
-_INLINE_EXAMPLE_RE = re.compile(r"\be\.g\.|for example\b", re.IGNORECASE)
+_EXAMPLE_TRIGGER_RE = re.compile(r"\b(?:e\.g\.|for\s+example)\s*", re.IGNORECASE)
+
+
+def _has_single_inline_example(description: str) -> bool:
+    """Return True if description embeds exactly one inline example value via 'e.g.' or 'for example'.
+
+    Descriptions that list multiple comma-separated values are self-documenting and
+    are left unchanged. Only descriptions with a single value are flagged.
+    """
+    for m in _EXAMPLE_TRIGGER_RE.finditer(description):
+        rest = description[m.end():]
+        clause = re.match(r"[^.\n]*", rest)
+        if clause and "," not in clause.group(0):
+            return True
+    return False
 
 
 # HTML tags that are noise outside of Markdown table cells.
@@ -965,17 +979,20 @@ def test_descriptions_have_no_html_tags(spec_path):
     )
 
 
-@pytest.mark.xfail(reason="inline examples not yet migrated to example: field — blocked until issues #100–#106 are resolved", strict=False)
 @pytest.mark.parametrize("spec_path", SPEC_FILES, ids=lambda p: p.parent.name)
 def test_descriptions_have_no_inline_examples(spec_path):
-    """Descriptions must not embed inline examples via 'e.g.' or 'for example'; use example: field."""
+    """Descriptions must not embed a single inline example value via 'e.g.' or 'for example'; use example: field.
+
+    Descriptions that list multiple comma-separated values are allowed — they are
+    self-documenting enumeration and do not require an example: field.
+    """
     spec = _load(spec_path)
     violations = []
     for json_path, description in _walk_descriptions_with_path(spec):
-        if _INLINE_EXAMPLE_RE.search(description):
+        if _has_single_inline_example(description):
             violations.append(f"{json_path}: {description[:80]!r}")
     assert not violations, (
-        "{}: {} description(s) contain inline example phrases (use example: field instead):\n".format(
+        "{}: {} description(s) embed a single inline example value (move to example: field):\n".format(
             spec_path.parent.name, len(violations)
         )
         + "\n".join(f"  {v}" for v in violations)

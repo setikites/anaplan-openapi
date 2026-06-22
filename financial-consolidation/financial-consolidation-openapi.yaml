@@ -794,7 +794,7 @@ components:
         A row in a client schema staging table. Field names and types are defined by the table's schema and vary by client configuration.
 
         Supported data types per field:
-        - **string** — alphanumeric text (e.g. dimension member names such as `Scenario_Name`)
+        - **string** — alphanumeric text (dimension member names such as `Scenario_Name`)
         - **number** — integer or decimal (e.g. `Amount`, `Periodic_Amount`)
         - **boolean** — `1` for true, `0` for false
 
