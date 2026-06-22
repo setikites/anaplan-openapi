@@ -216,10 +216,11 @@
         {
           "name": "id",
           "in": "path",
-          "description": "Anaplan user ID.",
+          "description": "Anaplan-assigned hex-32 GUID of the user.",
           "required": true,
           "schema": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
           }
         }
       ],
@@ -668,12 +669,13 @@
           },
           "id": {
             "type": "string",
-            "description": "Unique identifier assigned by Anaplan (read-only, case-insensitive).",
+            "pattern": "^[0-9a-f]{32}$",
+            "description": "Anaplan-assigned hex-32 GUID for this user (read-only).",
             "readOnly": true
           },
           "externalId": {
             "type": "string",
-            "description": "Unique identifier assigned by the provisioning client."
+            "description": "Unique identifier assigned by the provisioning client. Format is caller-controlled; no pattern constraint."
           },
           "userName": {
             "type": "string",
