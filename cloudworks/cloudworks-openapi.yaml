@@ -27,6 +27,70 @@ security:
 - BearerAuth: []
 paths:
   /integrations/connections:
+    get:
+      summary: Get connections
+      description: Retrieve all connections available to the authenticated user.
+      operationId: getConnections
+      tags:
+      - Connections
+      responses:
+        '200':
+          description: List of connections.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    $ref: '#/components/schemas/Status'
+                  connections:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        connectionId:
+                          type: string
+                        connectionType:
+                          type: string
+                          enum:
+                          - AmazonS3
+                          - GoogleBigQuery
+                          - AzureBlob
+                        body:
+                          type: object
+                          description: Connection-type-specific fields. For AzureBlob includes `name`, `storageAccountName`,
+                            `containerName`, and `authMethod` (camelCase in response, contrasting with snake_case `auth_method`
+                            in create/update requests).
+                        creationDate:
+                          type: string
+                          format: date-time
+                        modificationDate:
+                          type: string
+                          format: date-time
+                        createdBy:
+                          type: string
+                        modifiedBy:
+                          type: string
+                        status:
+                          description: 'Connection health: 1 = active, 0 = error.'
+                          type: integer
+                        integrationErrorCode:
+                          description: Error code set when `status` is 0; null when the connection is healthy.
+                          type: integer
+                          nullable: true
+                        workspaceId:
+                          description: Anaplan workspace ID for restricted-user connections; null for unrestricted connections.
+                          type: string
+                          nullable: true
+                        authMethod:
+                          description: Authentication method used by this connection (denormalized from `body.authMethod`).
+                            `"SAS-based"` for SAS-token connections; null for connections created before this field was introduced.
+                          type: string
+                          nullable: true
+                  meta:
+                    $ref: '#/components/schemas/PagingMeta'
+        '403':
+          $ref: '#/components/responses/Forbidden'
     post:
       summary: Create a connection
       description: Create a new connection to Amazon S3, Google BigQuery, or Azure Blob Storage for use in CloudWorks integrations.
@@ -236,71 +300,13 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '500':
           $ref: '#/components/responses/InternalServerError'
-    get:
-      summary: Get connections
-      description: Retrieve all connections available to the authenticated user.
-      operationId: getConnections
-      tags:
-      - Connections
-      responses:
-        '200':
-          description: List of connections.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    $ref: '#/components/schemas/Status'
-                  connections:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        connectionId:
-                          type: string
-                        connectionType:
-                          type: string
-                          enum:
-                          - AmazonS3
-                          - GoogleBigQuery
-                          - AzureBlob
-                        body:
-                          type: object
-                          description: Connection-type-specific fields. For AzureBlob includes `name`, `storageAccountName`,
-                            `containerName`, and `authMethod` (camelCase in response, contrasting with snake_case `auth_method`
-                            in create/update requests).
-                        creationDate:
-                          type: string
-                          format: date-time
-                        modificationDate:
-                          type: string
-                          format: date-time
-                        createdBy:
-                          type: string
-                        modifiedBy:
-                          type: string
-                        status:
-                          description: 'Connection health: 1 = active, 0 = error.'
-                          type: integer
-                        integrationErrorCode:
-                          description: Error code set when `status` is 0; null when the connection is healthy.
-                          type: integer
-                          nullable: true
-                        workspaceId:
-                          description: Anaplan workspace ID for restricted-user connections; null for unrestricted connections.
-                          type: string
-                          nullable: true
-                        authMethod:
-                          description: Authentication method used by this connection (denormalized from `body.authMethod`).
-                            `"SAS-based"` for SAS-token connections; null for connections created before this field was introduced.
-                          type: string
-                          nullable: true
-                  meta:
-                    $ref: '#/components/schemas/PagingMeta'
-        '403':
-          $ref: '#/components/responses/Forbidden'
   /integrations/connections/{connectionId}:
+    parameters:
+    - name: connectionId
+      in: path
+      required: true
+      schema:
+        type: string
     put:
       summary: Edit a connection
       operationId: editConnection
@@ -358,84 +364,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '409':
           $ref: '#/components/responses/Conflict'
-    parameters:
-    - name: connectionId
-      in: path
-      required: true
-      schema:
-        type: string
   /integrations:
-    post:
-      summary: Create an integration
-      description: Create a new import/export integration or process integration. For process integrations, include `processId`
-        in the request body. The `jobs` array is required for import/export integrations and optional (0 or more) for process
-        integrations.
-      operationId: createIntegration
-      tags:
-      - Integrations
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-              - name
-              - version
-              - workspaceId
-              - modelId
-              properties:
-                name:
-                  type: string
-                  description: Integration name.
-                  example: sample import integration
-                version:
-                  type: string
-                  description: Schema version. Must be `2.0`.
-                  enum:
-                  - '2.0'
-                workspaceId:
-                  type: string
-                  description: Anaplan workspace ID.
-                  example: 8a80db657068fjef01718955f3b3390b
-                modelId:
-                  type: string
-                  description: Anaplan model ID.
-                  example: E559BFF3B1GD4RKE874P745BEL259711
-                processId:
-                  type: string
-                  description: Anaplan process ID. Required for process integrations.
-                  example: '118000000001'
-                nuxVisible:
-                  type: boolean
-                  description: Whether the integration is visible in the CloudWorks UI.
-                  default: false
-                jobs:
-                  type: array
-                  description: Import/export job definitions. Required for import/export integrations; optional for process
-                    integrations.
-                  items:
-                    $ref: '#/components/schemas/Job'
-      responses:
-        '200':
-          description: Integration created.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    $ref: '#/components/schemas/Status'
-                  integrationId:
-                    type: string
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
     get:
       summary: Get all integrations
       description: Retrieve all integrations. Returns 25 integrations if `offset` and `limit` are not provided.
@@ -512,7 +441,85 @@ paths:
                   schema: https://api.cloudworks.anaplan.com/1/0/integrations/objects/integrations
         '403':
           $ref: '#/components/responses/Forbidden'
+    post:
+      summary: Create an integration
+      description: Create a new import/export integration or process integration. For process integrations, include `processId`
+        in the request body. The `jobs` array is required for import/export integrations and optional (0 or more) for process
+        integrations.
+      operationId: createIntegration
+      tags:
+      - Integrations
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - name
+              - version
+              - workspaceId
+              - modelId
+              properties:
+                name:
+                  type: string
+                  description: Integration name.
+                  example: sample import integration
+                version:
+                  type: string
+                  description: Schema version. Must be `2.0`.
+                  enum:
+                  - '2.0'
+                workspaceId:
+                  type: string
+                  description: Anaplan workspace ID.
+                  example: 8a80db657068fjef01718955f3b3390b
+                modelId:
+                  type: string
+                  description: Anaplan model ID.
+                  example: E559BFF3B1GD4RKE874P745BEL259711
+                processId:
+                  type: string
+                  description: Anaplan process ID. Required for process integrations.
+                  example: '118000000001'
+                nuxVisible:
+                  type: boolean
+                  description: Whether the integration is visible in the CloudWorks UI.
+                  default: false
+                jobs:
+                  type: array
+                  description: Import/export job definitions. Required for import/export integrations; optional for process
+                    integrations.
+                  items:
+                    $ref: '#/components/schemas/Job'
+      responses:
+        '200':
+          description: Integration created.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    $ref: '#/components/schemas/Status'
+                  integrationId:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /integrations/{integrationId}:
+    parameters:
+    - name: integrationId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: fe40dc5793084f7dbb685cffe6a5ad2a
     get:
       summary: Get integration by ID
       operationId: getIntegrationById
@@ -593,14 +600,15 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /integrations/anaplanModels/{modelId}:
     parameters:
-    - name: integrationId
+    - name: modelId
       in: path
+      description: Anaplan model ID.
       required: true
       schema:
         type: string
-      example: fe40dc5793084f7dbb685cffe6a5ad2a
-  /integrations/anaplanModels/{modelId}:
+      example: E559BFF3B1GD4RKE874P745BEL259711
     get:
       summary: Get integrations by model ID
       description: '**Note (live-tested June 2026):** This endpoint returned an HTML 404 from nginx on a live tenant. It may
@@ -626,15 +634,14 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+  /integrations/{integrationId}/run:
     parameters:
-    - name: modelId
+    - name: integrationId
       in: path
-      description: Anaplan model ID.
       required: true
       schema:
         type: string
-      example: E559BFF3B1GD4RKE874P745BEL259711
-  /integrations/{integrationId}/run:
+      example: fe40dc5793084f7dbb685cffe6a5ad2a
     post:
       summary: Run an integration
       operationId: runIntegration
@@ -673,6 +680,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
         '503':
           $ref: '#/components/responses/ServiceUnavailable'
+  /integrations/{integrationId}/cancel:
     parameters:
     - name: integrationId
       in: path
@@ -680,7 +688,6 @@ paths:
       schema:
         type: string
       example: fe40dc5793084f7dbb685cffe6a5ad2a
-  /integrations/{integrationId}/cancel:
     post:
       summary: Cancel a running integration
       operationId: cancelIntegration
@@ -700,6 +707,7 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+  /integrations/{integrationId}/schedule:
     parameters:
     - name: integrationId
       in: path
@@ -707,7 +715,6 @@ paths:
       schema:
         type: string
       example: fe40dc5793084f7dbb685cffe6a5ad2a
-  /integrations/{integrationId}/schedule:
     post:
       summary: Create an integration schedule
       description: 'Create a schedule for an integration. Supports a maximum of one schedule per integration. Schedule types:
@@ -775,27 +782,7 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
-    parameters:
-    - name: integrationId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: fe40dc5793084f7dbb685cffe6a5ad2a
   /integrations/{integrationId}/schedule/status/{status}:
-    post:
-      summary: Set schedule status
-      description: Enable or disable the schedule for an integration.
-      operationId: setScheduleStatus
-      tags:
-      - Schedules
-      responses:
-        '200':
-          $ref: '#/components/responses/SuccessStatus'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
     parameters:
     - name: integrationId
       in: path
@@ -812,7 +799,27 @@ paths:
         enum:
         - enabled
         - disabled
+    post:
+      summary: Set schedule status
+      description: Enable or disable the schedule for an integration.
+      operationId: setScheduleStatus
+      tags:
+      - Schedules
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessStatus'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
   /integrations/runs/{integrationId}:
+    parameters:
+    - name: integrationId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: fe40dc5793084f7dbb685cffe6a5ad2a
     get:
       summary: Get integration run history
       operationId: getRunHistory
@@ -896,14 +903,14 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+  /integrations/runerror/{runId}:
     parameters:
-    - name: integrationId
+    - name: runId
       in: path
       required: true
       schema:
         type: string
-      example: fe40dc5793084f7dbb685cffe6a5ad2a
-  /integrations/runerror/{runId}:
+      example: hy40d89893084f0dkb985cmme9i5io2a
     get:
       summary: Get integration run errors
       operationId: getRunErrors
@@ -972,13 +979,6 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
-    parameters:
-    - name: runId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: hy40d89893084f0dkb985cmme9i5io2a
   /integrations/notification:
     post:
       summary: Create a notification configuration
@@ -1008,6 +1008,13 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
   /integrations/notification/{notificationId}:
+    parameters:
+    - name: notificationId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: 067d1426ac964a7cac871c87790c4555
     get:
       summary: Get a notification configuration
       operationId: getNotification
@@ -1063,14 +1070,14 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+  /integrations/run/{runId}/dumps:
     parameters:
-    - name: notificationId
+    - name: runId
       in: path
       required: true
       schema:
         type: string
-      example: 067d1426ac964a7cac871c87790c4555
-  /integrations/run/{runId}/dumps:
+      example: hy40d89893084f0dkb985cmme9i5io2a
     get:
       summary: Get an import error log
       description: Retrieve the import error log (dump file) for a specific run. The response body contains a CSV-formatted
@@ -1092,6 +1099,7 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+  /integrations/run/{runId}/process/import/{actionId}/dumps:
     parameters:
     - name: runId
       in: path
@@ -1099,7 +1107,13 @@ paths:
       schema:
         type: string
       example: hy40d89893084f0dkb985cmme9i5io2a
-  /integrations/run/{runId}/process/import/{actionId}/dumps:
+    - name: actionId
+      in: path
+      description: Anaplan action ID.
+      required: true
+      schema:
+        type: string
+      example: '112000000011'
     get:
       summary: Get a process error log
       description: Retrieve the process import error log (dump file) for a specific run and action.
@@ -1120,21 +1134,41 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
-    parameters:
-    - name: runId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: hy40d89893084f0dkb985cmme9i5io2a
-    - name: actionId
-      in: path
-      description: Anaplan action ID.
-      required: true
-      schema:
-        type: string
-      example: '112000000011'
   /integrationflows:
+    get:
+      summary: Get all integration flows
+      operationId: getIntegrationFlows
+      tags:
+      - Integration Flows
+      parameters:
+      - name: offset
+        in: query
+        description: Number of items to skip.
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        description: Number of flows to return.
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: List of integration flows.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    $ref: '#/components/schemas/Status'
+                  integrationFlows:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/IntegrationFlowSummary'
+                  meta:
+                    $ref: '#/components/schemas/PagingMeta'
+        '403':
+          $ref: '#/components/responses/Forbidden'
     post:
       summary: Create an integration flow
       description: Create a new multi-step integration flow. Requires at least two enabled steps.
@@ -1232,41 +1266,14 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '500':
           $ref: '#/components/responses/InternalServerError'
-    get:
-      summary: Get all integration flows
-      operationId: getIntegrationFlows
-      tags:
-      - Integration Flows
-      parameters:
-      - name: offset
-        in: query
-        description: Number of items to skip.
-        schema:
-          type: integer
-      - name: limit
-        in: query
-        description: Number of flows to return.
-        schema:
-          type: integer
-      responses:
-        '200':
-          description: List of integration flows.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    $ref: '#/components/schemas/Status'
-                  integrationFlows:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/IntegrationFlowSummary'
-                  meta:
-                    $ref: '#/components/schemas/PagingMeta'
-        '403':
-          $ref: '#/components/responses/Forbidden'
   /integrationflows/{integrationFlowId}:
+    parameters:
+    - name: integrationFlowId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: fe40dc5793084f7dbb685cffe6a5ad2a
     get:
       summary: Get an integration flow by ID
       operationId: getIntegrationFlowById
@@ -1323,6 +1330,7 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+  /integrationflows/{integrationFlowId}/run:
     parameters:
     - name: integrationFlowId
       in: path
@@ -1330,7 +1338,6 @@ paths:
       schema:
         type: string
       example: fe40dc5793084f7dbb685cffe6a5ad2a
-  /integrationflows/{integrationFlowId}/run:
     post:
       summary: Run an integration flow
       operationId: runIntegrationFlow
@@ -1371,13 +1378,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '409':
           $ref: '#/components/responses/Conflict'
-    parameters:
-    - name: integrationFlowId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: fe40dc5793084f7dbb685cffe6a5ad2a
 components:
   schemas:
     Status:

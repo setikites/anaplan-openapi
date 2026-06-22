@@ -41,6 +41,14 @@ security:
 - AnaplanAuthToken: []
 paths:
   /permissions/exception-users/users/{userGuid}:
+    parameters:
+    - name: userGuid
+      in: path
+      description: GUID of the user whose exception-user status is being changed.
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9a-f]{32}$
     patch:
       summary: Assign or unassign an exception user
       description: 'Updates the exception-user status for a user in a specific workspace. Use `op: assign` to grant exception-user
@@ -97,14 +105,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-    parameters:
-    - name: userGuid
-      in: path
-      description: GUID of the user whose exception-user status is being changed.
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
   /permissions/exception-users/search:
     post:
       summary: Search exception users

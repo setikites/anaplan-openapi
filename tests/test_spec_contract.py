@@ -251,6 +251,30 @@ def test_path_items_declare_inline_path_params(spec_path):
     )
 
 
+@pytest.mark.parametrize("spec_path", SPEC_FILES, ids=lambda p: p.parent.name)
+def test_path_item_parameters_precede_verbs(spec_path):
+    """In every path item, the 'parameters' key must appear before any HTTP verb key (ADR 0002)."""
+    spec = _load(spec_path)
+    violations = []
+    for path_str, path_item in spec.get("paths", {}).items():
+        if "parameters" not in path_item:
+            continue
+        keys = list(path_item.keys())
+        params_index = keys.index("parameters")
+        for verb in _HTTP_METHODS:
+            if verb in path_item:
+                verb_index = keys.index(verb)
+                if verb_index < params_index:
+                    violations.append(
+                        f"{path_str}: '{verb}' (index {verb_index}) appears before "
+                        f"'parameters' (index {params_index})"
+                    )
+    assert not violations, (
+        "Path item 'parameters' must come before HTTP verb keys (ADR 0002):\n"
+        + "\n".join(f"  {v}" for v in violations)
+    )
+
+
 # ─── Cross-spec invariants ────────────────────────────────────────────────
 
 
@@ -867,6 +891,23 @@ def _all_description_strings(spec: dict):
     yield from _walk(spec)
 
 
+def _walk_descriptions_with_path(obj, path: str = ""):
+    """Recursively walk spec yielding (json_path, description_str) for every description key."""
+    if isinstance(obj, dict):
+        for k, v in obj.items():
+            child_path = f"{path}.{k}" if path else k
+            if k == "description" and isinstance(v, str):
+                yield child_path, v
+            else:
+                yield from _walk_descriptions_with_path(v, child_path)
+    elif isinstance(obj, list):
+        for i, item in enumerate(obj):
+            yield from _walk_descriptions_with_path(item, f"{path}[{i}]")
+
+
+_INLINE_EXAMPLE_RE = re.compile(r"\be\.g\.|for example\b", re.IGNORECASE)
+
+
 # HTML tags that are noise outside of Markdown table cells.
 # <br> inside a GFM table cell (line starting with |) is the standard way to
 # add line breaks within cells -- those are kept. All other known HTML tags are noise.
@@ -921,6 +962,23 @@ def test_descriptions_have_no_html_tags(spec_path):
             spec_path.parent.name, len(violations)
         )
         + "\n".join("  " + v for v in violations[:3])
+    )
+
+
+@pytest.mark.xfail(reason="inline examples not yet migrated to example: field — blocked until issues #100–#106 are resolved", strict=False)
+@pytest.mark.parametrize("spec_path", SPEC_FILES, ids=lambda p: p.parent.name)
+def test_descriptions_have_no_inline_examples(spec_path):
+    """Descriptions must not embed inline examples via 'e.g.' or 'for example'; use example: field."""
+    spec = _load(spec_path)
+    violations = []
+    for json_path, description in _walk_descriptions_with_path(spec):
+        if _INLINE_EXAMPLE_RE.search(description):
+            violations.append(f"{json_path}: {description[:80]!r}")
+    assert not violations, (
+        "{}: {} description(s) contain inline example phrases (use example: field instead):\n".format(
+            spec_path.parent.name, len(violations)
+        )
+        + "\n".join(f"  {v}" for v in violations)
     )
 
 

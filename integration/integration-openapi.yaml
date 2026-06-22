@@ -111,6 +111,13 @@ paths:
                   user:
                     $ref: '#/components/schemas/User'
   /users/{userId}:
+    parameters:
+    - name: userId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: '{{userId}}'
     get:
       summary: Retrieve user information
       description: |-
@@ -155,13 +162,6 @@ paths:
                     $ref: '#/components/schemas/Status'
                   user:
                     $ref: '#/components/schemas/User'
-    parameters:
-    - name: userId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{userId}}'
   /models:
     get:
       summary: List user models
@@ -321,7 +321,7 @@ paths:
                   code: 200
                   message: Success
                 workspaces:
-                - id: 8a8b8c8d8e8f8g8i
+                - id: 8a8b8c8d8e8f1a2b3c4d5e6f78901234
                   name: Financial Planning
                   active: true
                   sizeAllowance: 1073741824
@@ -338,6 +338,15 @@ paths:
                     items:
                       $ref: '#/components/schemas/Workspace'
   /workspaces/{workspaceId}:
+    parameters:
+    - name: workspaceId
+      in: path
+      description: Workspace identifier (32-character lowercase hex string).
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9a-f]{32}$
+      example: 8a868cda7c8b28f5017c9a4b2d8341cd
     get:
       summary: Get single workspace metadata
       tags:
@@ -364,16 +373,16 @@ paths:
                     $ref: '#/components/schemas/Workspace'
         '404':
           description: Workspace not found or caller lacks Workspace Administrator role
+  /models/{modelId}:
     parameters:
-    - name: workspaceId
+    - name: modelId
       in: path
-      description: Workspace identifier (32-character lowercase hex string).
+      description: Model identifier (32-character uppercase hex string).
       required: true
       schema:
         type: string
-        pattern: ^[0-9a-f]{32}$
-      example: 8a868cda7c8b28f5017c9a4b2d8341cd
-  /models/{modelId}:
+        pattern: ^[0-9A-F]{32}$
+      example: 4261ECE4389B45E18915B5EB72F7510B
     get:
       summary: Get single model metadata
       tags:
@@ -398,16 +407,16 @@ paths:
                     $ref: '#/components/schemas/Status'
                   model:
                     $ref: '#/components/schemas/Model'
+  /workspaces/{workspaceId}/models:
     parameters:
-    - name: modelId
+    - name: workspaceId
       in: path
-      description: Model identifier (32-character uppercase hex string).
+      description: Workspace identifier (32-character lowercase hex string).
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-F]{32}$
-      example: 4261ECE4389B45E18915B5EB72F7510B
-  /workspaces/{workspaceId}/models:
+        pattern: ^[0-9a-f]{32}$
+      example: 8a868cd885f53bd201860f5a4fea1ff1
     get:
       summary: List workspace models
       description: Returns models accessible to the calling user within the specified workspace. The response shape is identical
@@ -430,6 +439,7 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Model'
+  /workspaces/{workspaceId}/models/{modelId}/dimensions/{dimensionId}/items:
     parameters:
     - name: workspaceId
       in: path
@@ -438,8 +448,113 @@ paths:
       schema:
         type: string
         pattern: ^[0-9a-f]{32}$
-      example: 8a868cd885f53bd201860f5a4fea1ff1
-  /workspaces/{workspaceId}/models/{modelId}/dimensions/{dimensionId}/items:
+      example: 8a868cda7c8b28f5017c9a4b2d8341cd
+    - name: modelId
+      in: path
+      description: Model identifier (32-character uppercase hex string).
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9A-F]{32}$
+      example: 4261ECE4389B45E18915B5EB72F7510B
+    - name: dimensionId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: '{{dimensionId}}'
+    get:
+      summary: Retrieve all items in a dimension
+      description: |-
+        ## Retrieve all items in a dimension
+
+        `/models/{modelGuid}/dimensions/{dimensionId}/items`
+
+        Use this call to retrieve the IDs, codes, and names for items in a specified dimension. The dimension must be a list, a list subset, a line item subset, or the Users dimension.
+
+        Calls at model-level do not support the Time dimension. The calls return a `400` response. To avoid this, use the view dimension instead.
+
+        **Notes**:
+
+        *   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html).
+        *   This call is on the model-level. It returns all dimension items as it does not have view-level hiding, filtering, or [Selective Access](https://help.anaplan.com/anapedia/Content/Modeling/Users/Selective_Access.html). For the view-level endpoint, see [Retrieve selected items in a dimension](https://anaplanbulkapi20.docs.apiary.io/#RetrieveSelectedItemsDimension).
+        *   If codes have not been set for an item, then the response excludes the `code` field.
+        *   This call only supports the retrieval of dimensions and items from a dimension that contains a maximum of 1,000,000 items.
+            The call returns a `400` response for any more than that number of items.
+        *   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response.
+
+
+        ### Request
+
+        ```
+        curl -X GET
+        'https://api.anaplan.com/2/0/models/{modelGuid}/dimensions/{dimensionId}/items'\
+        -H 'Authorization: AnaplanAuthToken {anaplan_auth_token}'\
+        -H 'Accept: application/json'
+        ```
+
+        ### Request headers
+
+        | **Header** | **Details** |
+        | --- | --- |
+        | `Authorization: AnaplanAuthToken {anaplan_auth_token}` | <br><br>*   Required<br>*   Description: the Anaplan authentication token<br><br> |
+        | `Accept: application/json` | <br><br>*   Required<br>*   Description: This indicates the preferred response is `application/json` format.<br><br> |
+
+        ### Request parameters
+
+        | **Parameter** | **Details** |
+        | --- | --- |
+        | `{modelId}` | <br><br>*   Required<br>*   Type: String<br>*   Description: the ID for the model<br>*   Example: `75A40874E6B64FA3AE074327899685`<br><br> |
+        | `{dimensionId}` | <br><br>*   Required<br>*   Type: Number<br>*   Description: the ID for the dimension<br>*   Example: `101000000028`<br><br> |
+      tags:
+      - Model Metadata
+      - List Metadata
+      responses:
+        '200':
+          description: Response 200
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              example: application/json
+          content:
+            application/json:
+              example:
+                meta:
+                  schema: https://api.anaplan.com/2/0/objects/dimension
+                status:
+                  code: 200
+                  message: Success
+                items:
+                - code: N
+                  id: '200000000001'
+                  name: North
+                - code: E
+                  id: '200000000002'
+                  name: East
+                - code: S
+                  id: '200000000003'
+                  name: South
+                - code: W
+                  id: '200000000004'
+                  name: West
+                - id: '200000000000'
+                  name: Total Company
+              schema:
+                type: object
+                properties:
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                  status:
+                    $ref: '#/components/schemas/Status'
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Dimension'
+        '400':
+          description: more detail in path description
+        '429':
+          description: more detail in path description
     post:
       summary: Lookup dimension items by name or code
       description: |-
@@ -556,15 +671,8 @@ paths:
           description: more detail in path description
         '400':
           description: more detail in path description
+  /models/{modelId}/views/{viewId}/dimensions/{dimensionId}/items:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: 8a868cda7c8b28f5017c9a4b2d8341cd
     - name: modelId
       in: path
       description: Model identifier (32-character uppercase hex string).
@@ -573,105 +681,18 @@ paths:
         type: string
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
+    - name: viewId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: ''
     - name: dimensionId
       in: path
       required: true
       schema:
         type: string
       example: '{{dimensionId}}'
-    get:
-      summary: Retrieve all items in a dimension
-      description: |-
-        ## Retrieve all items in a dimension
-
-        `/models/{modelGuid}/dimensions/{dimensionId}/items`
-
-        Use this call to retrieve the IDs, codes, and names for items in a specified dimension. The dimension must be a list, a list subset, a line item subset, or the Users dimension.
-
-        Calls at model-level do not support the Time dimension. The calls return a `400` response. To avoid this, use the view dimension instead.
-
-        **Notes**:
-
-        *   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html).
-        *   This call is on the model-level. It returns all dimension items as it does not have view-level hiding, filtering, or [Selective Access](https://help.anaplan.com/anapedia/Content/Modeling/Users/Selective_Access.html). For the view-level endpoint, see [Retrieve selected items in a dimension](https://anaplanbulkapi20.docs.apiary.io/#RetrieveSelectedItemsDimension).
-        *   If codes have not been set for an item, then the response excludes the `code` field.
-        *   This call only supports the retrieval of dimensions and items from a dimension that contains a maximum of 1,000,000 items.
-            The call returns a `400` response for any more than that number of items.
-        *   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response.
-
-
-        ### Request
-
-        ```
-        curl -X GET
-        'https://api.anaplan.com/2/0/models/{modelGuid}/dimensions/{dimensionId}/items'\
-        -H 'Authorization: AnaplanAuthToken {anaplan_auth_token}'\
-        -H 'Accept: application/json'
-        ```
-
-        ### Request headers
-
-        | **Header** | **Details** |
-        | --- | --- |
-        | `Authorization: AnaplanAuthToken {anaplan_auth_token}` | <br><br>*   Required<br>*   Description: the Anaplan authentication token<br><br> |
-        | `Accept: application/json` | <br><br>*   Required<br>*   Description: This indicates the preferred response is `application/json` format.<br><br> |
-
-        ### Request parameters
-
-        | **Parameter** | **Details** |
-        | --- | --- |
-        | `{modelId}` | <br><br>*   Required<br>*   Type: String<br>*   Description: the ID for the model<br>*   Example: `75A40874E6B64FA3AE074327899685`<br><br> |
-        | `{dimensionId}` | <br><br>*   Required<br>*   Type: Number<br>*   Description: the ID for the dimension<br>*   Example: `101000000028`<br><br> |
-      tags:
-      - Model Metadata
-      - List Metadata
-      responses:
-        '200':
-          description: Response 200
-          headers:
-            Content-Type:
-              schema:
-                type: string
-              example: application/json
-          content:
-            application/json:
-              example:
-                meta:
-                  schema: https://api.anaplan.com/2/0/objects/dimension
-                status:
-                  code: 200
-                  message: Success
-                items:
-                - code: N
-                  id: '200000000001'
-                  name: North
-                - code: E
-                  id: '200000000002'
-                  name: East
-                - code: S
-                  id: '200000000003'
-                  name: South
-                - code: W
-                  id: '200000000004'
-                  name: West
-                - id: '200000000000'
-                  name: Total Company
-              schema:
-                type: object
-                properties:
-                  meta:
-                    $ref: '#/components/schemas/Meta'
-                  status:
-                    $ref: '#/components/schemas/Status'
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Dimension'
-        '400':
-          description: more detail in path description
-        '429':
-          description: more detail in path description
-  /models/{modelId}/views/{viewId}/dimensions/{dimensionId}/items:
     get:
       summary: Retrieve selected items in a dimension
       description: |-
@@ -751,7 +772,16 @@ paths:
                       $ref: '#/components/schemas/Dimension'
         '429':
           description: more detail in path description
+  /workspaces/{workspaceId}/models/{modelId}/lists:
     parameters:
+    - name: workspaceId
+      in: path
+      description: Workspace identifier (32-character lowercase hex string).
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9a-f]{32}$
+      example: 8a868cda7c8b28f5017c9a4b2d8341cd
     - name: modelId
       in: path
       description: Model identifier (32-character uppercase hex string).
@@ -760,19 +790,6 @@ paths:
         type: string
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
-    - name: viewId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: ''
-    - name: dimensionId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{dimensionId}}'
-  /workspaces/{workspaceId}/models/{modelId}/lists:
     get:
       summary: Retrieve Lists
       description: |-
@@ -843,6 +860,7 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/List'
+  /workspaces/{workspaceId}/models/{modelId}/lists/{listId}:
     parameters:
     - name: workspaceId
       in: path
@@ -860,7 +878,12 @@ paths:
         type: string
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
-  /workspaces/{workspaceId}/models/{modelId}/lists/{listId}:
+    - name: listId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: '{{listId}}'
     get:
       summary: Retrieve list metadata
       description: |-
@@ -974,15 +997,8 @@ paths:
                     $ref: '#/components/schemas/List'
         '429':
           description: more detail in path description
+  /models/{modelId}/modules:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: 8a868cda7c8b28f5017c9a4b2d8341cd
     - name: modelId
       in: path
       description: Model identifier (32-character uppercase hex string).
@@ -991,13 +1007,6 @@ paths:
         type: string
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
-    - name: listId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{listId}}'
-  /models/{modelId}/modules:
     get:
       summary: Retrieve IDs and names for all modules in a model
       description: |-
@@ -1074,6 +1083,7 @@ paths:
                       $ref: '#/components/schemas/Module'
         '429':
           description: more detail in path description
+  /models/{modelId}/modules/{moduleId}/lineItems:
     parameters:
     - name: modelId
       in: path
@@ -1083,7 +1093,12 @@ paths:
         type: string
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
-  /models/{modelId}/modules/{moduleId}/lineItems:
+    - name: moduleId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: '{{moduleId}}'
     get:
       summary: Retrieve all line item metadata in a module
       description: |-
@@ -1208,7 +1223,16 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/LineItem'
+  /workspaces/{workspaceId}/models/{modelId}/views:
     parameters:
+    - name: workspaceId
+      in: path
+      description: Workspace identifier (32-character lowercase hex string).
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9a-f]{32}$
+      example: 8a868cda7c8b28f5017c9a4b2d8341cd
     - name: modelId
       in: path
       description: Model identifier (32-character uppercase hex string).
@@ -1217,13 +1241,6 @@ paths:
         type: string
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
-    - name: moduleId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{moduleId}}'
-  /workspaces/{workspaceId}/models/{modelId}/views:
     get:
       summary: Retrieve IDs and names for all views in a model
       description: |-
@@ -1352,15 +1369,8 @@ paths:
                       $ref: '#/components/schemas/View'
         '429':
           description: more detail in path description
+  /models/{modelId}/views/{viewId}:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: 8a868cda7c8b28f5017c9a4b2d8341cd
     - name: modelId
       in: path
       description: Model identifier (32-character uppercase hex string).
@@ -1369,7 +1379,12 @@ paths:
         type: string
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
-  /models/{modelId}/views/{viewId}:
+    - name: viewId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: ''
     get:
       summary: Retrieve metadata for dimensions on a view
       description: |-
@@ -1488,6 +1503,7 @@ paths:
                       $ref: '#/components/schemas/Dimension'
         '429':
           description: more detail in path description
+  /models/{modelId}/modules/{moduleId}/views:
     parameters:
     - name: modelId
       in: path
@@ -1497,13 +1513,12 @@ paths:
         type: string
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
-    - name: viewId
+    - name: moduleId
       in: path
       required: true
       schema:
         type: string
-      example: ''
-  /models/{modelId}/modules/{moduleId}/views:
+      example: '{{moduleId}}'
     get:
       summary: Retrieve IDs and names for views in a module
       description: |-
@@ -1593,6 +1608,7 @@ paths:
                       $ref: '#/components/schemas/View'
         '429':
           description: more detail in path description
+  /models/{modelId}/lineItems:
     parameters:
     - name: modelId
       in: path
@@ -1602,13 +1618,6 @@ paths:
         type: string
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
-    - name: moduleId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{moduleId}}'
-  /models/{modelId}/lineItems:
     get:
       summary: Retrieve all line items in a model
       description: |-
@@ -1704,6 +1713,7 @@ paths:
                       $ref: '#/components/schemas/LineItem'
         '429':
           description: more detail in path description
+  /models/{modelId}/lineItems/{lineItemId}/dimensions:
     parameters:
     - name: modelId
       in: path
@@ -1713,7 +1723,12 @@ paths:
         type: string
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
-  /models/{modelId}/lineItems/{lineItemId}/dimensions:
+    - name: lineItemId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: '{{lineItemId}}'
     get:
       summary: Retrieve dimensions IDs for a line item
       description: |-
@@ -1782,6 +1797,7 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Dimension'
+  /models/{modelId}/lineItems/{lineItemId}/dimensions/{dimensionId}/items:
     parameters:
     - name: modelId
       in: path
@@ -1797,7 +1813,12 @@ paths:
       schema:
         type: string
       example: '{{lineItemId}}'
-  /models/{modelId}/lineItems/{lineItemId}/dimensions/{dimensionId}/items:
+    - name: dimensionId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: '{{dimensionId}}'
     get:
       summary: Retrieve dimension items for a line item
       description: |-
@@ -1878,6 +1899,7 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Dimension'
+  /models/{modelId}/versions:
     parameters:
     - name: modelId
       in: path
@@ -1887,19 +1909,6 @@ paths:
         type: string
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
-    - name: lineItemId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{lineItemId}}'
-    - name: dimensionId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{dimensionId}}'
-  /models/{modelId}/versions:
     get:
       summary: Retrieve version metadata
       description: |-
@@ -1991,7 +2000,16 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Version'
+  /workspaces/{workspaceId}/models/{modelId}/currentPeriod:
     parameters:
+    - name: workspaceId
+      in: path
+      description: Workspace identifier (32-character lowercase hex string).
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9a-f]{32}$
+      example: 8a868cda7c8b28f5017c9a4b2d8341cd
     - name: modelId
       in: path
       description: Model identifier (32-character uppercase hex string).
@@ -2000,7 +2018,6 @@ paths:
         type: string
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
-  /workspaces/{workspaceId}/models/{modelId}/currentPeriod:
     get:
       summary: Retrieve current period
       description: |-
@@ -2073,6 +2090,7 @@ paths:
                     $ref: '#/components/schemas/CurrentPeriod'
         '429':
           description: more detail in path description
+  /workspaces/{workspaceId}/models/{modelId}/modelCalendar:
     parameters:
     - name: workspaceId
       in: path
@@ -2090,7 +2108,6 @@ paths:
         type: string
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
-  /workspaces/{workspaceId}/models/{modelId}/modelCalendar:
     get:
       summary: Get current fiscal year
       description: |-
@@ -2204,6 +2221,7 @@ paths:
                     $ref: '#/components/schemas/Status'
                   modelCalendar:
                     $ref: '#/components/schemas/ModelCalendar'
+  /workspaces/{workspaceId}/models/{modelId}/actions:
     parameters:
     - name: workspaceId
       in: path
@@ -2221,7 +2239,6 @@ paths:
         type: string
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
-  /workspaces/{workspaceId}/models/{modelId}/actions:
     get:
       summary: List the actions in the model as a JSON array
       description: |-
@@ -2283,6 +2300,7 @@ paths:
                   name: Open Other Buttons
                 - id: '117000000017'
                   name: Delete Branch
+  /workspaces/{workspaceId}/models/{modelId}/processes:
     parameters:
     - name: workspaceId
       in: path
@@ -2300,7 +2318,6 @@ paths:
         type: string
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
-  /workspaces/{workspaceId}/models/{modelId}/processes:
     get:
       summary: List the process definitions available in a model as a JSON array
       description: |-
@@ -2359,6 +2376,7 @@ paths:
                 name: Process1
               - id: '118000000002'
                 name: Process2
+  /workspaces/{workspaceId}/models/{modelId}/imports/:
     parameters:
     - name: workspaceId
       in: path
@@ -2376,7 +2394,6 @@ paths:
         type: string
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
-  /workspaces/{workspaceId}/models/{modelId}/imports/:
     get:
       summary: Get a list of import actions
       description: |-
@@ -2450,6 +2467,7 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Import'
+  /workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks:
     parameters:
     - name: workspaceId
       in: path
@@ -2467,7 +2485,12 @@ paths:
         type: string
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
-  /workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks:
+    - name: importId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: '{{importId}}'
     get:
       summary: Get a list of the import tasks
       description: |-
@@ -2536,29 +2559,6 @@ paths:
                     $ref: '#/components/schemas/Status'
                   task:
                     $ref: '#/components/schemas/Task'
-    parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: 8a868cda7c8b28f5017c9a4b2d8341cd
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: 4261ECE4389B45E18915B5EB72F7510B
-    - name: importId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{importId}}'
     post:
       summary: Start the import
       description: |-
@@ -2615,6 +2615,23 @@ paths:
               example:
                 taskId: 5E6331685CC648A29B725923B8FAEA1C
   /workspaces/{workspaceId}/models/{modelId}/exports:
+    parameters:
+    - name: workspaceId
+      in: path
+      description: Workspace identifier (32-character lowercase hex string).
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9a-f]{32}$
+      example: 8a868cda7c8b28f5017c9a4b2d8341cd
+    - name: modelId
+      in: path
+      description: Model identifier (32-character uppercase hex string).
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9A-F]{32}$
+      example: 4261ECE4389B45E18915B5EB72F7510B
     get:
       summary: List the available export definitions as a JSON array
       description: |-
@@ -2693,15 +2710,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Export'
+  /models/{modelId}/processes/{processId}:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: 8a868cda7c8b28f5017c9a4b2d8341cd
     - name: modelId
       in: path
       description: Model identifier (32-character uppercase hex string).
@@ -2710,7 +2720,12 @@ paths:
         type: string
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
-  /models/{modelId}/processes/{processId}:
+    - name: processId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: '{{processId}}'
     get:
       summary: Retrieve metadata for a process
       description: |-
@@ -2814,7 +2829,16 @@ paths:
                     $ref: '#/components/schemas/Status'
                   processMetadata:
                     $ref: '#/components/schemas/Process'
+  /workspaces/{workspaceId}/models/{modelId}/exports/{exportId}:
     parameters:
+    - name: workspaceId
+      in: path
+      description: Workspace identifier (32-character lowercase hex string).
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9a-f]{32}$
+      example: 8a868cda7c8b28f5017c9a4b2d8341cd
     - name: modelId
       in: path
       description: Model identifier (32-character uppercase hex string).
@@ -2823,13 +2847,12 @@ paths:
         type: string
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
-    - name: processId
+    - name: exportId
       in: path
       required: true
       schema:
         type: string
-      example: '{{processId}}'
-  /workspaces/{workspaceId}/models/{modelId}/exports/{exportId}:
+      example: '{{exportId}}'
     get:
       summary: Get the metadata for an export definition
       description: |-
@@ -2920,6 +2943,7 @@ paths:
                     $ref: '#/components/schemas/Status'
                   exportMetadata:
                     $ref: '#/components/schemas/ExportMetadata'
+  /workspaces/{workspaceId}/models/{modelId}/imports/{importId}:
     parameters:
     - name: workspaceId
       in: path
@@ -2937,13 +2961,12 @@ paths:
         type: string
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
-    - name: exportId
+    - name: importId
       in: path
       required: true
       schema:
         type: string
-      example: '{{exportId}}'
-  /workspaces/{workspaceId}/models/{modelId}/imports/{importId}:
+      example: '{{importId}}'
     get:
       summary: Get the metadata for an import definition
       description: |-
@@ -3034,15 +3057,8 @@ paths:
                     $ref: '#/components/schemas/Status'
                   importMetadata:
                     $ref: '#/components/schemas/ImportMetadata'
+  /models/{modelId}/files:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: 8a868cda7c8b28f5017c9a4b2d8341cd
     - name: modelId
       in: path
       description: Model identifier (32-character uppercase hex string).
@@ -3051,13 +3067,6 @@ paths:
         type: string
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
-    - name: importId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{importId}}'
-  /models/{modelId}/files:
     get:
       summary: Get a list of files
       description: |-
@@ -3171,58 +3180,7 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/File'
-    parameters:
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: 4261ECE4389B45E18915B5EB72F7510B
   /workspaces/{workspaceId}/models/{modelId}/files/{fileId}:
-    delete:
-      summary: Delete files
-      description: |-
-        ## Delete Files
-
-        `/workspaces/{workspaceId}/models/{modelId}/files/{fileId}`
-
-        You can delete files that you have uploaded using the API.
-
-        **Note:** This only removes private content. Default content and the import data source model object remain.
-
-        ### Delete a file that you have uploaded
-
-        #### Request
-
-        ```
-        curl -X DELETE \
-        https://api.anaplan.com/2/0/workspaces/{workspaceId}/models/{modelId}/files/{fileId} \
-        -H 'authorization: AnaplanAuthToken {anaplan_auth_token}' \
-        -H "Content-Type:application/json"
-        ```
-
-        #### Headers
-
-        *   `Authorization:AnaplanAuthToken {anaplan_auth_token}`
-        *   `Content-Type:application/json`
-
-        #### Parameters
-
-        | **Parameter** | **Description** |
-        | --- | --- |
-        | `workspaceId` | <br><br>*   Required<br>*   Type: string<br>*   Description: The workspace ID<br>*   Example: `8a8b8c8d8e8f8g8i`<br><br> |
-        | `modelId` | <br><br>*   Required<br>*   Type: string<br>*   Description: The model ID<br>*   Example: `75A40874E6B64FA3AE0743278996850F`<br><br> |
-        | `fileId` | <br><br>*   Required<br>*   Type: number<br>*   Description: The file ID<br>*   Example: `113000000002`<br><br> |
-
-        #
-      tags:
-      - Model Metadata
-      - File Metadata
-      responses:
-        '200':
-          description: 'TODO: document response'
     parameters:
     - name: workspaceId
       in: path
@@ -3246,6 +3204,30 @@ paths:
       schema:
         type: string
       example: '{{fileId}}'
+    get:
+      summary: Get file metadata
+      description: Returns metadata for a specific file in the model. Requires Workspace Administrator access; standard Integration
+        API users receive 404. Individual file metadata is also accessible via the full file list endpoint. See integration/README.md
+        for details.
+      tags:
+      - Model Metadata
+      - File Metadata
+      responses:
+        '200':
+          description: File metadata retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                  status:
+                    $ref: '#/components/schemas/Status'
+                  file:
+                    $ref: '#/components/schemas/File'
+        '404':
+          description: File not found or endpoint not available for this account role.
     post:
       summary: Set the chunk count
       description: |-
@@ -3386,31 +3368,64 @@ paths:
       responses:
         '200':
           description: 'TODO: document response'
-    get:
-      summary: Get file metadata
-      description: Returns metadata for a specific file in the model. Requires Workspace Administrator access; standard Integration
-        API users receive 404. Individual file metadata is also accessible via the full file list endpoint. See integration/README.md
-        for details.
+    delete:
+      summary: Delete files
+      description: |-
+        ## Delete Files
+
+        `/workspaces/{workspaceId}/models/{modelId}/files/{fileId}`
+
+        You can delete files that you have uploaded using the API.
+
+        **Note:** This only removes private content. Default content and the import data source model object remain.
+
+        ### Delete a file that you have uploaded
+
+        #### Request
+
+        ```
+        curl -X DELETE \
+        https://api.anaplan.com/2/0/workspaces/{workspaceId}/models/{modelId}/files/{fileId} \
+        -H 'authorization: AnaplanAuthToken {anaplan_auth_token}' \
+        -H "Content-Type:application/json"
+        ```
+
+        #### Headers
+
+        *   `Authorization:AnaplanAuthToken {anaplan_auth_token}`
+        *   `Content-Type:application/json`
+
+        #### Parameters
+
+        | **Parameter** | **Description** |
+        | --- | --- |
+        | `workspaceId` | <br><br>*   Required<br>*   Type: string<br>*   Description: The workspace ID<br>*   Example: `8a8b8c8d8e8f8g8i`<br><br> |
+        | `modelId` | <br><br>*   Required<br>*   Type: string<br>*   Description: The model ID<br>*   Example: `75A40874E6B64FA3AE0743278996850F`<br><br> |
+        | `fileId` | <br><br>*   Required<br>*   Type: number<br>*   Description: The file ID<br>*   Example: `113000000002`<br><br> |
+
+        #
       tags:
       - Model Metadata
       - File Metadata
       responses:
         '200':
-          description: File metadata retrieved successfully.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  meta:
-                    $ref: '#/components/schemas/Meta'
-                  status:
-                    $ref: '#/components/schemas/Status'
-                  file:
-                    $ref: '#/components/schemas/File'
-        '404':
-          description: File not found or endpoint not available for this account role.
+          description: 'TODO: document response'
   /models/{modelId}/versions/{versionId}/switchover:
+    parameters:
+    - name: modelId
+      in: path
+      description: Model identifier (32-character uppercase hex string).
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9A-F]{32}$
+      example: 4261ECE4389B45E18915B5EB72F7510B
+    - name: versionId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: '{{versionId}}'
     put:
       summary: Set version switchover date
       description: |-
@@ -3503,6 +3518,7 @@ paths:
                     $ref: '#/components/schemas/Status'
                   versionSwitchover:
                     $ref: '#/components/schemas/Switchover'
+  /models/{modelId}/currentPeriod:
     parameters:
     - name: modelId
       in: path
@@ -3512,13 +3528,34 @@ paths:
         type: string
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
-    - name: versionId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{versionId}}'
-  /models/{modelId}/currentPeriod:
+    get:
+      summary: Get current period (model-scoped)
+      tags:
+      - Model Settings
+      responses:
+        '200':
+          description: Response 200
+          content:
+            application/json:
+              example:
+                meta:
+                  schema: https://api.anaplan.com/2/0/objects/currentPeriod
+                status:
+                  code: 200
+                  message: Success
+                currentPeriod:
+                  periodText: May 20
+                  lastDay: '2020-05-31'
+                  calendarType: Calendar Months/Quarters/Years
+              schema:
+                type: object
+                properties:
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                  status:
+                    $ref: '#/components/schemas/Status'
+                  currentPeriod:
+                    $ref: '#/components/schemas/CurrentPeriod'
     put:
       summary: Set current period
       description: |-
@@ -3632,6 +3669,7 @@ paths:
             Date should match format YYYY-MM-DD"; (2) the date falls outside the model timescale — "Specified date ''{date}''
             is out of timescale range {start} - {end}"; (3) date is supplied as both a query parameter and a request body
             field simultaneously.'
+  /models/{modelId}/modelCalendar/fiscalYear:
     parameters:
     - name: modelId
       in: path
@@ -3641,35 +3679,6 @@ paths:
         type: string
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
-    get:
-      summary: Get current period (model-scoped)
-      tags:
-      - Model Settings
-      responses:
-        '200':
-          description: Response 200
-          content:
-            application/json:
-              example:
-                meta:
-                  schema: https://api.anaplan.com/2/0/objects/currentPeriod
-                status:
-                  code: 200
-                  message: Success
-                currentPeriod:
-                  periodText: May 20
-                  lastDay: '2020-05-31'
-                  calendarType: Calendar Months/Quarters/Years
-              schema:
-                type: object
-                properties:
-                  meta:
-                    $ref: '#/components/schemas/Meta'
-                  status:
-                    $ref: '#/components/schemas/Status'
-                  currentPeriod:
-                    $ref: '#/components/schemas/CurrentPeriod'
-  /models/{modelId}/modelCalendar/fiscalYear:
     put:
       summary: Update current fiscal year
       description: |-
@@ -3771,6 +3780,7 @@ paths:
                     $ref: '#/components/schemas/Status'
                   modelCalendar:
                     $ref: '#/components/schemas/ModelCalendar'
+  /models/{modelId}/modules/{moduleId}/data:
     parameters:
     - name: modelId
       in: path
@@ -3780,7 +3790,12 @@ paths:
         type: string
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
-  /models/{modelId}/modules/{moduleId}/data:
+    - name: moduleId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: '{{moduleId}}'
     post:
       summary: Write cell data by coordinate to module
       description: |-
@@ -3895,160 +3910,7 @@ paths:
       responses:
         '200':
           description: 'TODO: document response'
-    parameters:
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: 4261ECE4389B45E18915B5EB72F7510B
-    - name: moduleId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{moduleId}}'
   /workspaces/{workspaceId}/models/{modelId}/lists/{listId}/items:
-    post:
-      summary: Add list items
-      description: |-
-        ## Add list items
-
-        `/workspaces/{workspaceId}/models/{modelId}/lists/{listId}/items?action=add'`
-
-        Use this call to add items to a list. You must provide the list ID and data for each item. You can add one or more items in each request.
-
-        **Notes:**
-
-        *   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html).
-        *   A maximum of 100,000 list items can be added with a single call.
-
-
-        ### Requests that support this feature
-
-        ```
-        curl -X POST 'https://api.anaplan.com/2/0/workspaces/{workspaceId}/models/{modelId}/lists/{listId}/items?action=add' \
-        -H 'Authorization: AnaplanAuthToken {anaplan_auth_token}' \
-        -H 'Content-Type: application/json' \
-        -H 'Accept: application/json'
-        ```
-
-        ### Request headers
-
-        | **Header** | **Details** |
-        | --- | --- |
-        | `Authorization: AnaplanAuthToken {anaplan_auth_token}` | <br><br>*   Required<br>*   Description: the Anaplan authentication token<br><br> |
-        | `Content-Type: application/json` | <br><br>*   Required<br>*   Description: This indicates the request format is `application/json`.<br><br> |
-        | `Accept: application/json` | <br><br>*   Required<br>*   Description: This indicates the preferred response is either `application/json` format. Note that this call only outputs in `application/json` format.<br><br> |
-
-        ### Request parameters
-
-        | **Parameter** | **Details** |
-        | --- | --- |
-        | `{workspaceId}` | <br><br>*   Required<br>*   Type: String<br>*   Description: The workspace ID<br>*   Example: `8a8196b15b7dbae6015b8694411d13fe`<br><br> |
-        | `{modelId}` | <br><br>*   Required<br>*   Type: String<br>*   Description: the model ID<br>*   Example: `75A40874E6B64FA3AE074327899685`<br><br> |
-        | `{listId}` | <br><br>*   Required<br>*   Type: Number<br>*   Description: the list ID<br>*   Example: `101000000001`<br><br> |
-        | `action=add` | <br><br>*   Required<br>*   Type: query parameter<br>*   Description: The Anaplan Add action. This query parameter must be included in the URL as shown in the Requests section above.<br>*   Example: `action=addRequest`<br><br> |
-
-        ### Request body
-
-        | **List Data** | **Description** |
-        | --- | --- |
-        | `{name}` | The name value for the item in the list. |
-        | `{code}` | The code value for the item in the list. |
-        | `{parent}` | The name of the parent item in the list |
-        | `{properties}` | The value of each custom list property. |
-        | `{subsets}` | The value of each custom list subset. |
-
-        Example:
-
-        ```
-        {
-          "items": [
-            {
-              "name": "mike",
-              "code": "id1",
-              "parent": "west",
-              "properties": {
-                "p-text":"hello world",
-                "p-number":"123456",
-                "p-boolean": "true",
-                "p-list": "east",
-                "p-period": "Sep 20"
-              },
-            "subsets": {
-              "s11": true
-            }
-          },
-            {
-              "name": "cindy",
-              "code": "id2",
-              "properties": {
-                "p-text":"hello world",
-                "p-number":"wrong format for number",
-                "p-boolean": "true",
-                "p-list": "east",
-                "p-period": "Sep 20"
-              },
-              "subsets": {
-                "s11": true
-              }
-            }
-          ]
-        }
-
-        ```
-
-        ### Logic for add items
-
-        The add list items behavior uses specific logic with names and codes. This logic varies between [general lists](https://help.anaplan.com/f7f01453-71bc-4046-935a-b9d7cb47d15a-General-Lists) and [numbered lists](https://help.anaplan.com/54b75174-848f-482b-a051-a9a063ece50c-Numbered-Lists) in Anaplan.
-
-        #### Add items to a general list
-
-        | **Scenario** | **Existing** | **Input in API** | **Behavior** | **Result** |
-        | --- | --- | --- | --- | --- |
-        | Add a new list Item | There are no existing items | name=n1  <br>code=c1 | Success.  <br>A new list item is created. | name=n1  <br>code=c1 |
-        | Add list item with name conflicts | name=n1  <br>code=c1 | name=n1  <br>code=c2 | There is a duplicate name. A new list item is not added. | An error message returns. |
-        | Add list item with code conflicts | name=n1  <br>code=c1 | name=n2  <br>code=c1 | There is a duplicate name. A new list item is not added. | An error message returns. |
-        | Add list item without name | There are no existing items | code=c1 | There is a missing name. A new list item is not added. | An error message returns. |
-
-        #### Add items to a numbered list
-
-        For a numbered list, the name column is used for the index. The name is automatically generated. When you add an item, the API does not allow a name as an input.
-
-        | **Scenario** | **Existing** | **Input in API** | **Behavior** | **Result** |
-        | --- | --- | --- | --- | --- |
-        | Add a new list Item | There are no existing items | name=n1  <br>code=c1 | A name is not a valid input. A new list item is not added. | An error message returns. |
-        | Add a new list item | There are no existing items | code=c1 | Success.  <br>A new item is added. | success code=c1 |
-        | Add a list item with a conflicting code | code=c1 | code=c1 | There is a duplicate code. A new list item is not added. | An error message returns. |
-      tags:
-      - Transactional Write
-      parameters:
-      - name: action
-        in: query
-        schema:
-          type: string
-        example: add
-      responses:
-        '200':
-          description: Response 200
-          content:
-            application/json:
-              example:
-                meta:
-                  schema: https://anaplan.api.com/2/0/objects/item
-                status:
-                  code: 200
-                  message: Success
-                added: 1
-                ignored: 1
-                total: 2
-                failures:
-                - requestIndex: 1
-                  failureType: INCORRECT_FORMAT
-                  failureMessageDetails: incorrect format -- column name:p-number, value:wrong value for number
     parameters:
     - name: workspaceId
       in: path
@@ -4072,147 +3934,6 @@ paths:
       schema:
         type: string
       example: '{{listId}}'
-    put:
-      summary: Update list items
-      description: |-
-        ## Update list items
-
-        `/workspaces/{workspaceId}/models/{modelId}/lists/{listId}/items`
-
-        Use this call to update items to a list. You must provide the model ID and list ID on the request URL. There are two kinds of lists in Anaplan: standard list and numbered list. For a standard list, the API identifies the item using the id, code, or name. For numbered list, the API uses the id or code. If property or subset is not specified in the input, the existing value is not updated. You can update one or more items in each request.
-
-        When you specify the list item identifier, select one of the appropriate identifiers (id, code, or name). If the request contains multiple identifiers, the API returns an error.
-
-        **Notes:**
-
-        *   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html).
-        *   A maximum of 100,000 list items can be updated with a single call.
-
-
-        Note: When an update to a list item completes successfully, all downstream calculations are also complete. This includes cells linked by formulas to the cells being updated.
-
-        ### Requests that support this feature
-
-        ```
-        curl -X PUT 'https://api.anaplan.com/2/0/workspaces/{workspaceId}/models/{modelId}/lists/{listId}/items' \
-        -H 'Authorization: AnaplanAuthToken {anaplan_auth_token}' \
-        -H 'Content-Type: application/json' \
-        -H 'Accept: application/json'
-        ```
-
-        ### Request headers
-
-        | **Header** | **Details** |
-        | --- | --- |
-        | `Authorization: AnaplanAuthToken {anaplan_auth_token}` | <br><br>*   Required<br>*   Description: the Anaplan authentication token<br><br> |
-        | `Content-Type: application/json` | <br><br>*   Required<br>*   Description: This indicates the request format is `application/json`.<br><br> |
-        | `Accept: application/json` | <br><br>*   Required<br>*   Description: This indicates the preferred response is either `application/json` format. Note that this call only outputs in `application/json` format.<br><br> |
-
-        ### Request parameters
-
-        | **Parameter** | **Details** |
-        | --- | --- |
-        | `{workspaceId}` | <br><br>*   Required<br>*   Type: String<br>*   Description: The workspace ID<br>*   Example: `8a8196b15b7dbae6015b8694411d13fe`<br><br> |
-        | `{modelId}` | <br><br>*   Required<br>*   Type: String<br>*   Description: the model ID<br>*   Example: `75A40874E6B64FA3AE074327899685`<br><br> |
-        | `{listId}` | <br><br>*   Required<br>*   Type: Number<br>*   Description: the list ID<br>*   Example: `101000000001`<br><br> |
-
-        ### Request body
-
-        | **List Data** | **Description** |
-        | --- | --- |
-        | `{name}` | The name value for the item in the list. |
-        | `{code}` | The code value for the item in the list. |
-        | `{id}` | The Anaplan ID of the item in the list. |
-        | `{parent}` | The name of the parent item in the list |
-        | `{properties}` | The value of each custom list property. |
-        | `{subsets}` | The value of each custom list subset. |
-
-        Example:
-
-        ```
-        {
-          "items": [
-            {
-              "name": "n1",
-              "code": "c1",
-              "properties": {
-                "p-text":"hello world",
-                "p-number":"1111",
-                "p-boolean": "true",
-                "p-list": "east",
-                "p-period": "Sep 21"
-              },
-            "subsets": {
-              "s11": true
-            }
-          },
-            {
-              "name": "n1",
-              "code": "c2",
-              "properties": {
-                "p-text":"hello world",
-                "p-number":"wrong format for number",
-                "p-boolean": "true",
-                "p-list": "east",
-                "p-period": "Sep 21"
-              },
-              "subsets": {
-                "s11": true
-              }
-            }
-          ]
-        }
-
-        ```
-
-        ### Update logic
-
-        The update list item endpoint logic varies by the update scenario.
-
-        | **Scenario** | **Existing** | **Input in API** | **Behavior** | **Result** |
-        | --- | --- | --- | --- | --- |
-        | Update list item | name=n1  <br>code=c1 | name=n1  <br>code=c1 | Success | name=n1  <br>code=c1 |
-        | Update name | name=n1  <br>code=c1 | name=n2  <br>code=c1 | Success | name=n2  <br>code=c1 |
-        | Update code | id=id1  <br>name=n1  <br>code=c1 | id=id1  <br>name=n1  <br>code=c2 | Success | id=id1  <br>name=n1  <br>code=c2 |
-        | Update code without existing code | id=id1  <br>name=n1 | id=id1  <br>name=n1  <br>code=c2 | Success | id=id1  <br>name=n1  <br>code=c2 |
-        | Update code  <br>(removing existing code) | id=id1  <br>name=n1  <br>code=c1 | id=id1  <br>name=n1  <br>code="" | This scenario does not provide a new code to replace the existing value. An error returns. | error: `INCOMPLETE_DATA` |
-        | Update code without an existing code  <br>(assign a code without the id) | name=n1 | name=n1  <br>code=c1 | Success | name=n1  <br>code=c1 |
-        | Update code with same name | name=n1  <br>code=c1 | name=n1  <br>code=c2 | The name is already used. An error returns. | error: `INCOMPLETE_DATA` |
-        | Update value with code only | name=n1  <br>code=c1  <br>properties{p1=1234} | code=c1  <br>properties{p1=1234} | Success  <br>It's valid to use the code to identify the record. | code=c1  <br>properties {p1=4321} |
-        | Update value with name only.  <br>Do not specify the code | name=n1  <br>code=c1  <br>properties{p1=1234} | name=n1  <br>properties{p1=1234} | The code is required to identify the record. An error returns. | error: `INCOMPLETE_DATA` |
-        | Update value with name only | name=n1  <br>properties{p1=1234} | name=n1  <br>properties{p1=4321} | Success  <br>When the code is not defined, the API can still update with the name. | name=n1  <br>properties{p1=4321} |
-
-        ### Response 200 body
-
-        The response body contains a JSON object that contains `total` (total number of items in request), `updated` (number of items updated), `ignored` (number of items ignored), and `failures` fields. On `failures`, each field contains information about any errors encountered while performing the update action. `requestIndex` is the index in the input items array.
-
-        ```
-        {
-            "meta": {
-                "schema": "https://anaplan.api.com/2/0/objects/list"
-            },
-            "status": {
-                "code": 200,
-                "message": "Success"
-            },
-            "total": 2,
-            "ignored": 1,
-            "updated": 1,
-            "failures": {
-               {
-                  "failureType": "INCORRECT_FORMAT",
-                  "failureMessageDetails": "incorrect format -- column name:p-number, value:wrong format for number",
-                  "requestIndex": 1
-               }
-            }
-        }
-
-        ```
-      tags:
-      - Transactional Write
-      responses:
-        '200':
-          description: 'TODO: document response'
     get:
       summary: Retrieve list data
       description: |-
@@ -4399,7 +4120,309 @@ paths:
       responses:
         '429':
           description: more detail in path description
+    post:
+      summary: Add list items
+      description: |-
+        ## Add list items
+
+        `/workspaces/{workspaceId}/models/{modelId}/lists/{listId}/items?action=add'`
+
+        Use this call to add items to a list. You must provide the list ID and data for each item. You can add one or more items in each request.
+
+        **Notes:**
+
+        *   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html).
+        *   A maximum of 100,000 list items can be added with a single call.
+
+
+        ### Requests that support this feature
+
+        ```
+        curl -X POST 'https://api.anaplan.com/2/0/workspaces/{workspaceId}/models/{modelId}/lists/{listId}/items?action=add' \
+        -H 'Authorization: AnaplanAuthToken {anaplan_auth_token}' \
+        -H 'Content-Type: application/json' \
+        -H 'Accept: application/json'
+        ```
+
+        ### Request headers
+
+        | **Header** | **Details** |
+        | --- | --- |
+        | `Authorization: AnaplanAuthToken {anaplan_auth_token}` | <br><br>*   Required<br>*   Description: the Anaplan authentication token<br><br> |
+        | `Content-Type: application/json` | <br><br>*   Required<br>*   Description: This indicates the request format is `application/json`.<br><br> |
+        | `Accept: application/json` | <br><br>*   Required<br>*   Description: This indicates the preferred response is either `application/json` format. Note that this call only outputs in `application/json` format.<br><br> |
+
+        ### Request parameters
+
+        | **Parameter** | **Details** |
+        | --- | --- |
+        | `{workspaceId}` | <br><br>*   Required<br>*   Type: String<br>*   Description: The workspace ID<br>*   Example: `8a8196b15b7dbae6015b8694411d13fe`<br><br> |
+        | `{modelId}` | <br><br>*   Required<br>*   Type: String<br>*   Description: the model ID<br>*   Example: `75A40874E6B64FA3AE074327899685`<br><br> |
+        | `{listId}` | <br><br>*   Required<br>*   Type: Number<br>*   Description: the list ID<br>*   Example: `101000000001`<br><br> |
+        | `action=add` | <br><br>*   Required<br>*   Type: query parameter<br>*   Description: The Anaplan Add action. This query parameter must be included in the URL as shown in the Requests section above.<br>*   Example: `action=addRequest`<br><br> |
+
+        ### Request body
+
+        | **List Data** | **Description** |
+        | --- | --- |
+        | `{name}` | The name value for the item in the list. |
+        | `{code}` | The code value for the item in the list. |
+        | `{parent}` | The name of the parent item in the list |
+        | `{properties}` | The value of each custom list property. |
+        | `{subsets}` | The value of each custom list subset. |
+
+        Example:
+
+        ```
+        {
+          "items": [
+            {
+              "name": "mike",
+              "code": "id1",
+              "parent": "west",
+              "properties": {
+                "p-text":"hello world",
+                "p-number":"123456",
+                "p-boolean": "true",
+                "p-list": "east",
+                "p-period": "Sep 20"
+              },
+            "subsets": {
+              "s11": true
+            }
+          },
+            {
+              "name": "cindy",
+              "code": "id2",
+              "properties": {
+                "p-text":"hello world",
+                "p-number":"wrong format for number",
+                "p-boolean": "true",
+                "p-list": "east",
+                "p-period": "Sep 20"
+              },
+              "subsets": {
+                "s11": true
+              }
+            }
+          ]
+        }
+
+        ```
+
+        ### Logic for add items
+
+        The add list items behavior uses specific logic with names and codes. This logic varies between [general lists](https://help.anaplan.com/f7f01453-71bc-4046-935a-b9d7cb47d15a-General-Lists) and [numbered lists](https://help.anaplan.com/54b75174-848f-482b-a051-a9a063ece50c-Numbered-Lists) in Anaplan.
+
+        #### Add items to a general list
+
+        | **Scenario** | **Existing** | **Input in API** | **Behavior** | **Result** |
+        | --- | --- | --- | --- | --- |
+        | Add a new list Item | There are no existing items | name=n1  <br>code=c1 | Success.  <br>A new list item is created. | name=n1  <br>code=c1 |
+        | Add list item with name conflicts | name=n1  <br>code=c1 | name=n1  <br>code=c2 | There is a duplicate name. A new list item is not added. | An error message returns. |
+        | Add list item with code conflicts | name=n1  <br>code=c1 | name=n2  <br>code=c1 | There is a duplicate name. A new list item is not added. | An error message returns. |
+        | Add list item without name | There are no existing items | code=c1 | There is a missing name. A new list item is not added. | An error message returns. |
+
+        #### Add items to a numbered list
+
+        For a numbered list, the name column is used for the index. The name is automatically generated. When you add an item, the API does not allow a name as an input.
+
+        | **Scenario** | **Existing** | **Input in API** | **Behavior** | **Result** |
+        | --- | --- | --- | --- | --- |
+        | Add a new list Item | There are no existing items | name=n1  <br>code=c1 | A name is not a valid input. A new list item is not added. | An error message returns. |
+        | Add a new list item | There are no existing items | code=c1 | Success.  <br>A new item is added. | success code=c1 |
+        | Add a list item with a conflicting code | code=c1 | code=c1 | There is a duplicate code. A new list item is not added. | An error message returns. |
+      tags:
+      - Transactional Write
+      parameters:
+      - name: action
+        in: query
+        schema:
+          type: string
+        example: add
+      responses:
+        '200':
+          description: Response 200
+          content:
+            application/json:
+              example:
+                meta:
+                  schema: https://anaplan.api.com/2/0/objects/item
+                status:
+                  code: 200
+                  message: Success
+                added: 1
+                ignored: 1
+                total: 2
+                failures:
+                - requestIndex: 1
+                  failureType: INCORRECT_FORMAT
+                  failureMessageDetails: incorrect format -- column name:p-number, value:wrong value for number
+    put:
+      summary: Update list items
+      description: |-
+        ## Update list items
+
+        `/workspaces/{workspaceId}/models/{modelId}/lists/{listId}/items`
+
+        Use this call to update items to a list. You must provide the model ID and list ID on the request URL. There are two kinds of lists in Anaplan: standard list and numbered list. For a standard list, the API identifies the item using the id, code, or name. For numbered list, the API uses the id or code. If property or subset is not specified in the input, the existing value is not updated. You can update one or more items in each request.
+
+        When you specify the list item identifier, select one of the appropriate identifiers (id, code, or name). If the request contains multiple identifiers, the API returns an error.
+
+        **Notes:**
+
+        *   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html).
+        *   A maximum of 100,000 list items can be updated with a single call.
+
+
+        Note: When an update to a list item completes successfully, all downstream calculations are also complete. This includes cells linked by formulas to the cells being updated.
+
+        ### Requests that support this feature
+
+        ```
+        curl -X PUT 'https://api.anaplan.com/2/0/workspaces/{workspaceId}/models/{modelId}/lists/{listId}/items' \
+        -H 'Authorization: AnaplanAuthToken {anaplan_auth_token}' \
+        -H 'Content-Type: application/json' \
+        -H 'Accept: application/json'
+        ```
+
+        ### Request headers
+
+        | **Header** | **Details** |
+        | --- | --- |
+        | `Authorization: AnaplanAuthToken {anaplan_auth_token}` | <br><br>*   Required<br>*   Description: the Anaplan authentication token<br><br> |
+        | `Content-Type: application/json` | <br><br>*   Required<br>*   Description: This indicates the request format is `application/json`.<br><br> |
+        | `Accept: application/json` | <br><br>*   Required<br>*   Description: This indicates the preferred response is either `application/json` format. Note that this call only outputs in `application/json` format.<br><br> |
+
+        ### Request parameters
+
+        | **Parameter** | **Details** |
+        | --- | --- |
+        | `{workspaceId}` | <br><br>*   Required<br>*   Type: String<br>*   Description: The workspace ID<br>*   Example: `8a8196b15b7dbae6015b8694411d13fe`<br><br> |
+        | `{modelId}` | <br><br>*   Required<br>*   Type: String<br>*   Description: the model ID<br>*   Example: `75A40874E6B64FA3AE074327899685`<br><br> |
+        | `{listId}` | <br><br>*   Required<br>*   Type: Number<br>*   Description: the list ID<br>*   Example: `101000000001`<br><br> |
+
+        ### Request body
+
+        | **List Data** | **Description** |
+        | --- | --- |
+        | `{name}` | The name value for the item in the list. |
+        | `{code}` | The code value for the item in the list. |
+        | `{id}` | The Anaplan ID of the item in the list. |
+        | `{parent}` | The name of the parent item in the list |
+        | `{properties}` | The value of each custom list property. |
+        | `{subsets}` | The value of each custom list subset. |
+
+        Example:
+
+        ```
+        {
+          "items": [
+            {
+              "name": "n1",
+              "code": "c1",
+              "properties": {
+                "p-text":"hello world",
+                "p-number":"1111",
+                "p-boolean": "true",
+                "p-list": "east",
+                "p-period": "Sep 21"
+              },
+            "subsets": {
+              "s11": true
+            }
+          },
+            {
+              "name": "n1",
+              "code": "c2",
+              "properties": {
+                "p-text":"hello world",
+                "p-number":"wrong format for number",
+                "p-boolean": "true",
+                "p-list": "east",
+                "p-period": "Sep 21"
+              },
+              "subsets": {
+                "s11": true
+              }
+            }
+          ]
+        }
+
+        ```
+
+        ### Update logic
+
+        The update list item endpoint logic varies by the update scenario.
+
+        | **Scenario** | **Existing** | **Input in API** | **Behavior** | **Result** |
+        | --- | --- | --- | --- | --- |
+        | Update list item | name=n1  <br>code=c1 | name=n1  <br>code=c1 | Success | name=n1  <br>code=c1 |
+        | Update name | name=n1  <br>code=c1 | name=n2  <br>code=c1 | Success | name=n2  <br>code=c1 |
+        | Update code | id=id1  <br>name=n1  <br>code=c1 | id=id1  <br>name=n1  <br>code=c2 | Success | id=id1  <br>name=n1  <br>code=c2 |
+        | Update code without existing code | id=id1  <br>name=n1 | id=id1  <br>name=n1  <br>code=c2 | Success | id=id1  <br>name=n1  <br>code=c2 |
+        | Update code  <br>(removing existing code) | id=id1  <br>name=n1  <br>code=c1 | id=id1  <br>name=n1  <br>code="" | This scenario does not provide a new code to replace the existing value. An error returns. | error: `INCOMPLETE_DATA` |
+        | Update code without an existing code  <br>(assign a code without the id) | name=n1 | name=n1  <br>code=c1 | Success | name=n1  <br>code=c1 |
+        | Update code with same name | name=n1  <br>code=c1 | name=n1  <br>code=c2 | The name is already used. An error returns. | error: `INCOMPLETE_DATA` |
+        | Update value with code only | name=n1  <br>code=c1  <br>properties{p1=1234} | code=c1  <br>properties{p1=1234} | Success  <br>It's valid to use the code to identify the record. | code=c1  <br>properties {p1=4321} |
+        | Update value with name only.  <br>Do not specify the code | name=n1  <br>code=c1  <br>properties{p1=1234} | name=n1  <br>properties{p1=1234} | The code is required to identify the record. An error returns. | error: `INCOMPLETE_DATA` |
+        | Update value with name only | name=n1  <br>properties{p1=1234} | name=n1  <br>properties{p1=4321} | Success  <br>When the code is not defined, the API can still update with the name. | name=n1  <br>properties{p1=4321} |
+
+        ### Response 200 body
+
+        The response body contains a JSON object that contains `total` (total number of items in request), `updated` (number of items updated), `ignored` (number of items ignored), and `failures` fields. On `failures`, each field contains information about any errors encountered while performing the update action. `requestIndex` is the index in the input items array.
+
+        ```
+        {
+            "meta": {
+                "schema": "https://anaplan.api.com/2/0/objects/list"
+            },
+            "status": {
+                "code": 200,
+                "message": "Success"
+            },
+            "total": 2,
+            "ignored": 1,
+            "updated": 1,
+            "failures": {
+               {
+                  "failureType": "INCORRECT_FORMAT",
+                  "failureMessageDetails": "incorrect format -- column name:p-number, value:wrong format for number",
+                  "requestIndex": 1
+               }
+            }
+        }
+
+        ```
+      tags:
+      - Transactional Write
+      responses:
+        '200':
+          description: 'TODO: document response'
   /workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests:
+    parameters:
+    - name: workspaceId
+      in: path
+      description: Workspace identifier (32-character lowercase hex string).
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9a-f]{32}$
+      example: 8a868cda7c8b28f5017c9a4b2d8341cd
+    - name: modelId
+      in: path
+      description: Model identifier (32-character uppercase hex string).
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9A-F]{32}$
+      example: 4261ECE4389B45E18915B5EB72F7510B
+    - name: viewId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: ''
     post:
       summary: Initiate long read request
       description: |-
@@ -4490,6 +4513,7 @@ paths:
                     $ref: '#/components/schemas/Status'
                   viewReadRequest:
                     $ref: '#/components/schemas/ViewReadRequest'
+  /workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests/{requestId}:
     parameters:
     - name: workspaceId
       in: path
@@ -4513,7 +4537,12 @@ paths:
       schema:
         type: string
       example: ''
-  /workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests/{requestId}:
+    - name: requestId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: ''
     get:
       summary: Retrieve status of large read request
       description: |-
@@ -4596,35 +4625,6 @@ paths:
                     $ref: '#/components/schemas/Status'
                   viewReadRequest:
                     $ref: '#/components/schemas/ViewReadRequest'
-    parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: 8a868cda7c8b28f5017c9a4b2d8341cd
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: 4261ECE4389B45E18915B5EB72F7510B
-    - name: viewId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: ''
-    - name: requestId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: ''
     delete:
       summary: Delete Read Request
       description: |-
@@ -4718,6 +4718,41 @@ paths:
         '200':
           description: 'TODO: document response'
   /workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests/{requestId}/pages/{pageNo}:
+    parameters:
+    - name: workspaceId
+      in: path
+      description: Workspace identifier (32-character lowercase hex string).
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9a-f]{32}$
+      example: 8a868cda7c8b28f5017c9a4b2d8341cd
+    - name: modelId
+      in: path
+      description: Model identifier (32-character uppercase hex string).
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9A-F]{32}$
+      example: 4261ECE4389B45E18915B5EB72F7510B
+    - name: viewId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: ''
+    - name: requestId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: ''
+    - name: pageNo
+      in: path
+      required: true
+      schema:
+        type: string
+      example: ''
     get:
       summary: Download Pages
       description: |-
@@ -4796,15 +4831,8 @@ paths:
       responses:
         '200':
           description: 'TODO: document response'
+  /models/{modelId}/views/{viewId}/data:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: 8a868cda7c8b28f5017c9a4b2d8341cd
     - name: modelId
       in: path
       description: Model identifier (32-character uppercase hex string).
@@ -4819,19 +4847,6 @@ paths:
       schema:
         type: string
       example: ''
-    - name: requestId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: ''
-    - name: pageNo
-      in: path
-      required: true
-      schema:
-        type: string
-      example: ''
-  /models/{modelId}/views/{viewId}/data:
     get:
       summary: Retrieve cell data for a view
       description: |-
@@ -4991,7 +5006,16 @@ paths:
       responses:
         '429':
           description: more detail in path description
+  /workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks/0:
     parameters:
+    - name: workspaceId
+      in: path
+      description: Workspace identifier (32-character lowercase hex string).
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9a-f]{32}$
+      example: 8a868cda7c8b28f5017c9a4b2d8341cd
     - name: modelId
       in: path
       description: Model identifier (32-character uppercase hex string).
@@ -5000,13 +5024,19 @@ paths:
         type: string
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
-    - name: viewId
+    - name: fileId
       in: path
       required: true
       schema:
         type: string
-      example: ''
-  /workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks/0:
+      example: '{{fileId}}'
+    get:
+      summary: Get the data in a chunk
+      tags:
+      - Bulk Read
+      responses:
+        '200':
+          description: 'TODO: document response'
     put:
       summary: Upload a file in chunks
       description: |-
@@ -5053,6 +5083,7 @@ paths:
           description: Chunk uploaded successfully. No response body.
         '200':
           description: Chunk uploaded successfully (some regions may return 200).
+  /workspaces/{workspaceId}/models/{modelId}/files/{fileId}/complete:
     parameters:
     - name: workspaceId
       in: path
@@ -5076,14 +5107,6 @@ paths:
       schema:
         type: string
       example: '{{fileId}}'
-    get:
-      summary: Get the data in a chunk
-      tags:
-      - Bulk Read
-      responses:
-        '200':
-          description: 'TODO: document response'
-  /workspaces/{workspaceId}/models/{modelId}/files/{fileId}/complete:
     post:
       summary: Complete the upload
       description: |-
@@ -5153,6 +5176,7 @@ paths:
                     $ref: '#/components/schemas/Status'
                   file:
                     $ref: '#/components/schemas/File'
+  /workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}:
     parameters:
     - name: workspaceId
       in: path
@@ -5170,13 +5194,18 @@ paths:
         type: string
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
-    - name: fileId
+    - name: importId
       in: path
       required: true
       schema:
         type: string
-      example: '{{fileId}}'
-  /workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}:
+      example: '{{importId}}'
+    - name: taskId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: '{{taskId}}'
     get:
       summary: Monitor the import task
       description: |-
@@ -5305,6 +5334,7 @@ paths:
                     $ref: '#/components/schemas/Status'
                   task:
                     $ref: '#/components/schemas/Task'
+  /workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/dump/chunks:
     parameters:
     - name: workspaceId
       in: path
@@ -5334,7 +5364,6 @@ paths:
       schema:
         type: string
       example: '{{taskId}}'
-  /workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/dump/chunks:
     get:
       summary: Query the number of chunks in a dump file
       description: |-
@@ -5408,6 +5437,7 @@ paths:
       responses:
         '200':
           description: 'TODO: document response'
+  /workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/dump/chunks/0:
     parameters:
     - name: workspaceId
       in: path
@@ -5437,7 +5467,6 @@ paths:
       schema:
         type: string
       example: '{{taskId}}'
-  /workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/dump/chunks/0:
     get:
       summary: Download dump file chunks
       description: |-
@@ -5484,6 +5513,7 @@ paths:
       responses:
         '200':
           description: 'TODO: document response'
+  /workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/dump:
     parameters:
     - name: workspaceId
       in: path
@@ -5513,7 +5543,6 @@ paths:
       schema:
         type: string
       example: '{{taskId}}'
-  /workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/dump:
     get:
       summary: Check dump file for failures
       description: |-
@@ -5548,6 +5577,7 @@ paths:
       responses:
         '200':
           description: 'TODO: document response'
+  /workspaces/{workspaceId}/models/{modelId}/exports/{exportId}/tasks:
     parameters:
     - name: workspaceId
       in: path
@@ -5565,19 +5595,41 @@ paths:
         type: string
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
-    - name: importId
+    - name: exportId
       in: path
       required: true
       schema:
         type: string
-      example: '{{importId}}'
-    - name: taskId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{taskId}}'
-  /workspaces/{workspaceId}/models/{modelId}/exports/{exportId}/tasks:
+      example: '{{exportId}}'
+    get:
+      summary: Get a list of export tasks
+      parameters:
+      - name: sort
+        in: query
+        description: 'Sort order for the task list. Format: [prefix]field where prefix is - (descending), + (ascending), or
+          omitted (ascending). Documented sortable fields: creationDate, taskId, taskState, progress. Example: -creationDate
+          (newest first), +taskId, taskState. The API does not validate the field name — unknown fields are silently accepted
+          and appear to fall back to default ordering.'
+        required: false
+        schema:
+          type: string
+        example: -creationDate
+      responses:
+        '200':
+          description: List of export tasks
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                  status:
+                    $ref: '#/components/schemas/Status'
+                  tasks:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Task'
     post:
       summary: Start the export
       description: |-
@@ -5653,6 +5705,7 @@ paths:
                     $ref: '#/components/schemas/Status'
                   task:
                     $ref: '#/components/schemas/Task'
+  /workspaces/{workspaceId}/models/{modelId}/exports/{exportId}/tasks/{taskId}:
     parameters:
     - name: workspaceId
       in: path
@@ -5676,36 +5729,12 @@ paths:
       schema:
         type: string
       example: '{{exportId}}'
-    get:
-      summary: Get a list of export tasks
-      parameters:
-      - name: sort
-        in: query
-        description: 'Sort order for the task list. Format: [prefix]field where prefix is - (descending), + (ascending), or
-          omitted (ascending). Documented sortable fields: creationDate, taskId, taskState, progress. Example: -creationDate
-          (newest first), +taskId, taskState. The API does not validate the field name — unknown fields are silently accepted
-          and appear to fall back to default ordering.'
-        required: false
-        schema:
-          type: string
-        example: -creationDate
-      responses:
-        '200':
-          description: List of export tasks
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  meta:
-                    $ref: '#/components/schemas/Meta'
-                  status:
-                    $ref: '#/components/schemas/Status'
-                  tasks:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Task'
-  /workspaces/{workspaceId}/models/{modelId}/exports/{exportId}/tasks/{taskId}:
+    - name: taskId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: '{{taskId}}'
     get:
       summary: Monitor the export tasks
       description: |-
@@ -5800,6 +5829,7 @@ paths:
                     $ref: '#/components/schemas/Status'
                   task:
                     $ref: '#/components/schemas/Task'
+  /workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks:
     parameters:
     - name: workspaceId
       in: path
@@ -5817,19 +5847,12 @@ paths:
         type: string
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
-    - name: exportId
+    - name: fileId
       in: path
       required: true
       schema:
         type: string
-      example: '{{exportId}}'
-    - name: taskId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{taskId}}'
-  /workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks:
+      example: '{{fileId}}'
     get:
       summary: Get Chunks Details
       description: |-
@@ -5896,82 +5919,7 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Chunk'
-    parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: 8a868cda7c8b28f5017c9a4b2d8341cd
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: 4261ECE4389B45E18915B5EB72F7510B
-    - name: fileId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{fileId}}'
   /workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks:
-    post:
-      summary: Start the process
-      description: |-
-        ## Start the process
-
-        `/workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks`
-
-        You can POST a process task to run a process. This returns a new `taskID`. Once you have started the process, you can use GET to receive a list of tasks as a JSON array. You can use this to monitor the status of each task.
-
-        ### Run the process
-
-        #### Request
-
-        ```
-        curl -X POST \
-        https://api.anaplan.com/2/0/workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks
-        -H 'authorization: AnaplanAuthToken {anaplan_auth_token}' \
-        -H "Content-Type:application/json" \
-        -d '{"localeName": "en_US"}'
-
-        ```
-
-        #### Headers
-
-        *   `Authorization:AnaplanAuthToken {anaplan_auth_token}`
-        *   `Content-Type:application/json`
-
-
-        #### Body
-
-        ```json
-        {"localeName": "en_US"}
-        ```
-
-        #### Parameters
-
-        | **Parameter** | **Description** |
-        | --- | --- |
-        | `workspaceId` | <br><br>*   Required<br>*   Type: string<br>*   Description: The workspace ID<br>*   Example: `8a8b8c8d8e8f8g8i`<br><br> |
-        | `modelId` | <br><br>*   Required<br>*   Type: string<br>*   Description: The model ID<br>*   Example: `75A40874E6B64FA3AE0743278996850F`<br><br> |
-        | `processId` | <br><br>*   Required<br>*   Type: number<br>*   Description: The process ID<br>*   Example: `118000000002`<br><br> |
-
-        #
-      tags:
-      - Bulk Other
-      responses:
-        '200':
-          description: Response 200
-          content:
-            application/json:
-              example:
-                taskId: E1F648F527AF4297B09E06C278B99F4C
     parameters:
     - name: workspaceId
       in: path
@@ -6065,24 +6013,23 @@ paths:
                 taskId: BAB7819744034F25BF73EA1B41804478
                 taskState: IN_PROGRESS
                 creationTime: 1535145539157
-  /workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks:
     post:
-      summary: Start Other Action
+      summary: Start the process
       description: |-
-        ## Start deletion
+        ## Start the process
 
-        `/workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks`
+        `/workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks`
 
-        You can POST a deletion task to start the delete. This returns a new `taskID`. Once you have started the delete, you can use GET to receive a list of the deletion tasks as a JSON array. You can use this to monitor the status of the delete.
+        You can POST a process task to run a process. This returns a new `taskID`. Once you have started the process, you can use GET to receive a list of tasks as a JSON array. You can use this to monitor the status of each task.
 
-        ### Run deletion
+        ### Run the process
 
         #### Request
 
         ```
         curl -X POST \
-        https://api.anaplan.com/2/0/workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks \
-        -H 'authorization: AnaplanAuthToken {anaplan_auth_token}'\
+        https://api.anaplan.com/2/0/workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks
+        -H 'authorization: AnaplanAuthToken {anaplan_auth_token}' \
         -H "Content-Type:application/json" \
         -d '{"localeName": "en_US"}'
 
@@ -6106,7 +6053,7 @@ paths:
         | --- | --- |
         | `workspaceId` | <br><br>*   Required<br>*   Type: string<br>*   Description: The workspace ID<br>*   Example: `8a8b8c8d8e8f8g8i`<br><br> |
         | `modelId` | <br><br>*   Required<br>*   Type: string<br>*   Description: The model ID<br>*   Example: `75A40874E6B64FA3AE0743278996850F`<br><br> |
-        | `actionId` | <br><br>*   Required<br>*   Type: number<br>*   Description: The ID for the Delete action.<br>*   Example: `117000000019`<br><br> |
+        | `processId` | <br><br>*   Required<br>*   Type: number<br>*   Description: The process ID<br>*   Example: `118000000002`<br><br> |
 
         #
       tags:
@@ -6117,8 +6064,8 @@ paths:
           content:
             application/json:
               example:
-                task:
-                  taskId: 0690AA1C761F48549C3442A02F91D962
+                taskId: E1F648F527AF4297B09E06C278B99F4C
+  /workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks:
     parameters:
     - name: workspaceId
       in: path
@@ -6194,7 +6141,89 @@ paths:
                 - taskId: F37EA1512BC448D3B223431C33B844B6
                   taskState: COMPLETE
                   creationTime: 1535145589808
+    post:
+      summary: Start Other Action
+      description: |-
+        ## Start deletion
+
+        `/workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks`
+
+        You can POST a deletion task to start the delete. This returns a new `taskID`. Once you have started the delete, you can use GET to receive a list of the deletion tasks as a JSON array. You can use this to monitor the status of the delete.
+
+        ### Run deletion
+
+        #### Request
+
+        ```
+        curl -X POST \
+        https://api.anaplan.com/2/0/workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks \
+        -H 'authorization: AnaplanAuthToken {anaplan_auth_token}'\
+        -H "Content-Type:application/json" \
+        -d '{"localeName": "en_US"}'
+
+        ```
+
+        #### Headers
+
+        *   `Authorization:AnaplanAuthToken {anaplan_auth_token}`
+        *   `Content-Type:application/json`
+
+
+        #### Body
+
+        ```json
+        {"localeName": "en_US"}
+        ```
+
+        #### Parameters
+
+        | **Parameter** | **Description** |
+        | --- | --- |
+        | `workspaceId` | <br><br>*   Required<br>*   Type: string<br>*   Description: The workspace ID<br>*   Example: `8a8b8c8d8e8f8g8i`<br><br> |
+        | `modelId` | <br><br>*   Required<br>*   Type: string<br>*   Description: The model ID<br>*   Example: `75A40874E6B64FA3AE0743278996850F`<br><br> |
+        | `actionId` | <br><br>*   Required<br>*   Type: number<br>*   Description: The ID for the Delete action.<br>*   Example: `117000000019`<br><br> |
+
+        #
+      tags:
+      - Bulk Other
+      responses:
+        '200':
+          description: Response 200
+          content:
+            application/json:
+              example:
+                task:
+                  taskId: 0690AA1C761F48549C3442A02F91D962
   /workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks/{taskId}:
+    parameters:
+    - name: workspaceId
+      in: path
+      description: Workspace identifier (32-character lowercase hex string).
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9a-f]{32}$
+      example: 8a868cda7c8b28f5017c9a4b2d8341cd
+    - name: modelId
+      in: path
+      description: Model identifier (32-character uppercase hex string).
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9A-F]{32}$
+      example: 4261ECE4389B45E18915B5EB72F7510B
+    - name: processId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: '{{processId}}'
+    - name: taskId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: '{{taskId}}'
     get:
       summary: Monitor the process tasks
       description: |-
@@ -6287,6 +6316,7 @@ paths:
                     $ref: '#/components/schemas/Status'
                   task:
                     $ref: '#/components/schemas/Task'
+  /workspaces/{workspaceId}/models/{modelId}/modules:
     parameters:
     - name: workspaceId
       in: path
@@ -6304,19 +6334,6 @@ paths:
         type: string
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
-    - name: processId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{processId}}'
-    - name: taskId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{taskId}}'
-  /workspaces/{workspaceId}/models/{modelId}/modules:
     get:
       summary: 'Workspace-scoped form: Retrieve IDs and names for all modules in a model'
       description: |-
@@ -6395,6 +6412,7 @@ paths:
                       $ref: '#/components/schemas/Module'
         '429':
           description: more detail in path description
+  /workspaces/{workspaceId}/models/{modelId}/modules/{moduleId}/lineItems:
     parameters:
     - name: workspaceId
       in: path
@@ -6412,7 +6430,12 @@ paths:
         type: string
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
-  /workspaces/{workspaceId}/models/{modelId}/modules/{moduleId}/lineItems:
+    - name: moduleId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: '{{moduleId}}'
     get:
       summary: 'Workspace-scoped form: Retrieve all line item metadata in a module'
       description: |-
@@ -6539,6 +6562,7 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/LineItem'
+  /workspaces/{workspaceId}/models/{modelId}/modules/{moduleId}/views:
     parameters:
     - name: workspaceId
       in: path
@@ -6562,7 +6586,6 @@ paths:
       schema:
         type: string
       example: '{{moduleId}}'
-  /workspaces/{workspaceId}/models/{modelId}/modules/{moduleId}/views:
     get:
       summary: 'Workspace-scoped form: Retrieve IDs and names for views in a module'
       description: |-
@@ -6654,6 +6677,7 @@ paths:
                       $ref: '#/components/schemas/View'
         '429':
           description: more detail in path description
+  /workspaces/{workspaceId}/models/{modelId}/lineItems:
     parameters:
     - name: workspaceId
       in: path
@@ -6671,13 +6695,6 @@ paths:
         type: string
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
-    - name: moduleId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{moduleId}}'
-  /workspaces/{workspaceId}/models/{modelId}/lineItems:
     get:
       summary: 'Workspace-scoped form: Retrieve all line items in a model'
       description: |-
@@ -6775,6 +6792,7 @@ paths:
                       $ref: '#/components/schemas/LineItem'
         '429':
           description: more detail in path description
+  /workspaces/{workspaceId}/models/{modelId}/lineItems/{lineItemId}/dimensions:
     parameters:
     - name: workspaceId
       in: path
@@ -6792,7 +6810,12 @@ paths:
         type: string
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
-  /workspaces/{workspaceId}/models/{modelId}/lineItems/{lineItemId}/dimensions:
+    - name: lineItemId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: '{{lineItemId}}'
     get:
       summary: 'Workspace-scoped form: Retrieve dimensions IDs for a line item'
       description: |-
@@ -6863,6 +6886,7 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Dimension'
+  /workspaces/{workspaceId}/models/{modelId}/lineItems/{lineItemId}/dimensions/{dimensionId}/items:
     parameters:
     - name: workspaceId
       in: path
@@ -6886,7 +6910,12 @@ paths:
       schema:
         type: string
       example: '{{lineItemId}}'
-  /workspaces/{workspaceId}/models/{modelId}/lineItems/{lineItemId}/dimensions/{dimensionId}/items:
+    - name: dimensionId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: '{{dimensionId}}'
     get:
       summary: 'Workspace-scoped form: Retrieve dimension items for a line item'
       description: |-
@@ -6969,6 +6998,7 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Dimension'
+  /workspaces/{workspaceId}/models/{modelId}/views/{viewId}:
     parameters:
     - name: workspaceId
       in: path
@@ -6986,19 +7016,12 @@ paths:
         type: string
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
-    - name: lineItemId
+    - name: viewId
       in: path
       required: true
       schema:
         type: string
-      example: '{{lineItemId}}'
-    - name: dimensionId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{dimensionId}}'
-  /workspaces/{workspaceId}/models/{modelId}/views/{viewId}:
+      example: '{{viewId}}'
     get:
       summary: 'Workspace-scoped form: Retrieve metadata for dimensions on a view'
       description: |-
@@ -7119,15 +7142,8 @@ paths:
                       $ref: '#/components/schemas/Dimension'
         '429':
           description: more detail in path description
+  /models/{modelId}/views:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: 8a868cda7c8b28f5017c9a4b2d8341cd
     - name: modelId
       in: path
       description: Model identifier (32-character uppercase hex string).
@@ -7136,13 +7152,6 @@ paths:
         type: string
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
-    - name: viewId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{viewId}}'
-  /models/{modelId}/views:
     get:
       summary: 'Model-direct form: Retrieve IDs and names for all views in a model'
       description: |-
@@ -7273,6 +7282,7 @@ paths:
                       $ref: '#/components/schemas/View'
         '429':
           description: more detail in path description
+  /models/{modelId}/dimensions/{dimensionId}/items:
     parameters:
     - name: modelId
       in: path
@@ -7282,7 +7292,12 @@ paths:
         type: string
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
-  /models/{modelId}/dimensions/{dimensionId}/items:
+    - name: dimensionId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: '{{dimensionId}}'
     get:
       summary: 'Model-direct form: Retrieve all items in a dimension'
       description: |-
@@ -7377,6 +7392,7 @@ paths:
           description: more detail in path description
         '429':
           description: more detail in path description
+  /models/{modelId}/lists:
     parameters:
     - name: modelId
       in: path
@@ -7386,13 +7402,6 @@ paths:
         type: string
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
-    - name: dimensionId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{dimensionId}}'
-  /models/{modelId}/lists:
     get:
       summary: 'Model-direct form: Retrieve Lists'
       description: |-
@@ -7465,6 +7474,7 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/List'
+  /models/{modelId}/lists/{listId}:
     parameters:
     - name: modelId
       in: path
@@ -7474,7 +7484,12 @@ paths:
         type: string
         pattern: ^[0-9A-F]{32}$
       example: 4261ECE4389B45E18915B5EB72F7510B
-  /models/{modelId}/lists/{listId}:
+    - name: listId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: '{{listId}}'
     get:
       summary: 'Model-direct form: Retrieve list metadata'
       description: |-
@@ -7590,21 +7605,6 @@ paths:
                     $ref: '#/components/schemas/List'
         '429':
           description: more detail in path description
-    parameters:
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: 4261ECE4389B45E18915B5EB72F7510B
-    - name: listId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{listId}}'
 components:
   securitySchemes:
     AnaplanAuthToken:
