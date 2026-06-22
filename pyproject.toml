@@ -17,10 +17,6 @@ dev = [
     "pytest>=8.0.0",
 ]
 
-[tool.pyright]
-venvPath = "."
-venv = ".venv"
-
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["scripts", "tests"]
