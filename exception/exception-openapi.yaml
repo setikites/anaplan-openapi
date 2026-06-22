@@ -272,6 +272,7 @@ components:
           type: string
           description: Error status string, e.g. `FAILURE_BAD_HEADER`, `FAILURE_BAD_REQUEST`, `FAILURE_INVALID_TOKEN`, `FAILURE_UNAUTHORIZED_USER_ACTION`,
             `FAILURE_NOT_FOUND`.
+          example: FAILURE_BAD_HEADER
         statusMessage:
           type: string
           description: Human-readable error description. Distinguishes this narrative text from the machine-readable `status`
