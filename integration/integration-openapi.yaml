@@ -8129,8 +8129,8 @@ components:
           type: string
         periodText:
           type: string
-          description: Human-readable label for the current period (e.g. 'Jan 24'). Empty string when no current period is
-            set.
+          description: Human-readable label for the current period. Empty string when no current period is set.
+          example: Jan 24
     Process:
       properties:
         code:
@@ -8196,8 +8196,8 @@ components:
       properties:
         calendarType:
           type: string
-          description: Calendar model used in this model, e.g. 'Calendar Months' or '4-4-5'. Determines the period hierarchy
-            and week-based options.
+          description: Calendar model used in this model. Determines the period hierarchy and week-based options.
+          example: Calendar Months
         currentPeriod:
           properties:
             lastDay:
@@ -8295,7 +8295,8 @@ components:
           type: string
         requestState:
           type: string
-          description: Current state of the async read operation (e.g. IN_PROGRESS, COMPLETE, NOT_STARTED).
+          description: Current state of the async read operation.
+          example: IN_PROGRESS
         url:
           type: string
           description: URL to poll for the read-request result or download pages.
@@ -8496,8 +8497,9 @@ components:
           type: string
         origin:
           type: string
-          description: 'Source type of the file: ''NATIVE_ANAPLAN'' for Anaplan-owned files (e.g. export outputs), ''FILE_BASED''
-            for externally uploaded import sources.'
+          description: 'Source type of the file: ''NATIVE_ANAPLAN'' for Anaplan-owned files, ''FILE_BASED'' for externally
+            uploaded import sources.'
+          example: NATIVE_ANAPLAN
         separator:
           type: string
     Import:
@@ -8810,11 +8812,12 @@ components:
       properties:
         code:
           type: integer
-          description: Anaplan API status code for this response (e.g. 200 for success, 403 for forbidden). Distinct from
-            the HTTP status code.
+          description: Anaplan API status code for this response. Distinct from the HTTP status code.
+          example: 200
         message:
           type: string
-          description: Human-readable description of the status outcome, e.g. 'Success' or 'Not Found'.
+          description: Human-readable description of the status outcome.
+          example: Success
     Meta:
       description: Response metadata envelope present in paginated Anaplan API responses. `schema` is a URL to the JSON schema
         definition for the response body; `paging` holds cursor-based navigation state.
