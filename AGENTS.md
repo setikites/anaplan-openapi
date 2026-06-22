@@ -43,9 +43,9 @@ The current hand-maintained specs (live tests exist — do not rebuild):
 - `authentication/authentication-openapi.json`
 - `oauth/oauth-openapi.json`
 - `integration/integration-openapi.json`
-
-## Python tooling
-
-Always use `uv` to run Python scripts in this project. Examples:
-- `uv run python scripts/build_spec.py ...`
-- `uv run pytest`
+- `cloudworks/cloudworks-openapi.json`
+- `scim/scim-openapi.json`
+- `alm/alm-openapi.json`
+- `audit/audit-openapi.json`
+- `financial-consolidation/financial-consolidation-openapi.json`
+- `exception/exception-openapi.json`

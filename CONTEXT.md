@@ -284,12 +284,9 @@ Each API folder contains:
 
 All 9 specs now exist. Ongoing work is refinement rather than initial authoring:
 
-- **Hand-maintained specs** (Authentication, OAuth, Integration, Audit, Exception Users) have live tests
-  and must be edited by hand — do **not** re-run `scripts/build_spec.py` against
-  them (see [CONTRIBUTING.md](CONTRIBUTING.md)).
-- **Bootstrap specs** (CloudWorks, SCIM, ALM, Financial Consolidation)
-  can be improved by adding live tests and graduating them to
-  hand-maintained as coverage grows.
+- **All 9 specs are hand-maintained** (live tests exist for each) and must be edited
+  by hand — do **not** re-run `scripts/build_spec.py` against any of them
+  (see [CONTRIBUTING.md](CONTRIBUTING.md)).
 - Record any behavior that differs from the official docs in the relevant
   `<api>/README.md` under "Discrepancies".
 - Live-test setup is documented in [docs/TESTING.md](docs/TESTING.md).
