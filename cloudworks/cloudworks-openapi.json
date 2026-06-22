@@ -2316,7 +2316,8 @@
           },
           "processId": {
             "type": "string",
-            "description": "Anaplan process ID (numeric string, e.g. `\"118000000114\"`); present only for `Process` integrations."
+            "description": "Anaplan process ID (numeric string); present only for `Process` integrations.",
+            "example": "118000000114"
           },
           "workspaceId": {
             "type": "string",
@@ -2366,12 +2367,14 @@
               },
               "message": {
                 "description": "Outcome message. Common values: `\"Success\"`, `\"Cancelled\"`, `\"Process failed\"`, `\"Anaplan model was deleted\"`. Partial-success imports include row counts in this field even when `success` is `true`.",
-                "type": "string"
+                "type": "string",
+                "example": "Success"
               },
               "executionErrorCode": {
                 "description": "Numeric error code. Null on full success. Known values: `12` (import data-type mismatch), `35`, `38` (partial success), `39`.",
                 "type": "integer",
-                "nullable": true
+                "nullable": true,
+                "example": 12
               },
               "triggerSource": {
                 "description": "What triggered this run. `scheduled` = integration's own schedule; `manual` = user-initiated from the CloudWorks UI or API; `scheduled_inf` = triggered by an integration flow's schedule; `manual_inf` = manually triggered from within an integration flow; `nux_dashboard` = triggered from the CloudWorks NUX dashboard.",
@@ -2382,7 +2385,8 @@
                   "scheduled_inf",
                   "manual_inf",
                   "nux_dashboard"
-                ]
+                ],
+                "example": "scheduled"
               }
             }
           },
@@ -2447,7 +2451,8 @@
           },
           "lastRun": {
             "type": "integer",
-            "description": "Unix timestamp (seconds since epoch) of when this run ended. Duplicates `endDate` in epoch form. Example: `1781832681`."
+            "description": "Unix timestamp (seconds since epoch) of when this run ended. Duplicates `endDate` in epoch form.",
+            "example": 1781832681
           },
           "startDate": {
             "description": "ISO 8601 UTC datetime when the run started. Format: `YYYY-MM-DDTHH:MM:SS.sssZ`.",
@@ -2466,12 +2471,14 @@
           },
           "message": {
             "description": "Outcome message. Common values: `\"Success\"`, `\"Cancelled\"`, `\"Process failed\"`, `\"Anaplan model was deleted\"`. Partial-success imports include row counts here even when `success` is `true`.",
-            "type": "string"
+            "type": "string",
+            "example": "Success"
           },
           "executionErrorCode": {
             "description": "Numeric error code. Null on full success. Known values: `12` (import data-type mismatch), `35`, `38` (partial success), `39`.",
             "type": "integer",
-            "nullable": true
+            "nullable": true,
+            "example": 12
           },
           "traceId": {
             "description": "32-character lowercase hex trace identifier, useful for support diagnostics.",
@@ -2484,7 +2491,8 @@
               "scheduled",
               "manual",
               "scheduled_inf"
-            ]
+            ],
+            "example": "scheduled"
           }
         }
       },
