@@ -30,6 +30,12 @@ uv run --env-file .env pytest tests/ --live
 | `ANAPLAN_OAUTH_DEVICE_CLIENT_ID` | OAuth Device Grant | Client ID registered for the device flow |
 | `ANAPLAN_OAUTH_AUTHCODE_CLIENT_ID` / `ANAPLAN_OAUTH_AUTHCODE_CLIENT_SECRET` | `scripts/oauth/` helpers | Auth-code client credentials for the manual OAuth helper scripts |
 | `ANAPLAN_OAUTH_KEYRING_SERVICE` | `scripts/oauth/` helpers + audit live tests | Keyring service name under which the Authorization Code grant token blob is stored (default `anaplan-oauth-authcode`). When a token is present, the audit live tests use its `access_token` as the bearer instead of basic auth. |
+| `ANAPLAN_INTEGRATION_WORKSPACE_ID` | Integration live tests | Workspace ID for model-scoped Integration API tests |
+| `ANAPLAN_INTEGRATION_MODEL_ID` | Integration live tests | Model ID for model-scoped Integration API tests |
+| `ANAPLAN_ALM_WORKSPACE_ID` | ALM live tests | Workspace ID for ALM API tests |
+| `ANAPLAN_ALM_MODEL_ID` | ALM live tests | Model ID for ALM API tests |
+| `ANAPLAN_EXCEPTION_WORKSPACE_GUID` | Exception live tests | Workspace GUID for Exception API tests |
+| `ANAPLAN_EXCEPTION_USER_GUID` | Exception live tests | User GUID for Exception API tests |
 
 Certificate auth is preferred where configured; basic auth is the fallback.
 Fixtures `skip` cleanly when a credential is missing, so you can run a subset

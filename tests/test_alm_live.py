@@ -16,12 +16,9 @@ Credentials are read from .env at the repo root. Required variables:
     ANAPLAN_PASSWORD  - password for basic auth
 
 Optional variables:
-    ANAPLAN_WORKSPACE_ID      - workspace ID for ALM endpoint tests
-                                (default: 8a868cd87b46bdb3017bd10aa5c31a6e)
-    ANAPLAN_MODEL_ID          - model ID for ALM endpoint tests
-                                (default: B1A963FFC71D4DC69DC2C087824BE619)
-    ANAPLAN_ALM_BASE_URL      - override ALM base URL
-                                (default: https://api.anaplan.com/2/0)
+    ANAPLAN_ALM_WORKSPACE_ID   - workspace ID for ALM endpoint tests
+    ANAPLAN_ALM_MODEL_ID       - model ID for ALM endpoint tests
+    ANAPLAN_ALM_BASE_URL       - override ALM base URL (default: https://api.anaplan.com/2/0)
     ANAPLAN_OAUTH_ACCESS_TOKEN - pre-obtained OAuth Bearer token for Bearer probe
 
 Notes on expected responses for read endpoints:
@@ -44,8 +41,8 @@ ALM_BASE_URL = os.getenv(
     "ANAPLAN_ALM_BASE_URL", "https://api.anaplan.com/2/0"
 ).rstrip("/")
 AUTH_URL = "https://auth.anaplan.com"
-WORKSPACE_ID = os.getenv("ANAPLAN_WORKSPACE_ID", "8a868cd87b46bdb3017bd10aa5c31a6e")  # EBP Administration DEV
-MODEL_ID = os.getenv("ANAPLAN_MODEL_ID", "B1A963FFC71D4DC69DC2C087824BE619")  # EBP Request DEV
+WORKSPACE_ID = os.getenv("ANAPLAN_ALM_WORKSPACE_ID", "")
+MODEL_ID = os.getenv("ANAPLAN_ALM_MODEL_ID", "")
 
 _HEX32_UPPER = re.compile(r"^[0-9A-F]{32}$")
 _HEX32_LOWER = re.compile(r"^[0-9a-f]{32}$")

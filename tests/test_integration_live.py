@@ -16,9 +16,9 @@ Basic authentication (fallback):
     ANAPLAN_PASSWORD          - password
 
 Optional:
-    ANAPLAN_API_BASE_URL      - API base URL (default: https://api.anaplan.com)
-    ANAPLAN_WORKSPACE_ID      - workspace ID for model-scoped tests (default: see below)
-    ANAPLAN_MODEL_ID          - model ID for model-scoped tests (default: see below)
+    ANAPLAN_API_BASE_URL               - API base URL (default: https://api.anaplan.com)
+    ANAPLAN_INTEGRATION_WORKSPACE_ID   - workspace ID for model-scoped tests
+    ANAPLAN_INTEGRATION_MODEL_ID       - model ID for model-scoped tests
 """
 
 import base64
@@ -38,8 +38,8 @@ from cryptography.hazmat.primitives.asymmetric import padding
 AUTH_URL = "https://auth.anaplan.com"
 _api_base = os.getenv("ANAPLAN_API_BASE_URL", "https://api.anaplan.com").rstrip("/")
 API_URL = _api_base if _api_base.endswith("/2/0") else _api_base + "/2/0"
-WORKSPACE_ID = os.getenv("ANAPLAN_WORKSPACE_ID", "8a868cd885f53bd201860f5a4fea1ff1")  # EBP Commercial Budget Z-PREPROD
-MODEL_ID = os.getenv("ANAPLAN_MODEL_ID", "09F86E3942A84353892853BE3BE82280")  # Commercial Flash | PS [PREPROD]
+WORKSPACE_ID = os.getenv("ANAPLAN_INTEGRATION_WORKSPACE_ID", "")
+MODEL_ID = os.getenv("ANAPLAN_INTEGRATION_MODEL_ID", "")
 
 
 def _sign_data(data: bytes, key_path: str, key_password: str | None = None) -> str:
