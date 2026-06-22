@@ -26,6 +26,7 @@ import os
 import pathlib
 import re
 import secrets
+import time
 import warnings
 
 import httpx
@@ -1409,6 +1410,7 @@ def test_get_fiscal_year(integration_token):
 
 
 @pytest.mark.live
+@pytest.mark.write
 def test_switchover_invalid_date_returns_400(integration_token, version_id):
     """PUT /2/0/models/{modelId}/versions/{versionId}/switchover with invalid date returns 400.
 
@@ -1547,6 +1549,7 @@ def test_download_first_chunk(integration_token, file_id):
 
 
 @pytest.mark.live
+@pytest.mark.write
 def test_upload_single_chunk(integration_token, file_id):
     """PUT /2/0/workspaces/{workspaceId}/models/{modelId}/files/{fileId} uploads a file as a single chunk.
 
@@ -1586,6 +1589,7 @@ def test_upload_single_chunk(integration_token, file_id):
 
 
 @pytest.mark.live
+@pytest.mark.write
 def test_upload_and_complete_cycle(integration_token, file_id):
     """Multi-chunk upload cycle: set chunk count → PUT chunk → POST complete → verify → teardown.
 
@@ -1939,13 +1943,13 @@ def test_list_export_tasks(integration_token, export_id):
 
 
 @pytest.mark.live
+@pytest.mark.write
 def test_run_export_and_poll_task(integration_token, export_id):
     """POST export task + poll GET until terminal state (non-destructive run-and-poll cycle).
 
     Requires --allow-writes. Without it the POST is auto-skipped by the write guard.
     Times out after 30 s; fails if terminal state is not reached.
     """
-    import time
     h = _auth_headers(integration_token)
     with httpx.Client() as client:
         run_r = client.post(

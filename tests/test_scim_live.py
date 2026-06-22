@@ -180,6 +180,7 @@ def test_scim_users_http_basic_probe():
 # ── Probe: DELETE /Users/{id} existence ─────────────────────────────────────
 
 @pytest.mark.live
+@pytest.mark.write
 def test_scim_delete_user_endpoint_exists(scim_token):
     """Probes whether DELETE /Users/{id} is implemented on the SCIM endpoint.
 

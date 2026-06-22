@@ -23,4 +23,5 @@ pythonpath = ["scripts", "tests"]
 python_files = ["test_*.py"]
 markers = [
     "live: mark test as requiring live API access (skipped by default)",
+    "write: mark test as mutating live API state (skipped without --allow-writes)",
 ]
