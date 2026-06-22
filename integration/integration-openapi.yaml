@@ -2289,17 +2289,37 @@ paths:
         example: +name
       responses:
         '200':
-          description: Response 200
+          description: Actions retrieved successfully
           content:
             application/json:
               example:
+                meta:
+                  paging:
+                    currentPageSize: 3
+                    offset: 0
+                    totalSize: 3
+                  schema: https://api.anaplan.com/2/0/models/09F86E3942A84353892853BE3BE82280/objects/action
+                status:
+                  code: 200
+                  message: Success
                 actions:
                 - id: '117000000019'
+                  actionType: DELETE_BY_SELECTION
                   name: Delete From Org 2
                 - id: '117000000018'
+                  actionType: DELETE_BY_SELECTION
                   name: Open Other Buttons
-                - id: '117000000017'
-                  name: Delete Branch
+              schema:
+                type: object
+                properties:
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                  status:
+                    $ref: '#/components/schemas/Status'
+                  actions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Action'
   /workspaces/{workspaceId}/models/{modelId}/processes:
     parameters:
     - name: workspaceId
@@ -2609,11 +2629,13 @@ paths:
       - Bulk Write
       responses:
         '200':
-          description: Response 200
+          description: Task created successfully
           content:
             application/json:
               example:
                 taskId: 5E6331685CC648A29B725923B8FAEA1C
+              schema:
+                $ref: '#/components/schemas/TaskWithUrl'
   /workspaces/{workspaceId}/models/{modelId}/exports:
     parameters:
     - name: workspaceId
@@ -3909,7 +3931,14 @@ paths:
       - Transactional Write
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Cell data written successfully
+          content:
+            application/json:
+              example:
+                numberOfCellsChanged: 2
+                failures: []
+              schema:
+                $ref: '#/components/schemas/WriteCellDataResponse'
   /workspaces/{workspaceId}/models/{modelId}/lists/{listId}/items:
     parameters:
     - name: workspaceId
@@ -4120,6 +4149,42 @@ paths:
       responses:
         '429':
           description: more detail in path description
+        '200':
+          description: List items retrieved successfully
+          content:
+            application/json:
+              example:
+                meta:
+                  schema: https://api.anaplan.com/2/0/objects/list
+                status:
+                  code: 200
+                  message: Success
+                listItems:
+                - id: '206000000001'
+                  name: cake
+                  code: c1
+                  subsets:
+                    favourite: true
+                  properties:
+                    count: '1.0'
+                - id: '206000000002'
+                  name: bread
+                  code: b2
+                  subsets:
+                    favourite: false
+                  properties:
+                    count: '4.0'
+              schema:
+                type: object
+                properties:
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                  status:
+                    $ref: '#/components/schemas/Status'
+                  listItems:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ListItem'
     post:
       summary: Add list items
       description: |-
@@ -4399,6 +4464,60 @@ paths:
       responses:
         '200':
           description: 'TODO: document response'
+  /workspaces/{workspaceId}/models/{modelId}/lists/{listId}/readRequests:
+    parameters:
+    - name: workspaceId
+      in: path
+      description: Workspace identifier (32-character lowercase hex string).
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9a-f]{32}$
+      example: 8a868cda7c8b28f5017c9a4b2d8341cd
+    - name: modelId
+      in: path
+      description: Model identifier (32-character uppercase hex string).
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9A-F]{32}$
+      example: 4261ECE4389B45E18915B5EB72F7510B
+    - name: listId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: '101000000001'
+    post:
+      summary: Start a large-list read request
+      description: Initiates an asynchronous read of all items in the specified list. Poll the returned `url` until `requestState`
+        is COMPLETE, then retrieve pages via the pages sub-resource.
+      tags:
+      - Transactional Read
+      responses:
+        '200':
+          description: Read request created successfully
+          content:
+            application/json:
+              example:
+                meta:
+                  schema: https://api.anaplan.com/2/0/objects/listReadRequest
+                status:
+                  code: 200
+                  message: Success
+                listReadRequest:
+                  requestId: 690B711AFECA467F85624DA799F0AB29
+                  requestState: IN_PROGRESS
+                  url: https://api.anaplan.com/2/0/workspaces/8a868cd885f53bd201860f5a4fea1ff1/models/09F86E3942A84353892853BE3BE82280/lists/101000000203/readRequests/
+              schema:
+                type: object
+                properties:
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                  status:
+                    $ref: '#/components/schemas/Status'
+                  listReadRequest:
+                    $ref: '#/components/schemas/ListReadRequest'
   /workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests:
     parameters:
     - name: workspaceId
@@ -6060,11 +6179,13 @@ paths:
       - Bulk Other
       responses:
         '200':
-          description: Response 200
+          description: Task created successfully
           content:
             application/json:
               example:
                 taskId: E1F648F527AF4297B09E06C278B99F4C
+              schema:
+                $ref: '#/components/schemas/TaskWithUrl'
   /workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks:
     parameters:
     - name: workspaceId
@@ -6188,12 +6309,178 @@ paths:
       - Bulk Other
       responses:
         '200':
-          description: Response 200
+          description: Task created successfully
           content:
             application/json:
               example:
                 task:
                   taskId: 0690AA1C761F48549C3442A02F91D962
+              schema:
+                type: object
+                properties:
+                  task:
+                    $ref: '#/components/schemas/TaskWithUrl'
+  /workspaces/{workspaceId}/models/{modelId}/dashboards:
+    parameters:
+    - name: workspaceId
+      in: path
+      description: Workspace identifier (32-character lowercase hex string).
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9a-f]{32}$
+      example: 8a868cda7c8b28f5017c9a4b2d8341cd
+    - name: modelId
+      in: path
+      description: Model identifier (32-character uppercase hex string).
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9A-F]{32}$
+      example: 4261ECE4389B45E18915B5EB72F7510B
+    get:
+      summary: List dashboards in a model
+      description: Returns all dashboards defined in the specified model.
+      tags:
+      - Model Metadata
+      responses:
+        '200':
+          description: Dashboards retrieved successfully
+          content:
+            application/json:
+              example:
+                dashboards:
+                - id: '115000000009'
+                  name: Sprint Planning
+                - id: '115000000010'
+                  name: Revenue Overview
+                status:
+                  code: 200
+                  message: Success
+                meta:
+                  paging:
+                    currentPageSize: 2
+                    offset: 0
+                    totalSize: 2
+                  schema: https://api.anaplan.com/2/0/models/09F86E3942A84353892853BE3BE82280/objects/dashboard
+              schema:
+                type: object
+                properties:
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                  status:
+                    $ref: '#/components/schemas/Status'
+                  dashboards:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Dashboard'
+  /workspaces/{workspaceId}/models/{modelId}/alm/revisions:
+    parameters:
+    - name: workspaceId
+      in: path
+      description: Workspace identifier (32-character lowercase hex string).
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9a-f]{32}$
+      example: 8a868cda7c8b28f5017c9a4b2d8341cd
+    - name: modelId
+      in: path
+      description: Model identifier (32-character uppercase hex string).
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9A-F]{32}$
+      example: 4261ECE4389B45E18915B5EB72F7510B
+    get:
+      summary: List ALM revisions for a model
+      description: Returns all tagged revisions for the specified model, ordered from oldest to newest.
+      tags:
+      - Model Metadata
+      responses:
+        '200':
+          description: Revisions retrieved successfully
+          content:
+            application/json:
+              example:
+                meta:
+                  paging:
+                    currentPageSize: 2
+                    offset: 0
+                    totalSize: 1947
+                  schema: https://api.anaplan.com/2/0/objects/revision
+                status:
+                  code: 200
+                  message: Success
+                revisions:
+                - id: FDE14C4606E14F739C102C50C21E5CF0
+                  name: Copy Model
+                  createdOn: '2023-10-12T11:41:24Z'
+                  createdBy: 8a868cda88beaa28018948a3e44546c1
+                  creationMethod: Model imported
+                  appliedOn: '2023-10-12T11:47:03Z'
+                  appliedBy: 8a868cda88beaa28018948a3e44546c1
+              schema:
+                type: object
+                properties:
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                  status:
+                    $ref: '#/components/schemas/Status'
+                  revisions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Revision'
+  /workspaces/{workspaceId}/models/{modelId}/alm/syncTasks:
+    parameters:
+    - name: workspaceId
+      in: path
+      description: Workspace identifier (32-character lowercase hex string).
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9a-f]{32}$
+      example: 8a868cda7c8b28f5017c9a4b2d8341cd
+    - name: modelId
+      in: path
+      description: Model identifier (32-character uppercase hex string).
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9A-F]{32}$
+      example: 4261ECE4389B45E18915B5EB72F7510B
+    get:
+      summary: List ALM sync tasks for a model
+      description: Returns all ALM sync task records for the specified model.
+      tags:
+      - Model Metadata
+      responses:
+        '200':
+          description: Sync tasks retrieved successfully
+          content:
+            application/json:
+              example:
+                meta:
+                  paging:
+                    currentPageSize: 0
+                    offset: 0
+                    totalSize: 0
+                  schema: https://api.anaplan.com/2/0/objects/syncTask
+                status:
+                  code: 200
+                  message: Success
+                syncTasks: []
+              schema:
+                type: object
+                properties:
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                  status:
+                    $ref: '#/components/schemas/Status'
+                  syncTasks:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SyncTask'
   /workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks/{taskId}:
     parameters:
     - name: workspaceId
@@ -7644,6 +7931,36 @@ components:
           type: boolean
         customerId:
           type: string
+    Admin:
+      x-stub: true
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          pattern: ^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$
+        active:
+          type: boolean
+        otherWorkspaces:
+          type: array
+    Visitor:
+      x-stub: true
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          pattern: ^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$
+        active:
+          type: boolean
+        otherWorkspaces:
+          type: array
     Model:
       type: object
       properties:
@@ -7716,6 +8033,7 @@ components:
         currentSize:
           type: integer
     Category:
+      x-stub: true
       type: object
       properties:
         id:
@@ -7725,23 +8043,7 @@ components:
         categoryValues:
           type: array
           items:
-            type: object
-            properties:
-              id:
-                description: Category value Id
-                type: string
-              attribute:
-                description: Category value
-                type: string
-              categoryId:
-                type: string
-              categoryName:
-                enum:
-                - App
-                - Environment
-                - Department
-                - Region
-                - Planning Cycle
+            $ref: '#/components/schemas/CategoryValue'
           minItems: 0
           maxItems: 5
     CategoryValue:
@@ -7757,34 +8059,10 @@ components:
           type: string
         customerId:
           type: string
-    Admin:
-      type: object
-      properties:
-        firstName:
-          type: string
-        lastName:
-          type: string
-        email:
-          type: string
-          pattern: ^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$
-        active:
-          type: boolean
-        otherWorkspaces:
-          type: array
-    Visitor:
-      type: object
-      properties:
-        firstName:
-          type: string
-        lastName:
-          type: string
-        email:
-          type: string
-          pattern: ^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$
-        active:
-          type: boolean
-        otherWorkspaces:
-          type: array
+    BulkDeleteModels:
+      x-stub: true
+      description: Result of bulk deleting models
+      properties: {}
     Module:
       properties:
         code:
@@ -7814,6 +8092,35 @@ components:
           type: string
         name:
           type: string
+    DimensionItem:
+      x-stub: true
+      properties:
+        code:
+          type: string
+        id:
+          type: string
+        listId:
+          type: string
+        listName:
+          type: string
+        name:
+          type: string
+        parent:
+          type: string
+        parentId:
+          type: string
+        properties:
+          properties: {}
+          type: object
+        read:
+          type: array
+        subsetId:
+          type: string
+        subsets:
+          properties: {}
+          type: object
+        write:
+          type: array
     CurrentPeriod:
       properties:
         calendarType:
@@ -7833,6 +8140,58 @@ components:
           description: 12-digit numeric identifier. The prefix 118 marks this as a process.
         name:
           type: string
+    Action:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        code:
+          type: string
+        actionType:
+          type: string
+          description: Category of action. Observed values include DELETE_BY_SELECTION. Distinguishes deletion actions from
+            imports, exports, and processes.
+    Dashboard:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        code:
+          type: string
+    Revision:
+      description: A tagged revision of an Anaplan model.
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        createdBy:
+          type: string
+        createdOn:
+          type: string
+          format: date-time
+        appliedBy:
+          type: string
+        appliedOn:
+          type: string
+          format: date-time
+        creationMethod:
+          type: string
+          description: 'How this revision was created. Observed value: ''Model imported''. Other values may represent manual
+            saves, ALM syncs, or API-triggered operations.'
+        revisionType:
+          type: string
+    AppliedToModel:
+      x-stub: true
+      description: A model that a revision is applied to
+      properties: {}
     ModelCalendar:
       properties:
         calendarType:
@@ -7885,26 +8244,6 @@ components:
           type: string
         weeksCount:
           type: integer
-    WriteCellDataResponse:
-      type: object
-      properties:
-        numberOfCellsChanged:
-          type: number
-        failures:
-          description: an array of cell write failures
-          type: array
-          items:
-            type: object
-            properties:
-              requestIndex:
-                description: index of the cell write request from the request array
-                type: number
-              failureType:
-                description: failure reason
-                type: string
-              failureMessageDetails:
-                description: details on the failure reason
-                type: string
     List:
       properties:
         code:
@@ -7914,6 +8253,76 @@ components:
           description: 12-digit numeric identifier. The prefix 101 marks this as a list.
         name:
           type: string
+    ListItem:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        code:
+          type: string
+        parent:
+          type: string
+        parentId:
+          type: string
+        listId:
+          type: string
+          description: Anaplan ID of the parent hierarchy list this item belongs to. Only present when the list has a Parent
+            Hierarchy configured.
+        listName:
+          type: string
+          description: Name of the parent hierarchy list this item belongs to. Only present when the list has a Parent Hierarchy
+            configured.
+        subsets:
+          type: object
+          description: Subset membership flags keyed by subset name. true means the item belongs to that subset. Only present
+            when includeAll=true.
+          additionalProperties:
+            type: boolean
+        properties:
+          type: object
+          description: Custom list property values keyed by property name. Values are string-encoded regardless of the underlying
+            property type. Only present when includeAll=true.
+          additionalProperties:
+            type: string
+    ListReadRequest:
+      description: Async read-request token returned by POST .../lists/{listId}/readRequests. Poll the returned url to retrieve
+        results when requestState is COMPLETE.
+      type: object
+      properties:
+        requestId:
+          type: string
+        requestState:
+          type: string
+          description: Current state of the async read operation (e.g. IN_PROGRESS, COMPLETE, NOT_STARTED).
+        url:
+          type: string
+          description: URL to poll for the read-request result or download pages.
+        availablePages:
+          type: integer
+        listId:
+          type: string
+        successful:
+          type: boolean
+    HistoryReadRequest:
+      x-stub: true
+      properties:
+        requestId:
+          type: string
+        requestState:
+          enum:
+          - NOT_STARTED
+          - IN_PROGRESS
+          - COMPLETE
+          - CANCELLING
+          - CANCELLED
+        url:
+          type: string
+    ReadRequestsQuota:
+      x-stub: true
+      description: The large read disk quota and usage for a workspace
+      properties: {}
     Version:
       description: The version of data being used in an Anaplan model
       properties:
@@ -7954,137 +8363,6 @@ components:
           type: string
         periodText:
           type: string
-    TaskWithUrl:
-      description: Initial task reference returned by POST .../tasks. Contains the taskId and a URL for polling status.
-      properties:
-        creationTime:
-          type: integer
-          description: Task creation time in milliseconds since epoch
-        taskId:
-          type: string
-          description: Unique identifier for the task; use this to poll GET .../tasks/{taskId}
-        taskState:
-          description: Lifecycle state of the task
-          enum:
-          - NOT_STARTED
-          - IN_PROGRESS
-          - COMPLETE
-          - CANCELLING
-          - CANCELLED
-        taskUrl:
-          type: string
-          description: URL for polling task status via GET
-    SyncTask:
-      description: A task tracking the execution of an ALM Sync
-      properties:
-        creationTime:
-          type: integer
-        currentStep:
-          type: string
-        result:
-          properties:
-            error:
-              properties:
-                messageText:
-                  type: string
-                subtitle:
-                  type: string
-                title:
-                  type: string
-              type: object
-            reportFileUrl:
-              type: string
-            sourceRevisionId:
-              type: string
-            successful:
-              type: boolean
-            targetRevisionId:
-              type: string
-          type: object
-        taskId:
-          type: string
-        taskState:
-          enum:
-          - NOT_STARTED
-          - IN_PROGRESS
-          - COMPLETE
-          - CANCELLING
-          - CANCELLED
-    Revision:
-      description: A tagged revision of a model
-      properties:
-        appliedBy:
-          type: string
-        appliedOn:
-          properties:
-            date:
-              type: integer
-            hours:
-              type: integer
-            minutes:
-              type: integer
-            month:
-              type: integer
-            seconds:
-              type: integer
-            time:
-              type: integer
-            year:
-              type: integer
-          type: object
-        createdBy:
-          type: string
-        createdOn:
-          properties:
-            date:
-              type: integer
-            hours:
-              type: integer
-            minutes:
-              type: integer
-            month:
-              type: integer
-            seconds:
-              type: integer
-            time:
-              type: integer
-            year:
-              type: integer
-          type: object
-        creationMethod:
-          type: string
-        description:
-          type: string
-        id:
-          type: string
-        name:
-          type: string
-        revisionType:
-          enum:
-          - FULL
-          - PARTIAL
-          - UNKNOWN
-    ListReadRequest:
-      description: Result record for a large-list read operation. Tracks the asynchronous read state and provides a URL for
-        downloading the data once it is ready.
-      properties:
-        availablePages:
-          type: integer
-        listId:
-          type: integer
-        requestId:
-          type: string
-        requestState:
-          enum:
-          - NOT_STARTED
-          - IN_PROGRESS
-          - COMPLETE
-          - CANCELLING
-          - CANCELLED
-        successful:
-          type: boolean
-        url:
-          type: string
     ViewReadRequest:
       description: Result record for a large-view read operation. Tracks the asynchronous read state and provides a URL for
         downloading the data once it is ready.
@@ -8106,26 +8384,6 @@ components:
           type: string
         viewId:
           type: integer
-    AppliedToModel:
-      description: A model that a revision is applied to
-      properties: {}
-    SummaryReport:
-      properties: {}
-    BulkDeleteModels:
-      description: Result of bulk deleting models
-      properties: {}
-    Action:
-      description: A saved action (not an import, export or process) in an Anaplan model
-      properties:
-        code:
-          type: string
-        id:
-          type: string
-          description: 12-digit numeric identifier. The prefix 117 marks this as an action.
-        name:
-          type: string
-        actionType:
-          type: string
     Chunk:
       description: A unit of partial file content
       properties:
@@ -8135,43 +8393,6 @@ components:
           type: string
         name:
           type: string
-    Dashboard:
-      properties:
-        code:
-          type: string
-        id:
-          type: string
-          description: 12-digit numeric identifier. The prefix 115 marks this as a dashboard.
-        name:
-          type: string
-    DimensionItem:
-      properties:
-        code:
-          type: string
-        id:
-          type: string
-        listId:
-          type: string
-        listName:
-          type: string
-        name:
-          type: string
-        parent:
-          type: string
-        parentId:
-          type: string
-        properties:
-          properties: {}
-          type: object
-        read:
-          type: array
-        subsetId:
-          type: string
-        subsets:
-          properties: {}
-          type: object
-        write:
-          type: array
     Export:
       properties:
         code:
@@ -8278,19 +8499,6 @@ components:
           description: 'Source type of the file: ''NATIVE_ANAPLAN'' for Anaplan-owned files (e.g. export outputs), ''FILE_BASED''
             for externally uploaded import sources.'
         separator:
-          type: string
-    HistoryReadRequest:
-      properties:
-        requestId:
-          type: string
-        requestState:
-          enum:
-          - NOT_STARTED
-          - IN_PROGRESS
-          - COMPLETE
-          - CANCELLING
-          - CANCELLED
-        url:
           type: string
     Import:
       properties:
@@ -8433,43 +8641,32 @@ components:
             name:
               type: string
           type: object
-    ListItem:
+    WriteCellDataResponse:
+      type: object
       properties:
-        code:
-          type: string
-        id:
-          type: string
-        listId:
-          type: string
-        listName:
-          type: string
-        name:
-          type: string
-        parent:
-          type: string
-        parentId:
-          type: string
-        properties:
-          properties: {}
-          type: object
-        read:
+        numberOfCellsChanged:
+          type: number
+        failures:
+          description: An array of cell write failures; empty when all cells updated successfully.
           type: array
-        subsetId:
-          type: string
-        subsets:
-          properties: {}
-          type: object
-        write:
-          type: array
+          items:
+            type: object
+            properties:
+              requestIndex:
+                description: Index of the cell write request from the request array.
+                type: number
+              failureType:
+                description: Failure reason.
+                type: string
+              failureMessageDetails:
+                description: Details on the failure reason.
+                type: string
     Period:
       properties:
         date:
           type: string
         periodText:
           type: string
-    ReadRequestsQuota:
-      description: The large read disk quota and usage for a workspace
-      properties: {}
     Task:
       description: A task tracking the execution of a process/import/export/action
       properties:
@@ -8534,6 +8731,65 @@ components:
           type: string
         successful:
           type: boolean
+    SyncTask:
+      description: A task tracking the execution of an ALM Sync
+      properties:
+        creationTime:
+          type: integer
+        currentStep:
+          type: string
+        result:
+          type: object
+          properties:
+            error:
+              type: object
+              properties:
+                messageText:
+                  type: string
+                subtitle:
+                  type: string
+                title:
+                  type: string
+            reportFileUrl:
+              type: string
+            sourceRevisionId:
+              type: string
+            successful:
+              type: boolean
+            targetRevisionId:
+              type: string
+        taskId:
+          type: string
+        taskState:
+          enum:
+          - NOT_STARTED
+          - IN_PROGRESS
+          - COMPLETE
+          - CANCELLING
+          - CANCELLED
+    TaskWithUrl:
+      description: Initial task reference returned by POST .../tasks. Contains the taskId and a URL for polling status.
+      properties:
+        creationTime:
+          type: integer
+          description: Task creation time in milliseconds since epoch.
+        taskId:
+          type: string
+          description: Unique identifier for the task; use this to poll GET .../tasks/{taskId}.
+        taskState:
+          enum:
+          - NOT_STARTED
+          - IN_PROGRESS
+          - COMPLETE
+          - CANCELLING
+          - CANCELLED
+          description: Lifecycle state of the task.
+        taskUrl:
+          type: string
+          description: URL for polling task status via GET.
+    SummaryReport:
+      x-stub: true
+      properties: {}
     Paging:
       type: object
       required:

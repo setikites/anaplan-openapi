@@ -18,5 +18,8 @@ jobs:
       - name: Validate OpenAPI specs (schema)
         run: uv run python scripts/validate.py
 
+      - name: Check for unused components
+        run: uv run python scripts/check_unused_components.py
+
       - name: Run tests
         run: uv run pytest tests/ -v --tb=short -m "not live"

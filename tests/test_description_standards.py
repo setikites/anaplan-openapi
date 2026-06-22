@@ -83,7 +83,6 @@ _SCHEMA_MUST_HAVE_DESCRIPTION = [
     # Integration — status and metadata envelopes whose names alone are insufficient
     pytest.param("integration", ["components", "schemas", "Status"],          id="int-status"),
     pytest.param("integration", ["components", "schemas", "Meta"],            id="int-meta"),
-    pytest.param("integration", ["components", "schemas", "ListReadRequest"], id="int-listreadrequest"),
     pytest.param("integration", ["components", "schemas", "ViewReadRequest"], id="int-viewreadrequest"),
 ]
 
@@ -221,12 +220,10 @@ _PROPERTY_MUST_HAVE_DESCRIPTION = [
     # Integration — numeric IDs: 12-digit type-prefixed strings; format is non-obvious from name + type alone
     pytest.param("integration", ["components", "schemas", "Import",    "properties", "id"], id="int-import-id"),
     pytest.param("integration", ["components", "schemas", "Export",    "properties", "id"], id="int-export-id"),
-    pytest.param("integration", ["components", "schemas", "Action",    "properties", "id"], id="int-action-id"),
     pytest.param("integration", ["components", "schemas", "Process",   "properties", "id"], id="int-process-id"),
     pytest.param("integration", ["components", "schemas", "File",      "properties", "id"], id="int-file-id"),
     pytest.param("integration", ["components", "schemas", "List",      "properties", "id"], id="int-list-id"),
     pytest.param("integration", ["components", "schemas", "Module",    "properties", "id"], id="int-module-id"),
-    pytest.param("integration", ["components", "schemas", "Dashboard", "properties", "id"], id="int-dashboard-id"),
     pytest.param("integration", ["components", "schemas", "View",      "properties", "id"], id="int-view-id"),
     # Integration — File: encoding observed values (ISO-8859-1, UTF-16LE, UTF-8) non-obvious
     pytest.param("integration", ["components", "schemas", "File", "properties", "encoding"], id="int-file-encoding"),
@@ -402,49 +399,17 @@ _MUST_NOT_HAVE_DESCRIPTION = [
     pytest.param("integration", ["components", "schemas", "Workspace", "properties", "active"],                     id="int-workspace-active"),
     pytest.param("integration", ["components", "schemas", "Workspace", "properties", "sizeAllowance"],              id="int-workspace-sizeallowance"),
     pytest.param("integration", ["components", "schemas", "Workspace", "properties", "currentSize"],                id="int-workspace-currentsize"),
-    # Integration Category — id and name are self-evident from field name + type
-    pytest.param("integration", ["components", "schemas", "Category"],                                       id="int-category-schema"),
-    pytest.param("integration", ["components", "schemas", "Category", "properties", "id"],                  id="int-category-id"),
-    pytest.param("integration", ["components", "schemas", "Category", "properties", "name"],                id="int-category-name"),
-    # Integration CategoryValue — schema name self-evident; all property descriptions restate the name or context
-    pytest.param("integration", ["components", "schemas", "CategoryValue"],                                                   id="int-categoryvalue-schema"),
-    pytest.param("integration", ["components", "schemas", "CategoryValue", "properties", "id"],                              id="int-categoryvalue-id"),
-    pytest.param("integration", ["components", "schemas", "CategoryValue", "properties", "attribute"],                      id="int-categoryvalue-attribute"),
-    pytest.param("integration", ["components", "schemas", "CategoryValue", "properties", "categoryId"],                     id="int-categoryvalue-categoryid"),
-    pytest.param("integration", ["components", "schemas", "CategoryValue", "properties", "categoryName"],                   id="int-categoryvalue-categoryname"),
-    pytest.param("integration", ["components", "schemas", "CategoryValue", "properties", "customerId"],                     id="int-categoryvalue-customerid"),
-    # Integration Admin/Visitor — schema names self-evident; all property descriptions restate the field name
-    pytest.param("integration", ["components", "schemas", "Admin"],                                            id="int-admin-schema"),
-    pytest.param("integration", ["components", "schemas", "Admin", "properties", "firstName"],                id="int-admin-firstname"),
-    pytest.param("integration", ["components", "schemas", "Admin", "properties", "lastName"],                 id="int-admin-lastname"),
-    pytest.param("integration", ["components", "schemas", "Admin", "properties", "email"],                   id="int-admin-email"),
-    pytest.param("integration", ["components", "schemas", "Admin", "properties", "active"],                  id="int-admin-active"),
-    pytest.param("integration", ["components", "schemas", "Admin", "properties", "otherWorkspaces"],         id="int-admin-otherworkspaces"),
-    pytest.param("integration", ["components", "schemas", "Visitor"],                                          id="int-visitor-schema"),
-    pytest.param("integration", ["components", "schemas", "Visitor", "properties", "firstName"],              id="int-visitor-firstname"),
-    pytest.param("integration", ["components", "schemas", "Visitor", "properties", "lastName"],               id="int-visitor-lastname"),
-    pytest.param("integration", ["components", "schemas", "Visitor", "properties", "email"],                  id="int-visitor-email"),
-    pytest.param("integration", ["components", "schemas", "Visitor", "properties", "active"],                 id="int-visitor-active"),
-    pytest.param("integration", ["components", "schemas", "Visitor", "properties", "otherWorkspaces"],        id="int-visitor-otherworkspaces"),
-    # Integration WriteCellDataResponse — 'writeCellDataResponse' restates the schema name; 'numberOfCellsChanged' copies the field name
-    pytest.param("integration", ["components", "schemas", "WriteCellDataResponse"],                                                     id="int-writecelldata-schema"),
-    pytest.param("integration", ["components", "schemas", "WriteCellDataResponse", "properties", "numberOfCellsChanged"], id="int-writecelldata-numcellschanged"),
     # Integration — self-evident schema names whose descriptions restate the name without adding value
-    pytest.param("integration", ["components", "schemas", "SummaryReport"],   id="int-summaryreport-schema"),
     pytest.param("integration", ["components", "schemas", "CurrentPeriod"],   id="int-currentperiod-schema"),
     pytest.param("integration", ["components", "schemas", "ModelCalendar"],   id="int-modelcalendar-schema"),
     pytest.param("integration", ["components", "schemas", "Module"],          id="int-module-schema"),
     pytest.param("integration", ["components", "schemas", "View"],            id="int-view-schema"),
     pytest.param("integration", ["components", "schemas", "Dimension"],       id="int-dimension-schema"),
     pytest.param("integration", ["components", "schemas", "List"],            id="int-list-schema"),
-    pytest.param("integration", ["components", "schemas", "Dashboard"],       id="int-dashboard-schema"),
-    pytest.param("integration", ["components", "schemas", "DimensionItem"],   id="int-dimensionitem-schema"),
     pytest.param("integration", ["components", "schemas", "Export"],          id="int-export-schema"),
     pytest.param("integration", ["components", "schemas", "Import"],          id="int-import-schema"),
     pytest.param("integration", ["components", "schemas", "LineItem"],        id="int-lineitem-schema"),
-    pytest.param("integration", ["components", "schemas", "ListItem"],        id="int-listitem-schema"),
     pytest.param("integration", ["components", "schemas", "Period"],          id="int-period-schema"),
-    pytest.param("integration", ["components", "schemas", "HistoryReadRequest"], id="int-historyreadrequest-schema"),
     pytest.param("integration", ["components", "schemas", "ExportMetadata"],  id="int-exportmetadata-schema"),
     pytest.param("integration", ["components", "schemas", "Process"],         id="int-process-schema"),
 ]

@@ -713,5 +713,45 @@
     "spec": "alm",
     "path": "/components/schemas/SummaryReportResponse/properties/summaryReport/properties/sourceRevisionId",
     "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/dashboards/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/dashboards/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/alm/revisions/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/alm/revisions/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/lists/{listId}/readRequests/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/lists/{listId}/readRequests/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/alm/syncTasks/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/alm/syncTasks/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
   }
 ]
