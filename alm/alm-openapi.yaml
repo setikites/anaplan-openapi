@@ -606,7 +606,8 @@ components:
           type: string
         creationMethod:
           type: string
-          description: How the revision was created (e.g. 'user', 'api').
+          description: How the revision was created.
+          example: user
         appliedOn:
           type: string
           format: date-time
@@ -703,15 +704,17 @@ components:
           type: integer
     Status:
       type: object
-      description: Anaplan API response status. The code mirrors the HTTP status code (e.g. 200, 204); the message is a human-readable
-        outcome string (e.g. 'Success').
+      description: Anaplan API response status. The code mirrors the HTTP status code; the message is a human-readable outcome
+        string.
       properties:
         code:
           type: integer
-          description: Numeric response code, mirrors the HTTP status code (e.g. 200, 204).
+          description: Numeric response code, mirrors the HTTP status code.
+          example: 200
         message:
           type: string
-          description: Human-readable outcome string, e.g. 'Success'.
+          description: Human-readable outcome string.
+          example: Success
     RevisionResponse:
       type: object
       description: Response for the latestRevision endpoint. When no revision exists, the response contains only meta and
