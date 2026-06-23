@@ -3157,9 +3157,21 @@
         "tags": [
           "Bulk Write"
         ],
+        "requestBody": {
+          "description": "Raw binary content of the file.",
+          "required": true,
+          "content": {
+            "application/octet-stream": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            }
+          }
+        },
         "responses": {
-          "200": {
-            "description": "TODO: document response"
+          "204": {
+            "description": "File uploaded successfully. No response body."
           }
         }
       },
@@ -3171,8 +3183,8 @@
           "File Metadata"
         ],
         "responses": {
-          "200": {
-            "description": "TODO: document response"
+          "204": {
+            "description": "File deleted successfully. No response body."
           }
         }
       }
@@ -4318,7 +4330,15 @@
         ],
         "responses": {
           "200": {
-            "description": "TODO: document response"
+            "description": "Chunk data downloaded successfully.",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
           }
         }
       },

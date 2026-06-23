@@ -3406,9 +3406,17 @@ paths:
         #
       tags:
       - Bulk Write
+      requestBody:
+        description: Raw binary content of the file.
+        required: true
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
       responses:
-        '200':
-          description: 'TODO: document response'
+        '204':
+          description: File uploaded successfully. No response body.
     delete:
       summary: Delete files
       description: |-
@@ -3449,8 +3457,8 @@ paths:
       - Model Metadata
       - File Metadata
       responses:
-        '200':
-          description: 'TODO: document response'
+        '204':
+          description: File deleted successfully. No response body.
   /models/{modelId}/versions/{versionId}/switchover:
     parameters:
     - name: modelId
@@ -5300,7 +5308,12 @@ paths:
       - Bulk Read
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Chunk data downloaded successfully.
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
     put:
       summary: Upload a file in chunks
       description: |-
