@@ -9,6 +9,28 @@ info:
 servers:
 - url: https://api.anaplan.com/admin/1/0
   description: Production (US1, US2, US5, US7, EU1, EU2, EU4, AP1 and other legacy regions sharing the non-prefixed host)
+- url: https://us9.api.anaplan.com/admin/1/0
+  description: US9 (Cloud - US)
+- url: https://eu3.api.anaplan.com/admin/1/0
+  description: EU3 (Cloud - Europe)
+- url: https://eu5.api.anaplan.com/admin/1/0
+  description: EU5 (Cloud - Europe)
+- url: https://gb1.api.anaplan.com/admin/1/0
+  description: GB1 (Cloud - UK)
+- url: https://ca1a.api.anaplan.com/admin/1/0
+  description: CA1 (Cloud - Canada)
+- url: https://sg1.api.anaplan.com/admin/1/0
+  description: SG1 (Cloud - Singapore)
+- url: https://ae1.api.anaplan.com/admin/1/0
+  description: AE1 (Cloud - UAE)
+- url: https://me1.api.anaplan.com/admin/1/0
+  description: ME1 (Cloud - Saudi Arabia)
+- url: https://in1.api.anaplan.com/admin/1/0
+  description: IN1 (Cloud - India)
+- url: https://id1.api.anaplan.com/admin/1/0
+  description: ID1 (Cloud - Indonesia)
+- url: https://au1a.api2.anaplan.com/admin/1/0
+  description: AU1 (Cloud - Australia)
 security:
 - AnaplanAuthToken: []
 paths:
