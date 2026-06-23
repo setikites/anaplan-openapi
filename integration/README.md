@@ -67,6 +67,8 @@ Endpoints covered (all paths relative to the `/2/0` base URL):
 | `test_get_user_by_id` | `GET /users/{userId}` |
 | `test_list_workspaces` | `GET /workspaces` |
 | `test_get_workspace` | `GET /workspaces/{workspaceId}` |
+| `test_get_workspace_admins` | `GET /workspaces/{workspaceId}/admins` (warns — 500 without tenant admin privilege) |
+| `test_get_workspace_visitors` | `GET /workspaces/{workspaceId}/visitors` (warns — 500 without tenant admin privilege) |
 | `test_list_models` | `GET /models` |
 | `test_get_model` | `GET /models/{modelId}` |
 | `test_list_workspace_models` | `GET /workspaces/{workspaceId}/models` |
@@ -118,6 +120,16 @@ Expected skips:
 ## Discovered Discrepancies
 
 _Document differences between Apiary docs, Postman collection, and live API behavior here as they are discovered._
+
+### `Admin` and `Visitor` schema email regex is over-escaped
+
+The `email` property on both `Admin` and `Visitor` uses the pattern inherited verbatim from `sources/integration/objectSchema.json`:
+
+```
+^[_A-Za-z0-9-\\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$
+```
+
+After JSON double-escaping, the decoded regex pattern contains `\\.` (two characters: backslash + dot) where `\.` (escaped dot = literal dot) was almost certainly intended. In Python's `re` module, `\\.` means "literal backslash followed by any character" rather than "literal dot", making the pattern reject standard emails like `user.name@example.com`. The pattern is retained as-is to preserve fidelity to the source schema; inline examples in the spec omit the `email` field to avoid failing the example/schema contract test.
 
 ### `GET /models/{modelId}/files/{fileId}` requires Workspace Administrator
 

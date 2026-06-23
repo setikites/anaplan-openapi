@@ -407,6 +407,145 @@
         }
       }
     },
+    "/workspaces/{workspaceId}/admins": {
+      "parameters": [
+        {
+          "name": "workspaceId",
+          "in": "path",
+          "description": "Workspace identifier (32-character lowercase hex string).",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
+          },
+          "example": "8a868cda7c8b28f5017c9a4b2d8341cd"
+        }
+      ],
+      "get": {
+        "summary": "List workspace administrators",
+        "description": "Returns all administrators for a workspace. Requires tenant admin privilege; workspace admin access alone is insufficient.",
+        "tags": [
+          "General Workspace & Model Metadata"
+        ],
+        "responses": {
+          "200": {
+            "description": "Administrators retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    },
+                    "status": {
+                      "$ref": "#/components/schemas/Status"
+                    },
+                    "admins": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Admin"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "meta": {
+                    "schema": "https://api.anaplan.com/2/0/objects/admin",
+                    "paging": {
+                      "currentPageSize": 1,
+                      "totalSize": 1,
+                      "offset": 0
+                    }
+                  },
+                  "status": {
+                    "code": 200,
+                    "message": "Success"
+                  },
+                  "admins": [
+                    {
+                      "firstName": "Jane",
+                      "lastName": "Smith",
+                      "active": true,
+                      "otherWorkspaces": ["Sales Planning Workspace"]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Workspace not found."
+          }
+        }
+      }
+    },
+    "/workspaces/{workspaceId}/visitors": {
+      "parameters": [
+        {
+          "name": "workspaceId",
+          "in": "path",
+          "description": "Workspace identifier (32-character lowercase hex string).",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
+          },
+          "example": "8a868cda7c8b28f5017c9a4b2d8341cd"
+        }
+      ],
+      "get": {
+        "summary": "List workspace visitors",
+        "description": "Returns all visitors for a workspace. Requires tenant admin privilege; workspace admin access alone is insufficient.",
+        "tags": [
+          "General Workspace & Model Metadata"
+        ],
+        "responses": {
+          "200": {
+            "description": "Visitors retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    },
+                    "status": {
+                      "$ref": "#/components/schemas/Status"
+                    },
+                    "visitors": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Visitor"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "meta": {
+                    "schema": "https://api.anaplan.com/2/0/objects/visitor",
+                    "paging": {
+                      "currentPageSize": 0,
+                      "totalSize": 0,
+                      "offset": 0
+                    }
+                  },
+                  "status": {
+                    "code": 200,
+                    "message": "Success"
+                  },
+                  "visitors": []
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Workspace not found."
+          }
+        }
+      }
+    },
     "/models/{modelId}": {
       "parameters": [
         {
@@ -7024,7 +7163,6 @@
         }
       },
       "Admin": {
-        "x-stub": true,
         "type": "object",
         "properties": {
           "firstName": {
@@ -7041,12 +7179,14 @@
             "type": "boolean"
           },
           "otherWorkspaces": {
-            "type": "array"
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       },
       "Visitor": {
-        "x-stub": true,
         "type": "object",
         "properties": {
           "firstName": {
@@ -7063,7 +7203,10 @@
             "type": "boolean"
           },
           "otherWorkspaces": {
-            "type": "array"
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       },

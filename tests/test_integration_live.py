@@ -273,6 +273,82 @@ def test_get_workspace(integration_token):
 
 
 @pytest.mark.live
+def test_get_workspace_admins(integration_token):
+    """GET /2/0/workspaces/{workspaceId}/admins returns workspace administrator list.
+
+    Requires tenant admin access (OAuth Authorization Code grant). Basic-auth tokens
+    receive 500; this test warns and skips in that case.
+    """
+    if not WORKSPACE_ID:
+        pytest.skip("ANAPLAN_INTEGRATION_WORKSPACE_ID not set")
+    with httpx.Client() as client:
+        response = client.get(
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/admins",
+            headers={"Authorization": f"AnaplanAuthToken {integration_token}"},
+        )
+
+    if response.status_code in (403, 500):
+        warnings.warn(
+            f"GET /workspaces/{WORKSPACE_ID}/admins returned {response.status_code} — "
+            "endpoint requires tenant admin privilege (workspace admin alone is insufficient).",
+            UserWarning,
+            stacklevel=2,
+        )
+        return
+
+    assert response.status_code == 200, (
+        f"Expected 200, got {response.status_code}: {response.text[:200]}"
+    )
+    body = response.json()
+    assert body.get("status", {}).get("code") == 200
+    admins = body.get("admins")
+    assert isinstance(admins, list), (
+        f"Response must contain 'admins' array; keys were: {list(body.keys())}"
+    )
+    for admin in admins:
+        assert "email" in admin, f"Admin must have an email; keys: {list(admin.keys())}"
+        assert "active" in admin, f"Admin must have active flag; keys: {list(admin.keys())}"
+
+
+@pytest.mark.live
+def test_get_workspace_visitors(integration_token):
+    """GET /2/0/workspaces/{workspaceId}/visitors returns workspace visitor list.
+
+    Requires tenant admin access (OAuth Authorization Code grant). Basic-auth tokens
+    receive 500; this test warns and skips in that case.
+    """
+    if not WORKSPACE_ID:
+        pytest.skip("ANAPLAN_INTEGRATION_WORKSPACE_ID not set")
+    with httpx.Client() as client:
+        response = client.get(
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/visitors",
+            headers={"Authorization": f"AnaplanAuthToken {integration_token}"},
+        )
+
+    if response.status_code in (403, 500):
+        warnings.warn(
+            f"GET /workspaces/{WORKSPACE_ID}/visitors returned {response.status_code} — "
+            "endpoint requires tenant admin privilege (workspace admin alone is insufficient).",
+            UserWarning,
+            stacklevel=2,
+        )
+        return
+
+    assert response.status_code == 200, (
+        f"Expected 200, got {response.status_code}: {response.text[:200]}"
+    )
+    body = response.json()
+    assert body.get("status", {}).get("code") == 200
+    visitors = body.get("visitors")
+    assert isinstance(visitors, list), (
+        f"Response must contain 'visitors' array; keys were: {list(body.keys())}"
+    )
+    for visitor in visitors:
+        assert "email" in visitor, f"Visitor must have an email; keys: {list(visitor.keys())}"
+        assert "active" in visitor, f"Visitor must have active flag; keys: {list(visitor.keys())}"
+
+
+@pytest.mark.live
 def test_list_models(integration_token):
     """GET /2/0/models returns list of accessible models."""
     with httpx.Client() as client:

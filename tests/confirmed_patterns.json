@@ -26,6 +26,16 @@
   },
   {
     "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/admins/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/visitors/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
     "path": "/paths//workspaces/{workspaceId}/models/{modelId}/dimensions/{dimensionId}/items/parameters/0/schema",
     "pattern": "^[0-9a-f]{32}$"
   },
