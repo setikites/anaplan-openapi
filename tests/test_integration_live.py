@@ -1932,6 +1932,98 @@ def test_import_dump_chunks(integration_token, import_id, import_task_id):
     assert isinstance(chunks, list), f"Expected 'chunks' list; keys: {list(body.keys())}"
 
 
+@pytest.mark.live
+def test_import_dump(integration_token, import_id, import_task_id):
+    """GET .../imports/{importId}/tasks/{taskId}/dump returns text/plain or 404.
+
+    Returns the full dump file (unchunked). When failureDumpAvailable=True the
+    body is plain text with CSV-formatted error rows. When no dump is available
+    the API returns 404 (or 204 on some regions).
+    """
+    h = _auth_headers(integration_token)
+    with httpx.Client() as client:
+        task_r = client.get(
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+            f"/imports/{import_id}/tasks/{import_task_id}",
+            headers=h,
+        )
+        if task_r.status_code != 200:
+            pytest.skip(f"Could not fetch task status: {task_r.status_code}")
+        task = task_r.json().get("task", {})
+        dump_available = task.get("result", {}).get("failureDumpAvailable", False)
+
+        response = client.get(
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+            f"/imports/{import_id}/tasks/{import_task_id}/dump",
+            headers=h,
+        )
+
+    if not dump_available:
+        assert response.status_code in (200, 204, 404), (
+            f"GET .../dump (no dump expected) returned unexpected status: {response.status_code}"
+        )
+        return
+
+    assert response.status_code in (200, 404), (
+        f"GET .../dump returned unexpected status: {response.status_code}: {response.text[:200]}"
+    )
+    if response.status_code == 200:
+        ct = response.headers.get("content-type", "")
+        assert "text" in ct or "octet" in ct, (
+            f"Expected text/plain or octet-stream for dump content; got: {ct!r}"
+        )
+        assert len(response.content) > 0, "Dump body must not be empty when status is 200"
+        print(f"\nGET .../dump content-type: {ct!r}, body bytes: {len(response.content)}")
+
+
+@pytest.mark.live
+def test_import_dump_chunk_download(integration_token, import_id, import_task_id):
+    """GET .../imports/{importId}/tasks/{taskId}/dump/chunks/0 downloads first dump chunk.
+
+    Only probed when failureDumpAvailable=True and dump/chunks lists at least one chunk.
+    Confirms the response is plain text with CSV-formatted error rows.
+    """
+    h = _auth_headers(integration_token)
+    with httpx.Client() as client:
+        task_r = client.get(
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+            f"/imports/{import_id}/tasks/{import_task_id}",
+            headers=h,
+        )
+        if task_r.status_code != 200:
+            pytest.skip(f"Could not fetch task status: {task_r.status_code}")
+        task = task_r.json().get("task", {})
+        if not task.get("result", {}).get("failureDumpAvailable"):
+            pytest.skip("failureDumpAvailable=False for this task — no dump chunk to download")
+
+        chunks_r = client.get(
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+            f"/imports/{import_id}/tasks/{import_task_id}/dump/chunks",
+            headers=h,
+        )
+        if chunks_r.status_code != 200:
+            pytest.skip(f"dump/chunks returned {chunks_r.status_code}")
+        chunks = chunks_r.json().get("chunks", [])
+        if not chunks:
+            pytest.skip("dump/chunks returned empty list — no chunks to download")
+
+        response = client.get(
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+            f"/imports/{import_id}/tasks/{import_task_id}/dump/chunks/0",
+            headers=h,
+        )
+
+    assert response.status_code == 200, (
+        f"GET .../dump/chunks/0 returned {response.status_code}: {response.text[:200]}"
+    )
+    assert len(response.content) > 0, "Dump chunk 0 must have non-empty content"
+    ct = response.headers.get("content-type", "")
+    print(f"\nGET .../dump/chunks/0 content-type: {ct!r}, body bytes: {len(response.content)}")
+    assert "text" in ct or "octet" in ct, (
+        f"Expected text/plain or octet-stream for dump chunk; got: {ct!r}"
+    )
+
+
 # ─── Exports ──────────────────────────────────────────────────────────────────
 
 

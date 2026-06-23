@@ -4642,7 +4642,31 @@
         ],
         "responses": {
           "200": {
-            "description": "TODO: document response"
+            "description": "List of chunks in the import failure dump file.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    },
+                    "status": {
+                      "$ref": "#/components/schemas/Status"
+                    },
+                    "chunks": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Chunk"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Dump file not found or not yet available for this task."
           }
         }
       }
@@ -4698,7 +4722,17 @@
         ],
         "responses": {
           "200": {
-            "description": "TODO: document response"
+            "description": "Dump file chunk content. Plain text with CSV-formatted error rows; each row contains _Status_, data columns, _Line_, and _Error_1_ fields.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Chunk not found or dump has expired."
           }
         }
       }
@@ -4754,7 +4788,20 @@
         ],
         "responses": {
           "200": {
-            "description": "TODO: document response"
+            "description": "Full dump file content (unchunked). Plain text with CSV-formatted error rows. Prefer /dump/chunks for large files to avoid timeouts.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No dump content available (import completed with no failures)."
+          },
+          "404": {
+            "description": "Dump file not found, not yet available, or has expired (48-hour TTL after last access)."
           }
         }
       }
