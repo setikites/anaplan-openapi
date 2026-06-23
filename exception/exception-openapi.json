@@ -368,8 +368,7 @@
         "properties": {
           "workspaceGuid": {
             "type": "string",
-            "pattern": "^[0-9a-f]{32}$",
-            "description": "Anaplan-assigned hex-32 GUID of the workspace."
+            "pattern": "^[0-9a-f]{32}$"
           },
           "workspaceName": {
             "type": "string"
@@ -387,8 +386,7 @@
         "properties": {
           "userGuid": {
             "type": "string",
-            "pattern": "^[0-9a-f]{32}$",
-            "description": "Anaplan-assigned hex-32 GUID of the exception user."
+            "pattern": "^[0-9a-f]{32}$"
           },
           "email": {
             "type": "string",

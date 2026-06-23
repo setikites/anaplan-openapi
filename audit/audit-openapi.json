@@ -238,8 +238,7 @@
           },
           "tenantId": {
             "type": "string",
-            "pattern": "^[0-9a-f]{32}$",
-            "description": "Identifier of the tenant that owns the event — 32-character lowercase hex string."
+            "pattern": "^[0-9a-f]{32}$"
           },
           "objectId": {
             "type": "string",

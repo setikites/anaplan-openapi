@@ -248,7 +248,6 @@ components:
         workspaceGuid:
           type: string
           pattern: ^[0-9a-f]{32}$
-          description: Anaplan-assigned hex-32 GUID of the workspace.
         workspaceName:
           type: string
         users:
@@ -261,7 +260,6 @@ components:
         userGuid:
           type: string
           pattern: ^[0-9a-f]{32}$
-          description: Anaplan-assigned hex-32 GUID of the exception user.
         email:
           type: string
           format: email

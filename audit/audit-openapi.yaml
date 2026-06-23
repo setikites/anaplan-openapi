@@ -191,7 +191,6 @@ components:
         tenantId:
           type: string
           pattern: ^[0-9a-f]{32}$
-          description: Identifier of the tenant that owns the event — 32-character lowercase hex string.
         objectId:
           type: string
           description: 'Identifier of the object acted upon. Format varies by object type: model, workspace, and user objects

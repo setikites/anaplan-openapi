@@ -763,5 +763,55 @@
     "spec": "integration",
     "path": "/paths//workspaces/{workspaceId}/models/{modelId}/alm/syncTasks/parameters/1/schema",
     "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "scim",
+    "path": "/paths//Users/{id}/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "scim",
+    "path": "/components/schemas/User/properties/id",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "audit",
+    "path": "/components/schemas/AuditEvent/properties/tenantId",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "audit",
+    "path": "/components/schemas/AuditEvent/properties/objectTenantId",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "exception",
+    "path": "/paths//permissions/exception-users/users/{userGuid}/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "exception",
+    "path": "/components/schemas/ExceptionUserPatchRequest/properties/workspaceGuid",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "exception",
+    "path": "/components/schemas/ExceptionUserSearchByWorkspaceRequest/properties/workspaceGuid",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "exception",
+    "path": "/components/schemas/ExceptionUserSearchByUserRequest/properties/userGuid",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "exception",
+    "path": "/components/schemas/ExceptionUserWorkspaceResult/properties/workspaceGuid",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "exception",
+    "path": "/components/schemas/ExceptionUser/properties/userGuid",
+    "pattern": "^[0-9a-f]{32}$"
   }
 ]

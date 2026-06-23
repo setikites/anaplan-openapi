@@ -293,7 +293,7 @@ _MUST_NOT_HAVE_DESCRIPTION = [
     # Audit AuditEvent (schema) — 'A single audit event record.' restates the name
     pytest.param("audit", ["components", "schemas", "AuditEvent"],                                                id="audit-auditevent-schema"),
     # Audit AuditEvent properties — field name and type already express the meaning
-    pytest.param("audit", ["components", "schemas", "AuditEvent", "properties", "userId"],        id="audit-auditevent-userid"),
+    # userId is NOT listed here: its description documents the non-obvious INTERNAL_ prefix for system events
     pytest.param("audit", ["components", "schemas", "AuditEvent", "properties", "tenantId"],      id="audit-auditevent-tenantid"),
     pytest.param("audit", ["components", "schemas", "AuditEvent", "properties", "success"],       id="audit-auditevent-success"),
     pytest.param("audit", ["components", "schemas", "AuditEvent", "properties", "userAgent"],     id="audit-auditevent-useragent"),
