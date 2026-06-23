@@ -59,25 +59,51 @@ Setup and how to run live tests (credentials, `.env`, flags) are documented in
 [docs/TESTING.md](../docs/TESTING.md). The suite for this API is
 `tests/test_integration_live.py`.
 
-Endpoints covered:
+Endpoints covered (all paths relative to the `/2/0` base URL):
 
 | Test | Endpoint |
 |------|----------|
-| `test_get_current_user` | `GET /2/0/users/me` |
-| `test_get_user_by_id` | `GET /2/0/users/{userId}` |
-| `test_list_workspaces` | `GET /2/0/workspaces` |
-| `test_get_workspace` | `GET /2/0/workspaces/{workspaceId}` |
-| `test_list_models` | `GET /2/0/models` |
-| `test_get_model` | `GET /2/0/models/{modelId}` |
-| `test_list_workspace_models` | `GET /2/0/workspaces/{workspaceId}/models` |
-| `test_get_workspace_model` | `GET /2/0/workspaces/{workspaceId}/models/{modelId}` (skipped — 405) |
+| `test_get_current_user` | `GET /users/me` |
+| `test_get_user_by_id` | `GET /users/{userId}` |
+| `test_list_workspaces` | `GET /workspaces` |
+| `test_get_workspace` | `GET /workspaces/{workspaceId}` |
+| `test_list_models` | `GET /models` |
+| `test_get_model` | `GET /models/{modelId}` |
+| `test_list_workspace_models` | `GET /workspaces/{workspaceId}/models` |
+| `test_get_workspace_model` | `GET /workspaces/{workspaceId}/models/{modelId}` (skipped — 405) |
 | `test_auth_scheme_probe` | Probes Bearer vs AnaplanAuthToken on 3 endpoints |
-| `test_list_versions` | `GET /2/0/models/{modelId}/versions` |
-| `test_get_workspace_current_period` | `GET /2/0/workspaces/{workspaceId}/models/{modelId}/currentPeriod` |
-| `test_get_model_current_period` | `GET /2/0/models/{modelId}/currentPeriod` |
-| `test_get_model_calendar` | `GET /2/0/workspaces/{workspaceId}/models/{modelId}/modelCalendar` |
-| `test_get_fiscal_year` | `GET /2/0/models/{modelId}/modelCalendar/fiscalYear` (warns — 405) |
-| `test_switchover_invalid_date_returns_400` | `PUT /2/0/models/{modelId}/versions/{versionId}/switchover` (guarded — requires `--allow-writes`) |
+| `test_list_modules` | `GET /models/{modelId}/modules` |
+| `test_list_module_line_items` | `GET /models/{modelId}/modules/{moduleId}/lineItems` |
+| `test_list_module_views` | `GET /models/{modelId}/modules/{moduleId}/views` |
+| `test_list_model_views` | `GET /workspaces/{workspaceId}/models/{modelId}/views` |
+| `test_get_view` | `GET /models/{modelId}/views/{viewId}` |
+| `test_list_model_line_items` | `GET /models/{modelId}/lineItems` |
+| `test_list_line_item_dimensions` | `GET /models/{modelId}/lineItems/{lineItemId}/dimensions` |
+| `test_list_line_item_dimension_items` | `GET /models/{modelId}/lineItems/{lineItemId}/dimensions/{dimensionId}/items` |
+| `test_list_view_dimension_items` | `GET /models/{modelId}/views/{viewId}/dimensions/{dimensionId}/items` |
+| `test_list_workspace_dimension_items` | `GET /workspaces/{workspaceId}/models/{modelId}/dimensions/{dimensionId}/items` |
+| `test_list_lists` | `GET /workspaces/{workspaceId}/models/{modelId}/lists` |
+| `test_get_list` | `GET /workspaces/{workspaceId}/models/{modelId}/lists/{listId}` |
+| `test_get_list_items` | `GET /workspaces/{workspaceId}/models/{modelId}/lists/{listId}/items` |
+| `test_post_and_put_list_items` | `POST` + `PUT /workspaces/{workspaceId}/models/{modelId}/lists/{listId}/items` (write-guarded) |
+| `test_list_versions` | `GET /models/{modelId}/versions` |
+| `test_get_workspace_current_period` | `GET /workspaces/{workspaceId}/models/{modelId}/currentPeriod` |
+| `test_get_model_current_period` | `GET /models/{modelId}/currentPeriod` |
+| `test_get_model_calendar` | `GET /workspaces/{workspaceId}/models/{modelId}/modelCalendar` |
+| `test_get_fiscal_year` | `GET /models/{modelId}/modelCalendar/fiscalYear` (warns — 405) |
+| `test_switchover_invalid_date_returns_400` | `PUT /models/{modelId}/versions/{versionId}/switchover` (write-guarded) |
+| `test_view_data_csv` | `GET /models/{modelId}/views/{viewId}/data` (default: `text/csv`) |
+| `test_view_data_json` | `GET /models/{modelId}/views/{viewId}/data?format=v1` (`Accept: application/json`) |
+| `test_view_read_request_lifecycle` | `POST` / `GET` / `DELETE /workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests` (write-guarded) |
+| `test_list_model_files` | `GET /models/{modelId}/files` |
+| `test_get_file_metadata` | `GET /workspaces/{workspaceId}/models/{modelId}/files/{fileId}` (warns — 404 or 200+octet-stream) |
+| `test_list_file_chunks` | `GET /workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks` |
+| `test_download_first_chunk` | `GET /workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks/0` (skips when no content) |
+| `test_upload_single_chunk` | `PUT /workspaces/{workspaceId}/models/{modelId}/files/{fileId}` + `DELETE` (write-guarded) |
+| `test_upload_and_complete_cycle` | `POST` (set chunk count) + `PUT /chunks/0` + `POST /complete` (write-guarded) |
+| `test_run_process_and_poll_task` | `POST /workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks` + `GET .../tasks/{taskId}` (write-guarded) |
+| `test_run_action_and_poll_task` | `POST /workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks` + `GET .../tasks/{taskId}` (write-guarded) |
+| `test_export_import_cycle` | Full export → download → stage → import cycle (write-guarded; see details below) |
 
 ## Modern Endpoint Validation (post-legacy retirement)
 
@@ -93,25 +119,34 @@ Expected skips:
 
 _Document differences between Apiary docs, Postman collection, and live API behavior here as they are discovered._
 
-### `GET /2/0/models/{modelId}/files/{fileId}` requires Workspace Administrator
+### `GET /models/{modelId}/files/{fileId}` requires Workspace Administrator
 
-Returns 404 for standard Integration API users. Individual file metadata is only accessible to Workspace Administrators; all other callers should use `GET /2/0/models/{modelId}/files` (the full file list endpoint).
+Returns 404 for standard Integration API users. Individual file metadata is only accessible to Workspace Administrators; all other callers should use `GET /models/{modelId}/files` (the full file list endpoint).
 
-### `GET /2/0/workspaces/{workspaceId}` returns 404 for non-admins
+### `GET /workspaces/{workspaceId}/models/{modelId}/files/{fileId}` — content vs. metadata (issue #111)
+
+Live testing with file ID `113000001109` (an import source file, `Users.csv`) showed:
+
+- For import source files, this endpoint returns **200 with `application/octet-stream`** (the raw file content), not a JSON metadata envelope. The test warns and skips the metadata assertions in this case.
+- For other files (discovered dynamically), the endpoint returns **404** for non-Workspace-Administrator accounts (see above).
+
+The test (`test_get_file_metadata`) handles both cases gracefully and issues a warning rather than failing.
+
+### `GET /workspaces/{workspaceId}` returns 404 for non-admins
 
 Live testing shows this endpoint returns `404 Resource not found` even when the workspace appears in `GET /workspaces`. The endpoint likely requires **Workspace Administrator** role. The spec documents both 200 and 404 responses; the live test accepts 404 with a warning rather than failing.
 
 ### `pages` and `sort` query parameters (issue #31)
 
-**`pages` on `GET /2/0/models/{modelId}/views/{viewId}/data`**
+**`pages` on `GET /models/{modelId}/views/{viewId}/data`**
 
 Live testing confirmed the `pages` parameter is accepted and returns 200 with a `text/csv` response (when `format=v1` is used). Both multi-value forms work:
 - Repeated-key form: `?pages=dimId:itemId&pages=dimId2:itemId2`
 - Comma-separated form: `?pages=dimId:itemId,dimId2:itemId2`
 
 Key findings:
-- Valid page selectors must correspond to dimensions on the *pages axis* of the view (not rows or columns). Use `GET /2/0/models/{modelId}/views/{viewId}` to identify row/column axes; any model dimension not on those axes may be a page dimension.
-- Dimension items must be fetched from `GET /2/0/workspaces/{workspaceId}/models/{modelId}/dimensions/{dimensionId}/items`, not from the view-scoped `GET /models/{modelId}/views/{viewId}/dimensions/{dimensionId}/items` endpoint (the latter returns items usable for row/column navigation, not page selectors).
+- Valid page selectors must correspond to dimensions on the *pages axis* of the view (not rows or columns). Use `GET /models/{modelId}/views/{viewId}` to identify row/column axes; any model dimension not on those axes may be a page dimension.
+- Dimension items must be fetched from `GET /workspaces/{workspaceId}/models/{modelId}/dimensions/{dimensionId}/items`, not from the view-scoped `GET /models/{modelId}/views/{viewId}/dimensions/{dimensionId}/items` endpoint (the latter returns items usable for row/column navigation, not page selectors).
 - Supplying a dimension ID that is not a page-axis dimension for the given view returns `400: "Invalid page selector [{dimensionId}]"`.
 - Spec models `pages` as `style: form, explode: true` (repeated-key canonical form; comma-separated also accepted).
 
@@ -129,7 +164,7 @@ Live testing confirmed the following on all four task list endpoints (imports, e
 
 Format: `[prefix]field` where prefix is `-` (descending), `+` (ascending), or omitted (ascending). The API does not validate the field name — unknown fields also return 200 and appear to fall back to default ordering. Actual sort ordering could not be verified because the test model's task lists were empty at the time of testing.
 
-### `PUT /2/0/models/{modelId}/currentPeriod` — date parameter interface (issue #30)
+### `PUT /models/{modelId}/currentPeriod` — date parameter interface (issue #30)
 
 Live testing confirmed `date` is accepted as **either** a query parameter (`?date=YYYY-MM-DD`) **or** a request body field (`{"date": "YYYY-MM-DD"}`), but not both simultaneously. Sending both returns:
 
@@ -143,9 +178,9 @@ Confirmed 400 error cases:
 
 The spec declares `date` as a query parameter and documents the 400 response. The request body (`Schema2`) already declared `date` as a body field.
 
-### `GET /2/0/models/{modelId}/modelCalendar/fiscalYear` returns 405
+### `GET /models/{modelId}/modelCalendar/fiscalYear` returns 405
 
-Live testing confirmed this path only supports `PUT` (update fiscal year). `GET` returns `405 Method Not Allowed`. Fiscal year data is available via `GET /2/0/workspaces/{workspaceId}/models/{modelId}/modelCalendar`, which returns the full `modelCalendar` object including `fiscalYear`. The spec retains only `PUT` on this path.
+Live testing confirmed this path only supports `PUT` (update fiscal year). `GET` returns `405 Method Not Allowed`. Fiscal year data is available via `GET /workspaces/{workspaceId}/models/{modelId}/modelCalendar`, which returns the full `modelCalendar` object including `fiscalYear`. The spec retains only `PUT` on this path.
 
 ### Workspace-scoped model paths (issue #25)
 
@@ -153,12 +188,12 @@ Two paths absent from the original spec were probed via live testing:
 
 | Path | Status | Finding |
 |------|--------|---------|
-| `GET /2/0/workspaces/{workspaceId}/models` | **200 OK** | Valid — workspace-filtered model list |
-| `GET /2/0/workspaces/{workspaceId}/models/{modelId}` | **405 Method Not Allowed** | Endpoint does not support GET |
+| `GET /workspaces/{workspaceId}/models` | **200 OK** | Valid — workspace-filtered model list |
+| `GET /workspaces/{workspaceId}/models/{modelId}` | **405 Method Not Allowed** | Endpoint does not support GET |
 
 **`GET /workspaces/{workspaceId}/models`** is a working endpoint. Its response shape is **identical** to `GET /models` (top-level keys: `meta`, `status`, `models`; model object fields: `id`, `name`, `activeState`, `currentWorkspaceId`, `currentWorkspaceName`, `modelUrl`, `categoryValues`). The only behavioral difference is that results are scoped to the specified workspace. This path has been added to the spec.
 
-**`GET /workspaces/{workspaceId}/models/{modelId}`** returns `405 Method Not Allowed` with body `{"status": {"code": 405, "message": "Method Not Allowed"}, "path": "...", "timestamp": "..."}`. This is not a permissions issue (unlike the 404 on `GET /workspaces/{workspaceId}`) — the method simply does not exist on this path. Use `GET /2/0/models/{modelId}` for model detail lookups. This path is not added to the spec.
+**`GET /workspaces/{workspaceId}/models/{modelId}`** returns `405 Method Not Allowed` with body `{"status": {"code": 405, "message": "Method Not Allowed"}, "path": "...", "timestamp": "..."}`. This is not a permissions issue (unlike the 404 on `GET /workspaces/{workspaceId}`) — the method simply does not exist on this path. Use `GET /models/{modelId}` for model detail lookups. This path is not added to the spec.
 
 ### Response key naming (confirmed via live tests)
 
@@ -168,6 +203,88 @@ Two paths absent from the original spec were probed via live testing:
 - `GET /models/{modelId}`: response key is `model` (singular object) ✓
 - `GET /workspaces/{workspaceId}/models`: response key is `models` (array), identical shape to `GET /models` ✓
 - `GET /workspaces/{workspaceId}`: not confirmed (returns 404 — see above)
+
+### View data response formats (issue #110)
+
+**`GET /models/{modelId}/views/{viewId}/data`** supports two response formats:
+
+| Request | Response content-type | Shape |
+|---------|----------------------|-------|
+| No `format` param (default) | `text/csv` | Raw CSV rows |
+| `?format=v1` + `Accept: application/json` | `application/json` | `{columnCoordinates, rows:[{rowCoordinates, cells}]}` |
+
+The JSON format (`format=v1`) returns a `ViewData` object with:
+- `columnCoordinates` — array of column dimension item identifiers
+- `rows` — array of row objects, each with `rowCoordinates` and `cells`
+
+### View read-request lifecycle (issue #110)
+
+**`POST /workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests`** initiates an async read:
+- Returns 200 with `{requestId, requestState, ...}`
+- Poll `GET .../readRequests/{requestId}` until `requestState == "COMPLETE"`
+- Download pages via `GET .../readRequests/{requestId}/pages/{pageNo}` — returns `text/csv`
+- **`DELETE .../readRequests/{requestId}`** returns **200** with `{meta, status, viewReadRequest}` where `viewReadRequest.requestState` is `"CANCELLED"` or `"COMPLETE"`
+
+Note: `POST /complete` (mark multi-chunk upload complete) returns **500** for standard Integration API users on the test model. Set chunk count, PUT chunk, and GET chunks all succeed. This is a known limitation of the test account.
+
+### List item write response schemas (issue #109)
+
+**`POST /workspaces/{workspaceId}/models/{modelId}/lists/{listId}/items`** returns:
+```json
+{
+  "meta": {...},
+  "status": {...},
+  "added": 2,
+  "ignored": 0,
+  "total": 2,
+  "failures": []
+}
+```
+
+**`PUT /workspaces/{workspaceId}/models/{modelId}/lists/{listId}/items`** returns:
+```json
+{
+  "meta": {...},
+  "status": {...},
+  "updated": 2,
+  "ignored": 0,
+  "total": 2
+}
+```
+
+Key findings:
+- The `failures` key is **omitted entirely** when there are no per-item errors (not present as an empty list).
+- When present, each failure object contains `requestIndex`, `failureType`, and `failureMessageDetails`.
+- PUT does not include a `failures` key in its response (only POST does).
+
+### Action execution and task polling (issue #18)
+
+`GET /workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks/{taskId}` was the only endpoint missing from the issue list; it has been added to the spec.
+
+Terminal task states: `COMPLETE`, `CANCELLED`, `CANCELLING`. Completed tasks always include a `result` object with a `successful` boolean field.
+
+### Export → import cycle (issue #18)
+
+**Export output file ID equals the export action ID.** When an export runs, the output is written to a file whose ID matches `INTEGRATION_EXPORT`. Download chunks from `GET /files/{INTEGRATION_EXPORT}/chunks/{chunkId}`, not from `INTEGRATION_FILE`.
+
+Full cycle confirmed:
+1. `POST /exports/{exportId}/tasks` → poll to `COMPLETE`
+2. `GET /files/{exportId}/chunks` → download each chunk
+3. `PUT /files/{fileId}` (single-chunk) → stage for import (uses `INTEGRATION_FILE`)
+4. `POST /imports/{importId}/tasks` → poll to `COMPLETE`
+5. Probe dump endpoints: `GET /imports/{importId}/tasks/{taskId}/dump` returns 200/204/404; `GET .../dump/chunks` returns 200/400/404 depending on whether `failureDumpAvailable` is true.
+
+### File management response shapes (issue #111)
+
+Live probe results for `INTEGRATION_FILE` (`113000001109`, Users.csv):
+
+| Endpoint | Method | Response |
+|----------|--------|----------|
+| `/workspaces/{wid}/models/{mid}/files/{fileId}` | `PUT` | **204 No Content** |
+| `/workspaces/{wid}/models/{mid}/files/{fileId}` | `DELETE` | **204 No Content** |
+| `/workspaces/{wid}/models/{mid}/files/{fileId}/chunks/0` | `GET` | **200 `application/octet-stream`** |
+
+`INTEGRATION_FILE` is an import source file. After `DELETE` teardown in write tests, the file has no content. The `chunkCount` field in the model-level file list (`GET /models/{modelId}/files`) may still show a non-zero value after DELETE (stale metadata), while `GET /chunks/0` returns 404. `test_download_first_chunk` handles this with a skip.
 
 ## ADR 0003 Description Sweep (issue #90)
 
