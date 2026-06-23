@@ -4931,7 +4931,29 @@ paths:
       - Transactional Read
       responses:
         '200':
-          description: 'TODO: document response'
+          description: Read request cancelled or removed; pages cleared from file store.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                  status:
+                    $ref: '#/components/schemas/Status'
+                  viewReadRequest:
+                    $ref: '#/components/schemas/ViewReadRequest'
+              example:
+                meta:
+                  schema: https://api.anaplan.com/2/0/objects/viewReadRequest
+                status:
+                  code: 200
+                  message: Success
+                viewReadRequest:
+                  requestId: F296566FA2CE4468925D8B85F2402541
+                  viewId: 102000001443
+                  requestState: CANCELLED
+                  url: https://api.anaplan.com/2/0/workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests/{requestId}
   /workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests/{requestId}/pages/{pageNo}:
     parameters:
     - name: workspaceId
@@ -5045,7 +5067,11 @@ paths:
         example: csv
       responses:
         '200':
-          description: 'TODO: document response'
+          description: One page of view data as CSV.
+          content:
+            text/csv:
+              schema:
+                type: string
   /models/{modelId}/views/{viewId}/data:
     parameters:
     - name: modelId
@@ -5219,6 +5245,29 @@ paths:
         style: form
         explode: true
       responses:
+        '200':
+          description: 'View cell data. Returns text/csv by default; returns application/json when both Accept: application/json
+            and format=v1 are set.'
+          content:
+            text/csv:
+              schema:
+                type: string
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ViewData'
+              example:
+                pages: []
+                columnCoordinates:
+                - - Jan 13
+                - - Feb 13
+                - - Mar 13
+                rows:
+                - rowCoordinates:
+                  - Durham
+                  cells:
+                  - '64.6'
+                  - '57.94'
+                  - '108.36'
         '429':
           description: more detail in path description
   /workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks/0:
@@ -8533,6 +8582,40 @@ components:
           type: string
         periodText:
           type: string
+    ViewData:
+      description: 'JSON-formatted view cell data returned when Accept: application/json and format=v1 are set on GET /models/{modelId}/views/{viewId}/data.'
+      type: object
+      properties:
+        pages:
+          type: array
+          items:
+            type: string
+          description: Selected item labels for each page-axis dimension; empty when no page dimensions exist.
+        columnCoordinates:
+          type: array
+          items:
+            type: array
+            items:
+              type: string
+          description: Coordinate labels for each column; each inner array has one entry per column dimension.
+        rows:
+          type: array
+          items:
+            $ref: '#/components/schemas/ViewDataRow'
+    ViewDataRow:
+      description: One row of view cell data.
+      type: object
+      properties:
+        rowCoordinates:
+          type: array
+          items:
+            type: string
+          description: Coordinate labels for this row; one entry per row dimension.
+        cells:
+          type: array
+          items:
+            type: string
+          description: Cell values in column order; positions correspond to columnCoordinates.
     ViewReadRequest:
       description: Result record for a large-view read operation. Tracks the asynchronous read state and provides a URL for
         downloading the data once it is ready.

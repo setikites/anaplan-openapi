@@ -46,6 +46,7 @@ INTEGRATION_IMPORT_ID = os.getenv("INTEGRATION_IMPORT", "")
 INTEGRATION_ACTION_ID = os.getenv("INTEGRATION_ACTION", "")
 INTEGRATION_FILE_ID = os.getenv("INTEGRATION_FILE", "")
 INTEGRATION_LIST_ID = os.getenv("INTEGRATION_LIST", "")
+INTEGRATION_MODULE_ID = os.getenv("INTEGRATION_MODULE", "")  # default view ID equals module ID
 
 
 def _sign_data(data: bytes, key_path: str, key_password: str | None = None) -> str:
@@ -2506,3 +2507,157 @@ def test_post_and_put_list_items(integration_token):
     assert cleanup_task.get("result", {}).get("successful"), (
         f"Cleanup action result not successful: {cleanup_task.get('result')}"
     )
+
+
+# ─── View data and large read-request lifecycle (issue #110) ──────────────────
+
+
+@pytest.mark.live
+def test_view_data_csv(integration_token):
+    """GET /models/{modelId}/views/{viewId}/data returns 200 text/csv by default.
+
+    Uses INTEGRATION_MODULE as the view ID (every module has a default view with
+    the same ID as the module itself). Skipped when the variable is not set.
+    """
+    if not INTEGRATION_MODULE_ID:
+        pytest.skip("INTEGRATION_MODULE not set in environment")
+    with httpx.Client() as client:
+        response = client.get(
+            f"{API_URL}/models/{MODEL_ID}/views/{INTEGRATION_MODULE_ID}/data",
+            headers=_auth_headers(integration_token),
+        )
+
+    assert response.status_code == 200, (
+        f"Expected 200, got {response.status_code}: {response.text[:300]}"
+    )
+    assert "text/csv" in response.headers.get("content-type", ""), (
+        f"Expected text/csv, got: {response.headers.get('content-type')}"
+    )
+    assert len(response.content) > 0, "CSV response must not be empty"
+
+
+@pytest.mark.live
+def test_view_data_json(integration_token):
+    """GET /models/{modelId}/views/{viewId}/data?format=v1 with Accept: application/json returns 200 JSON.
+
+    Uses INTEGRATION_MODULE as the view ID. Confirms response has pages,
+    columnCoordinates, and rows keys. Skipped when the variable is not set.
+    """
+    if not INTEGRATION_MODULE_ID:
+        pytest.skip("INTEGRATION_MODULE not set in environment")
+    with httpx.Client() as client:
+        response = client.get(
+            f"{API_URL}/models/{MODEL_ID}/views/{INTEGRATION_MODULE_ID}/data",
+            headers={**_auth_headers(integration_token), "Accept": "application/json"},
+            params={"format": "v1"},
+        )
+
+    assert response.status_code == 200, (
+        f"Expected 200, got {response.status_code}: {response.text[:300]}"
+    )
+    assert "application/json" in response.headers.get("content-type", ""), (
+        f"Expected application/json, got: {response.headers.get('content-type')}"
+    )
+    body = response.json()
+    assert "columnCoordinates" in body, (
+        f"JSON response must have columnCoordinates; keys: {list(body.keys())}"
+    )
+    assert "rows" in body, f"JSON response must have rows; keys: {list(body.keys())}"
+    assert isinstance(body["columnCoordinates"], list), "columnCoordinates must be a list"
+    assert isinstance(body["rows"], list), "rows must be a list"
+    if body["rows"]:
+        row = body["rows"][0]
+        assert "rowCoordinates" in row, f"Row must have rowCoordinates; keys: {list(row.keys())}"
+        assert "cells" in row, f"Row must have cells; keys: {list(row.keys())}"
+
+
+@pytest.mark.live
+@pytest.mark.write
+def test_view_read_request_lifecycle(integration_token):
+    """POST readRequest → poll GET → GET page 0 (CSV) → DELETE: covers all three issue #110 endpoints.
+
+    Uses INTEGRATION_MODULE as the view ID. Steps:
+      1. POST .../readRequests to initiate a large read.
+      2. Poll GET .../readRequests/{requestId} until COMPLETE.
+      3. GET .../readRequests/{requestId}/pages/0 confirms CSV page download.
+      4. DELETE .../readRequests/{requestId} confirms JSON response with viewReadRequest.
+
+    Skipped when INTEGRATION_MODULE is not set.
+    """
+    if not INTEGRATION_MODULE_ID:
+        pytest.skip("INTEGRATION_MODULE not set in environment")
+
+    h = _auth_headers(integration_token)
+    base = (
+        f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+        f"/views/{INTEGRATION_MODULE_ID}/readRequests"
+    )
+
+    with httpx.Client(timeout=60) as client:
+        # Step 1: initiate
+        post_r = client.post(
+            base,
+            headers={**h, "Content-Type": "application/json"},
+            json={"exportType": "TABULAR_MULTI_COLUMN"},
+        )
+        assert post_r.status_code == 200, (
+            f"POST readRequest failed: {post_r.status_code}: {post_r.text[:300]}"
+        )
+        post_body = post_r.json()
+        request_id = post_body.get("viewReadRequest", {}).get("requestId")
+        assert request_id, f"Expected requestId in POST response; keys: {list(post_body.keys())}"
+
+        # Step 2: poll until COMPLETE
+        task = _poll_read_request(client, f"{base}/{request_id}", h)
+        assert task.get("requestState") == "COMPLETE", (
+            f"readRequest did not complete within 60s; last state: {task.get('requestState')}"
+        )
+        assert task.get("successful") is True, (
+            f"readRequest reported unsuccessful: {task}"
+        )
+        available_pages = task.get("availablePages", 0)
+        assert available_pages >= 1, f"Expected at least 1 available page; got {available_pages}"
+
+        # Step 3: download page 0 — must be CSV
+        page_r = client.get(
+            f"{base}/{request_id}/pages/0",
+            headers={**h, "Accept": "text/csv"},
+        )
+        assert page_r.status_code == 200, (
+            f"GET page 0 failed: {page_r.status_code}: {page_r.text[:300]}"
+        )
+        assert "text/csv" in page_r.headers.get("content-type", ""), (
+            f"Expected text/csv for page download; got: {page_r.headers.get('content-type')}"
+        )
+        assert len(page_r.content) > 0, "Page 0 must contain non-empty CSV data"
+
+        # Step 4: delete — must return JSON with viewReadRequest
+        del_r = client.delete(f"{base}/{request_id}", headers=h)
+        assert del_r.status_code == 200, (
+            f"DELETE readRequest failed: {del_r.status_code}: {del_r.text[:300]}"
+        )
+        del_body = del_r.json()
+        assert del_body.get("status", {}).get("code") == 200
+        vrr = del_body.get("viewReadRequest")
+        assert vrr is not None, (
+            f"DELETE response must contain viewReadRequest; keys: {list(del_body.keys())}"
+        )
+        assert vrr.get("requestId") == request_id, "Returned requestId must match deleted requestId"
+        assert vrr.get("requestState") in {"CANCELLED", "COMPLETE"}, (
+            f"Unexpected requestState after DELETE: {vrr.get('requestState')}"
+        )
+
+
+def _poll_read_request(client, url, h, timeout=60):
+    """Poll GET url until requestState reaches a terminal state. Returns final viewReadRequest dict."""
+    terminal = {"COMPLETE", "CANCELLED"}
+    deadline = time.time() + timeout
+    vrr: dict = {}
+    while time.time() < deadline:
+        r = client.get(url, headers=h)
+        assert r.status_code == 200, f"Poll failed: {r.status_code}: {r.text[:200]}"
+        vrr = r.json().get("viewReadRequest", {})
+        if vrr.get("requestState") in terminal:
+            break
+        time.sleep(2)
+    return vrr
