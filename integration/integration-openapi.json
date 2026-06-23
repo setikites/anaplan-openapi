@@ -7243,32 +7243,8 @@
           "categoryValues": {
             "type": "array",
             "items": {
-              "type": "object",
-              "properties": {
-                "id": {
-                  "description": "Category value Id",
-                  "type": "string"
-                },
-                "attribute": {
-                  "description": "Category value",
-                  "type": "string"
-                },
-                "categoryId": {
-                  "type": "string"
-                },
-                "categoryName": {
-                  "enum": [
-                    "App",
-                    "Environment",
-                    "Department",
-                    "Region",
-                    "Planning Cycle"
-                  ]
-                }
-              }
-            },
-            "minItems": 0,
-            "maxItems": 5
+              "$ref": "#/components/schemas/CategoryValue"
+            }
           },
           "isoCreationDate": {
             "type": "string"
@@ -7308,26 +7284,6 @@
           },
           "currentSize": {
             "type": "integer"
-          }
-        }
-      },
-      "Category": {
-        "x-stub": true,
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "categoryValues": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CategoryValue"
-            },
-            "minItems": 0,
-            "maxItems": 5
           }
         }
       },
