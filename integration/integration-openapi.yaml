@@ -4331,7 +4331,7 @@ paths:
             application/json:
               example:
                 meta:
-                  schema: https://anaplan.api.com/2/0/objects/item
+                  schema: https://api.anaplan.com/2/0/objects/list
                 status:
                   code: 200
                   message: Success
@@ -4342,6 +4342,37 @@ paths:
                 - requestIndex: 1
                   failureType: INCORRECT_FORMAT
                   failureMessageDetails: incorrect format -- column name:p-number, value:wrong value for number
+              schema:
+                type: object
+                properties:
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                  status:
+                    $ref: '#/components/schemas/Status'
+                  added:
+                    type: integer
+                    description: Number of items successfully added.
+                  ignored:
+                    type: integer
+                    description: Number of items not added due to validation failures.
+                  total:
+                    type: integer
+                    description: Total number of items in the request.
+                  failures:
+                    type: array
+                    description: Per-item failure details. Omitted from response when all items were added successfully.
+                    items:
+                      type: object
+                      properties:
+                        requestIndex:
+                          type: integer
+                          description: Zero-based index of the failed item in the request array.
+                        failureType:
+                          type: string
+                          description: Failure category (e.g. INCORRECT_FORMAT, INCOMPLETE_DATA).
+                        failureMessageDetails:
+                          type: string
+                          description: Human-readable details about the failure.
     put:
       summary: Update list items
       description: |-
@@ -4482,7 +4513,53 @@ paths:
       - Transactional Write
       responses:
         '200':
-          description: 'TODO: document response'
+          description: List items updated; per-item failures reported inline
+          content:
+            application/json:
+              example:
+                meta:
+                  schema: https://api.anaplan.com/2/0/objects/list
+                status:
+                  code: 200
+                  message: Success
+                updated: 1
+                ignored: 1
+                total: 2
+                failures:
+                - requestIndex: 1
+                  failureType: INCORRECT_FORMAT
+                  failureMessageDetails: incorrect format -- column name:p-number, value:wrong format for number
+              schema:
+                type: object
+                properties:
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                  status:
+                    $ref: '#/components/schemas/Status'
+                  updated:
+                    type: integer
+                    description: Number of items successfully updated.
+                  ignored:
+                    type: integer
+                    description: Number of items not updated due to validation failures.
+                  total:
+                    type: integer
+                    description: Total number of items in the request.
+                  failures:
+                    type: array
+                    description: Per-item failure details. Omitted from response when all items were updated successfully.
+                    items:
+                      type: object
+                      properties:
+                        requestIndex:
+                          type: integer
+                          description: Zero-based index of the failed item in the request array.
+                        failureType:
+                          type: string
+                          description: Failure category (e.g. INCORRECT_FORMAT, INCOMPLETE_DATA).
+                        failureMessageDetails:
+                          type: string
+                          description: Human-readable details about the failure.
   /workspaces/{workspaceId}/models/{modelId}/lists/{listId}/readRequests:
     parameters:
     - name: workspaceId

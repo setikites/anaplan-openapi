@@ -45,6 +45,7 @@ INTEGRATION_EXPORT_ID = os.getenv("INTEGRATION_EXPORT", "")
 INTEGRATION_IMPORT_ID = os.getenv("INTEGRATION_IMPORT", "")
 INTEGRATION_ACTION_ID = os.getenv("INTEGRATION_ACTION", "")
 INTEGRATION_FILE_ID = os.getenv("INTEGRATION_FILE", "")
+INTEGRATION_LIST_ID = os.getenv("INTEGRATION_LIST", "")
 
 
 def _sign_data(data: bytes, key_path: str, key_password: str | None = None) -> str:
@@ -2360,3 +2361,148 @@ def test_export_import_cycle(integration_token):
                 assert chunk0_r.content, "Dump chunk 0 must have non-empty content"
 
 
+# ─── List item write (issue #109) ─────────────────────────────────────────────
+
+
+@pytest.mark.live
+def test_get_list_items(integration_token):
+    """GET /2/0/workspaces/{workspaceId}/models/{modelId}/lists/{listId}/items returns list items.
+
+    Uses INTEGRATION_LIST. Skipped when the variable is not set.
+    """
+    if not INTEGRATION_LIST_ID:
+        pytest.skip("INTEGRATION_LIST not set in environment")
+    h = _auth_headers(integration_token)
+    with httpx.Client() as client:
+        response = client.get(
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+            f"/lists/{INTEGRATION_LIST_ID}/items",
+            headers=h,
+            params={"includeAll": "true"},
+        )
+
+    assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
+    body = response.json()
+    assert body.get("status", {}).get("code") == 200
+    items = body.get("listItems")
+    assert isinstance(items, list), f"Expected 'listItems' list; keys: {list(body.keys())}"
+
+
+@pytest.mark.live
+@pytest.mark.write
+def test_post_and_put_list_items(integration_token):
+    """POST + PUT .../lists/{listId}/items confirm write response schemas; cleanup via INTEGRATION_ACTION.
+
+    Uses INTEGRATION_LIST (a numbered list — name not allowed, only code).
+    POST adds two items. PUT probes the update envelope. Cleans up by running
+    INTEGRATION_ACTION (Delete Alternate SKU) and polling to completion.
+
+    Skipped when INTEGRATION_LIST or INTEGRATION_ACTION is not set.
+    """
+    missing = [
+        name for name, val in [
+            ("INTEGRATION_LIST", INTEGRATION_LIST_ID),
+            ("INTEGRATION_ACTION", INTEGRATION_ACTION_ID),
+        ] if not val
+    ]
+    if missing:
+        pytest.skip(f"Required env vars not set: {', '.join(missing)}")
+
+    h = _auth_headers(integration_token)
+    hj = {**h, "Content-Type": "application/json"}
+    items_url = (
+        f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+        f"/lists/{INTEGRATION_LIST_ID}/items"
+    )
+
+    with httpx.Client(timeout=60) as client:
+        # ── POST: add items (numbered list — code only) ───────────────────────
+        post_r = client.post(
+            items_url,
+            headers=hj,
+            params={"action": "add"},
+            json={"items": [{"code": "probe-test-001"}, {"code": "probe-test-002"}]},
+        )
+        assert post_r.status_code == 200, (
+            f"POST list items failed: {post_r.status_code}: {post_r.text[:200]}"
+        )
+        post_body = post_r.json()
+        assert post_body.get("status", {}).get("code") == 200
+        for key in ("added", "ignored", "total", "failures"):
+            assert key in post_body, (
+                f"POST response missing '{key}'; keys: {list(post_body.keys())}"
+            )
+        assert isinstance(post_body["added"], int), "'added' must be an integer"
+        assert isinstance(post_body["ignored"], int), "'ignored' must be an integer"
+        assert isinstance(post_body["total"], int), "'total' must be an integer"
+        assert isinstance(post_body["failures"], list), "'failures' must be a list"
+        assert post_body["total"] == 2, f"Expected total=2; got {post_body['total']}"
+
+        # failures is omitted when all items succeed
+        post_failures = post_body.get("failures", [])
+        assert isinstance(post_failures, list), "'failures' must be a list when present"
+        for failure in post_failures:
+            assert "requestIndex" in failure, "Each failure must have 'requestIndex'"
+            assert "failureType" in failure, "Each failure must have 'failureType'"
+            assert "failureMessageDetails" in failure, (
+                "Each failure must have 'failureMessageDetails'"
+            )
+
+        # ── PUT: update items (reference by code) ─────────────────────────────
+        put_r = client.put(
+            items_url,
+            headers=hj,
+            json={"items": [{"code": "probe-test-001"}, {"code": "probe-test-002"}]},
+        )
+        assert put_r.status_code == 200, (
+            f"PUT list items failed: {put_r.status_code}: {put_r.text[:200]}"
+        )
+        put_body = put_r.json()
+        assert put_body.get("status", {}).get("code") == 200
+        for key in ("updated", "ignored", "total"):
+            assert key in put_body, (
+                f"PUT response missing '{key}'; keys: {list(put_body.keys())}"
+            )
+        assert isinstance(put_body["updated"], int), "'updated' must be an integer"
+        assert isinstance(put_body["ignored"], int), "'ignored' must be an integer"
+        assert isinstance(put_body["total"], int), "'total' must be an integer"
+        assert put_body["total"] == 2, f"Expected total=2; got {put_body['total']}"
+
+        # failures is omitted when all items succeed
+        put_failures = put_body.get("failures", [])
+        assert isinstance(put_failures, list), "'failures' must be a list when present"
+        for failure in put_failures:
+            assert "requestIndex" in failure, "Each failure must have 'requestIndex'"
+            assert "failureType" in failure, "Each failure must have 'failureType'"
+            assert "failureMessageDetails" in failure, (
+                "Each failure must have 'failureMessageDetails'"
+            )
+
+        # ── Cleanup: run Delete Alternate SKU action ───────────────────────────
+        cleanup_r = client.post(
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+            f"/actions/{INTEGRATION_ACTION_ID}/tasks",
+            headers=hj,
+            json={"localeName": "en_US"},
+        )
+        assert cleanup_r.status_code == 200, (
+            f"POST cleanup action failed: {cleanup_r.status_code}: {cleanup_r.text[:200]}"
+        )
+        cleanup_body = cleanup_r.json()
+        task_id = cleanup_body.get("task", {}).get("taskId") or cleanup_body.get("taskId")
+        assert task_id, f"Expected taskId in cleanup POST response; keys: {list(cleanup_body.keys())}"
+
+        cleanup_task = _poll_to_terminal(
+            client,
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+            f"/actions/{INTEGRATION_ACTION_ID}/tasks/{task_id}",
+            h,
+        )
+
+    assert cleanup_task.get("taskState") in {"COMPLETE", "CANCELLED", "CANCELLING"}, (
+        f"Cleanup action did not reach terminal state within 60s; "
+        f"last: {cleanup_task.get('taskState')}"
+    )
+    assert cleanup_task.get("result", {}).get("successful"), (
+        f"Cleanup action result not successful: {cleanup_task.get('result')}"
+    )
