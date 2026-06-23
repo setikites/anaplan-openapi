@@ -252,7 +252,7 @@ Legacy regions (us1–us7, eu1, eu2, eu4, ap1) share the older non-prefixed `api
 | Audit | ✓ | ✓ | — | High (events path: auth/role, event contract, filtering/pagination, CEF — issues #58–#61) | High | hand-maintained (do not rebuild) |
 | Financial Consolidation | ✓ | — | — | Low | Low | hand-maintained (do not rebuild) |
 | Exception Users | ✓ | ✓ | ✓ | High (auth schemes, search by workspace/user, PATCH error probe — issue #51) | High | hand-maintained (do not rebuild) |
-| Administration | — | — | — | None | Low | spec exists; live tests pending |
+| Administration | — | — | — | Low (export/import: role-gated 500 discrepancy confirmed — issue #120) | Low | hand-maintained (do not rebuild) |
 
 ## Project Structure
 
