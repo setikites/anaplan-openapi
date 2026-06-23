@@ -561,6 +561,39 @@ def test_list_workspace_models(integration_token):
 
 
 @pytest.mark.live
+def test_model_category_values(integration_token):
+    """GET /workspaces/{workspaceId}/models embeds categoryValues in each model object.
+
+    There is no dedicated /categories endpoint (returns 404). Category data is
+    returned inline as Model.categoryValues[].  Confirms CategoryValue schema:
+    {id, attribute, categoryId, categoryName, customerId}.
+    """
+    h = {"Authorization": f"AnaplanAuthToken {integration_token}"}
+    with httpx.Client() as client:
+        response = client.get(f"{API_URL}/workspaces/{WORKSPACE_ID}/models", headers=h)
+
+    if response.status_code in (404, 405):
+        pytest.skip(
+            f"GET /workspaces/{{workspaceId}}/models returned {response.status_code}"
+        )
+
+    assert response.status_code == 200, response.text[:200]
+    models = response.json().get("models", [])
+    assert isinstance(models, list)
+
+    for m in models:
+        assert "categoryValues" in m, f"Model {m.get('id')} missing categoryValues field"
+        assert isinstance(m["categoryValues"], list), (
+            f"Model {m.get('id')} categoryValues must be a list"
+        )
+        for cv in m["categoryValues"]:
+            for key in ("id", "attribute", "categoryId", "categoryName"):
+                assert key in cv, (
+                    f"CategoryValue missing key {key!r}; keys present: {list(cv.keys())}"
+                )
+
+
+@pytest.mark.live
 def test_get_workspace_model(integration_token):
     """GET /2/0/workspaces/{workspaceId}/models/{modelId} returns workspace-scoped model detail.
 

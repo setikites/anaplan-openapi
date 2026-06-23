@@ -88,13 +88,14 @@ Anaplan has 10 publicly documented REST APIs, each with different characteristic
 
 #### 9. Administration API
 - **Purpose**: Bulk user management — import users from CSV, export all users to CSV
-- **Auth**: `AnaplanAuthToken` (same scheme as Integration API)
+- **Auth**: `AnaplanAuthToken` only — `Bearer` rejected with empty 401 (confirmed via live testing); accepts both basic-auth tokens and OAuth Authorization Code access tokens under the `AnaplanAuthToken` scheme; requires the **Tenant Administrator** role
 - **Source of Truth**: Anaplan help documentation (no Apiary or Postman source)
 - **Key Points**:
   - Two endpoints: `PUT /users/import` (207 Multi-Status) and `GET /users/export` (text/csv)
   - CSV columns: `username, first_name, last_name, licenses`; max 500 rows per import
-  - Regional server coverage unconfirmed — single `api.anaplan.com` entry only (see `administration/README.md`)
-  - No live testing completed; confidence is lower than for Apiary/live-tested APIs
+  - **Live-tested (issue #120)**: auth schemes, regional server coverage, and role-gated error behavior all confirmed
+  - 11/12 regional servers confirmed via probe (`au1a.api2.anaplan.com` unreachable); all 12 entries now in spec
+  - Confirmed discrepancies: role-denied returns `500 INTERNAL_SERVER_ERROR` (basic-auth token) or `401 ACCESS_CONTROL_DENIED` (OAuth token) instead of the spec-documented 403; full 200 path requires an account with Tenant Administrator role — see `administration/README.md`
 
 #### 10. Exception Users API
 - **Purpose**: Manage exception users (users who can bypass SSO enforcement)
@@ -179,6 +180,7 @@ The Apiary identifier is the subdomain from the API's documentation URL (e.g. `h
 | Audit | `auditservice` |
 | Financial Consolidation | *(verify)* |
 | Exception Users | *(verify)* |
+| Administration | — (no Apiary documentation exists) |
 
 ### Accessing the Postman collection
 
@@ -186,7 +188,7 @@ The official Anaplan Postman collection is published and maintained by Anaplan a
 
 **https://www.postman.com/apiplan/official-anaplan-collection/**
 
-It covers 8 of the 9 APIs (all except Financial Consolidation) and is the primary source for endpoint discovery for those APIs. As Anaplan migrates documentation away from Apiary, the Postman collection is becoming the authoritative reference.
+It covers 8 of the 10 APIs (all except Financial Consolidation and Administration) and is the primary source for endpoint discovery for those APIs. As Anaplan migrates documentation away from Apiary, the Postman collection is becoming the authoritative reference.
 
 #### Local copy
 
@@ -205,7 +207,7 @@ The URL pattern varies by API type:
 | API type | URL pattern |
 |----------|-------------|
 | OAuth 2.0 API | `https://{region}.app.anaplan.com` |
-| Integration, ALM, SCIM, Exception Users, CloudWorks | `https://{region}.api.anaplan.com` |
+| Integration, ALM, SCIM, Exception Users, Administration, CloudWorks | `https://{region}.api.anaplan.com` |
 | Authentication (Auth) API | `https://{region}.auth.anaplan.com` |
 | Audit API | `https://audit.anaplan.com/audit/api/1` (single dedicated global host — **not** regional `api.anaplan.com`; confirmed via live testing) |
 
@@ -252,7 +254,7 @@ Legacy regions (us1–us7, eu1, eu2, eu4, ap1) share the older non-prefixed `api
 | Audit | ✓ | ✓ | — | High (events path: auth/role, event contract, filtering/pagination, CEF — issues #58–#61) | High | hand-maintained (do not rebuild) |
 | Financial Consolidation | ✓ | — | — | Low | Low | hand-maintained (do not rebuild) |
 | Exception Users | ✓ | ✓ | ✓ | High (auth schemes, search by workspace/user, PATCH error probe — issue #51) | High | hand-maintained (do not rebuild) |
-| Administration | — | — | — | Low (export/import: role-gated 500 discrepancy confirmed — issue #120) | Low | hand-maintained (do not rebuild) |
+| Administration | — | — | — | Low (auth schemes, regional servers, role-gated error behavior — issue #120; full 200 path requires Tenant Administrator) | Low | hand-maintained (do not rebuild) |
 
 ## Project Structure
 

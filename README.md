@@ -52,7 +52,7 @@ openapi-generator-cli generate -i integration/integration-openapi.json -g python
 | Audit | [`audit/`](audit/) | [`audit-openapi.json`](audit/audit-openapi.json) | High — live-tested |
 | Financial Consolidation | [`financial-consolidation/`](financial-consolidation/) | [`financial-consolidation-openapi.json`](financial-consolidation/financial-consolidation-openapi.json) | Low |
 | Exception Users | [`exception/`](exception/) | [`exception-openapi.json`](exception/exception-openapi.json) | High — live-tested |
-| Administration | [`administration/`](administration/) | [`administration-openapi.json`](administration/administration-openapi.json) | Low |
+| Administration | [`administration/`](administration/) | [`administration-openapi.json`](administration/administration-openapi.json) | Low — live-tested (role-gated; full 200 path requires Tenant Administrator) |
 
 Each API directory's **README** documents its sources, auth scheme(s), and any
 behavior discovered during live testing that differs from the official docs.
