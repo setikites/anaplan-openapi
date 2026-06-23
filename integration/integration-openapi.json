@@ -7496,11 +7496,6 @@
           }
         }
       },
-      "AppliedToModel": {
-        "x-stub": true,
-        "description": "A model that a revision is applied to",
-        "properties": {}
-      },
       "ModelCalendar": {
         "properties": {
           "calendarType": {

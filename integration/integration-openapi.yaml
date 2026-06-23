@@ -8515,10 +8515,6 @@ components:
             saves, ALM syncs, or API-triggered operations.'
         revisionType:
           type: string
-    AppliedToModel:
-      x-stub: true
-      description: A model that a revision is applied to
-      properties: {}
     ModelCalendar:
       properties:
         calendarType:
