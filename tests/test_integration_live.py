@@ -40,6 +40,11 @@ _api_base = os.getenv("ANAPLAN_API_BASE_URL", "https://api.anaplan.com").rstrip(
 API_URL = _api_base if _api_base.endswith("/2/0") else _api_base + "/2/0"
 WORKSPACE_ID = os.getenv("ANAPLAN_INTEGRATION_WORKSPACE_ID", "")
 MODEL_ID = os.getenv("ANAPLAN_INTEGRATION_MODEL_ID", "")
+INTEGRATION_PROCESS_ID = os.getenv("INTEGRATION_PROCESS", "")
+INTEGRATION_EXPORT_ID = os.getenv("INTEGRATION_EXPORT", "")
+INTEGRATION_IMPORT_ID = os.getenv("INTEGRATION_IMPORT", "")
+INTEGRATION_ACTION_ID = os.getenv("INTEGRATION_ACTION", "")
+INTEGRATION_FILE_ID = os.getenv("INTEGRATION_FILE", "")
 
 
 def _sign_data(data: bytes, key_path: str, key_password: str | None = None) -> str:
@@ -2094,5 +2099,264 @@ def test_list_process_tasks(integration_token, process_id):
     if tasks:
         assert tasks[0].get("taskId"), "Task must have a taskId"
         assert "taskState" in tasks[0], "Task must have a taskState"
+
+
+# ─── Write tests: run-and-poll cycles using INTEGRATION_* env vars ────────────
+
+
+def _poll_to_terminal(client, url, h, timeout=60):
+    """Poll GET url until taskState reaches a terminal state. Returns final task dict."""
+    terminal = {"COMPLETE", "CANCELLED", "CANCELLING"}
+    deadline = time.time() + timeout
+    task: dict = {}
+    while time.time() < deadline:
+        poll_r = client.get(url, headers=h)
+        assert poll_r.status_code == 200, (
+            f"Poll failed: {poll_r.status_code}: {poll_r.text[:200]}"
+        )
+        task = poll_r.json().get("task", {})
+        if task.get("taskState") in terminal:
+            break
+        time.sleep(2)
+    return task
+
+
+@pytest.mark.live
+@pytest.mark.write
+def test_run_process_and_poll_task(integration_token):
+    """POST .../processes/{processId}/tasks starts a process; GET .../tasks/{taskId} polls it.
+
+    Uses INTEGRATION_PROCESS from .env. Skipped when the variable is not set.
+    """
+    if not INTEGRATION_PROCESS_ID:
+        pytest.skip("INTEGRATION_PROCESS not set in environment")
+    h = _auth_headers(integration_token)
+    with httpx.Client() as client:
+        run_r = client.post(
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+            f"/processes/{INTEGRATION_PROCESS_ID}/tasks",
+            headers={**h, "Content-Type": "application/json"},
+            json={"localeName": "en_US"},
+        )
+        assert run_r.status_code == 200, (
+            f"POST process task failed: {run_r.status_code}: {run_r.text[:200]}"
+        )
+        run_body = run_r.json()
+        task_id = run_body.get("task", {}).get("taskId") or run_body.get("taskId")
+        assert task_id, f"Expected taskId in POST response; keys: {list(run_body.keys())}"
+
+        task = _poll_to_terminal(
+            client,
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+            f"/processes/{INTEGRATION_PROCESS_ID}/tasks/{task_id}",
+            h,
+        )
+
+    assert task is not None, "No task response received"
+    assert task.get("taskState") in {"COMPLETE", "CANCELLED", "CANCELLING"}, (
+        f"Process task did not reach terminal state within 60s; last: {task.get('taskState')}"
+    )
+    assert task.get("taskId") == task_id, "Polled taskId must match started taskId"
+    result = task.get("result")
+    assert result is not None, "Completed process task must have a result"
+    assert "successful" in result, "Task result must have 'successful' field"
+
+
+@pytest.mark.live
+@pytest.mark.write
+def test_run_action_and_poll_task(integration_token):
+    """POST .../actions/{actionId}/tasks starts an action; GET .../tasks/{taskId} polls it.
+
+    Uses INTEGRATION_ACTION from .env. Skipped when the variable is not set.
+    Also probes GET /actions/{actionId}/tasks/{taskId} to validate the spec entry.
+    """
+    if not INTEGRATION_ACTION_ID:
+        pytest.skip("INTEGRATION_ACTION not set in environment")
+    h = _auth_headers(integration_token)
+    with httpx.Client() as client:
+        run_r = client.post(
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+            f"/actions/{INTEGRATION_ACTION_ID}/tasks",
+            headers={**h, "Content-Type": "application/json"},
+            json={"localeName": "en_US"},
+        )
+        assert run_r.status_code == 200, (
+            f"POST action task failed: {run_r.status_code}: {run_r.text[:200]}"
+        )
+        run_body = run_r.json()
+        task_id = run_body.get("task", {}).get("taskId") or run_body.get("taskId")
+        assert task_id, f"Expected taskId in POST response; keys: {list(run_body.keys())}"
+
+        task = _poll_to_terminal(
+            client,
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+            f"/actions/{INTEGRATION_ACTION_ID}/tasks/{task_id}",
+            h,
+        )
+
+    assert task is not None, "No task response received"
+    assert task.get("taskState") in {"COMPLETE", "CANCELLED", "CANCELLING"}, (
+        f"Action task did not reach terminal state within 60s; last: {task.get('taskState')}"
+    )
+    assert task.get("taskId") == task_id, "Polled taskId must match started taskId"
+    result = task.get("result")
+    assert result is not None, "Completed action task must have a result"
+    assert "successful" in result, "Task result must have 'successful' field"
+
+
+@pytest.mark.live
+@pytest.mark.write
+def test_export_import_cycle(integration_token):
+    """Full export → stage → import cycle using INTEGRATION_* env vars.
+
+    Steps:
+      1. POST export task (INTEGRATION_EXPORT) → poll to completion.
+      2. Download all chunks from INTEGRATION_FILE — confirms export wrote the file.
+      3. Re-upload the same content to INTEGRATION_FILE as a single chunk — tests the
+         upload path and ensures the import sees fresh data.
+      4. POST import task (INTEGRATION_IMPORT) → poll to completion.
+      5. Probe the dump endpoints — accepts both empty and non-empty dump lists since
+         a successful import has no failure rows.
+
+    Skipped when any INTEGRATION_* variable is missing.
+    """
+    missing = [
+        name for name, val in [
+            ("INTEGRATION_EXPORT", INTEGRATION_EXPORT_ID),
+            ("INTEGRATION_IMPORT", INTEGRATION_IMPORT_ID),
+            ("INTEGRATION_FILE", INTEGRATION_FILE_ID),
+        ] if not val
+    ]
+    if missing:
+        pytest.skip(f"Required env vars not set: {', '.join(missing)}")
+
+    h = _auth_headers(integration_token)
+
+    with httpx.Client() as client:
+        # ── Step 1: run export ────────────────────────────────────────────────
+        export_r = client.post(
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+            f"/exports/{INTEGRATION_EXPORT_ID}/tasks",
+            headers={**h, "Content-Type": "application/json"},
+            json={"localeName": "en_US"},
+        )
+        assert export_r.status_code == 200, (
+            f"POST export task failed: {export_r.status_code}: {export_r.text[:200]}"
+        )
+        export_body = export_r.json()
+        export_task_id = (
+            export_body.get("task", {}).get("taskId") or export_body.get("taskId")
+        )
+        assert export_task_id, f"Expected taskId in export POST response; keys: {list(export_body.keys())}"
+
+        export_task = _poll_to_terminal(
+            client,
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+            f"/exports/{INTEGRATION_EXPORT_ID}/tasks/{export_task_id}",
+            h,
+        )
+        assert export_task.get("taskState") == "COMPLETE", (
+            f"Export did not complete; last state: {export_task.get('taskState')}"
+        )
+        assert export_task.get("result", {}).get("successful"), (
+            f"Export task result not successful: {export_task.get('result')}"
+        )
+
+        # ── Step 2: download chunks from the export output file ───────────────
+        # The export output file ID equals the export action ID.
+        chunks_r = client.get(
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+            f"/files/{INTEGRATION_EXPORT_ID}/chunks",
+            headers=h,
+        )
+        assert chunks_r.status_code == 200, (
+            f"GET export file chunks failed: {chunks_r.status_code}: {chunks_r.text[:200]}"
+        )
+        chunks = chunks_r.json().get("chunks", [])
+        assert chunks, (
+            f"Export completed but no chunks in export file ({INTEGRATION_EXPORT_ID})"
+        )
+
+        file_content = b""
+        for chunk in chunks:
+            chunk_id = chunk["id"]
+            dl_r = client.get(
+                f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+                f"/files/{INTEGRATION_EXPORT_ID}/chunks/{chunk_id}",
+                headers=h,
+            )
+            assert dl_r.status_code == 200, (
+                f"GET chunk {chunk_id} failed: {dl_r.status_code}"
+            )
+            file_content += dl_r.content
+
+        assert file_content, "Downloaded file content must not be empty"
+
+        # ── Step 3: re-upload to INTEGRATION_FILE as a single chunk ──────────
+        upload_r = client.put(
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+            f"/files/{INTEGRATION_FILE_ID}",
+            headers={**h, "Content-Type": "application/octet-stream"},
+            content=file_content,
+        )
+        assert upload_r.status_code in (200, 204), (
+            f"PUT file upload failed: {upload_r.status_code}: {upload_r.text[:200]}"
+        )
+
+        # ── Step 4: run import ────────────────────────────────────────────────
+        import_r = client.post(
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+            f"/imports/{INTEGRATION_IMPORT_ID}/tasks",
+            headers={**h, "Content-Type": "application/json"},
+            json={"localeName": "en_US"},
+        )
+        assert import_r.status_code == 200, (
+            f"POST import task failed: {import_r.status_code}: {import_r.text[:200]}"
+        )
+        import_body = import_r.json()
+        import_task_id = (
+            import_body.get("task", {}).get("taskId") or import_body.get("taskId")
+        )
+        assert import_task_id, f"Expected taskId in import POST response; keys: {list(import_body.keys())}"
+
+        import_task = _poll_to_terminal(
+            client,
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+            f"/imports/{INTEGRATION_IMPORT_ID}/tasks/{import_task_id}",
+            h,
+            timeout=120,
+        )
+        assert import_task.get("taskState") in {"COMPLETE", "CANCELLED", "CANCELLING"}, (
+            f"Import did not reach terminal state within 120s; last: {import_task.get('taskState')}"
+        )
+        import_result = import_task.get("result", {})
+        assert "successful" in import_result, "Import task result must have 'successful' field"
+
+        # ── Step 5: probe dump endpoints ──────────────────────────────────────
+        # When the import succeeded, failureDumpAvailable is False and the dump
+        # endpoints return 404. When failures exist they return 200 with chunk data.
+        dump_available = import_result.get("failureDumpAvailable", False)
+        dump_base = (
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+            f"/imports/{INTEGRATION_IMPORT_ID}/tasks/{import_task_id}/dump"
+        )
+
+        dump_r = client.get(dump_base, headers=h)
+        assert dump_r.status_code in (200, 204, 404), (
+            f"GET import dump returned unexpected status: {dump_r.status_code}"
+        )
+
+        dump_chunks_r = client.get(f"{dump_base}/chunks", headers=h)
+        assert dump_chunks_r.status_code in (200, 400, 404), (
+            f"GET dump/chunks unexpected status: {dump_chunks_r.status_code}"
+        )
+        if dump_available and dump_chunks_r.status_code == 200:
+            dump_chunks = dump_chunks_r.json().get("chunks", [])
+            if dump_chunks:
+                chunk0_r = client.get(f"{dump_base}/chunks/0", headers=h)
+                assert chunk0_r.status_code == 200, (
+                    f"GET dump/chunks/0 failed: {chunk0_r.status_code}"
+                )
+                assert chunk0_r.content, "Dump chunk 0 must have non-empty content"
 
 

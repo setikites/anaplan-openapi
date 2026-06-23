@@ -6320,6 +6320,72 @@ paths:
                 properties:
                   task:
                     $ref: '#/components/schemas/TaskWithUrl'
+  /workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks/{taskId}:
+    parameters:
+    - name: workspaceId
+      in: path
+      description: Workspace identifier (32-character lowercase hex string).
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9a-f]{32}$
+      example: 8a868cda7c8b28f5017c9a4b2d8341cd
+    - name: modelId
+      in: path
+      description: Model identifier (32-character uppercase hex string).
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9A-F]{32}$
+      example: 4261ECE4389B45E18915B5EB72F7510B
+    - name: actionId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: '117000000019'
+    - name: taskId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: F37EA1512BC448D3B223431C33B844B6
+    get:
+      summary: Get the status of an action task
+      description: |-
+        Returns the current state of a single action task. Poll this endpoint after starting an action via POST to monitor progress.
+
+        Possible `taskState` values: `NOT_STARTED`, `IN_PROGRESS`, `COMPLETE`, `CANCELLING`, `CANCELLED`.
+      tags:
+      - Bulk Other
+      responses:
+        '200':
+          description: Response 200
+          content:
+            application/json:
+              example:
+                meta:
+                  schema: https://api.anaplan.com//2/0/models/75A40874E6B64FA3AE0743278996850F/objects/task
+                status:
+                  code: 200
+                  message: Success
+                task:
+                  taskId: F37EA1512BC448D3B223431C33B844B6
+                  taskState: COMPLETE
+                  progress: 1.0
+                  result:
+                    failureDumpAvailable: false
+                    objectId: '117000000019'
+                    successful: true
+              schema:
+                type: object
+                properties:
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                  status:
+                    $ref: '#/components/schemas/Status'
+                  task:
+                    $ref: '#/components/schemas/Task'
   /workspaces/{workspaceId}/models/{modelId}/dashboards:
     parameters:
     - name: workspaceId
