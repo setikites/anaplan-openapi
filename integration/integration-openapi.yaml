@@ -6731,113 +6731,6 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Dashboard'
-  /workspaces/{workspaceId}/models/{modelId}/alm/revisions:
-    parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: 8a868cda7c8b28f5017c9a4b2d8341cd
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: 4261ECE4389B45E18915B5EB72F7510B
-    get:
-      summary: List ALM revisions for a model
-      description: Returns all tagged revisions for the specified model, ordered from oldest to newest.
-      tags:
-      - Model Metadata
-      responses:
-        '200':
-          description: Revisions retrieved successfully
-          content:
-            application/json:
-              example:
-                meta:
-                  paging:
-                    currentPageSize: 2
-                    offset: 0
-                    totalSize: 1947
-                  schema: https://api.anaplan.com/2/0/objects/revision
-                status:
-                  code: 200
-                  message: Success
-                revisions:
-                - id: FDE14C4606E14F739C102C50C21E5CF0
-                  name: Copy Model
-                  createdOn: '2023-10-12T11:41:24Z'
-                  createdBy: 8a868cda88beaa28018948a3e44546c1
-                  creationMethod: Model imported
-                  appliedOn: '2023-10-12T11:47:03Z'
-                  appliedBy: 8a868cda88beaa28018948a3e44546c1
-              schema:
-                type: object
-                properties:
-                  meta:
-                    $ref: '#/components/schemas/Meta'
-                  status:
-                    $ref: '#/components/schemas/Status'
-                  revisions:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Revision'
-  /workspaces/{workspaceId}/models/{modelId}/alm/syncTasks:
-    parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: 8a868cda7c8b28f5017c9a4b2d8341cd
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: 4261ECE4389B45E18915B5EB72F7510B
-    get:
-      summary: List ALM sync tasks for a model
-      description: Returns all ALM sync task records for the specified model.
-      tags:
-      - Model Metadata
-      responses:
-        '200':
-          description: Sync tasks retrieved successfully
-          content:
-            application/json:
-              example:
-                meta:
-                  paging:
-                    currentPageSize: 0
-                    offset: 0
-                    totalSize: 0
-                  schema: https://api.anaplan.com/2/0/objects/syncTask
-                status:
-                  code: 200
-                  message: Success
-                syncTasks: []
-              schema:
-                type: object
-                properties:
-                  meta:
-                    $ref: '#/components/schemas/Meta'
-                  status:
-                    $ref: '#/components/schemas/Status'
-                  syncTasks:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/SyncTask'
   /workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks/{taskId}:
     parameters:
     - name: workspaceId
@@ -8489,32 +8382,6 @@ components:
           type: string
         code:
           type: string
-    Revision:
-      description: A tagged revision of an Anaplan model.
-      type: object
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-        description:
-          type: string
-        createdBy:
-          type: string
-        createdOn:
-          type: string
-          format: date-time
-        appliedBy:
-          type: string
-        appliedOn:
-          type: string
-          format: date-time
-        creationMethod:
-          type: string
-          description: 'How this revision was created. Observed value: ''Model imported''. Other values may represent manual
-            saves, ALM syncs, or API-triggered operations.'
-        revisionType:
-          type: string
     ModelCalendar:
       properties:
         calendarType:
@@ -9090,42 +8957,6 @@ components:
           type: string
         successful:
           type: boolean
-    SyncTask:
-      description: A task tracking the execution of an ALM Sync
-      properties:
-        creationTime:
-          type: integer
-        currentStep:
-          type: string
-        result:
-          type: object
-          properties:
-            error:
-              type: object
-              properties:
-                messageText:
-                  type: string
-                subtitle:
-                  type: string
-                title:
-                  type: string
-            reportFileUrl:
-              type: string
-            sourceRevisionId:
-              type: string
-            successful:
-              type: boolean
-            targetRevisionId:
-              type: string
-        taskId:
-          type: string
-        taskState:
-          enum:
-          - NOT_STARTED
-          - IN_PROGRESS
-          - COMPLETE
-          - CANCELLING
-          - CANCELLED
     TaskWithUrl:
       description: Initial task reference returned by POST .../tasks. Contains the taskId and a URL for polling status.
       properties:
