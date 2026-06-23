@@ -141,6 +141,16 @@
   },
   {
     "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks/{taskId}/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks/{taskId}/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
     "path": "/paths//workspaces/{workspaceId}/models/{modelId}/processes/parameters/0/schema",
     "pattern": "^[0-9a-f]{32}$"
   },

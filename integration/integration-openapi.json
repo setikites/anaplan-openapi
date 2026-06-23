@@ -2229,16 +2229,43 @@
             "description": "Response 200",
             "content": {
               "application/json": {
-                "example": [
-                  {
-                    "id": "118000000001",
-                    "name": "Process1"
+                "example": {
+                  "meta": {
+                    "paging": {
+                      "currentPageSize": 1,
+                      "offset": 0,
+                      "totalSize": 1
+                    },
+                    "schema": "https://api.anaplan.com//2/0/models/09F86E3942A84353892853BE3BE82280/objects/process"
                   },
-                  {
-                    "id": "118000000002",
-                    "name": "Process2"
+                  "status": {
+                    "code": 200,
+                    "message": "Success"
+                  },
+                  "processes": [
+                    {
+                      "id": "118000000070",
+                      "name": "Wakeup Script"
+                    }
+                  ]
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    },
+                    "status": {
+                      "$ref": "#/components/schemas/Status"
+                    },
+                    "processes": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Process"
+                      }
+                    }
                   }
-                ]
+                }
               }
             }
           }
@@ -5045,6 +5072,17 @@
                       "creationTime": 1535145589808
                     }
                   ]
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tasks": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/TaskWithUrl"
+                      }
+                    }
+                  }
                 }
               }
             }
