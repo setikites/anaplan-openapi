@@ -30,6 +30,7 @@ LIVE_TEST = {
     "audit": "test_audit_live.py",
     "financial": "test_financial_consolidation_live.py",
     "exception": "test_exception_live.py",
+    "administration": "test_administration_live.py",
 }
 
 

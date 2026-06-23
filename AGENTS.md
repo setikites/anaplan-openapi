@@ -49,3 +49,4 @@ The current hand-maintained specs (live tests exist — do not rebuild):
 - `audit/audit-openapi.json`
 - `financial-consolidation/financial-consolidation-openapi.json`
 - `exception/exception-openapi.json`
+- `administration/administration-openapi.json`

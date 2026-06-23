@@ -1,0 +1,152 @@
+openapi: 3.0.0
+info:
+  title: Anaplan Administration API
+  version: 1.0.0
+  description: |-
+    Bulk user management for an Anaplan tenant. Supports importing users from a CSV file and exporting all users to CSV.
+
+    Authentication: `AnaplanAuthToken` header, using a token obtained from the Authentication API or an OAuth Authorization Code access token.
+servers:
+- url: https://api.anaplan.com/admin/1/0
+  description: Production (US1, US2, US5, US7, EU1, EU2, EU4, AP1 and other legacy regions sharing the non-prefixed host)
+security:
+- AnaplanAuthToken: []
+paths:
+  /users/export:
+    get:
+      summary: Export all users to CSV
+      description: 'Downloads all users in the tenant as a CSV file. Columns: `username`, `first_name`, `last_name`, `licenses`.
+        Use `Limit` and `Offset` to page through large tenants.'
+      operationId: exportUsers
+      parameters:
+      - name: Limit
+        in: query
+        description: Maximum number of rows to return.
+        required: false
+        schema:
+          type: integer
+      - name: Offset
+        in: query
+        description: Number of rows to skip before returning results.
+        required: false
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: 'CSV file containing user records. Columns: `username`, `first_name`, `last_name`, `licenses`.'
+          content:
+            text/csv:
+              schema:
+                type: string
+        '401':
+          description: Missing or invalid authentication token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminErrorResponse'
+        '403':
+          description: Caller lacks the required administrator role.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminErrorResponse'
+  /users/import:
+    put:
+      summary: Import users from CSV
+      description: |-
+        Bulk-creates or updates users by uploading a CSV file. Users are matched by `username` (email address); existing users are updated, new addresses are created.
+
+        CSV columns: `username`, `first_name`, `last_name`, `licenses`. Constraints: at least one data row, no more than 500 rows, no duplicate email addresses, no empty cells. Licenses must be quoted and comma-separated when a user holds more than one.
+
+        Returns 207 Multi-Status with per-row counts and line-level errors.
+      operationId: importUsers
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+              - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: CSV file containing user records to import.
+      responses:
+        '207':
+          description: Import processed. Contains per-row counts and any line-level validation errors.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserImportResponse'
+              example:
+                accepted: 3
+                created: 2
+                updated: 1
+                errors: []
+        '400':
+          description: 'Request rejected before processing. Possible causes: missing file, empty CSV, more than 500 rows,
+            duplicate email addresses, or empty cells.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminErrorResponse'
+        '401':
+          description: Missing or invalid authentication token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminErrorResponse'
+        '403':
+          description: Caller lacks the required administrator role.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminErrorResponse'
+components:
+  securitySchemes:
+    AnaplanAuthToken:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Anaplan token authentication. Header value format: `AnaplanAuthToken <token>`. Accepted tokens: Authentication
+        API token (username/password or CA certificate), or an OAuth Authorization Code access token using the `AnaplanAuthToken`
+        prefix.'
+  schemas:
+    UserImportResponse:
+      type: object
+      properties:
+        accepted:
+          type: integer
+          description: Total number of data rows found in the CSV (excluding the header).
+        created:
+          type: integer
+          description: Number of rows that resulted in a new user being created.
+        updated:
+          type: integer
+          description: Number of rows that resulted in an existing user being updated.
+        errors:
+          type: array
+          description: Line-level validation errors. Empty when all rows were accepted.
+          items:
+            $ref: '#/components/schemas/UserImportError'
+    UserImportError:
+      type: object
+      properties:
+        line:
+          type: integer
+          description: 1-based line number in the CSV (excluding the header row) where the error occurred.
+        message:
+          type: string
+          description: Human-readable description of why the row was rejected.
+    AdminErrorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          description: Machine-readable error code.
+          example: FAILURE_BAD_REQUEST
+        message:
+          type: string
+          description: Human-readable error description.

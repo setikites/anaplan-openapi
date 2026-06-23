@@ -2,13 +2,13 @@
 
 ## Purpose
 
-This project generates OpenAPI 3.0 JSON specifications for the 9 publicly available Anaplan REST APIs. These specs are intended for:
+This project generates OpenAPI 3.0 JSON specifications for the 10 publicly available Anaplan REST APIs. These specs are intended for:
 - **API client code generation** (via MCP servers and other tools)
 - **Community-maintained documentation** (enhancing official Anaplan docs)
 
-## The 9 Anaplan APIs
+## The 10 Anaplan APIs
 
-Anaplan has 9 publicly documented REST APIs, each with different characteristics, authentication schemes, and documentation quality. This project documents them as-is rather than normalizing across them, since they were built by different teams at different times.
+Anaplan has 10 publicly documented REST APIs, each with different characteristics, authentication schemes, and documentation quality. This project documents them as-is rather than normalizing across them, since they were built by different teams at different times.
 
 > **Confidence and spec lifecycle for every API are consolidated in the [Confidence table](#confidence-table) below — the single source of truth for those facts.** The per-API notes here cover purpose, authentication, sources, and key behaviors only.
 
@@ -86,7 +86,17 @@ Anaplan has 9 publicly documented REST APIs, each with different characteristics
   - No Postman collection available
   - May have limited live testing
 
-#### 9. Exception Users API
+#### 9. Administration API
+- **Purpose**: Bulk user management — import users from CSV, export all users to CSV
+- **Auth**: `AnaplanAuthToken` (same scheme as Integration API)
+- **Source of Truth**: Anaplan help documentation (no Apiary or Postman source)
+- **Key Points**:
+  - Two endpoints: `PUT /users/import` (207 Multi-Status) and `GET /users/export` (text/csv)
+  - CSV columns: `username, first_name, last_name, licenses`; max 500 rows per import
+  - Regional server coverage unconfirmed — single `api.anaplan.com` entry only (see `administration/README.md`)
+  - No live testing completed; confidence is lower than for Apiary/live-tested APIs
+
+#### 10. Exception Users API
 - **Purpose**: Manage exception users (users who can bypass SSO enforcement)
 - **Auth**: `AnaplanAuthToken` (confirmed — works with both Authentication API tokens and OAuth Authorization Code access tokens); `AnaplanApiKey` (confirmed); `Bearer` rejected with `FAILURE_BAD_HEADER` even for valid OAuth tokens
 - **Source of Truth**: Apiary docs + Postman collection (top-level "Exception Users" folder, 4 requests) + live testing (issue #51)
@@ -242,6 +252,7 @@ Legacy regions (us1–us7, eu1, eu2, eu4, ap1) share the older non-prefixed `api
 | Audit | ✓ | ✓ | — | High (events path: auth/role, event contract, filtering/pagination, CEF — issues #58–#61) | High | hand-maintained (do not rebuild) |
 | Financial Consolidation | ✓ | — | — | Low | Low | hand-maintained (do not rebuild) |
 | Exception Users | ✓ | ✓ | ✓ | High (auth schemes, search by workspace/user, PATCH error probe — issue #51) | High | hand-maintained (do not rebuild) |
+| Administration | — | — | — | None | Low | spec exists; live tests pending |
 
 ## Project Structure
 
@@ -271,7 +282,7 @@ Legacy regions (us1–us7, eu1, eu2, eu4, ap1) share the older non-prefixed `api
 ├── tests/                    (pytest suite: unit/contract + *_live.py)
 └── <api>/                    (one per API: authentication, oauth, integration,
     ├── README.md              cloudworks, scim, alm, audit,
-    ├── <api>-openapi.json     financial-consolidation, exception)
+    ├── <api>-openapi.json     financial-consolidation, exception, administration)
     └── <api>-openapi.yaml
 ```
 
@@ -282,10 +293,10 @@ Each API folder contains:
 
 ## Maintenance
 
-All 9 specs now exist. Ongoing work is refinement rather than initial authoring:
+All 10 specs now exist. Ongoing work is refinement rather than initial authoring:
 
-- **All 9 specs are hand-maintained** (live tests exist for each) and must be edited
-  by hand — do **not** re-run `scripts/build_spec.py` against any of them
+- **All 10 specs are hand-maintained** and must be edited by hand — do **not**
+  re-run `scripts/build_spec.py` against any of them
   (see [CONTRIBUTING.md](CONTRIBUTING.md)).
 - Record any behavior that differs from the official docs in the relevant
   `<api>/README.md` under "Discrepancies".

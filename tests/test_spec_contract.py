@@ -39,6 +39,7 @@ SERVER_URL_PATTERNS: dict[str, str] = {
     "cloudworks":              "api.anaplan.com",
     "financial-consolidation": "fluenceapi-prod.fluence.app",
     "exception":               "api.anaplan.com",
+    "administration":          "api.anaplan.com",
 }
 
 # Host fragments that must NOT appear in a spec of each family.
@@ -408,6 +409,8 @@ _SCHEME_REQUIREMENTS = [
     pytest.param("alm",            "anaplan_token", id="alm-anaplan-token"),
     # Exception Users: AnaplanAuthToken only (Apiary confirmed; Bearer not documented)
     pytest.param("exception",      "anaplan_token", id="exception-anaplan-token"),
+    # Administration: AnaplanAuthToken (same scheme as Integration API — issue #119)
+    pytest.param("administration", "anaplan_token", id="administration-anaplan-token"),
     # Audit: AnaplanAuthToken confirmed via Apiary; Bearer declared but unconfirmed
     pytest.param("audit",          "anaplan_token", id="audit-anaplan-token"),
     # Financial Consolidation: X_API_TOKEN apiKey header (Fluence platform — different host)
@@ -496,6 +499,9 @@ _REQUIRED_ENDPOINTS = [
     pytest.param("financial-consolidation", "post", "/process/start/{path}/{name_of_workflow}", id="fc-workflow-start"),
     pytest.param("financial-consolidation", "post", "/process/stop/{path}/{name_of_workflow}",  id="fc-workflow-stop"),
     pytest.param("financial-consolidation", "get",  "/process/state/{path}/{name_of_workflow}", id="fc-workflow-state"),
+    # Administration API
+    pytest.param("administration", "put", "/users/import", id="admin-import"),
+    pytest.param("administration", "get", "/users/export", id="admin-export"),
     # Financial Consolidation API — User Management endpoints
     pytest.param("financial-consolidation", "get",    "/users",                    id="fc-users-list"),
     pytest.param("financial-consolidation", "post",   "/users",                    id="fc-users-add"),
@@ -1735,3 +1741,62 @@ def test_fc_user_management_declares_username_path_param(path):
         p = names["username"]
         assert p.get("in") == "path"
         assert p.get("required") is True
+
+
+# ─── Administration API ────────────────────────────────────────────────────
+# Bulk user management: import (PUT, multipart CSV) and export (GET, text/csv).
+# Auth: AnaplanAuthToken (same scheme as Integration API).
+# Server: api.anaplan.com/admin/1/0 — regional coverage unconfirmed (issue #119).
+
+_ADMIN_SPEC = REPO_ROOT / "administration" / "administration-openapi.json"
+_skip_admin = _skip_if_missing("administration")
+
+
+@_skip_admin
+def test_administration_import_declares_multipart_request_body():
+    """PUT /users/import must declare a multipart/form-data request body for the CSV upload."""
+    spec = _load(_ADMIN_SPEC)
+    op = spec.get("paths", {}).get("/users/import", {}).get("put", {})
+    body = op.get("requestBody", {})
+    assert "multipart/form-data" in body.get("content", {}), (
+        "PUT /users/import must declare a multipart/form-data request body"
+    )
+
+
+@_skip_admin
+def test_administration_import_declares_207_response():
+    """PUT /users/import must document a 207 Multi-Status response for per-row results."""
+    spec = _load(_ADMIN_SPEC)
+    op = spec.get("paths", {}).get("/users/import", {}).get("put", {})
+    responses = op.get("responses", {})
+    assert "207" in responses, (
+        "PUT /users/import must document a 207 Multi-Status response"
+    )
+
+
+@_skip_admin
+def test_administration_export_declares_csv_response():
+    """GET /users/export must declare a text/csv 200 response for the CSV download."""
+    spec = _load(_ADMIN_SPEC)
+    op = spec.get("paths", {}).get("/users/export", {}).get("get", {})
+    content = op.get("responses", {}).get("200", {}).get("content", {})
+    assert "text/csv" in content, (
+        "GET /users/export must declare a text/csv 200 response"
+    )
+
+
+@_skip_admin
+def test_administration_export_declares_limit_and_offset_params():
+    """GET /users/export must declare optional Limit and Offset query parameters."""
+    spec = _load(_ADMIN_SPEC)
+    params = _all_params(spec, "/users/export", "get")
+    names = {p["name"]: p for p in params if "name" in p}
+    for param_name in ("Limit", "Offset"):
+        assert param_name in names, (
+            f"GET /users/export must declare {param_name!r} query parameter"
+        )
+        p = names[param_name]
+        assert p.get("in") == "query"
+        assert p.get("required") is not True, (
+            f"GET /users/export {param_name!r} must be optional"
+        )
