@@ -7522,31 +7522,6 @@
           }
         }
       },
-      "HistoryReadRequest": {
-        "x-stub": true,
-        "properties": {
-          "requestId": {
-            "type": "string"
-          },
-          "requestState": {
-            "enum": [
-              "NOT_STARTED",
-              "IN_PROGRESS",
-              "COMPLETE",
-              "CANCELLING",
-              "CANCELLED"
-            ]
-          },
-          "url": {
-            "type": "string"
-          }
-        }
-      },
-      "ReadRequestsQuota": {
-        "x-stub": true,
-        "description": "The large read disk quota and usage for a workspace",
-        "properties": {}
-      },
       "Version": {
         "description": "The version of data being used in an Anaplan model",
         "properties": {
