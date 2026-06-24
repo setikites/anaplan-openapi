@@ -377,6 +377,30 @@ These fields are defined in the spec but were never returned by the live API acr
 
 `ModelCalendar.extraWeekMonth` is specific to 4-4-5 calendar models. The probed model uses Calendar Months; the field appears for 4-4-5 models only.
 
+### `POST /workspaces/{workspaceId}/bulkDeleteModels` — endpoint shape (issue #116)
+
+Live testing confirmed this endpoint exists and accepts `POST` (not `DELETE`). Key findings:
+
+- **Method**: `POST` — `OPTIONS` returns `Allow: POST,OPTIONS`. There is no `DELETE /workspaces/{workspaceId}/models` endpoint.
+- **Request body field**: `modelIdsToDelete` (not `modelIds`). Sending `modelIds` returns `400: "Identified an unrecognized 'modelIds'. Amend the content so it only contains applicable fields."` Sending an empty body returns `400: "Expected mandatory field 'modelIdsToDelete' to be present and not empty."`.
+- **Success response** (all models deleted): `bulkDeleteModelsFailures` is **omitted entirely** — it is not present as an empty array.
+- **Partial failure response** (some models not deleted): `bulkDeleteModelsFailures` array is present with `{modelId, message}` objects. Known failure messages:
+  - `"Model is open. Please close the model before trying again."`
+  - `"Model ID does not exist."`
+
+Full success response shape:
+```json
+{
+  "meta": {"schema": "https://api.anaplan.com/2/0/objects/bulkDeleteModels"},
+  "status": {"code": 200, "message": "Success"},
+  "modelsDeleted": 1
+}
+```
+
+### `SummaryReport` stub retired from integration spec (issue #116)
+
+The `SummaryReport` schema was present in the integration spec as an empty stub (`x-stub: true`, no properties, no description). Live probing of export and import task results found no `summaryReport` field in any integration API response. The ALM API has the real summary-report concept — `SummaryReportResponse` is wired to `GET /workspaces/{workspaceId}/alm/models/{modelId}/summaryReport`. The integration stub has been removed.
+
 ### Schema Additions from Probe
 
 Fields observed in live responses that were missing from the spec:

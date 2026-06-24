@@ -534,6 +534,53 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Model'
+  /workspaces/{workspaceId}/bulkDeleteModels:
+    parameters:
+    - name: workspaceId
+      in: path
+      description: Workspace identifier (32-character lowercase hex string).
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9a-f]{32}$
+      example: 8a868cd885f53bd201860f5a4fea1ff1
+    post:
+      summary: Bulk delete models
+      description: Deletes multiple models in a workspace in a single request. Models that cannot be deleted (e.g., because
+        they are currently open) are listed in `bulkDeleteModelsFailures`; the overall HTTP status is still 200 in that case.
+      tags:
+      - General Workspace & Model Metadata
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - modelIdsToDelete
+              properties:
+                modelIdsToDelete:
+                  type: array
+                  description: IDs of the models to delete.
+                  items:
+                    type: string
+            example:
+              modelIdsToDelete:
+              - 09F86E3942A84353892853BE3BE82280
+      responses:
+        '200':
+          description: Bulk delete completed. Check `modelsDeleted` and `bulkDeleteModelsFailures` for per-model outcomes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkDeleteModels'
+              example:
+                meta:
+                  schema: https://api.anaplan.com/2/0/objects/bulkDeleteModels
+                status:
+                  code: 200
+                  message: Success
+                modelsDeleted: 1
   /workspaces/{workspaceId}/models/{modelId}/dimensions/{dimensionId}/items:
     parameters:
     - name: workspaceId
@@ -8280,9 +8327,27 @@ components:
         customerId:
           type: string
     BulkDeleteModels:
-      x-stub: true
-      description: Result of bulk deleting models
-      properties: {}
+      type: object
+      description: Result of bulk deleting models.
+      properties:
+        meta:
+          $ref: '#/components/schemas/Meta'
+        status:
+          $ref: '#/components/schemas/Status'
+        modelsDeleted:
+          type: integer
+          description: Number of models successfully deleted.
+        bulkDeleteModelsFailures:
+          type: array
+          description: Models that could not be deleted, with failure reasons. Omitted from the response when all requested
+            deletions succeed.
+          items:
+            type: object
+            properties:
+              modelId:
+                type: string
+              message:
+                type: string
     Module:
       properties:
         code:
@@ -8977,9 +9042,6 @@ components:
         taskUrl:
           type: string
           description: URL for polling task status via GET.
-    SummaryReport:
-      x-stub: true
-      properties: {}
     Paging:
       type: object
       required:

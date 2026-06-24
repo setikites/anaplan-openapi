@@ -21,6 +21,11 @@
   },
   {
     "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/bulkDeleteModels/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
     "path": "/paths//workspaces/{workspaceId}/models/parameters/0/schema",
     "pattern": "^[0-9a-f]{32}$"
   },
