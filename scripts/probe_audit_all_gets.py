@@ -109,6 +109,18 @@ def get(path: str, params: dict | None = None) -> dict | list | None:
     return None
 
 
+def post(path: str, body: dict, params: dict | None = None) -> dict | list | None:
+    """POST to an Audit API path; return parsed JSON or None on error."""
+    url = f"{BASE_URL}{path}"
+    qs = "?" + "&".join(f"{k}={v}" for k, v in (params or {}).items()) if params else ""
+    r = CLIENT.post(url, headers={**HDRS, "Content-Type": "application/json"}, json=body, params=params or {})
+    print(f"  POST {path}{qs} -> {r.status_code}")
+    if r.status_code == 200:
+        return r.json()
+    print(f"    -> {r.text[:300]}")
+    return None
+
+
 # ── pattern detection helpers ─────────────────────────────────────────────────
 
 HEX32_RE   = re.compile(r"^[0-9a-f]{32}$")
@@ -213,6 +225,22 @@ for evt_type in TYPES_TO_PROBE:
         events = data.get("response", [])
         SAMPLES[f"events_{evt_type}"].extend(events)
         walk(data)
+
+# 3. POST /events/search — interval-based (non-destructive read endpoint)
+print("\n[3] POST /events/search -- interval=168 (last 7 days, limit=100)")
+data = post("/events/search", body={"interval": 168}, params={"limit": "100", "offset": "0"})
+if isinstance(data, dict):
+    events = data.get("response", [])
+    SAMPLES["events_search_interval"].extend(events)
+    walk(data)
+
+# Also probe with explicit date range via POST
+print("\n[4] POST /events/search -- per-type via query param (user_activity, limit=50)")
+data = post("/events/search", body={"interval": 168}, params={"type": "user_activity", "limit": "50", "offset": "0"})
+if isinstance(data, dict):
+    events = data.get("response", [])
+    SAMPLES["events_search_user_activity"].extend(events)
+    walk(data)
 
 CLIENT.close()
 
