@@ -467,7 +467,9 @@
                       "firstName": "Jane",
                       "lastName": "Smith",
                       "active": true,
-                      "otherWorkspaces": ["Sales Planning Workspace"]
+                      "otherWorkspaces": [
+                        "Sales Planning Workspace"
+                      ]
                     }
                   ]
                 }
@@ -3432,7 +3434,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Schema2"
+                "$ref": "#/components/schemas/DateRequest"
               },
               "example": {
                 "date": "2021-06-03"
@@ -3560,7 +3562,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Schema2"
+                "$ref": "#/components/schemas/DateRequest"
               },
               "example": {
                 "date": "2020-07-03"
@@ -4482,11 +4484,27 @@
                 },
                 "example": {
                   "pages": [],
-                  "columnCoordinates": [["Jan 13"], ["Feb 13"], ["Mar 13"]],
+                  "columnCoordinates": [
+                    [
+                      "Jan 13"
+                    ],
+                    [
+                      "Feb 13"
+                    ],
+                    [
+                      "Mar 13"
+                    ]
+                  ],
                   "rows": [
                     {
-                      "rowCoordinates": ["Durham"],
-                      "cells": ["64.6", "57.94", "108.36"]
+                      "rowCoordinates": [
+                        "Durham"
+                      ],
+                      "cells": [
+                        "64.6",
+                        "57.94",
+                        "108.36"
+                      ]
                     }
                   ]
                 }
@@ -5101,10 +5119,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Schema2"
-              },
-              "example": {
-                "localeName": "en_US"
+                "type": "object",
+                "required": [
+                  "localeName"
+                ],
+                "properties": {
+                  "localeName": {
+                    "type": "string",
+                    "description": "Locale for the export.",
+                    "example": "en_US"
+                  }
+                }
               }
             }
           }
@@ -5195,18 +5220,6 @@
         "tags": [
           "Bulk Read"
         ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Schema2"
-              },
-              "example": {
-                "localeName": "en_US"
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "Response 200",
@@ -7034,15 +7047,6 @@
       }
     },
     "schemas": {
-      "Schema2": {
-        "properties": {
-          "date": {
-            "format": "date",
-            "type": "string"
-          }
-        },
-        "type": "object"
-      },
       "User": {
         "type": "object",
         "properties": {
@@ -7292,49 +7296,6 @@
           },
           "name": {
             "type": "string"
-          }
-        }
-      },
-      "DimensionItem": {
-        "x-stub": true,
-        "properties": {
-          "code": {
-            "type": "string"
-          },
-          "id": {
-            "type": "string"
-          },
-          "listId": {
-            "type": "string"
-          },
-          "listName": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "parent": {
-            "type": "string"
-          },
-          "parentId": {
-            "type": "string"
-          },
-          "properties": {
-            "properties": {},
-            "type": "object"
-          },
-          "read": {
-            "type": "array"
-          },
-          "subsetId": {
-            "type": "string"
-          },
-          "subsets": {
-            "properties": {},
-            "type": "object"
-          },
-          "write": {
-            "type": "array"
           }
         }
       },
@@ -8300,6 +8261,15 @@
             "$ref": "#/components/schemas/Paging"
           }
         }
+      },
+      "DateRequest": {
+        "properties": {
+          "date": {
+            "format": "date",
+            "type": "string"
+          }
+        },
+        "type": "object"
       }
     }
   }

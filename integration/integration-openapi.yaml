@@ -3682,7 +3682,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Schema2'
+              $ref: '#/components/schemas/DateRequest'
             example:
               date: '2021-06-03'
       responses:
@@ -3821,7 +3821,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Schema2'
+              $ref: '#/components/schemas/DateRequest'
             example:
               date: '2020-07-03'
       responses:
@@ -6130,9 +6130,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Schema2'
-            example:
-              localeName: en_US
+              type: object
+              required:
+              - localeName
+              properties:
+                localeName:
+                  type: string
+                  description: Locale for the export.
+                  example: en_US
       responses:
         '200':
           description: Response 200
@@ -6242,13 +6247,6 @@ paths:
         #
       tags:
       - Bulk Read
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Schema2'
-            example:
-              localeName: en_US
       responses:
         '200':
           description: Response 200
@@ -8200,12 +8198,6 @@ components:
       type: http
       scheme: bearer
   schemas:
-    Schema2:
-      properties:
-        date:
-          format: date
-          type: string
-      type: object
     User:
       type: object
       properties:
@@ -8377,35 +8369,6 @@ components:
           type: string
         name:
           type: string
-    DimensionItem:
-      x-stub: true
-      properties:
-        code:
-          type: string
-        id:
-          type: string
-        listId:
-          type: string
-        listName:
-          type: string
-        name:
-          type: string
-        parent:
-          type: string
-        parentId:
-          type: string
-        properties:
-          properties: {}
-          type: object
-        read:
-          type: array
-        subsetId:
-          type: string
-        subsets:
-          properties: {}
-          type: object
-        write:
-          type: array
     CurrentPeriod:
       properties:
         calendarType:
@@ -9080,3 +9043,9 @@ components:
           description: URL to the JSON schema definition for this response body. A URL string, not an inline JSON Schema object.
         paging:
           $ref: '#/components/schemas/Paging'
+    DateRequest:
+      properties:
+        date:
+          format: date
+          type: string
+      type: object
