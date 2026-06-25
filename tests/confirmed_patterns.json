@@ -256,6 +256,11 @@
   },
   {
     "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/currentPeriod/put/parameters/0/schema",
+    "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+  },
+  {
+    "spec": "integration",
     "path": "/paths//models/{modelId}/currentPeriod/parameters/0/schema",
     "pattern": "^[0-9A-F]{32}$"
   },
