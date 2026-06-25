@@ -2477,6 +2477,92 @@
         }
       }
     },
+    "/models/{modelId}/actions": {
+      "parameters": [
+        {
+          "name": "modelId",
+          "in": "path",
+          "description": "Model identifier (32-character uppercase hex string).",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
+          },
+          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+        }
+      ],
+      "get": {
+        "summary": "List the actions in the model as a JSON array",
+        "description": "Model-direct form of `GET /workspaces/{workspaceId}/models/{modelId}/actions`. Returns the same response shape without requiring a workspace ID. Lists delete actions available for the specified model.",
+        "tags": [
+          "Model Metadata",
+          "Action Metadata"
+        ],
+        "parameters": [
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sort results by object properties. Prefix with `+` for ascending or `-` for descending order.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "+name"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Actions retrieved successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "meta": {
+                    "paging": {
+                      "currentPageSize": 3,
+                      "offset": 0,
+                      "totalSize": 3
+                    },
+                    "schema": "https://api.anaplan.com/2/0/models/D4E5F6A1B2C3D4E5F6A1B2C3D4E5F6A1/objects/action"
+                  },
+                  "status": {
+                    "code": 200,
+                    "message": "Success"
+                  },
+                  "actions": [
+                    {
+                      "id": "117000000019",
+                      "actionType": "DELETE_BY_SELECTION",
+                      "name": "Delete Flat New SKU List"
+                    },
+                    {
+                      "id": "117000000018",
+                      "actionType": "DELETE_BY_SELECTION",
+                      "name": "Delete Flat New SKU List After Import"
+                    }
+                  ]
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    },
+                    "status": {
+                      "$ref": "#/components/schemas/Status"
+                    },
+                    "actions": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Action"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/workspaces/{workspaceId}/models/{modelId}/processes": {
       "parameters": [
         {
@@ -2568,6 +2654,86 @@
         }
       }
     },
+    "/models/{modelId}/processes": {
+      "parameters": [
+        {
+          "name": "modelId",
+          "in": "path",
+          "description": "Model identifier (32-character uppercase hex string).",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
+          },
+          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+        }
+      ],
+      "get": {
+        "summary": "List the process definitions available in a model as a JSON array",
+        "description": "Model-direct form of `GET /workspaces/{workspaceId}/models/{modelId}/processes`. Returns the same response shape without requiring a workspace ID. Lists process definitions available for the specified model.",
+        "tags": [
+          "Model Metadata",
+          "Action Metadata"
+        ],
+        "parameters": [
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sort results by object properties. Prefix with `+` for ascending or `-` for descending order.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "+name"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Processes retrieved successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "meta": {
+                    "paging": {
+                      "currentPageSize": 1,
+                      "offset": 0,
+                      "totalSize": 1
+                    },
+                    "schema": "https://api.anaplan.com/2/0/models/A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4/objects/process"
+                  },
+                  "status": {
+                    "code": 200,
+                    "message": "Success"
+                  },
+                  "processes": [
+                    {
+                      "id": "118000000070",
+                      "name": "Wakeup Script"
+                    }
+                  ]
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    },
+                    "status": {
+                      "$ref": "#/components/schemas/Status"
+                    },
+                    "processes": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Process"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/workspaces/{workspaceId}/models/{modelId}/imports/": {
       "parameters": [
         {
@@ -2624,6 +2790,88 @@
                       "totalSize": 8
                     },
                     "schema": "https://api.anaplan.com//2/0/models/A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4/objects/import"
+                  },
+                  "status": {
+                    "code": 200,
+                    "message": "Success"
+                  },
+                  "imports": [
+                    {
+                      "id": "112000000007",
+                      "name": "ORG2Test from Organization.txt",
+                      "importDataSourceId": "113000000006",
+                      "importType": "HIERARCHY_DATA"
+                    }
+                  ]
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    },
+                    "status": {
+                      "$ref": "#/components/schemas/Status"
+                    },
+                    "imports": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Import"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/models/{modelId}/imports": {
+      "parameters": [
+        {
+          "name": "modelId",
+          "in": "path",
+          "description": "Model identifier (32-character uppercase hex string).",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
+          },
+          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+        }
+      ],
+      "get": {
+        "summary": "Get a list of import actions",
+        "description": "Model-direct form of `GET /workspaces/{workspaceId}/models/{modelId}/imports`. Returns the same response shape without requiring a workspace ID. Lists import definitions available for the specified model.",
+        "tags": [
+          "Model Metadata",
+          "Action Metadata"
+        ],
+        "parameters": [
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sort results by object properties. Prefix with `+` for ascending or `-` for descending order.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "+name"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Imports retrieved successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "meta": {
+                    "paging": {
+                      "currentPageSize": 8,
+                      "offset": 0,
+                      "totalSize": 8
+                    },
+                    "schema": "https://api.anaplan.com/2/0/models/A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4/objects/import"
                   },
                   "status": {
                     "code": 200,
@@ -2872,6 +3120,89 @@
         }
       }
     },
+    "/models/{modelId}/exports": {
+      "parameters": [
+        {
+          "name": "modelId",
+          "in": "path",
+          "description": "Model identifier (32-character uppercase hex string).",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
+          },
+          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+        }
+      ],
+      "get": {
+        "summary": "List the available export definitions as a JSON array",
+        "description": "Model-direct form of `GET /workspaces/{workspaceId}/models/{modelId}/exports`. Returns the same response shape without requiring a workspace ID. Lists export definitions available for the specified model.",
+        "tags": [
+          "Model Metadata",
+          "Action Metadata"
+        ],
+        "parameters": [
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sort results by object properties. Prefix with `+` for ascending or `-` for descending order.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "+name"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Exports retrieved successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "meta": {
+                    "paging": {
+                      "currentPageSize": 2,
+                      "offset": 0,
+                      "totalSize": 2
+                    },
+                    "schema": "https://api.anaplan.com/2/0/models/A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4/objects/export"
+                  },
+                  "status": {
+                    "code": 200,
+                    "message": "Success"
+                  },
+                  "exports": [
+                    {
+                      "id": "116000000000",
+                      "name": "Export Grid.xls",
+                      "exportType": "GRID_CURRENT_PAGE",
+                      "exportFormat": "text/csv",
+                      "layout": "GRID_CURRENT_PAGE"
+                    }
+                  ]
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    },
+                    "status": {
+                      "$ref": "#/components/schemas/Status"
+                    },
+                    "exports": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Export"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/models/{modelId}/processes/{processId}": {
       "parameters": [
         {
@@ -2898,6 +3229,131 @@
       "get": {
         "summary": "Retrieve metadata for a process",
         "description": "## Retrieve metadata for a process\n\n`/models/{modelId}/processes/{processId}`  \n\nUse this call to retrieve the names and actions for a given Process in an Anaplan model.\n\n**Notes**:\n\n*   Actions which are imports or exports (`actionType` field is `IMPORT` or `EXPORT`) contain additional fields in the response (see below). Other actions just contain the `id`, `name`, and `actionType`.\n*   Actions are ordered in the sequence that they run when the Process itself is executed.\n*   In the future, use of this call may be rate limited.\n*   For an action with `actionType` of `IMPORT`, you can use the `importDataSourceId` value as the ID of a file for the `fileId` parameter when you [upload or download files](https://anaplanbulkapi20.docs.apiary.io/#reference/upload-files)\n*   For actions with `actionType` of `EXPORT` or `IMPORT`, you can find more information about them if you use the IDs as `exportId` or `importId` in the [export](https://anaplanbulkapi20.docs.apiary.io/#reference/export) and [import](https://anaplanbulkapi20.docs.apiary.io/#reference/import) metadata endpoints.\n*   The possible values for actionType (non-exhaustive list):\n    *   IMPORT\n    *   EXPORT\n    *   DELETE_BY_SELECTION\n    *   ORDER_HIERARCHY\n    *   OPTIMIZER\n*   To include additional information regarding the import data source in an import action, add the `?showImportDataSource=true` query parameter to the request.\n    \n\n### Request\n\n```\ncurl -X GET 'https://api.anaplan.com/2/0/models/{modelId}/processes/{processId}' \\\n-H 'Authorization: AnaplanAuthToken {anaplan_auth_token}'\\\n-H 'Accept: application/json'\n```\n\n### Request headers\n\n| **Header** | **Details** |\n| --- | --- |\n| `Authorization: AnaplanAuthToken {anaplan_auth_token}` | <br><br>*   Required<br>*   Description: the Anaplan authentication token<br><br> |\n| `Accept: application/json` | <br><br>*   Optional<br>*   Description: This indicates the preferred response is either `application/json` format. Note that this call only outputs in `application/json` format.<br><br> |\n\n### Request parameters\n\n| **Parameter** | **Details** |\n| --- | --- |\n| `{modelId}` | <br><br>*   Required<br>*   Type: String<br>*   Description: the ID for the model<br>*   Example: `A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4`<br><br> |\n| `{processId}` | <br><br>*   Required<br>*   Type: Number<br>*   Description: the ID for the process<br>*   Example: `118000000001`<br>*   Note that you can get the process ID from the list of process for a model API<br><br> |\n| `{showImportDataSource}` | <br><br>*   Optional<br>*   Type: Boolean<br>*   Description: defines whether the response should include additional information regarding the import data source. The field is interpreted as `false` if anything other than `true` is specified.<br>*   Example: `?showImportDataSource=true`<br><br> |",
+        "tags": [
+          "Model Metadata",
+          "Action Metadata"
+        ],
+        "parameters": [
+          {
+            "name": "showImportDataSource",
+            "in": "query",
+            "description": "When set to \"true\", includes additional information about the import data source. Any value other than \"true\" is interpreted as false.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "true"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response 200",
+            "headers": {
+              "Content-Type": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "application/json"
+              }
+            },
+            "content": {
+              "application/json": {
+                "example": {
+                  "meta": {
+                    "schema": "https://api.anaplan.com/2/0/objects/process"
+                  },
+                  "status": {
+                    "code": 200,
+                    "message": "Success"
+                  },
+                  "processMetadata": {
+                    "name": "ProcessWithActions",
+                    "actions": [
+                      {
+                        "id": "112000000000",
+                        "name": "Sales from import-sales.csv",
+                        "actionType": "IMPORT",
+                        "importDataSourceId": "113000000000",
+                        "importType": "MODULE_DATA",
+                        "importDataSource": {
+                          "importDataSourceId": "113000000000",
+                          "type": "FILE"
+                        }
+                      },
+                      {
+                        "id": "116000000000",
+                        "name": "Sales - Revenue.xls",
+                        "actionType": "EXPORT",
+                        "exportType": "GRID_CURRENT_PAGE",
+                        "exportFormat": "application/vnd.ms-excel",
+                        "layout": "GRID_CURRENT_PAGE"
+                      },
+                      {
+                        "id": "117000000000",
+                        "name": "Delete from Products",
+                        "actionType": "DELETE_BY_SELECTION"
+                      }
+                    ]
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    },
+                    "status": {
+                      "$ref": "#/components/schemas/Status"
+                    },
+                    "processMetadata": {
+                      "$ref": "#/components/schemas/Process"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/workspaces/{workspaceId}/models/{modelId}/processes/{processId}": {
+      "parameters": [
+        {
+          "name": "workspaceId",
+          "in": "path",
+          "description": "Workspace identifier (32-character lowercase hex string).",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
+          },
+          "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+        },
+        {
+          "name": "modelId",
+          "in": "path",
+          "description": "Model identifier (32-character uppercase hex string).",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
+          },
+          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+        },
+        {
+          "name": "processId",
+          "in": "path",
+          "description": "Process identifier (12-digit numeric, prefix 118).",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^118[0-9]{9}$"
+          },
+          "example": "118000000070"
+        }
+      ],
+      "get": {
+        "summary": "Retrieve metadata for a process",
+        "description": "Workspace-prefixed form of `GET /models/{modelId}/processes/{processId}`. Returns the same `processMetadata` response shape. Use this form when a workspace ID is available; the model-direct form is also valid.",
         "tags": [
           "Model Metadata",
           "Action Metadata"
@@ -3092,6 +3548,105 @@
         }
       }
     },
+    "/models/{modelId}/exports/{exportId}": {
+      "parameters": [
+        {
+          "name": "modelId",
+          "in": "path",
+          "description": "Model identifier (32-character uppercase hex string).",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
+          },
+          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+        },
+        {
+          "name": "exportId",
+          "in": "path",
+          "description": "Export definition identifier (12-digit numeric, prefix 116).",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^116[0-9]{9}$"
+          },
+          "example": "116000000108"
+        }
+      ],
+      "get": {
+        "summary": "Get the metadata for an export definition",
+        "description": "Model-direct form of `GET /workspaces/{workspaceId}/models/{modelId}/exports/{exportId}`. Returns the same `exportMetadata` response shape without requiring a workspace ID.",
+        "tags": [
+          "Model Metadata",
+          "Action Metadata"
+        ],
+        "responses": {
+          "200": {
+            "description": "Response 200",
+            "content": {
+              "application/json": {
+                "example": {
+                  "meta": {
+                    "schema": "https://api-stg.anaplan.com/2/0/models/28D168FB7385407A8AC0026487733564/objects/exportMetadata"
+                  },
+                  "status": {
+                    "code": 200,
+                    "message": "Success"
+                  },
+                  "exportMetadata": {
+                    "columnCount": 16,
+                    "dataTypes": [
+                      "ENTITY",
+                      "MIXED",
+                      "MIXED",
+                      "MIXED",
+                      "MIXED"
+                    ],
+                    "delimiter": "\"",
+                    "encoding": "UTF-8",
+                    "exportFormat": "text/csv",
+                    "headerNames": [
+                      "ListWithSemiColonAsSeparator",
+                      "Parent",
+                      "Code",
+                      "DepProjects",
+                      "col1",
+                      "col2",
+                      "col3",
+                      "col4",
+                      "data",
+                      "delete"
+                    ],
+                    "listNames": [
+                      "",
+                      "",
+                      "",
+                      ""
+                    ],
+                    "rowCount": 20432,
+                    "separator": ","
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    },
+                    "status": {
+                      "$ref": "#/components/schemas/Status"
+                    },
+                    "exportMetadata": {
+                      "$ref": "#/components/schemas/ExportMetadata"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/workspaces/{workspaceId}/models/{modelId}/imports/{importId}": {
       "parameters": [
         {
@@ -3129,6 +3684,101 @@
       "get": {
         "summary": "Get the metadata for an import definition",
         "description": "## Get the metadata for an import definition\n\n`/workspaces/{workspaceId}/models/{modelId}/imports/{importId}`  \n\nYou can use the API to obtain metadata for an import definition for module and list imports using the import ID. This enables you to use mappings on your imports without querying the import file itself. You can retrieve:\n\n*   Name\n*   Type\n*   Source\n*   Column Count\n    \n\n### Get the metadata for an import definition\n\n#### Request\n\n```\ncurl -X GET \\\nhttps://api.anaplan.com/2/0/workspaces/{workspaceId}/models/{modelId}/imports/{importId} \\\n-H 'authorization: AnaplanAuthToken {anaplan_auth_token}' \\\n-H \"Content-Type:application/json\"\n```\n\n#### Headers\n\n*   `Authorization:AnaplanAuthToken {anaplan_auth_token}`\n*   `Content-Type:application/json`\n    \n\n#### Parameters\n\n| **Parameter** | **Description** |\n| --- | --- |\n| `workspaceId` | <br><br>*   Required<br>*   Type: string<br>*   Description: The workspace ID<br>*   Example: `8a8b8c8d8e8f8g8i`<br><br> |\n| `modelId` | <br><br>*   Required<br>*   Type: string<br>*   Description: The model ID<br>*   Example: `A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4`<br><br> |\n| `importId` | <br><br>*   Required<br>*   Type: number<br>*   Description: The model ID<br>*   Example: `112000000059`<br><br> |\n\n#",
+        "tags": [
+          "Model Metadata",
+          "Action Metadata"
+        ],
+        "responses": {
+          "200": {
+            "description": "Response 200",
+            "content": {
+              "application/json": {
+                "example": {
+                  "meta": {
+                    "schema": "https://api.anaplan.com/2/0/models/A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4/objects/importMetadata"
+                  },
+                  "status": {
+                    "code": 200,
+                    "message": "Success"
+                  },
+                  "importMetadata": {
+                    "name": "Employees from Employees.txt",
+                    "type": "FILE",
+                    "source": {
+                      "textEncoding": "ISO-8859-1",
+                      "columnSeparator": "\t",
+                      "textDelimiter": "\"",
+                      "headerRow": 1,
+                      "firstDataRow": 2,
+                      "decimalSeparator": ".",
+                      "headerNames": [
+                        "Name",
+                        "Sales Region",
+                        "Parent",
+                        "Code",
+                        "Sales Team",
+                        "Start Date",
+                        "Leave Date",
+                        "Salary",
+                        "Address",
+                        "Quota",
+                        "Bonus %",
+                        "Sales Rep",
+                        "Staff",
+                        "Exec"
+                      ],
+                      "columnCount": 14
+                    }
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    },
+                    "status": {
+                      "$ref": "#/components/schemas/Status"
+                    },
+                    "importMetadata": {
+                      "$ref": "#/components/schemas/ImportMetadata"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/models/{modelId}/imports/{importId}": {
+      "parameters": [
+        {
+          "name": "modelId",
+          "in": "path",
+          "description": "Model identifier (32-character uppercase hex string).",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
+          },
+          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+        },
+        {
+          "name": "importId",
+          "in": "path",
+          "description": "Import definition identifier (12-digit numeric, prefix 112).",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^112[0-9]{9}$"
+          },
+          "example": "112000001286"
+        }
+      ],
+      "get": {
+        "summary": "Get the metadata for an import definition",
+        "description": "Model-direct form of `GET /workspaces/{workspaceId}/models/{modelId}/imports/{importId}`. Returns the same `importMetadata` response shape without requiring a workspace ID.",
         "tags": [
           "Model Metadata",
           "Action Metadata"

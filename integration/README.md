@@ -106,6 +106,13 @@ Endpoints covered (all paths relative to the `/2/0` base URL):
 | `test_run_process_and_poll_task` | `POST /workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks` + `GET .../tasks/{taskId}` (write-guarded) |
 | `test_run_action_and_poll_task` | `POST /workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks` + `GET .../tasks/{taskId}` (write-guarded) |
 | `test_export_import_cycle` | Full export → download → stage → import cycle (write-guarded; see details below) |
+| `test_model_direct_list_actions` | `GET /models/{modelId}/actions` (model-direct form — issue #28) |
+| `test_model_direct_list_imports` | `GET /models/{modelId}/imports` (model-direct form — issue #28) |
+| `test_model_direct_list_exports` | `GET /models/{modelId}/exports` (model-direct form — issue #28) |
+| `test_model_direct_list_processes` | `GET /models/{modelId}/processes` (model-direct form — issue #28) |
+| `test_model_direct_get_export_metadata` | `GET /models/{modelId}/exports/{exportId}` (model-direct form — issue #28) |
+| `test_model_direct_get_import_metadata` | `GET /models/{modelId}/imports/{importId}` (model-direct form — issue #28) |
+| `test_workspace_prefixed_get_process_detail` | `GET /workspaces/{workspaceId}/models/{modelId}/processes/{processId}` (workspace form — issue #28) |
 
 ## Modern Endpoint Validation (post-legacy retirement)
 
@@ -193,6 +200,29 @@ The spec declares `date` as a query parameter and documents the 400 response. Th
 ### `GET /models/{modelId}/modelCalendar/fiscalYear` returns 405
 
 Live testing confirmed this path only supports `PUT` (update fiscal year). `GET` returns `405 Method Not Allowed`. Fiscal year data is available via `GET /workspaces/{workspaceId}/models/{modelId}/modelCalendar`, which returns the full `modelCalendar` object including `fiscalYear`. The spec retains only `PUT` on this path.
+
+### Action/import/export/process GET path duality (issue #28)
+
+Probed 2026-06-25 with live credentials. All 7 alternate-form GETs returned **200 OK** with response shapes identical to their counterpart form.
+
+**Listing endpoints** — model-direct forms confirmed valid:
+
+| Workspace form | Model-direct form | Status |
+|----------------|-------------------|--------|
+| `GET /workspaces/{workspaceId}/models/{modelId}/actions` | `GET /models/{modelId}/actions` | **200 OK** — identical response shape (`actions` array) |
+| `GET /workspaces/{workspaceId}/models/{modelId}/imports` | `GET /models/{modelId}/imports` | **200 OK** — identical response shape (`imports` array) |
+| `GET /workspaces/{workspaceId}/models/{modelId}/exports` | `GET /models/{modelId}/exports` | **200 OK** — identical response shape (`exports` array) |
+| `GET /workspaces/{workspaceId}/models/{modelId}/processes` | `GET /models/{modelId}/processes` | **200 OK** — identical response shape (`processes` array) |
+
+**Individual-resource GETs** — both forms confirmed valid:
+
+| Model-direct form | Workspace form | Status |
+|-------------------|----------------|--------|
+| `GET /models/{modelId}/exports/{exportId}` | `GET /workspaces/{workspaceId}/models/{modelId}/exports/{exportId}` | **200 OK** — identical `exportMetadata` response |
+| `GET /models/{modelId}/imports/{importId}` | `GET /workspaces/{workspaceId}/models/{modelId}/imports/{importId}` | **200 OK** — identical `importMetadata` response |
+| `GET /models/{modelId}/processes/{processId}` | `GET /workspaces/{workspaceId}/models/{modelId}/processes/{processId}` | **200 OK** — identical `processMetadata` response |
+
+All 7 new paths have been added to `integration/integration-openapi.json`.
 
 ### Workspace-scoped model paths (issue #25)
 
