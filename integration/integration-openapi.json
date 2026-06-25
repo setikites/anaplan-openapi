@@ -6437,7 +6437,7 @@
         }
       },
       "post": {
-        "summary": "Add list items",
+        "summary": "Add or delete list items",
         "description": "## Add list items\n\n`/workspaces/{workspaceId}/models/{modelId}/lists/{listId}/items?action=add'`\n\nUse this call to add items to a list. You must provide the list ID and data for each item. You can add one or more items in each request.\n\n**Notes:**\n\n*   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html).\n*   A maximum of 100,000 list items can be added with a single call.\n    \n\n### Requests that support this feature\n\n```\ncurl -X POST 'https://api.anaplan.com/2/0/workspaces/{workspaceId}/models/{modelId}/lists/{listId}/items?action=add' \\\n-H 'Authorization: AnaplanAuthToken {anaplan_auth_token}' \\\n-H 'Content-Type: application/json' \\\n-H 'Accept: application/json'\n```\n\n### Request headers\n\n| **Header** | **Details** |\n| --- | --- |\n| `Authorization: AnaplanAuthToken {anaplan_auth_token}` | <br><br>*   Required<br>*   Description: the Anaplan authentication token<br><br> |\n| `Content-Type: application/json` | <br><br>*   Required<br>*   Description: This indicates the request format is `application/json`.<br><br> |\n| `Accept: application/json` | <br><br>*   Required<br>*   Description: This indicates the preferred response is either `application/json` format. Note that this call only outputs in `application/json` format.<br><br> |\n\n### Request parameters\n\n| **Parameter** | **Details** |\n| --- | --- |\n| `{workspaceId}` | <br><br>*   Required<br>*   Type: String<br>*   Description: The workspace ID<br>*   Example: `c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6`<br><br> |\n| `{modelId}` | <br><br>*   Required<br>*   Type: String<br>*   Description: the model ID<br>*   Example: `A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3`<br><br> |\n| `{listId}` | <br><br>*   Required<br>*   Type: Number<br>*   Description: the list ID<br>*   Example: `101000000001`<br><br> |\n| `action=add` | <br><br>*   Required<br>*   Type: query parameter<br>*   Description: The Anaplan Add action. This query parameter must be included in the URL as shown in the Requests section above.<br>*   Example: `action=addRequest`<br><br> |\n\n### Request body\n\n| **List Data** | **Description** |\n| --- | --- |\n| `{name}` | The name value for the item in the list. |\n| `{code}` | The code value for the item in the list. |\n| `{parent}` | The name of the parent item in the list |\n| `{properties}` | The value of each custom list property. |\n| `{subsets}` | The value of each custom list subset. |\n\nExample:\n\n```\n{\n  \"items\": [\n    {\n      \"name\": \"mike\",\n      \"code\": \"id1\",\n      \"parent\": \"west\",\n      \"properties\": {\n        \"p-text\":\"hello world\",\n        \"p-number\":\"123456\",\n        \"p-boolean\": \"true\",\n        \"p-list\": \"east\",\n        \"p-period\": \"Sep 20\"\n      },\n    \"subsets\": {\n      \"s11\": true\n    }\n  },\n    {\n      \"name\": \"cindy\",\n      \"code\": \"id2\",\n      \"properties\": {\n        \"p-text\":\"hello world\",\n        \"p-number\":\"wrong format for number\",\n        \"p-boolean\": \"true\",\n        \"p-list\": \"east\",\n        \"p-period\": \"Sep 20\"\n      },\n      \"subsets\": {\n        \"s11\": true\n      }\n    }\n  ]\n}\n\n```\n\n### Logic for add items\n\nThe add list items behavior uses specific logic with names and codes. This logic varies between [general lists](https://help.anaplan.com/f7f01453-71bc-4046-935a-b9d7cb47d15a-General-Lists) and [numbered lists](https://help.anaplan.com/54b75174-848f-482b-a051-a9a063ece50c-Numbered-Lists) in Anaplan.\n\n#### Add items to a general list\n\n| **Scenario** | **Existing** | **Input in API** | **Behavior** | **Result** |\n| --- | --- | --- | --- | --- |\n| Add a new list Item | There are no existing items | name=n1  <br>code=c1 | Success.  <br>A new list item is created. | name=n1  <br>code=c1 |\n| Add list item with name conflicts | name=n1  <br>code=c1 | name=n1  <br>code=c2 | There is a duplicate name. A new list item is not added. | An error message returns. |\n| Add list item with code conflicts | name=n1  <br>code=c1 | name=n2  <br>code=c1 | There is a duplicate name. A new list item is not added. | An error message returns. |\n| Add list item without name | There are no existing items | code=c1 | There is a missing name. A new list item is not added. | An error message returns. |\n\n#### Add items to a numbered list\n\nFor a numbered list, the name column is used for the index. The name is automatically generated. When you add an item, the API does not allow a name as an input.\n\n| **Scenario** | **Existing** | **Input in API** | **Behavior** | **Result** |\n| --- | --- | --- | --- | --- |\n| Add a new list Item | There are no existing items | name=n1  <br>code=c1 | A name is not a valid input. A new list item is not added. | An error message returns. |\n| Add a new list item | There are no existing items | code=c1 | Success.  <br>A new item is added. | success code=c1 |\n| Add a list item with a conflicting code | code=c1 | code=c1 | There is a duplicate code. A new list item is not added. | An error message returns. |",
         "tags": [
           "Transactional Write"
@@ -6446,15 +6446,21 @@
           {
             "name": "action",
             "in": "query",
+            "required": true,
+            "description": "Operation to perform: `add` appends new items, `delete` removes items identified by name, code, or id.",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "add",
+                "delete"
+              ]
             },
             "example": "add"
           }
         ],
         "responses": {
           "200": {
-            "description": "Response 200",
+            "description": "Operation completed; per-item failures reported inline",
             "content": {
               "application/json": {
                 "example": {
@@ -6487,11 +6493,11 @@
                     },
                     "added": {
                       "type": "integer",
-                      "description": "Number of items successfully added."
+                      "description": "Number of items successfully added. Present when action=add."
                     },
                     "ignored": {
                       "type": "integer",
-                      "description": "Number of items not added due to validation failures."
+                      "description": "Number of items not processed due to validation failures."
                     },
                     "total": {
                       "type": "integer",
@@ -6517,9 +6523,87 @@
                           }
                         }
                       }
+                    },
+                    "deleted": {
+                      "description": "Number of items successfully deleted. Present when action=delete.",
+                      "type": "integer"
                     }
                   }
                 }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "items"
+                ],
+                "properties": {
+                  "items": {
+                    "type": "array",
+                    "description": "Array of items to add or delete.",
+                    "items": {
+                      "type": "object",
+                      "description": "A list item. For add: provide name/code/parent/properties/subsets. For delete: identify by name, code, or id.",
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "description": "Item display name. Required for named lists when adding; used as identifier when deleting."
+                        },
+                        "code": {
+                          "type": "string",
+                          "description": "Item code. Used as primary identifier for numbered lists."
+                        },
+                        "id": {
+                          "type": "string",
+                          "description": "Item ID. Returned by GET list items; can be used as identifier when deleting."
+                        },
+                        "parent": {
+                          "type": "string",
+                          "description": "Parent item name for hierarchical lists."
+                        },
+                        "properties": {
+                          "type": "object",
+                          "description": "Custom list property values keyed by property name.",
+                          "additionalProperties": {
+                            "type": "string"
+                          }
+                        },
+                        "subsets": {
+                          "type": "object",
+                          "description": "Subset membership flags keyed by subset name.",
+                          "additionalProperties": {
+                            "type": "boolean"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "items": [
+                  {
+                    "name": "mike",
+                    "code": "id1",
+                    "parent": "west",
+                    "properties": {
+                      "p-text": "hello world",
+                      "p-number": "123456",
+                      "p-boolean": "true",
+                      "p-list": "east",
+                      "p-period": "Sep 20"
+                    },
+                    "subsets": {
+                      "s11": true
+                    }
+                  }
+                ]
               }
             }
           }

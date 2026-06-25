@@ -6934,7 +6934,7 @@ paths:
                     items:
                       $ref: '#/components/schemas/ListItem'
     post:
-      summary: Add list items
+      summary: Add or delete list items
       description: |-
         ## Add list items
 
@@ -7050,12 +7050,17 @@ paths:
       parameters:
       - name: action
         in: query
+        required: true
+        description: 'Operation to perform: `add` appends new items, `delete` removes items identified by name, code, or id.'
         schema:
           type: string
+          enum:
+          - add
+          - delete
         example: add
       responses:
         '200':
-          description: Response 200
+          description: Operation completed; per-item failures reported inline
           content:
             application/json:
               example:
@@ -7080,10 +7085,10 @@ paths:
                     $ref: '#/components/schemas/Status'
                   added:
                     type: integer
-                    description: Number of items successfully added.
+                    description: Number of items successfully added. Present when action=add.
                   ignored:
                     type: integer
-                    description: Number of items not added due to validation failures.
+                    description: Number of items not processed due to validation failures.
                   total:
                     type: integer
                     description: Total number of items in the request.
@@ -7102,6 +7107,61 @@ paths:
                         failureMessageDetails:
                           type: string
                           description: Human-readable details about the failure.
+                  deleted:
+                    description: Number of items successfully deleted. Present when action=delete.
+                    type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - items
+              properties:
+                items:
+                  type: array
+                  description: Array of items to add or delete.
+                  items:
+                    type: object
+                    description: 'A list item. For add: provide name/code/parent/properties/subsets. For delete: identify
+                      by name, code, or id.'
+                    properties:
+                      name:
+                        type: string
+                        description: Item display name. Required for named lists when adding; used as identifier when deleting.
+                      code:
+                        type: string
+                        description: Item code. Used as primary identifier for numbered lists.
+                      id:
+                        type: string
+                        description: Item ID. Returned by GET list items; can be used as identifier when deleting.
+                      parent:
+                        type: string
+                        description: Parent item name for hierarchical lists.
+                      properties:
+                        type: object
+                        description: Custom list property values keyed by property name.
+                        additionalProperties:
+                          type: string
+                      subsets:
+                        type: object
+                        description: Subset membership flags keyed by subset name.
+                        additionalProperties:
+                          type: boolean
+            example:
+              items:
+              - name: mike
+                code: id1
+                parent: west
+                properties:
+                  p-text: hello world
+                  p-number: '123456'
+                  p-boolean: 'true'
+                  p-list: east
+                  p-period: Sep 20
+                subsets:
+                  s11: true
     put:
       summary: Update list items
       description: |-

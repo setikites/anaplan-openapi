@@ -154,7 +154,7 @@ def integration_token(_ca_certs, _basic_creds):
 
 @pytest.mark.live
 def test_get_current_user(integration_token):
-    """GET /2/0/users/me returns current user identity."""
+    """GET /users/me returns current user identity."""
     with httpx.Client() as client:
         response = client.get(
             f"{API_URL}/users/me",
@@ -177,7 +177,7 @@ def test_get_current_user(integration_token):
 
 @pytest.mark.live
 def test_get_user_by_id(integration_token):
-    """GET /2/0/users/{userId} returns the same user as GET /users/me."""
+    """GET /users/{userId} returns the same user as GET /users/me."""
     with httpx.Client() as client:
         me_response = client.get(
             f"{API_URL}/users/me",
@@ -206,7 +206,7 @@ def test_get_user_by_id(integration_token):
 
 @pytest.mark.live
 def test_list_workspaces(integration_token):
-    """GET /2/0/workspaces returns list of accessible workspaces."""
+    """GET /workspaces returns list of accessible workspaces."""
     with httpx.Client() as client:
         response = client.get(
             f"{API_URL}/workspaces",
@@ -350,7 +350,7 @@ def test_get_workspace_visitors(integration_token):
 
 @pytest.mark.live
 def test_list_models(integration_token):
-    """GET /2/0/models returns list of accessible models."""
+    """GET /models returns list of accessible models."""
     with httpx.Client() as client:
         response = client.get(
             f"{API_URL}/models",
@@ -514,7 +514,7 @@ def test_sort_param(integration_token, path, list_key, sort_field):
 def test_list_workspace_models(integration_token):
     """GET /workspaces/{workspaceId}/models returns workspace-scoped model list.
 
-    Compares response shape to GET /2/0/models. Documents any structural differences.
+    Compares response shape to GET /models. Documents any structural differences.
     """
     h = {"Authorization": f"AnaplanAuthToken {integration_token}"}
     with httpx.Client() as client:
@@ -1245,7 +1245,14 @@ def test_path_duality(request, integration_token, baseline_tmpl, alt_tmpl, list_
             _warn_shape_diff(alt_tmpl, set(baseline.json().keys()), set(body.keys()))
     else:
         value = body.get(list_key)
-        assert value is not None, f"Expected '{list_key}' in response; keys: {list(body.keys())}"
+        # Some APIs omit the key entirely when the collection is empty (e.g. chunks when
+        # chunkCount=0). Accept absence only when the baseline also omits the key.
+        if value is None:
+            bl_also_absent = baseline.status_code != 200 or baseline.json().get(list_key) is None
+            assert bl_also_absent, (
+                f"Expected '{list_key}' in response; keys: {list(body.keys())}"
+            )
+            return
         if isinstance(value, list):
             assert isinstance(value, list), f"Expected '{list_key}' to be a list"
             if baseline.status_code == 200:
@@ -2998,6 +3005,76 @@ def test_post_and_put_list_items(integration_token):
     assert cleanup_task.get("result", {}).get("successful"), (
         f"Cleanup action result not successful: {cleanup_task.get('result')}"
     )
+
+
+@pytest.mark.live
+@pytest.mark.write
+def test_delete_list_items(integration_token):
+    """POST .../lists/{listId}/items?action=delete removes items; response has deleted/ignored/total.
+
+    Full lifecycle: add two items, delete one by name, verify counts, clean up the second.
+    Skipped when INTEGRATION_LIST is not set or when the model is in Deployed Mode (425).
+    """
+    if not INTEGRATION_LIST_ID:
+        pytest.skip("INTEGRATION_LIST not set in environment")
+
+    h = _auth_headers(integration_token)
+    hj = {**h, "Content-Type": "application/json"}
+    items_url = (
+        f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+        f"/lists/{INTEGRATION_LIST_ID}/items"
+    )
+
+    with httpx.Client(timeout=60) as client:
+        # Add two test items
+        add_r = client.post(
+            items_url,
+            headers=hj,
+            params={"action": "add"},
+            json={"items": [{"name": "probe-delete-a"}, {"name": "probe-delete-b"}]},
+        )
+        if add_r.status_code == 425:
+            warnings.warn(
+                "POST ?action=add returned 425 — model is in Deployed Mode; "
+                "list item delete test skipped.",
+                UserWarning,
+                stacklevel=2,
+            )
+            return
+        assert add_r.status_code == 200, (
+            f"POST ?action=add failed: {add_r.status_code}: {add_r.text[:200]}"
+        )
+
+        # Delete one item by name
+        del_r = client.post(
+            items_url,
+            headers=hj,
+            params={"action": "delete"},
+            json={"items": [{"name": "probe-delete-a"}]},
+        )
+        assert del_r.status_code == 200, (
+            f"POST ?action=delete failed: {del_r.status_code}: {del_r.text[:200]}"
+        )
+        del_body = del_r.json()
+        assert del_body.get("status", {}).get("code") == 200
+        for key in ("deleted", "ignored", "total"):
+            assert key in del_body, (
+                f"DELETE response missing '{key}'; keys: {list(del_body.keys())}"
+            )
+        assert isinstance(del_body["deleted"], int), "'deleted' must be an integer"
+        assert isinstance(del_body["ignored"], int), "'ignored' must be an integer"
+        assert isinstance(del_body["total"], int), "'total' must be an integer"
+        assert del_body["total"] == 1, f"Expected total=1; got {del_body['total']}"
+        failures = del_body.get("failures", [])
+        assert isinstance(failures, list), "'failures' must be a list when present"
+
+        # Cleanup: remove the second item
+        client.post(
+            items_url,
+            headers=hj,
+            params={"action": "delete"},
+            json={"items": [{"name": "probe-delete-b"}]},
+        )
 
 
 # ─── View data and large read-request lifecycle (issue #110) ──────────────────
