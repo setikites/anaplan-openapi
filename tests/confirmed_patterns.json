@@ -833,5 +833,60 @@
     "spec": "exception",
     "path": "/components/schemas/ExceptionUser/properties/userGuid",
     "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//models/{modelId}/actions/parameters/0/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//models/{modelId}/processes/parameters/0/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//models/{modelId}/imports/parameters/0/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//models/{modelId}/exports/parameters/0/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/processes/{processId}/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/processes/{processId}/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/processes/{processId}/parameters/2/schema",
+    "pattern": "^118[0-9]{9}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//models/{modelId}/exports/{exportId}/parameters/0/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//models/{modelId}/exports/{exportId}/parameters/1/schema",
+    "pattern": "^116[0-9]{9}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//models/{modelId}/imports/{importId}/parameters/0/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//models/{modelId}/imports/{importId}/parameters/1/schema",
+    "pattern": "^112[0-9]{9}$"
   }
 ]

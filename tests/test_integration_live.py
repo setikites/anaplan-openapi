@@ -1122,6 +1122,51 @@ _DUALITY_PROBES = [
         "metadata",
         id="list-detail",
     ),
+    # issue #28: action/import/export/process listing endpoints
+    pytest.param(
+        "/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/actions",
+        "/2/0/models/{MODEL_ID}/actions",
+        "actions",
+        id="actions",
+    ),
+    pytest.param(
+        "/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/imports/",
+        "/2/0/models/{MODEL_ID}/imports",
+        "imports",
+        id="imports",
+    ),
+    pytest.param(
+        "/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/exports",
+        "/2/0/models/{MODEL_ID}/exports",
+        "exports",
+        id="exports",
+    ),
+    pytest.param(
+        "/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/processes",
+        "/2/0/models/{MODEL_ID}/processes",
+        "processes",
+        id="processes",
+    ),
+    # issue #28: individual-resource GETs (model-direct forms)
+    pytest.param(
+        "/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/exports/{export_id}",
+        "/2/0/models/{MODEL_ID}/exports/{export_id}",
+        "exportMetadata",
+        id="export-detail",
+    ),
+    pytest.param(
+        "/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/imports/{import_id}",
+        "/2/0/models/{MODEL_ID}/imports/{import_id}",
+        "importMetadata",
+        id="import-detail",
+    ),
+    # issue #28: processes/{processId} workspace-prefixed form
+    pytest.param(
+        "/2/0/models/{MODEL_ID}/processes/{process_id}",
+        "/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/processes/{process_id}",
+        "processMetadata",
+        id="process-detail",
+    ),
 ]
 
 
@@ -2399,6 +2444,129 @@ def test_list_process_tasks(integration_token, process_id):
     if tasks:
         assert tasks[0].get("taskId"), "Task must have a taskId"
         assert "taskState" in tasks[0], "Task must have a taskState"
+
+
+# ─── Model-direct GET path probes (issue #28) ────────────────────────────────
+
+
+@pytest.mark.live
+def test_model_direct_list_actions(integration_token):
+    """GET /models/{modelId}/actions returns the same action list as the workspace form."""
+    h = _auth_headers(integration_token)
+    with httpx.Client() as client:
+        response = client.get(
+            f"{API_URL}/models/{MODEL_ID}/actions",
+            headers=h,
+        )
+    assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
+    body = response.json()
+    assert body.get("status", {}).get("code") == 200
+    actions = body.get("actions")
+    assert isinstance(actions, list), f"Expected 'actions' list; keys: {list(body.keys())}"
+
+
+@pytest.mark.live
+def test_model_direct_list_imports(integration_token):
+    """GET /models/{modelId}/imports returns the same import list as the workspace form."""
+    h = _auth_headers(integration_token)
+    with httpx.Client() as client:
+        response = client.get(
+            f"{API_URL}/models/{MODEL_ID}/imports",
+            headers=h,
+        )
+    assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
+    body = response.json()
+    assert body.get("status", {}).get("code") == 200
+    imports = body.get("imports")
+    assert isinstance(imports, list), f"Expected 'imports' list; keys: {list(body.keys())}"
+    if imports:
+        assert imports[0].get("id"), "Import must have an id"
+
+
+@pytest.mark.live
+def test_model_direct_list_exports(integration_token):
+    """GET /models/{modelId}/exports returns the same export list as the workspace form."""
+    h = _auth_headers(integration_token)
+    with httpx.Client() as client:
+        response = client.get(
+            f"{API_URL}/models/{MODEL_ID}/exports",
+            headers=h,
+        )
+    assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
+    body = response.json()
+    assert body.get("status", {}).get("code") == 200
+    exports = body.get("exports")
+    assert isinstance(exports, list), f"Expected 'exports' list; keys: {list(body.keys())}"
+    if exports:
+        assert exports[0].get("id"), "Export must have an id"
+
+
+@pytest.mark.live
+def test_model_direct_list_processes(integration_token):
+    """GET /models/{modelId}/processes returns the same process list as the workspace form."""
+    h = _auth_headers(integration_token)
+    with httpx.Client() as client:
+        response = client.get(
+            f"{API_URL}/models/{MODEL_ID}/processes",
+            headers=h,
+        )
+    assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
+    body = response.json()
+    assert body.get("status", {}).get("code") == 200
+    processes = body.get("processes")
+    assert isinstance(processes, list), f"Expected 'processes' list; keys: {list(body.keys())}"
+    if processes:
+        assert processes[0].get("id"), "Process must have an id"
+
+
+@pytest.mark.live
+def test_model_direct_get_export_metadata(integration_token, export_id):
+    """GET /models/{modelId}/exports/{exportId} returns exportMetadata (model-direct form)."""
+    h = _auth_headers(integration_token)
+    with httpx.Client() as client:
+        response = client.get(
+            f"{API_URL}/models/{MODEL_ID}/exports/{export_id}",
+            headers=h,
+        )
+    assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
+    body = response.json()
+    assert body.get("status", {}).get("code") == 200
+    meta = body.get("exportMetadata")
+    assert meta is not None, f"Expected 'exportMetadata' key; keys: {list(body.keys())}"
+
+
+@pytest.mark.live
+def test_model_direct_get_import_metadata(integration_token, import_id):
+    """GET /models/{modelId}/imports/{importId} returns importMetadata (model-direct form)."""
+    h = _auth_headers(integration_token)
+    with httpx.Client() as client:
+        response = client.get(
+            f"{API_URL}/models/{MODEL_ID}/imports/{import_id}",
+            headers=h,
+        )
+    assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
+    body = response.json()
+    assert body.get("status", {}).get("code") == 200
+    meta = body.get("importMetadata")
+    assert meta is not None, f"Expected 'importMetadata' key; keys: {list(body.keys())}"
+    assert "name" in meta, "Import metadata must have a name"
+
+
+@pytest.mark.live
+def test_workspace_prefixed_get_process_detail(integration_token, process_id):
+    """GET /workspaces/{workspaceId}/models/{modelId}/processes/{processId} returns processMetadata."""
+    h = _auth_headers(integration_token)
+    with httpx.Client() as client:
+        response = client.get(
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/processes/{process_id}",
+            headers=h,
+        )
+    assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
+    body = response.json()
+    assert body.get("status", {}).get("code") == 200
+    process = body.get("process") or body.get("processMetadata")
+    assert process is not None, f"Expected process detail key; keys: {list(body.keys())}"
+    assert "name" in process, "Process detail must have a name"
 
 
 # ─── Write tests: run-and-poll cycles using INTEGRATION_* env vars ────────────
