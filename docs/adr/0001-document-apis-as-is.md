@@ -17,7 +17,7 @@ These variations exist because the APIs were designed independently, not as a co
 
 ## Decision
 
-We will **document each API in its OpenAPI 3.1 spec exactly as it exists**, preserving these variations rather than attempting to normalize them into a unified interface.
+We will **document each API in its OpenAPI 3.0 spec exactly as it exists**, preserving these variations rather than attempting to normalize them into a unified interface.
 
 ## Rationale
 
