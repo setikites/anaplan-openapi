@@ -1,5 +1,5 @@
 {
-  "openapi": "3.0.3",
+  "openapi": "3.1.0",
   "info": {
     "title": "Anaplan Financial Consolidation API",
     "version": "v2305.1",
@@ -998,8 +998,10 @@
             "type": "boolean"
           },
           "processingStatus": {
-            "type": "integer",
-            "nullable": true
+            "type": [
+              "integer",
+              "null"
+            ]
           },
           "typeInfo": {
             "type": "string"
@@ -1018,12 +1020,16 @@
           },
           "translations": {
             "description": "Available language translations for the dimension name.",
-            "type": "string",
-            "nullable": true
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "relatedDimension": {
-            "type": "string",
-            "nullable": true
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "properties": {
             "type": "array",
@@ -1032,8 +1038,10 @@
             }
           },
           "processingStatus": {
-            "type": "integer",
-            "nullable": true
+            "type": [
+              "integer",
+              "null"
+            ]
           }
         }
       },
@@ -1044,16 +1052,20 @@
             "type": "string"
           },
           "memberTag": {
-            "type": "string",
-            "nullable": true
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "memberCaption": {
             "type": "string"
           },
           "ancestors": {
             "description": "Hierarchy path from root to this member.",
-            "type": "string",
-            "nullable": true
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "translations": {
             "type": "array",
@@ -1061,8 +1073,10 @@
             "items": {}
           },
           "parentMemberName": {
-            "type": "string",
-            "nullable": true
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "sortOrder": {
             "type": "integer"
@@ -1072,20 +1086,26 @@
             "description": "Whether this member is a leaf node (has no children)."
           },
           "operator": {
-            "type": "string",
-            "nullable": true
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "startDate": {
             "description": "Start of the effective date range for the member.",
-            "type": "string",
-            "format": "date",
-            "nullable": true
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
           },
           "endDate": {
             "description": "End of the effective date range for the member.",
-            "type": "string",
-            "format": "date",
-            "nullable": true
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
           },
           "memberStorage": {
             "type": "string"
@@ -1141,8 +1161,7 @@
             {
               "type": "boolean"
             }
-          ],
-          "nullable": true
+          ]
         },
         "example": {
           "Account_Name": "6001",

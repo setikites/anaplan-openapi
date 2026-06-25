@@ -1,12 +1,12 @@
 # Anaplan OpenAPI Specifications
 
-Community-maintained OpenAPI 3.0 specifications for the 9 publicly documented
+Community-maintained OpenAPI 3.1 specifications for the 10 publicly documented
 Anaplan REST APIs.
 
 Anaplan's official API documentation is spread across an outdated
 Apiary site and a new Postman collection, without detailed
 machind-readable OpenAPI specs. This project fills that gap: accurate,
-testable OpenAPI 3.0 specs you can feed directly to code generators,
+testable OpenAPI 3.1 specs you can feed directly to code generators,
 MCP server tooling, and your own documentation.
 
 ## Who this is for
@@ -29,7 +29,7 @@ Each API has its own directory containing the canonical JSON spec and a generate
 YAML copy:
 
 ```
-<api>/<api>-openapi.json   # canonical OpenAPI 3.0 spec
+<api>/<api>-openapi.json   # canonical OpenAPI 3.1 spec
 <api>/<api>-openapi.yaml   # YAML equivalent (generated from the JSON)
 ```
 
