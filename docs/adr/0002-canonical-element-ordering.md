@@ -109,7 +109,7 @@ Required path parameters are listed first because they are structurally part of 
 
 **Path parameters at path item level**: a path parameter is a structural property of the URL, not of any individual verb — `{integrationId}` is part of the path regardless of whether you GET, PUT, or DELETE it. Declaring it once at the path item level makes this relationship explicit and eliminates per-operation repetition. Inlining the definition (rather than `$ref`-ing from `components/parameters`) keeps each path item self-contained and readable without jumping to the components section. `components/parameters` is reserved for non-path parameters that genuinely need reuse across unrelated paths, which has not yet arisen in these specs.
 
-The chosen ordering matches the implicit order of field tables in the OpenAPI 3.0 Specification and aligns with the Redocly style guide, reducing friction when contributors cross-reference the spec.
+The chosen ordering matches the implicit order of field tables in the OpenAPI Specification and aligns with the Redocly style guide, reducing friction when contributors cross-reference the spec.
 
 ## Alternatives Considered
 

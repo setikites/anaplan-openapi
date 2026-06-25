@@ -1,4 +1,4 @@
-# PRD: OpenAPI 3.0 Specifications for Anaplan APIs
+# PRD: OpenAPI 3.1 Specifications for Anaplan APIs
 
 > **Historical document.** This is the original product requirements document
 > that kicked off the project, retained for context. Status fields and phasing
@@ -7,7 +7,7 @@
 
 ## Problem Statement
 
-Anaplan provides 9 publicly available REST APIs, but their official Apiary documentation is outdated and incomplete. There are no machine-readable OpenAPI specifications available, making it difficult to:
+Anaplan provides 10 publicly available REST APIs, but their official Apiary documentation is outdated and incomplete. There are no machine-readable OpenAPI specifications available, making it difficult to:
 
 - Generate API client libraries in multiple languages (Python, Java, TypeScript, etc.)
 - Build tools that depend on precise API contracts (like MCP servers)
@@ -18,7 +18,7 @@ Additionally, these APIs were built by different teams at different times and ex
 
 ## Solution
 
-Generate accurate, machine-readable OpenAPI 3.0 JSON specifications for all 9 Anaplan APIs by:
+Generate accurate, machine-readable OpenAPI 3.1 JSON specifications for all 10 Anaplan APIs by:
 
 1. **Synthesizing multiple sources of truth**: Apiary documentation (canonical but outdated), Postman collection (for 3 APIs), extracted JSON schemas from actual API responses, and live API testing
 2. **Testing against a live Anaplan instance** to validate specs and discover undocumented behaviors (error cases, required fields not mentioned in docs)
@@ -29,7 +29,7 @@ The resulting OpenAPI specs will be suitable for code generation tools (OpenAPI 
 
 ## User Stories
 
-1. As an API client code generator, I want accurate OpenAPI 3.0 specifications, so that the generated code matches actual API behavior
+1. As an API client code generator, I want accurate OpenAPI 3.1 specifications, so that the generated code matches actual API behavior
 2. As a Python developer, I want to generate an Anaplan API client from an OpenAPI spec, so that I can use the API in my application
 3. As a Node.js developer, I want to generate TypeScript typings from an Anaplan API spec, so that I can have type-safe API calls
 4. As an MCP server developer, I want machine-readable API contracts, so that I can build Claude integrations for Anaplan APIs
@@ -49,8 +49,8 @@ The resulting OpenAPI specs will be suitable for code generation tools (OpenAPI 
 
 ### API Coverage and Scope
 
-- **9 APIs total**, documented in priority order: Authentication, OAuth, Integration, CloudWorks, SCIM, ALM, Audit, Financial Consolidation, Exception Users
-- Each API gets its own folder with an OpenAPI 3.0 JSON spec and a README documenting sources, testing approach, and discrepancies
+- **10 APIs total**, documented in priority order: Authentication, OAuth, Integration, CloudWorks, SCIM, ALM, Audit, Financial Consolidation, Exception Users, Administration
+- Each API gets its own folder with an OpenAPI 3.1 JSON spec and a README documenting sources, testing approach, and discrepancies
 - Status tracking in CONTEXT.md will indicate completion level for each API (not-started, in-progress, complete)
 
 ### Source Hierarchy and Methodology
@@ -77,7 +77,7 @@ Code generators that consume these specs can detect these variations and generat
 
 ### Validation and Testing
 
-- **OpenAPI 3.0 validation**: Each spec is validated using `openapi-spec-validator` (Python library) in YAML format
+- **OpenAPI 3.1 validation**: Each spec is validated using `openapi-spec-validator` (Python library) in YAML format
 - **Live API testing**: All endpoints are tested against a live Anaplan instance using Python test clients (anaplan-sdk for high-level methods, httpx for low-level endpoints)
 - **Testing coverage**: High-priority APIs get comprehensive testing; lower-priority APIs may have limited testing
 - **Discrepancies documentation**: When live testing reveals behavior not documented in Apiary (missing error cases, required fields marked optional, etc.), this is documented in the API's README.md
@@ -101,7 +101,7 @@ Code generators that consume these specs can detect these variations and generat
 
 ### Status Tracking
 
-CONTEXT.md includes a status column in the 9 APIs table:
+CONTEXT.md includes a status column in the 10 APIs table:
 - `not-started` — No spec yet
 - `in-progress` — Spec is being written/tested
 - `complete` — Spec is validated and ready for use
@@ -118,7 +118,7 @@ A good test exercises external API behavior (endpoints, parameters, responses) w
    - Unit tests on conversion logic (path mapping, parameter extraction, schema reference generation)
    - Test against the actual Postman collection to ensure correct output structure
 
-2. **OpenAPI 3.0 Validator**
+2. **OpenAPI 3.1 Validator**
    - Integration test: validate each generated spec
    - Success criteria: spec passes `openapi-spec-validator` without errors
 
@@ -133,7 +133,7 @@ A good test exercises external API behavior (endpoints, parameters, responses) w
 ## Out of Scope
 
 - **Adapter/wrapper services**: Creating a unified API layer that normalizes authentication or pagination
-- **Non-OpenAPI formats**: Only OpenAPI 3.0 JSON is produced (no RAML, GraphQL, gRPC specs)
+- **Non-OpenAPI formats**: Only OpenAPI 3.1 JSON is produced (no RAML, GraphQL, gRPC specs)
 - **SDKs or client libraries**: This project produces specs; code generation and SDKs are downstream
 - **Normalization**: We document APIs as-is; normalization happens in code generators that consume the specs
 - **Private or undocumented APIs**: Only publicly documented Anaplan APIs are included
@@ -156,6 +156,6 @@ Once published, specs can be refined by the community:
 
 ### Related Artifacts
 
-- **CONTEXT.md**: Overview of all 9 APIs, their sources, and confidence levels
+- **CONTEXT.md**: Overview of all 10 APIs, their sources, and confidence levels
 - **docs/adr/0001-document-apis-as-is.md**: Rationale for documenting variations rather than normalizing
 - **Per-API READMEs**: Testing notes, discrepancies, and source references for each API

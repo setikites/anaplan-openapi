@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This project generates OpenAPI 3.0 JSON specifications for the 10 publicly available Anaplan REST APIs. These specs are intended for:
+This project generates OpenAPI 3.1 JSON specifications for the 10 publicly available Anaplan REST APIs. These specs are intended for:
 - **API client code generation** (via MCP servers and other tools)
 - **Community-maintained documentation** (enhancing official Anaplan docs)
 
@@ -290,7 +290,7 @@ Legacy regions (us1–us7, eu1, eu2, eu4, ap1) share the older non-prefixed `api
 
 Each API folder contains:
 - **README.md**: sources, auth scheme(s), and behavior discovered during live testing
-- **`<api>-openapi.json`**: the canonical OpenAPI 3.0 spec (for code generation)
+- **`<api>-openapi.json`**: the canonical OpenAPI 3.1 spec (for code generation)
 - **`<api>-openapi.yaml`**: YAML counterpart, regenerated from the JSON
 
 ## Maintenance

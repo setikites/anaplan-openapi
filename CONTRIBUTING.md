@@ -97,7 +97,7 @@ in the relevant `<api>/README.md` under "Discrepancies".
 
 Every PR runs `.github/workflows/lint.yml`, which does two things:
 
-1. **Schema validation** (`scripts/validate.py`) — confirms each spec is a valid OpenAPI 3.0 document.
+1. **Schema validation** (`scripts/validate.py`) — confirms each spec is a valid OpenAPI 3.1 document.
 2. **Tests** (`pytest -m "not live"`) — runs all unit and contract tests, including the element ordering checks.
 
 Run both locally before opening a PR:

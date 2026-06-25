@@ -6,7 +6,7 @@
 
 ## Context
 
-Anaplan has 9 publicly available REST APIs, each built by different teams at different times. They exhibit significant variations in:
+Anaplan has 10 publicly available REST APIs, each built by different teams at different times. They exhibit significant variations in:
 
 - **Authentication**: Some use standard Bearer tokens (`Authorization: Bearer <token>`), others use Anaplan-specific tokens (`Authorization: AnaplanAuthToken <token>` or `AnaplanAuthToken` header)
 - **Pagination**: Different schemes (offset/limit, cursors, SCIM list responses with `startIndex`/`itemsPerPage`)
@@ -17,7 +17,7 @@ These variations exist because the APIs were designed independently, not as a co
 
 ## Decision
 
-We will **document each API in its OpenAPI 3.0 spec exactly as it exists**, preserving these variations rather than attempting to normalize them into a unified interface.
+We will **document each API in its OpenAPI 3.1 spec exactly as it exists**, preserving these variations rather than attempting to normalize them into a unified interface.
 
 ## Rationale
 
@@ -78,7 +78,7 @@ Publish both "as-is" specs (faithful to actual APIs) and "normalized" specs (uni
 
 ## Related Decisions
 
-- **CONTEXT.md**: Documents all 9 APIs, their authentication schemes, pagination patterns, and data sources so users understand the landscape
+- **CONTEXT.md**: Documents all 10 APIs, their authentication schemes, pagination patterns, and data sources so users understand the landscape
 - **Per-API READMEs**: Each API folder documents its specific patterns and any discrepancies found during testing
 
 ## Notes

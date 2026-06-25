@@ -128,7 +128,7 @@ The following discrepancies between the OpenAPI specification and actual API beh
   - Pattern: `^[0-9a-f]{32}$`
   - Example: `8a868cd97b120fc7017b36d7331d74be`
   - These are Anaplan's internal identifiers, not RFC 4122 UUIDs
-  - Note: OpenAPI 3.0 has no built-in format for hex strings, so pattern validation is used
+  - Note: OpenAPI has no built-in format for hex strings, so pattern validation is used
 
 ### Client-Level Header Validation
 

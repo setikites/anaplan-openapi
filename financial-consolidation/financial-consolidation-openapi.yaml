@@ -1,4 +1,4 @@
-openapi: 3.0.3
+openapi: 3.1.0
 info:
   title: Anaplan Financial Consolidation API
   version: v2305.1
@@ -696,8 +696,9 @@ components:
         readonlyProperty:
           type: boolean
         processingStatus:
-          type: integer
-          nullable: true
+          type:
+          - integer
+          - 'null'
         typeInfo:
           type: string
     Dimension:
@@ -710,57 +711,66 @@ components:
           type: string
         translations:
           description: Available language translations for the dimension name.
-          type: string
-          nullable: true
+          type:
+          - string
+          - 'null'
         relatedDimension:
-          type: string
-          nullable: true
+          type:
+          - string
+          - 'null'
         properties:
           type: array
           items:
             $ref: '#/components/schemas/DimensionProperty'
         processingStatus:
-          type: integer
-          nullable: true
+          type:
+          - integer
+          - 'null'
     DimensionMember:
       type: object
       properties:
         memberName:
           type: string
         memberTag:
-          type: string
-          nullable: true
+          type:
+          - string
+          - 'null'
         memberCaption:
           type: string
         ancestors:
           description: Hierarchy path from root to this member.
-          type: string
-          nullable: true
+          type:
+          - string
+          - 'null'
         translations:
           type: array
           description: Available translations for the member name.
           items: {}
         parentMemberName:
-          type: string
-          nullable: true
+          type:
+          - string
+          - 'null'
         sortOrder:
           type: integer
         isLeaf:
           type: boolean
           description: Whether this member is a leaf node (has no children).
         operator:
-          type: string
-          nullable: true
+          type:
+          - string
+          - 'null'
         startDate:
           description: Start of the effective date range for the member.
-          type: string
+          type:
+          - string
+          - 'null'
           format: date
-          nullable: true
         endDate:
           description: End of the effective date range for the member.
-          type: string
+          type:
+          - string
+          - 'null'
           format: date
-          nullable: true
         memberStorage:
           type: string
         properties:
@@ -804,7 +814,6 @@ components:
         - type: string
         - type: number
         - type: boolean
-        nullable: true
       example:
         Account_Name: '6001'
         Audit_Name: Reclassification
