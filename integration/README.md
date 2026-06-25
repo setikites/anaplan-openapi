@@ -113,6 +113,10 @@ Endpoints covered (all paths relative to the `/2/0` base URL):
 | `test_model_direct_get_export_metadata` | `GET /models/{modelId}/exports/{exportId}` (model-direct form — issue #28) |
 | `test_model_direct_get_import_metadata` | `GET /models/{modelId}/imports/{importId}` (model-direct form — issue #28) |
 | `test_workspace_prefixed_get_process_detail` | `GET /workspaces/{workspaceId}/models/{modelId}/processes/{processId}` (workspace form — issue #28) |
+| `test_path_duality[files-list]` | `GET /workspaces/{workspaceId}/models/{modelId}/files` (workspace form — issue #27) |
+| `test_path_duality[versions]` | `GET /workspaces/{workspaceId}/models/{modelId}/versions` (workspace form — issue #27) |
+| `test_path_duality[file-chunks]` | `GET /models/{modelId}/files/{fileId}/chunks` (model-direct form — issue #27) |
+| `test_path_duality[modelCalendar]` | `GET /models/{modelId}/modelCalendar` (model-direct form — issue #27) |
 
 ## Modern Endpoint Validation (post-legacy retirement)
 
@@ -200,6 +204,30 @@ The spec declares `date` as a query parameter and documents the 400 response. Th
 ### `GET /models/{modelId}/modelCalendar/fiscalYear` returns 405
 
 Live testing confirmed this path only supports `PUT` (update fiscal year). `GET` returns `405 Method Not Allowed`. Fiscal year data is available via `GET /workspaces/{workspaceId}/models/{modelId}/modelCalendar`, which returns the full `modelCalendar` object including `fiscalYear`. The spec retains only `PUT` on this path.
+
+### Files, versions, and calendar GET path duality (issue #27)
+
+Probed 2026-06-25 with live credentials using `WORKSPACE_ID=8a868cd885f53bd201860f5a4fea1ff1` and `MODEL_ID=09F86E3942A84353892853BE3BE82280`.
+
+**Confirmed valid (200 OK — identical response shape):**
+
+| Baseline form | Alternate form | Status |
+|---------------|----------------|--------|
+| `GET /models/{modelId}/files` | `GET /workspaces/{workspaceId}/models/{modelId}/files` | **200 OK** — identical `files` array response |
+| `GET /models/{modelId}/versions` | `GET /workspaces/{workspaceId}/models/{modelId}/versions` | **200 OK** — identical `versionMetadata` array response |
+| `GET /workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks` | `GET /models/{modelId}/files/{fileId}/chunks` | **200 OK** — identical `chunks` array response (key omitted when `chunkCount` is 0) |
+| `GET /workspaces/{workspaceId}/models/{modelId}/modelCalendar` | `GET /models/{modelId}/modelCalendar` | **200 OK** — identical `modelCalendar` object response |
+
+All 4 valid paths have been added to `integration-openapi.json`.
+
+**Not added (invalid or unconfirmed):**
+
+| Probe | Result | Notes |
+|-------|--------|-------|
+| `GET /workspaces/{workspaceId}/models/{modelId}/views/{viewId}/data` | **500** | Server error for the probed view (module default view with no data). Both baseline and alternate returned 500 — path likely exists but 200 response shape could not be confirmed. Not added to spec. |
+| `GET /workspaces/{workspaceId}/models/{modelId}/modules/{moduleId}/data` | **405** | Only `POST` is supported on this path; `GET` is not valid on either form. Not added. |
+| `GET /workspaces/{workspaceId}/models/{modelId}/modelCalendar/fiscalYear` | **405** | Only `PUT` is supported (see above). Not added. |
+| `GET /models/{modelId}/files/{fileId}` | **404** | Both model-direct and workspace-prefixed forms return 404 for non-Workspace-Administrator accounts. Existence of the model-direct form cannot be confirmed from a standard user account. Not added to spec. |
 
 ### Action/import/export/process GET path duality (issue #28)
 

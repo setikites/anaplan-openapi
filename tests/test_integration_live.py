@@ -230,7 +230,7 @@ def test_list_workspaces(integration_token):
 
 @pytest.mark.live
 def test_get_workspace(integration_token):
-    """GET /2/0/workspaces/{workspaceId} returns workspace detail.
+    """GET /workspaces/{workspaceId} returns workspace detail.
 
     NOTE: Live testing shows this endpoint returns 404 for non-Workspace-Administrator
     accounts even when the workspace is visible in GET /workspaces. See README discrepancies.
@@ -274,7 +274,7 @@ def test_get_workspace(integration_token):
 
 @pytest.mark.live
 def test_get_workspace_admins(integration_token):
-    """GET /2/0/workspaces/{workspaceId}/admins returns workspace administrator list.
+    """GET /workspaces/{workspaceId}/admins returns workspace administrator list.
 
     Requires tenant admin access (OAuth Authorization Code grant). Basic-auth tokens
     receive 500; this test warns and skips in that case.
@@ -312,7 +312,7 @@ def test_get_workspace_admins(integration_token):
 
 @pytest.mark.live
 def test_get_workspace_visitors(integration_token):
-    """GET /2/0/workspaces/{workspaceId}/visitors returns workspace visitor list.
+    """GET /workspaces/{workspaceId}/visitors returns workspace visitor list.
 
     Requires tenant admin access (OAuth Authorization Code grant). Basic-auth tokens
     receive 500; this test warns and skips in that case.
@@ -374,7 +374,7 @@ def test_list_models(integration_token):
 
 @pytest.mark.live
 def test_get_model(integration_token):
-    """GET /2/0/models/{modelId} returns model detail."""
+    """GET /models/{modelId} returns model detail."""
     with httpx.Client() as client:
         list_response = client.get(
             f"{API_URL}/models",
@@ -512,7 +512,7 @@ def test_sort_param(integration_token, path, list_key, sort_field):
 
 @pytest.mark.live
 def test_list_workspace_models(integration_token):
-    """GET /2/0/workspaces/{workspaceId}/models returns workspace-scoped model list.
+    """GET /workspaces/{workspaceId}/models returns workspace-scoped model list.
 
     Compares response shape to GET /2/0/models. Documents any structural differences.
     """
@@ -595,9 +595,9 @@ def test_model_category_values(integration_token):
 
 @pytest.mark.live
 def test_get_workspace_model(integration_token):
-    """GET /2/0/workspaces/{workspaceId}/models/{modelId} returns workspace-scoped model detail.
+    """GET /workspaces/{workspaceId}/models/{modelId} returns workspace-scoped model detail.
 
-    Compares response shape to GET /2/0/models/{modelId}. Documents any structural differences.
+    Compares response shape to GET /models/{modelId}. Documents any structural differences.
     """
     h = {"Authorization": f"AnaplanAuthToken {integration_token}"}
     with httpx.Client() as client:
@@ -819,7 +819,7 @@ def list_id(integration_token):
 
 @pytest.mark.live
 def test_list_modules(integration_token):
-    """GET /2/0/models/{modelId}/modules returns list of modules."""
+    """GET /models/{modelId}/modules returns list of modules."""
     with httpx.Client() as client:
         response = client.get(
             f"{API_URL}/models/{MODEL_ID}/modules",
@@ -838,7 +838,7 @@ def test_list_modules(integration_token):
 
 @pytest.mark.live
 def test_list_module_line_items(integration_token, module_id_with_line_items):
-    """GET /2/0/models/{modelId}/modules/{moduleId}/lineItems returns line items."""
+    """GET /models/{modelId}/modules/{moduleId}/lineItems returns line items."""
     with httpx.Client() as client:
         response = client.get(
             f"{API_URL}/models/{MODEL_ID}/modules/{module_id_with_line_items}/lineItems",
@@ -857,7 +857,7 @@ def test_list_module_line_items(integration_token, module_id_with_line_items):
 
 @pytest.mark.live
 def test_list_module_views(integration_token, module_id_with_views):
-    """GET /2/0/models/{modelId}/modules/{moduleId}/views returns views for a module."""
+    """GET /models/{modelId}/modules/{moduleId}/views returns views for a module."""
     with httpx.Client() as client:
         response = client.get(
             f"{API_URL}/models/{MODEL_ID}/modules/{module_id_with_views}/views",
@@ -876,7 +876,7 @@ def test_list_module_views(integration_token, module_id_with_views):
 
 @pytest.mark.live
 def test_list_model_views(integration_token):
-    """GET /2/0/workspaces/{workspaceId}/models/{modelId}/views returns all views."""
+    """GET /workspaces/{workspaceId}/models/{modelId}/views returns all views."""
     with httpx.Client() as client:
         response = client.get(
             f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/views",
@@ -895,7 +895,7 @@ def test_list_model_views(integration_token):
 
 @pytest.mark.live
 def test_get_view(integration_token, view_id):
-    """GET /2/0/models/{modelId}/views/{viewId} returns view metadata including dimensions."""
+    """GET /models/{modelId}/views/{viewId} returns view metadata including dimensions."""
     with httpx.Client() as client:
         response = client.get(
             f"{API_URL}/models/{MODEL_ID}/views/{view_id}",
@@ -915,7 +915,7 @@ def test_get_view(integration_token, view_id):
 
 @pytest.mark.live
 def test_list_model_line_items(integration_token):
-    """GET /2/0/models/{modelId}/lineItems returns all line items in the model."""
+    """GET /models/{modelId}/lineItems returns all line items in the model."""
     with httpx.Client() as client:
         response = client.get(
             f"{API_URL}/models/{MODEL_ID}/lineItems",
@@ -934,7 +934,7 @@ def test_list_model_line_items(integration_token):
 
 @pytest.mark.live
 def test_list_line_item_dimensions(integration_token, line_item_id):
-    """GET /2/0/models/{modelId}/lineItems/{lineItemId}/dimensions returns dimensions."""
+    """GET /models/{modelId}/lineItems/{lineItemId}/dimensions returns dimensions."""
     with httpx.Client() as client:
         response = client.get(
             f"{API_URL}/models/{MODEL_ID}/lineItems/{line_item_id}/dimensions",
@@ -953,7 +953,7 @@ def test_list_line_item_dimensions(integration_token, line_item_id):
 
 @pytest.mark.live
 def test_list_line_item_dimension_items(integration_token, line_item_id, dimension_id):
-    """GET /2/0/models/{modelId}/lineItems/{lineItemId}/dimensions/{dimensionId}/items."""
+    """GET /models/{modelId}/lineItems/{lineItemId}/dimensions/{dimensionId}/items."""
     with httpx.Client() as client:
         response = client.get(
             f"{API_URL}/models/{MODEL_ID}/lineItems/{line_item_id}/dimensions/{dimension_id}/items",
@@ -972,7 +972,7 @@ def test_list_line_item_dimension_items(integration_token, line_item_id, dimensi
 
 @pytest.mark.live
 def test_list_view_dimension_items(integration_token, view_and_dimension_for_items):
-    """GET /2/0/models/{modelId}/views/{viewId}/dimensions/{dimensionId}/items."""
+    """GET /models/{modelId}/views/{viewId}/dimensions/{dimensionId}/items."""
     vid, did = view_and_dimension_for_items
     with httpx.Client() as client:
         response = client.get(
@@ -992,7 +992,7 @@ def test_list_view_dimension_items(integration_token, view_and_dimension_for_ite
 
 @pytest.mark.live
 def test_list_workspace_dimension_items(integration_token, dimension_id):
-    """GET /2/0/workspaces/{workspaceId}/models/{modelId}/dimensions/{dimensionId}/items."""
+    """GET /workspaces/{workspaceId}/models/{modelId}/dimensions/{dimensionId}/items."""
     with httpx.Client() as client:
         response = client.get(
             f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/dimensions/{dimension_id}/items",
@@ -1011,7 +1011,7 @@ def test_list_workspace_dimension_items(integration_token, dimension_id):
 
 @pytest.mark.live
 def test_list_lists(integration_token):
-    """GET /2/0/workspaces/{workspaceId}/models/{modelId}/lists returns list of lists."""
+    """GET /workspaces/{workspaceId}/models/{modelId}/lists returns list of lists."""
     with httpx.Client() as client:
         response = client.get(
             f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/lists",
@@ -1030,7 +1030,7 @@ def test_list_lists(integration_token):
 
 @pytest.mark.live
 def test_get_list(integration_token, list_id):
-    """GET /2/0/workspaces/{workspaceId}/models/{modelId}/lists/{listId} returns list metadata."""
+    """GET /workspaces/{workspaceId}/models/{modelId}/lists/{listId} returns list metadata."""
     with httpx.Client() as client:
         response = client.get(
             f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/lists/{list_id}",
@@ -1057,115 +1057,140 @@ def test_get_list(integration_token, list_id):
 
 _DUALITY_PROBES = [
     pytest.param(
-        "/2/0/models/{MODEL_ID}/modules",
-        "/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/modules",
+        "/models/{MODEL_ID}/modules",
+        "/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/modules",
         "modules",
         id="modules",
     ),
     pytest.param(
-        "/2/0/models/{MODEL_ID}/modules/{module_id_with_line_items}/lineItems",
-        "/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/modules/{module_id_with_line_items}/lineItems",
+        "/models/{MODEL_ID}/modules/{module_id_with_line_items}/lineItems",
+        "/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/modules/{module_id_with_line_items}/lineItems",
         "items",
         id="module-lineItems",
     ),
     pytest.param(
-        "/2/0/models/{MODEL_ID}/modules/{module_id_with_views}/views",
-        "/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/modules/{module_id_with_views}/views",
+        "/models/{MODEL_ID}/modules/{module_id_with_views}/views",
+        "/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/modules/{module_id_with_views}/views",
         "views",
         id="module-views",
     ),
     pytest.param(
-        "/2/0/models/{MODEL_ID}/lineItems",
-        "/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/lineItems",
+        "/models/{MODEL_ID}/lineItems",
+        "/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/lineItems",
         "items",
         id="lineItems",
     ),
     pytest.param(
-        "/2/0/models/{MODEL_ID}/lineItems/{line_item_id}/dimensions",
-        "/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/lineItems/{line_item_id}/dimensions",
+        "/models/{MODEL_ID}/lineItems/{line_item_id}/dimensions",
+        "/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/lineItems/{line_item_id}/dimensions",
         "dimensions",
         id="lineItem-dimensions",
     ),
     pytest.param(
-        "/2/0/models/{MODEL_ID}/lineItems/{line_item_id}/dimensions/{dimension_id}/items",
-        "/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/lineItems/{line_item_id}/dimensions/{dimension_id}/items",
+        "/models/{MODEL_ID}/lineItems/{line_item_id}/dimensions/{dimension_id}/items",
+        "/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/lineItems/{line_item_id}/dimensions/{dimension_id}/items",
         "items",
         id="lineItem-dimension-items",
     ),
     pytest.param(
-        "/2/0/models/{MODEL_ID}/views/{view_id}",
-        "/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/views/{view_id}",
+        "/models/{MODEL_ID}/views/{view_id}",
+        "/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/views/{view_id}",
         None,
         id="view-detail",
     ),
     pytest.param(
-        "/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/views",
-        "/2/0/models/{MODEL_ID}/views",
+        "/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/views",
+        "/models/{MODEL_ID}/views",
         "views",
         id="views",
     ),
     pytest.param(
-        "/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/dimensions/{dimension_id}/items",
-        "/2/0/models/{MODEL_ID}/dimensions/{dimension_id}/items",
+        "/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/dimensions/{dimension_id}/items",
+        "/models/{MODEL_ID}/dimensions/{dimension_id}/items",
         "items",
         id="dimension-items",
     ),
     pytest.param(
-        "/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/lists",
-        "/2/0/models/{MODEL_ID}/lists",
+        "/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/lists",
+        "/models/{MODEL_ID}/lists",
         "lists",
         id="lists",
     ),
     pytest.param(
-        "/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/lists/{list_id}",
-        "/2/0/models/{MODEL_ID}/lists/{list_id}",
+        "/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/lists/{list_id}",
+        "/models/{MODEL_ID}/lists/{list_id}",
         "metadata",
         id="list-detail",
     ),
     # issue #28: action/import/export/process listing endpoints
     pytest.param(
-        "/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/actions",
-        "/2/0/models/{MODEL_ID}/actions",
+        "/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/actions",
+        "/models/{MODEL_ID}/actions",
         "actions",
         id="actions",
     ),
     pytest.param(
-        "/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/imports/",
-        "/2/0/models/{MODEL_ID}/imports",
+        "/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/imports/",
+        "/models/{MODEL_ID}/imports",
         "imports",
         id="imports",
     ),
     pytest.param(
-        "/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/exports",
-        "/2/0/models/{MODEL_ID}/exports",
+        "/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/exports",
+        "/models/{MODEL_ID}/exports",
         "exports",
         id="exports",
     ),
     pytest.param(
-        "/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/processes",
-        "/2/0/models/{MODEL_ID}/processes",
+        "/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/processes",
+        "/models/{MODEL_ID}/processes",
         "processes",
         id="processes",
     ),
     # issue #28: individual-resource GETs (model-direct forms)
     pytest.param(
-        "/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/exports/{export_id}",
-        "/2/0/models/{MODEL_ID}/exports/{export_id}",
+        "/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/exports/{export_id}",
+        "/models/{MODEL_ID}/exports/{export_id}",
         "exportMetadata",
         id="export-detail",
     ),
     pytest.param(
-        "/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/imports/{import_id}",
-        "/2/0/models/{MODEL_ID}/imports/{import_id}",
+        "/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/imports/{import_id}",
+        "/models/{MODEL_ID}/imports/{import_id}",
         "importMetadata",
         id="import-detail",
     ),
     # issue #28: processes/{processId} workspace-prefixed form
     pytest.param(
-        "/2/0/models/{MODEL_ID}/processes/{process_id}",
-        "/2/0/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/processes/{process_id}",
+        "/models/{MODEL_ID}/processes/{process_id}",
+        "/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/processes/{process_id}",
         "processMetadata",
         id="process-detail",
+    ),
+    # issue #27: files, versions, and calendar GET path duality (confirmed 200)
+    pytest.param(
+        "/models/{MODEL_ID}/files",
+        "/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/files",
+        "files",
+        id="files-list",
+    ),
+    pytest.param(
+        "/models/{MODEL_ID}/versions",
+        "/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/versions",
+        "versionMetadata",
+        id="versions",
+    ),
+    pytest.param(
+        "/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/files/{file_id}/chunks",
+        "/models/{MODEL_ID}/files/{file_id}/chunks",
+        "chunks",
+        id="file-chunks",
+    ),
+    pytest.param(
+        "/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/modelCalendar",
+        "/models/{MODEL_ID}/modelCalendar",
+        "modelCalendar",
+        id="modelCalendar",
     ),
 ]
 
@@ -1404,7 +1429,7 @@ def test_tasks_sort_param(integration_token):
 
 @pytest.mark.live
 def test_current_period_invalid_date_in_body_returns_400(integration_token):
-    """PUT /2/0/models/{modelId}/currentPeriod with invalid date in body returns 400."""
+    """PUT /models/{modelId}/currentPeriod with invalid date in body returns 400."""
     h = {**_auth_headers(integration_token), "Content-Type": "application/json"}
     with httpx.Client() as client:
         response = client.put(
@@ -1423,7 +1448,7 @@ def test_current_period_invalid_date_in_body_returns_400(integration_token):
 
 @pytest.mark.live
 def test_current_period_invalid_date_as_query_param_returns_400(integration_token):
-    """PUT /2/0/models/{modelId}/currentPeriod?date=invalid returns 400.
+    """PUT /models/{modelId}/currentPeriod?date=invalid returns 400.
 
     Confirms date is accepted as a query parameter (no body sent).
     Live probe also confirmed: sending both query param and body returns
@@ -1448,7 +1473,7 @@ def test_current_period_invalid_date_as_query_param_returns_400(integration_toke
 
 @pytest.mark.live
 def test_workspace_current_period_put_invalid_date_returns_400(integration_token):
-    """PUT /2/0/workspaces/{workspaceId}/models/{modelId}/currentPeriod with invalid date returns 400.
+    """PUT /workspaces/{workspaceId}/models/{modelId}/currentPeriod with invalid date returns 400.
 
     Live probe confirmed this workspace-scoped form exists and behaves identically
     to the model-direct PUT /models/{modelId}/currentPeriod.
@@ -1474,7 +1499,7 @@ def test_workspace_current_period_put_invalid_date_returns_400(integration_token
 
 @pytest.mark.live
 def test_model_dimension_items_post_empty_body_returns_400(integration_token, dimension_id):
-    """POST /2/0/models/{modelId}/dimensions/{dimensionId}/items with empty names/codes returns 400.
+    """POST /models/{modelId}/dimensions/{dimensionId}/items with empty names/codes returns 400.
 
     Live probe confirmed this model-direct form exists and behaves identically to
     POST /workspaces/{workspaceId}/models/{modelId}/dimensions/{dimensionId}/items.
@@ -1515,7 +1540,7 @@ def version_id(integration_token):
 
 @pytest.mark.live
 def test_list_versions(integration_token):
-    """GET /2/0/models/{modelId}/versions returns list of version metadata."""
+    """GET /models/{modelId}/versions returns list of version metadata."""
     with httpx.Client() as client:
         response = client.get(
             f"{API_URL}/models/{MODEL_ID}/versions",
@@ -1534,7 +1559,7 @@ def test_list_versions(integration_token):
 
 @pytest.mark.live
 def test_get_workspace_current_period(integration_token):
-    """GET /2/0/workspaces/{workspaceId}/models/{modelId}/currentPeriod returns current period."""
+    """GET /workspaces/{workspaceId}/models/{modelId}/currentPeriod returns current period."""
     with httpx.Client() as client:
         response = client.get(
             f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/currentPeriod",
@@ -1552,7 +1577,7 @@ def test_get_workspace_current_period(integration_token):
 
 @pytest.mark.live
 def test_get_model_current_period(integration_token):
-    """GET /2/0/models/{modelId}/currentPeriod returns current period (model-scoped)."""
+    """GET /models/{modelId}/currentPeriod returns current period (model-scoped)."""
     with httpx.Client() as client:
         response = client.get(
             f"{API_URL}/models/{MODEL_ID}/currentPeriod",
@@ -1570,7 +1595,7 @@ def test_get_model_current_period(integration_token):
 
 @pytest.mark.live
 def test_get_model_calendar(integration_token):
-    """GET /2/0/workspaces/{workspaceId}/models/{modelId}/modelCalendar returns model calendar."""
+    """GET /workspaces/{workspaceId}/models/{modelId}/modelCalendar returns model calendar."""
     with httpx.Client() as client:
         response = client.get(
             f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/modelCalendar",
@@ -1586,7 +1611,7 @@ def test_get_model_calendar(integration_token):
 
 @pytest.mark.live
 def test_get_fiscal_year(integration_token):
-    """GET /2/0/models/{modelId}/modelCalendar/fiscalYear returns 405 — GET not supported.
+    """GET /models/{modelId}/modelCalendar/fiscalYear returns 405 — GET not supported.
 
     Live testing confirmed this path only supports PUT. Fiscal year info is available
     via GET /workspaces/{workspaceId}/models/{modelId}/modelCalendar instead.
@@ -1623,7 +1648,7 @@ def test_get_fiscal_year(integration_token):
 @pytest.mark.live
 @pytest.mark.write
 def test_switchover_invalid_date_returns_400(integration_token, version_id):
-    """PUT /2/0/models/{modelId}/versions/{versionId}/switchover with invalid date returns 400.
+    """PUT /models/{modelId}/versions/{versionId}/switchover with invalid date returns 400.
 
     Non-destructive guard: invalid date format is rejected before any state change.
     Auto-skipped without --allow-writes (conftest guard intercepts the PUT).
@@ -1666,7 +1691,7 @@ def file_id(integration_token):
 
 @pytest.mark.live
 def test_list_model_files(integration_token):
-    """GET /2/0/models/{modelId}/files returns list of model files."""
+    """GET /models/{modelId}/files returns list of model files."""
     with httpx.Client() as client:
         response = client.get(
             f"{API_URL}/models/{MODEL_ID}/files",
@@ -1685,7 +1710,7 @@ def test_list_model_files(integration_token):
 
 @pytest.mark.live
 def test_get_file_metadata(integration_token, file_id):
-    """GET /2/0/workspaces/{workspaceId}/models/{modelId}/files/{fileId} returns file metadata.
+    """GET /workspaces/{workspaceId}/models/{modelId}/files/{fileId} returns file metadata.
 
     NOTE: Live testing shows this endpoint returns 404 even for files visible in
     GET /models/{modelId}/files. Individual file metadata is only available via
@@ -1728,7 +1753,7 @@ def test_get_file_metadata(integration_token, file_id):
 
 @pytest.mark.live
 def test_list_file_chunks(integration_token, file_id):
-    """GET /2/0/workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks returns chunk list."""
+    """GET /workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks returns chunk list."""
     with httpx.Client() as client:
         response = client.get(
             f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/files/{file_id}/chunks",
@@ -1749,7 +1774,7 @@ def test_list_file_chunks(integration_token, file_id):
 
 @pytest.mark.live
 def test_download_first_chunk(integration_token, file_id):
-    """GET /2/0/workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks/0 downloads first chunk.
+    """GET /workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks/0 downloads first chunk.
 
     Uses the model-level file list to check chunkCount (workspace-scoped metadata
     endpoint returns 404 for non-Workspace-Administrator accounts).
@@ -1794,7 +1819,7 @@ def test_download_first_chunk(integration_token, file_id):
 @pytest.mark.live
 @pytest.mark.write
 def test_upload_single_chunk(integration_token, file_id):
-    """PUT /2/0/workspaces/{workspaceId}/models/{modelId}/files/{fileId} uploads a file as a single chunk.
+    """PUT /workspaces/{workspaceId}/models/{modelId}/files/{fileId} uploads a file as a single chunk.
 
     Single-chunk upload: PUT directly to the file path (no set-chunk-count or complete step).
     Probes PUT response body (JSON envelope or no-body 204) and DELETE response shape.
@@ -2011,7 +2036,7 @@ def import_task_id(integration_token, import_id):
 
 @pytest.mark.live
 def test_list_imports(integration_token):
-    """GET /2/0/workspaces/{workspaceId}/models/{modelId}/imports/ returns import list."""
+    """GET /workspaces/{workspaceId}/models/{modelId}/imports/ returns import list."""
     with httpx.Client() as client:
         response = client.get(
             f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/imports/",
@@ -2030,7 +2055,7 @@ def test_list_imports(integration_token):
 
 @pytest.mark.live
 def test_get_import_metadata(integration_token, import_id):
-    """GET /2/0/workspaces/{workspaceId}/models/{modelId}/imports/{importId} returns metadata.
+    """GET /workspaces/{workspaceId}/models/{modelId}/imports/{importId} returns metadata.
 
     NOTE: Live testing shows the API returns {importMetadata: {name, type}} — no id field.
     The id is only included in the list response, not the single-item metadata response.
@@ -2051,7 +2076,7 @@ def test_get_import_metadata(integration_token, import_id):
 
 @pytest.mark.live
 def test_list_import_tasks(integration_token, import_id):
-    """GET /2/0/workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks lists tasks.
+    """GET /workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks lists tasks.
 
     NOTE: When no tasks have ever run, the API returns {meta: {paging: {totalSize: 0}}, status}
     with no 'tasks' or 'task' key. This is the correct empty-list representation.
@@ -2233,7 +2258,7 @@ def test_import_dump_chunk_download(integration_token, import_id, import_task_id
 
 @pytest.mark.live
 def test_list_exports(integration_token):
-    """GET /2/0/workspaces/{workspaceId}/models/{modelId}/exports returns export list."""
+    """GET /workspaces/{workspaceId}/models/{modelId}/exports returns export list."""
     with httpx.Client() as client:
         response = client.get(
             f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/exports",
@@ -2252,7 +2277,7 @@ def test_list_exports(integration_token):
 
 @pytest.mark.live
 def test_get_export_metadata(integration_token, export_id):
-    """GET /2/0/workspaces/{workspaceId}/models/{modelId}/exports/{exportId} returns metadata.
+    """GET /workspaces/{workspaceId}/models/{modelId}/exports/{exportId} returns metadata.
 
     NOTE: Live testing shows the API returns {exportMetadata: {...}} — no id field in the
     metadata object. The id is only included in the list response.
@@ -2274,7 +2299,7 @@ def test_get_export_metadata(integration_token, export_id):
 
 @pytest.mark.live
 def test_list_export_tasks(integration_token, export_id):
-    """GET /2/0/workspaces/{workspaceId}/models/{modelId}/exports/{exportId}/tasks lists tasks."""
+    """GET /workspaces/{workspaceId}/models/{modelId}/exports/{exportId}/tasks lists tasks."""
     with httpx.Client() as client:
         response = client.get(
             f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
@@ -2350,7 +2375,7 @@ def test_run_export_and_poll_task(integration_token, export_id):
 
 @pytest.mark.live
 def test_list_actions(integration_token):
-    """GET /2/0/workspaces/{workspaceId}/models/{modelId}/actions returns action list."""
+    """GET /workspaces/{workspaceId}/models/{modelId}/actions returns action list."""
     with httpx.Client() as client:
         response = client.get(
             f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/actions",
@@ -2369,7 +2394,7 @@ def test_list_actions(integration_token):
 
 @pytest.mark.live
 def test_list_action_tasks(integration_token, action_id):
-    """GET /2/0/workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks lists tasks."""
+    """GET /workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks lists tasks."""
     with httpx.Client() as client:
         response = client.get(
             f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
@@ -2392,7 +2417,7 @@ def test_list_action_tasks(integration_token, action_id):
 
 @pytest.mark.live
 def test_list_processes(integration_token):
-    """GET /2/0/workspaces/{workspaceId}/models/{modelId}/processes returns process list."""
+    """GET /workspaces/{workspaceId}/models/{modelId}/processes returns process list."""
     with httpx.Client() as client:
         response = client.get(
             f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/processes",
@@ -2411,7 +2436,7 @@ def test_list_processes(integration_token):
 
 @pytest.mark.live
 def test_get_process_detail(integration_token, process_id):
-    """GET /2/0/models/{modelId}/processes/{processId} returns process detail."""
+    """GET /models/{modelId}/processes/{processId} returns process detail."""
     with httpx.Client() as client:
         response = client.get(
             f"{API_URL}/models/{MODEL_ID}/processes/{process_id}",
@@ -2428,7 +2453,7 @@ def test_get_process_detail(integration_token, process_id):
 
 @pytest.mark.live
 def test_list_process_tasks(integration_token, process_id):
-    """GET /2/0/workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks lists tasks."""
+    """GET /workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks lists tasks."""
     with httpx.Client() as client:
         response = client.get(
             f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
@@ -2833,7 +2858,7 @@ def test_export_import_cycle(integration_token):
 
 @pytest.mark.live
 def test_get_list_items(integration_token):
-    """GET /2/0/workspaces/{workspaceId}/models/{modelId}/lists/{listId}/items returns list items.
+    """GET /workspaces/{workspaceId}/models/{modelId}/lists/{listId}/items returns list items.
 
     Uses INTEGRATION_LIST. Skipped when the variable is not set.
     """

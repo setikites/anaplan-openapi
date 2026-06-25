@@ -888,5 +888,35 @@
     "spec": "integration",
     "path": "/paths//models/{modelId}/imports/{importId}/parameters/1/schema",
     "pattern": "^112[0-9]{9}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/files/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/files/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/versions/parameters/0/schema",
+    "pattern": "^[0-9a-f]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//workspaces/{workspaceId}/models/{modelId}/versions/parameters/1/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//models/{modelId}/files/{fileId}/chunks/parameters/0/schema",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "integration",
+    "path": "/paths//models/{modelId}/modelCalendar/parameters/0/schema",
+    "pattern": "^[0-9A-F]{32}$"
   }
 ]
