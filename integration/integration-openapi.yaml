@@ -2232,6 +2232,121 @@ paths:
                     $ref: '#/components/schemas/CurrentPeriod'
         '429':
           description: more detail in path description
+    put:
+      summary: Set current period (workspace-scoped)
+      description: |-
+        Workspace-scoped alternate URL form — identical behaviour to `/models/{modelId}/currentPeriod` PUT.
+
+        ## Set current period
+
+        `/workspaces/{workspaceId}/models/{modelId}/currentPeriod`
+
+        Use this call to change or reset the current period in Anaplan. When this call contains a specified date (for example, 2020-05-20), the API determines what period range contains the specified data and sets that range as the current period.  When the date value is set to blank in this call, the API resets the current period to blank.
+
+        **Warning**: A change to your time settings is a potentially destructive action and may lead to data loss.  The new range of time periods may not include previous time periods. Any data in the removed time periods is deleted from the model.
+
+        **Notes**:
+
+        *   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html)
+        *   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response
+
+
+        ### Request
+
+        ```
+        curl -X PUT https://api.anaplan.com/2/0/workspaces/{workspaceId}/models/{modelId}/currentPeriod\
+        -H 'Accept: application/json' \
+        -H 'Authorization: AnaplanAuthToken {anaplan_auth_token}' \
+        -H 'Content-Type: application/json'
+
+        ```
+
+        ### Request headers
+
+        | **Header** | **Details** |
+        | --- | --- |
+        | `Authorization: AnaplanAuthToken {anaplan_auth_token}` | <br><br>*   Required<br>*   Description: the Anaplan authentication token<br><br> |
+        | `Accept: application/json` | <br><br>*   Required<br>*   Description: This indicates the preferred response is `application/json` format.<br><br> |
+        | `Content-Type: application/json` | <br><br>*   Required<br>*   Description: This indicates the call uses a content type of `application/json`.<br><br> |
+
+        ### Request parameter
+
+        | **Parameter** | **Details** |
+        | --- | --- |
+        | `{workspaceId}` | <br><br>*   Required<br>*   Type: String<br>*   Description: The workspace ID<br>*   Example: `c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6`<br><br> |
+        | `{modelId}` | <br><br>*   Required<br>*   Type: String<br>*   Description: the ID for the model<br>*   Example: `A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3`<br><br> |
+
+        ### Request body
+
+        | **Body** | **Details** |
+        | --- | --- |
+        | `{date}` | <br><br>*   Required<br>*   Type: String<br>*   Description: The date to use to set, or reset, the current period. The date format is YYYY-MM-DD.  <br>    If the `date` parameter is left blank (for example, `/currentperiod?date=`) the current period resets.  <br>    If the date is not provided in the YYYY-MM-DD format, the call returns a `400 Bad Request` response with this message: `Invalid ISO date format '{date}'. Date should match format YYYY-MM-DD`  <br>    If this value falls outside of a valid range, the call returns a `400 Bad Request` response with this message: `Specified date '{date}' is out of timescale range {start of timescale} - {end of timescale}`.<br>*   Example: 2010-05-20<br><br> |
+
+        ### Example of request body
+
+        ```
+        {
+               "date":"2020-05-20"
+            }
+
+        ```
+      tags:
+      - Transactional Write
+      parameters:
+      - name: date
+        in: query
+        description: The date used to set the current period (YYYY-MM-DD). Leave blank (?date=) to reset the current period.
+          Accepted as either a query parameter or a request body field, but not both simultaneously. Returns 400 if the format
+          is invalid or the date falls outside the model timescale.
+        required: false
+        schema:
+          type: string
+          format: date
+          pattern: ^\d{4}-\d{2}-\d{2}$
+        example: '2020-05-20'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DateRequest'
+            example:
+              date: '2020-07-03'
+      responses:
+        '200':
+          description: Response 200
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              example: application/json
+          content:
+            application/json:
+              example:
+                meta:
+                  schema: https://api.anaplan.com/2/0/objects/currentPeriod
+                status:
+                  code: 200
+                  message: Success
+                currentPeriod:
+                  periodText: May 20
+                  lastDay: '2020-05-31'
+                  calendarType: Calendar Months/Quarters/Years
+              schema:
+                type: object
+                properties:
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                  status:
+                    $ref: '#/components/schemas/Status'
+                  currentPeriod:
+                    $ref: '#/components/schemas/CurrentPeriod'
+        '429':
+          description: more detail in path description
+        '400':
+          description: 'Bad request. Occurs when: (1) the date is not in YYYY-MM-DD format — "Invalid ISO date format ''{date}''.
+            Date should match format YYYY-MM-DD"; (2) the date falls outside the model timescale — "Specified date ''{date}''
+            is out of timescale range {start} - {end}"; (3) date is supplied as both a query parameter and a request body
+            field simultaneously.'
   /workspaces/{workspaceId}/models/{modelId}/modelCalendar:
     parameters:
     - name: workspaceId
@@ -7973,6 +8088,124 @@ paths:
         '400':
           description: more detail in path description
         '429':
+          description: more detail in path description
+    post:
+      summary: 'Model-direct form: Lookup dimension items by name or code'
+      description: |-
+        Model-direct alternate URL form — identical behaviour to `/workspaces/{workspaceId}/models/{modelId}/dimensions/{dimensionId}/items` POST.
+
+        ## Lookup dimension items by name or code
+
+        Retrieve the items from a dimension that match one of a list of names or a list or codes.
+
+        ** Notes: **
+
+        *   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html).
+        *   This call does not return results for names or codes for which an item does not exist.
+        *   If the given workspace, model, or dimension do not exist, this call returns a `404` code.
+        *   If the dimension does not support codes and codes are provided, this call returns a `400` code.
+        *   In the future, use of this call may be rate limited.
+
+
+        ### Requests that support this feature
+
+        ```
+        curl -X POST https://api.anaplan.com/2/0/workspaces/{workspaceId}/models/{modelId}/dimensions/{dimensionId}/items \
+        -H ‘Authorization: AnaplanAuthToken {anaplan_auth_token}' \
+        -H 'Content-Type: application/json' \
+        -H 'Accept: application/json' --data-raw ''
+
+        ```
+
+        ### Request headers
+
+        | **Header** | **Details** |
+        | --- | --- |
+        | `Authorization: AnaplanAuthToken {anaplan_auth_token}` | <br><br>*   Required<br>*   Description: the Anaplan authentication token<br><br> |
+        | `Content-Type: application/json` | <br><br>*   Required<br>*   Description: This indicates the request format is `application/json`.<br><br> |
+        | `Accept: application/json` | <br><br>*   Optional<br>*   Description: This indicates the preferred response is either `application/json` format. Note that this call only outputs in `application/json` format.<br><br> |
+
+        ### Request parameters
+
+        | **Parameter** | **Details** |
+        | --- | --- |
+        | `{workspaceId}` | <br><br>*   Required in the supported request<br>*   Type: String<br>*   Description: The workspace ID<br>*   Example: `c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6`<br><br> |
+        | `{modelId}` | <br><br>*   Required<br>*   Type: String<br>*   Description: the model ID<br>*   Example: `A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3`<br><br> |
+        | `{dimensionId}` | <br><br>*   Required<br>*   Type: Number<br>*   Description: the dimension ID. This value must be the ID for any of these dimension types:<br>    *   Lists<br>    *   Time periods<br>    *   Users<br>    *   Versions<br>*   Example: `101000000001`<br><br> |
+
+        ### Request body
+
+        | **JSON Element** | **Description** |
+        | --- | --- |
+        | `names` | The case-insensitive strings that match the name of a returned item. |
+        | `codes` | The case-insensitive strings that match the code of a returned item. |
+
+        Example:
+
+        ```
+        {
+            "names": ["South", "East"],
+            "codes": ["N", "W"]
+        }
+
+        ```
+
+        Note that the `names`, `codes`, or both fields in the request body must contain a non-empty value. If the request body does not include at least one of these fields, the response returns an error.
+      tags:
+      - Model Metadata
+      - List Metadata
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                codes:
+                  type: array
+                  items:
+                    type: string
+                    format: utc-millisec
+                names:
+                  type: array
+                  items:
+                    type: string
+            example:
+              codes:
+              - '2'
+              names:
+              - Test1
+      responses:
+        '200':
+          description: Response 200
+          content:
+            application/json:
+              example:
+                meta:
+                  schema: https://api.anaplan.com/2/0/objects/dimension
+                status:
+                  code: 200
+                  message: Success
+                items:
+                - name: South
+                  id: '208000000001'
+                  code: S
+                - name: West
+                  id: '208000000004'
+                  code: W
+              schema:
+                type: object
+                properties:
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                  status:
+                    $ref: '#/components/schemas/Status'
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Dimension'
+        '404':
+          description: more detail in path description
+        '400':
           description: more detail in path description
   /models/{modelId}/lists:
     parameters:

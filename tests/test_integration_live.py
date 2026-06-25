@@ -1401,6 +1401,56 @@ def test_current_period_invalid_date_as_query_param_returns_400(integration_toke
     )
 
 
+@pytest.mark.live
+def test_workspace_current_period_put_invalid_date_returns_400(integration_token):
+    """PUT /2/0/workspaces/{workspaceId}/models/{modelId}/currentPeriod with invalid date returns 400.
+
+    Live probe confirmed this workspace-scoped form exists and behaves identically
+    to the model-direct PUT /models/{modelId}/currentPeriod.
+    Non-destructive: invalid date is rejected before any state change.
+    """
+    h = {**_auth_headers(integration_token), "Content-Type": "application/json"}
+    with httpx.Client() as client:
+        response = client.put(
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/currentPeriod",
+            headers=h,
+            json={"date": "not-a-date"},
+        )
+
+    assert response.status_code == 400, (
+        f"Expected 400 for invalid date on workspace currentPeriod PUT, got {response.status_code}: "
+        f"{response.text[:300]}"
+    )
+    body = response.json()
+    assert "Invalid ISO date format" in body.get("status", {}).get("message", ""), (
+        f"Expected format-error message, got: {body}"
+    )
+
+
+@pytest.mark.live
+def test_model_dimension_items_post_empty_body_returns_400(integration_token, dimension_id):
+    """POST /2/0/models/{modelId}/dimensions/{dimensionId}/items with empty names/codes returns 400.
+
+    Live probe confirmed this model-direct form exists and behaves identically to
+    POST /workspaces/{workspaceId}/models/{modelId}/dimensions/{dimensionId}/items.
+    Non-destructive: empty names+codes is rejected before returning any data.
+    """
+    h = {**_auth_headers(integration_token), "Content-Type": "application/json"}
+    with httpx.Client() as client:
+        response = client.post(
+            f"{API_URL}/models/{MODEL_ID}/dimensions/{dimension_id}/items",
+            headers=h,
+            json={"names": [], "codes": []},
+        )
+
+    assert response.status_code == 400, (
+        f"Expected 400 for empty names/codes on model dimension items POST, got {response.status_code}: "
+        f"{response.text[:300]}"
+    )
+    body = response.json()
+    assert body.get("status", {}).get("code") == 400, f"Expected status.code 400, got: {body}"
+
+
 # ─── Model settings (versions, current period, model calendar) ─────────────────
 
 
