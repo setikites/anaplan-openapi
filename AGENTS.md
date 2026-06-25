@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project generates OpenAPI 3.1 JSON specifications for the 10 publicly available Anaplan REST APIs, intended for API client code generation and community documentation.
+This project generates OpenAPI 3.0 JSON specifications for the 10 publicly available Anaplan REST APIs, intended for API client code generation and community documentation.
 
 See [CONTEXT.md](./CONTEXT.md) for an overview of all 10 APIs, their sources, and testing coverage.
 

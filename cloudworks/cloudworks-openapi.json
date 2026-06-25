@@ -1,5 +1,5 @@
 {
-  "openapi": "3.1.0",
+  "openapi": "3.0.0",
   "info": {
     "title": "Anaplan CloudWorks API",
     "version": "2.0.0",
@@ -83,24 +83,18 @@
                           },
                           "integrationErrorCode": {
                             "description": "Error code set when `status` is 0; null when the connection is healthy.",
-                            "type": [
-                              "integer",
-                              "null"
-                            ]
+                            "type": "integer",
+                            "nullable": true
                           },
                           "workspaceId": {
                             "description": "Anaplan workspace ID for restricted-user connections; null for unrestricted connections.",
-                            "type": [
-                              "string",
-                              "null"
-                            ]
+                            "type": "string",
+                            "nullable": true
                           },
                           "authMethod": {
                             "description": "Authentication method used by this connection (denormalized from `body.authMethod`). `\"SAS-based\"` for SAS-token connections; null for connections created before this field was introduced.",
-                            "type": [
-                              "string",
-                              "null"
-                            ]
+                            "type": "string",
+                            "nullable": true
                           }
                         }
                       }
@@ -1256,10 +1250,8 @@
                           "type": "string"
                         },
                         "schedule": {
-                          "type": [
-                            "object",
-                            "null"
-                          ]
+                          "type": "object",
+                          "nullable": true
                         },
                         "workspaceId": {
                           "type": "string"
@@ -2380,10 +2372,8 @@
               },
               "executionErrorCode": {
                 "description": "Numeric error code. Null on full success. Known values: `12` (import data-type mismatch), `35`, `38` (partial success), `39`.",
-                "type": [
-                  "integer",
-                  "null"
-                ],
+                "type": "integer",
+                "nullable": true,
                 "example": 12
               },
               "triggerSource": {
@@ -2486,10 +2476,8 @@
           },
           "executionErrorCode": {
             "description": "Numeric error code. Null on full success. Known values: `12` (import data-type mismatch), `35`, `38` (partial success), `39`.",
-            "type": [
-              "integer",
-              "null"
-            ],
+            "type": "integer",
+            "nullable": true,
             "example": 12
           },
           "traceId": {
@@ -2717,10 +2705,8 @@
                 "type": "string"
               },
               "executionErrorCode": {
-                "type": [
-                  "integer",
-                  "null"
-                ]
+                "type": "integer",
+                "nullable": true
               },
               "triggerSource": {
                 "type": "string",
@@ -2787,10 +2773,8 @@
                       "type": "string"
                     },
                     "modifiedBy": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
+                      "type": "string",
+                      "nullable": true
                     },
                     "modelId": {
                       "type": "string"
@@ -2855,10 +2839,8 @@
                         },
                         "executionErrorCode": {
                           "description": "Error code if the step failed; null on success. Code 38 indicates partial success.",
-                          "type": [
-                            "integer",
-                            "null"
-                          ]
+                          "type": "integer",
+                          "nullable": true
                         },
                         "triggerSource": {
                           "type": "string",
