@@ -237,7 +237,7 @@
                       "properties": {
                         "userGuid": {
                           "type": "string",
-                          "example": "8a89d9999f3c7099015f999d5208458a",
+                          "example": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4",
                           "description": "User identifier (32-character hex string)",
                           "pattern": "^[0-9a-f]{32}$"
                         },
@@ -247,7 +247,7 @@
                         },
                         "customerGuid": {
                           "type": "string",
-                          "example": "8a80d99a5bf97b99995c3d1577610415",
+                          "example": "b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5",
                           "description": "Customer identifier (32-character hex string)",
                           "pattern": "^[0-9a-f]{32}$"
                         }

@@ -176,7 +176,7 @@
                           "workspaceId": {
                             "type": "string",
                             "description": "Required for restricted integration users.",
-                            "example": "2c9ba1a8719d5fbf01722b11d9385b1a"
+                            "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
                           }
                         }
                       }
@@ -581,7 +581,7 @@
                   },
                   "integrations": [
                     {
-                      "integrationId": "fe40dc5793084f7dbb685cffe6a5ad2aa",
+                      "integrationId": "e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2a",
                       "name": "sample import integration",
                       "createdBy": "John Smith",
                       "creationDate": "2020-09-29T01:31:16.000Z",
@@ -595,7 +595,7 @@
                         "message": "Success",
                         "executionErrorCode": null
                       },
-                      "notificationId": "a72d86ac0a9c454aa8baf67c1db67486",
+                      "notificationId": "f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c4",
                       "nuxVisible": false
                     }
                   ],
@@ -723,7 +723,7 @@
           "schema": {
             "type": "string"
           },
-          "example": "fe40dc5793084f7dbb685cffe6a5ad2a"
+          "example": "e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2"
         }
       ],
       "get": {
@@ -908,7 +908,7 @@
           "schema": {
             "type": "string"
           },
-          "example": "fe40dc5793084f7dbb685cffe6a5ad2a"
+          "example": "e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2"
         }
       ],
       "post": {
@@ -980,7 +980,7 @@
           "schema": {
             "type": "string"
           },
-          "example": "fe40dc5793084f7dbb685cffe6a5ad2a"
+          "example": "e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2"
         }
       ],
       "post": {
@@ -997,7 +997,7 @@
                 "example": {
                   "success": true,
                   "message": {
-                    "integration_id": "56c122362f9d4a69bdca922252575065",
+                    "integration_id": "e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b3",
                     "state": "cancelled"
                   }
                 }
@@ -1022,7 +1022,7 @@
           "schema": {
             "type": "string"
           },
-          "example": "fe40dc5793084f7dbb685cffe6a5ad2a"
+          "example": "e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2"
         }
       ],
       "post": {
@@ -1136,7 +1136,7 @@
           "schema": {
             "type": "string"
           },
-          "example": "fe40dc5793084f7dbb685cffe6a5ad2a"
+          "example": "e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2"
         },
         {
           "name": "status",
@@ -1181,7 +1181,7 @@
           "schema": {
             "type": "string"
           },
-          "example": "fe40dc5793084f7dbb685cffe6a5ad2a"
+          "example": "e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2"
         }
       ],
       "get": {
@@ -1474,7 +1474,7 @@
           "schema": {
             "type": "string"
           },
-          "example": "067d1426ac964a7cac871c87790c4555"
+          "example": "f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3"
         }
       ],
       "get": {
@@ -1866,7 +1866,7 @@
           "schema": {
             "type": "string"
           },
-          "example": "fe40dc5793084f7dbb685cffe6a5ad2a"
+          "example": "e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2"
         }
       ],
       "get": {
@@ -1965,7 +1965,7 @@
           "schema": {
             "type": "string"
           },
-          "example": "fe40dc5793084f7dbb685cffe6a5ad2a"
+          "example": "e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2"
         }
       ],
       "post": {
@@ -2301,7 +2301,7 @@
           "integrationId": {
             "type": "string",
             "description": "32-character lowercase hex string uniquely identifying this integration.",
-            "example": "fe40dc5793084f7dbb685cffe6a5ad2a"
+            "example": "e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2"
           },
           "name": {
             "type": "string"
@@ -2511,7 +2511,7 @@
               "type": "string"
             },
             "example": [
-              "214a2ac51e5a479aafd49e9228334515"
+              "e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b4"
             ]
           },
           "channels": {

@@ -93,14 +93,14 @@
                   "summary": "Assign exception-user access",
                   "value": {
                     "op": "assign",
-                    "workspaceGuid": "8a81b09b5d5c10fb015d5c18a5050b99"
+                    "workspaceGuid": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
                   }
                 },
                 "unassign": {
                   "summary": "Revoke exception-user access",
                   "value": {
                     "op": "unassign",
-                    "workspaceGuid": "8a81b09b5d5c10fb015d5c18a5050b99"
+                    "workspaceGuid": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
                   }
                 }
               }
@@ -180,13 +180,13 @@
                 "byWorkspace": {
                   "summary": "List all exception users in a workspace",
                   "value": {
-                    "workspaceGuid": "8a81b09b5d5c10fb015d5c18a5050b99"
+                    "workspaceGuid": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
                   }
                 },
                 "byUser": {
                   "summary": "List all workspaces where a user has exception-user access",
                   "value": {
-                    "userGuid": "8a81b010520d34ab01520d366e0f0007"
+                    "userGuid": "b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5"
                   }
                 }
               }
@@ -204,15 +204,15 @@
                 "example": {
                   "response": [
                     {
-                      "workspaceGuid": "8a81b09b5d5c10fb015d5c18a5050b99",
+                      "workspaceGuid": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6",
                       "workspaceName": "Finance Workspace",
                       "users": [
                         {
-                          "userGuid": "8a81b010520d34ab01520d366e0f0007",
+                          "userGuid": "b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5",
                           "email": "alice@example.com"
                         },
                         {
-                          "userGuid": "8a81b010520d34ab01520d366e0f0008",
+                          "userGuid": "b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e6",
                           "email": "bob@example.com"
                         }
                       ]
