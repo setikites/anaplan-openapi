@@ -85,7 +85,7 @@
             "required": true,
             "schema": {
               "type": "string",
-              "example": "8a89d9999f3c7099015f999d5208458a",
+              "example": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4",
               "pattern": "^[0-9a-f]{32}$"
             }
           },
@@ -163,7 +163,7 @@
                 "properties": {
                   "client_id": {
                     "type": "string",
-                    "example": "8a89d9999f3c7099015f999d5208458a",
+                    "example": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4",
                     "pattern": "^[0-9a-f]{32}$",
                     "description": "Your device grant OAuth client ID."
                   },
@@ -339,7 +339,7 @@
           },
           "client_id": {
             "type": "string",
-            "example": "8a89d9999f3c7099015f999d5208458a",
+            "example": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4",
             "pattern": "^[0-9a-f]{32}$",
             "description": "Your application's OAuth client ID."
           },
@@ -377,7 +377,7 @@
           },
           "client_id": {
             "type": "string",
-            "example": "8a89d9999f3c7099015f999d5208458a",
+            "example": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4",
             "pattern": "^[0-9a-f]{32}$",
             "description": "Your device grant OAuth client ID."
           }
@@ -399,7 +399,7 @@
           },
           "client_id": {
             "type": "string",
-            "example": "8a89d9999f3c7099015f999d5208458a",
+            "example": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4",
             "pattern": "^[0-9a-f]{32}$",
             "description": "Your application's OAuth client ID."
           },

@@ -144,7 +144,7 @@ paths:
                       workspaceId:
                         type: string
                         description: Required for restricted integration users.
-                        example: 2c9ba1a8719d5fbf01722b11d9385b1a
+                        example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
               - title: Google BigQuery connection
                 type: object
                 required:
@@ -418,7 +418,7 @@ paths:
                   code: 200
                   message: Success
                 integrations:
-                - integrationId: fe40dc5793084f7dbb685cffe6a5ad2aa
+                - integrationId: e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2a
                   name: sample import integration
                   createdBy: John Smith
                   creationDate: '2020-09-29T01:31:16.000Z'
@@ -431,7 +431,7 @@ paths:
                     success: true
                     message: Success
                     executionErrorCode: null
-                  notificationId: a72d86ac0a9c454aa8baf67c1db67486
+                  notificationId: f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c4
                   nuxVisible: false
                 meta:
                   paging:
@@ -519,7 +519,7 @@ paths:
       required: true
       schema:
         type: string
-      example: fe40dc5793084f7dbb685cffe6a5ad2a
+      example: e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2
     get:
       summary: Get integration by ID
       operationId: getIntegrationById
@@ -641,7 +641,7 @@ paths:
       required: true
       schema:
         type: string
-      example: fe40dc5793084f7dbb685cffe6a5ad2a
+      example: e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2
     post:
       summary: Run an integration
       operationId: runIntegration
@@ -687,7 +687,7 @@ paths:
       required: true
       schema:
         type: string
-      example: fe40dc5793084f7dbb685cffe6a5ad2a
+      example: e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2
     post:
       summary: Cancel a running integration
       operationId: cancelIntegration
@@ -701,7 +701,7 @@ paths:
               example:
                 success: true
                 message:
-                  integration_id: 56c122362f9d4a69bdca922252575065
+                  integration_id: e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b3
                   state: cancelled
         '403':
           $ref: '#/components/responses/Forbidden'
@@ -714,7 +714,7 @@ paths:
       required: true
       schema:
         type: string
-      example: fe40dc5793084f7dbb685cffe6a5ad2a
+      example: e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2
     post:
       summary: Create an integration schedule
       description: 'Create a schedule for an integration. Supports a maximum of one schedule per integration. Schedule types:
@@ -789,7 +789,7 @@ paths:
       required: true
       schema:
         type: string
-      example: fe40dc5793084f7dbb685cffe6a5ad2a
+      example: e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2
     - name: status
       in: path
       description: Desired schedule status.
@@ -819,7 +819,7 @@ paths:
       required: true
       schema:
         type: string
-      example: fe40dc5793084f7dbb685cffe6a5ad2a
+      example: e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2
     get:
       summary: Get integration run history
       operationId: getRunHistory
@@ -1014,7 +1014,7 @@ paths:
       required: true
       schema:
         type: string
-      example: 067d1426ac964a7cac871c87790c4555
+      example: f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3
     get:
       summary: Get a notification configuration
       operationId: getNotification
@@ -1273,7 +1273,7 @@ paths:
       required: true
       schema:
         type: string
-      example: fe40dc5793084f7dbb685cffe6a5ad2a
+      example: e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2
     get:
       summary: Get an integration flow by ID
       operationId: getIntegrationFlowById
@@ -1337,7 +1337,7 @@ paths:
       required: true
       schema:
         type: string
-      example: fe40dc5793084f7dbb685cffe6a5ad2a
+      example: e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2
     post:
       summary: Run an integration flow
       operationId: runIntegrationFlow
@@ -1584,7 +1584,7 @@ components:
         integrationId:
           type: string
           description: 32-character lowercase hex string uniquely identifying this integration.
-          example: fe40dc5793084f7dbb685cffe6a5ad2a
+          example: e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2
         name:
           type: string
         integrationType:
@@ -1748,7 +1748,7 @@ components:
           items:
             type: string
           example:
-          - 214a2ac51e5a479aafd49e9228334515
+          - e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b4
         channels:
           type: array
           description: Notification channels.

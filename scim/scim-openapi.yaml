@@ -476,7 +476,7 @@ components:
               value:
                 type: string
                 description: The target resource ID of the entitlement.
-                example: 8a81b09c7da2421f017da9c9742b3a44
+                example: a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4
               display:
                 type: string
                 description: Human-readable name of the entitlement.
