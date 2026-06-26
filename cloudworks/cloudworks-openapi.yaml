@@ -304,9 +304,11 @@ paths:
     parameters:
     - name: connectionId
       in: path
+      description: Connection identifier. From `GET /integrations/connections`.
       required: true
       schema:
         type: string
+      example: b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5
     put:
       summary: Edit a connection
       operationId: editConnection
@@ -514,12 +516,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
   /integrations/{integrationId}:
     parameters:
-    - name: integrationId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2
+    - $ref: '#/components/parameters/IntegrationId'
     get:
       summary: Get integration by ID
       operationId: getIntegrationById
@@ -604,7 +601,7 @@ paths:
     parameters:
     - name: modelId
       in: path
-      description: Anaplan model ID.
+      description: Anaplan model ID. From `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2).
       required: true
       schema:
         type: string
@@ -636,12 +633,7 @@ paths:
           $ref: '#/components/responses/NotFound'
   /integrations/{integrationId}/run:
     parameters:
-    - name: integrationId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2
+    - $ref: '#/components/parameters/IntegrationId'
     post:
       summary: Run an integration
       operationId: runIntegration
@@ -682,12 +674,7 @@ paths:
           $ref: '#/components/responses/ServiceUnavailable'
   /integrations/{integrationId}/cancel:
     parameters:
-    - name: integrationId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2
+    - $ref: '#/components/parameters/IntegrationId'
     post:
       summary: Cancel a running integration
       operationId: cancelIntegration
@@ -709,12 +696,7 @@ paths:
           $ref: '#/components/responses/NotFound'
   /integrations/{integrationId}/schedule:
     parameters:
-    - name: integrationId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2
+    - $ref: '#/components/parameters/IntegrationId'
     post:
       summary: Create an integration schedule
       description: 'Create a schedule for an integration. Supports a maximum of one schedule per integration. Schedule types:
@@ -784,12 +766,7 @@ paths:
           $ref: '#/components/responses/NotFound'
   /integrations/{integrationId}/schedule/status/{status}:
     parameters:
-    - name: integrationId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2
+    - $ref: '#/components/parameters/IntegrationId'
     - name: status
       in: path
       description: Desired schedule status.
@@ -814,12 +791,7 @@ paths:
           $ref: '#/components/responses/NotFound'
   /integrations/runs/{integrationId}:
     parameters:
-    - name: integrationId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2
+    - $ref: '#/components/parameters/IntegrationId'
     get:
       summary: Get integration run history
       operationId: getRunHistory
@@ -905,12 +877,7 @@ paths:
           $ref: '#/components/responses/NotFound'
   /integrations/runerror/{runId}:
     parameters:
-    - name: runId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: hy40d89893084f0dkb985cmme9i5io2a
+    - $ref: '#/components/parameters/RunId'
     get:
       summary: Get integration run errors
       operationId: getRunErrors
@@ -1011,6 +978,7 @@ paths:
     parameters:
     - name: notificationId
       in: path
+      description: Notification configuration identifier. From `GET /integrations/notification`.
       required: true
       schema:
         type: string
@@ -1072,12 +1040,7 @@ paths:
           $ref: '#/components/responses/NotFound'
   /integrations/run/{runId}/dumps:
     parameters:
-    - name: runId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: hy40d89893084f0dkb985cmme9i5io2a
+    - $ref: '#/components/parameters/RunId'
     get:
       summary: Get an import error log
       description: Retrieve the import error log (dump file) for a specific run. The response body contains a CSV-formatted
@@ -1101,15 +1064,10 @@ paths:
           $ref: '#/components/responses/NotFound'
   /integrations/run/{runId}/process/import/{actionId}/dumps:
     parameters:
-    - name: runId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: hy40d89893084f0dkb985cmme9i5io2a
+    - $ref: '#/components/parameters/RunId'
     - name: actionId
       in: path
-      description: Anaplan action ID.
+      description: Anaplan action ID. From `GET /models/{modelId}/actions` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2).
       required: true
       schema:
         type: string
@@ -1268,12 +1226,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
   /integrationflows/{integrationFlowId}:
     parameters:
-    - name: integrationFlowId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2
+    - $ref: '#/components/parameters/IntegrationFlowId'
     get:
       summary: Get an integration flow by ID
       operationId: getIntegrationFlowById
@@ -1332,12 +1285,7 @@ paths:
           $ref: '#/components/responses/NotFound'
   /integrationflows/{integrationFlowId}/run:
     parameters:
-    - name: integrationFlowId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2
+    - $ref: '#/components/parameters/IntegrationFlowId'
     post:
       summary: Run an integration flow
       operationId: runIntegrationFlow
@@ -2044,3 +1992,28 @@ components:
     BearerAuth:
       type: http
       scheme: bearer
+  parameters:
+    RunId:
+      name: runId
+      in: path
+      description: Integration run identifier. From `GET /integrations/runs/{integrationId}`.
+      required: true
+      schema:
+        type: string
+      example: hy40d89893084f0dkb985cmme9i5io2a
+    IntegrationId:
+      name: integrationId
+      in: path
+      description: Integration identifier. From `GET /integrations`.
+      required: true
+      schema:
+        type: string
+      example: e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2
+    IntegrationFlowId:
+      name: integrationFlowId
+      in: path
+      description: Integration flow identifier. From `GET /integrationflows`.
+      required: true
+      schema:
+        type: string
+      example: e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2

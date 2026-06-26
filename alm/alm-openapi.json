@@ -67,14 +67,7 @@
     "/models/{modelId}/onlineStatus": {
       "parameters": [
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          }
+          "$ref": "#/components/parameters/ModelId"
         }
       ],
       "post": {
@@ -145,14 +138,7 @@
     "/models/{modelId}/alm/syncableRevisions": {
       "parameters": [
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          }
+          "$ref": "#/components/parameters/ModelId"
         }
       ],
       "get": {
@@ -163,7 +149,7 @@
           {
             "name": "sourceModelId",
             "in": "query",
-            "description": "Model identifier (32-character uppercase hex string) of the source model whose revisions to evaluate.",
+            "description": "Model identifier (32-character uppercase hex string) of the source model whose revisions to evaluate. From `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2).",
             "required": true,
             "schema": {
               "type": "string",
@@ -194,14 +180,7 @@
     "/models/{modelId}/alm/latestRevision": {
       "parameters": [
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          }
+          "$ref": "#/components/parameters/ModelId"
         }
       ],
       "get": {
@@ -231,14 +210,7 @@
     "/models/{modelId}/alm/revisions": {
       "parameters": [
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          }
+          "$ref": "#/components/parameters/ModelId"
         }
       ],
       "get": {
@@ -351,24 +323,18 @@
     "/models/{modelId}/alm/revisions/{revisionId}/appliedToModels": {
       "parameters": [
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          }
+          "$ref": "#/components/parameters/ModelId"
         },
         {
           "name": "revisionId",
           "in": "path",
-          "description": "Revision identifier (32-character uppercase hex string).",
+          "description": "Revision identifier (32-character uppercase hex string). From `GET /models/{modelId}/alm/revisions`.",
           "required": true,
           "schema": {
             "type": "string",
             "pattern": "^[0-9A-F]{32}$"
-          }
+          },
+          "example": "B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4E5"
         }
       ],
       "get": {
@@ -398,14 +364,7 @@
     "/models/{modelId}/alm/syncTasks": {
       "parameters": [
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          }
+          "$ref": "#/components/parameters/ModelId"
         }
       ],
       "get": {
@@ -474,24 +433,18 @@
     "/models/{modelId}/alm/syncTasks/{syncTaskId}": {
       "parameters": [
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          }
+          "$ref": "#/components/parameters/ModelId"
         },
         {
           "name": "syncTaskId",
           "in": "path",
-          "description": "Sync task identifier (32-character uppercase hex string).",
+          "description": "Sync task identifier (32-character uppercase hex string). Returned by `POST /models/{modelId}/alm/syncTasks`.",
           "required": true,
           "schema": {
             "type": "string",
             "pattern": "^[0-9A-F]{32}$"
-          }
+          },
+          "example": "0A1B2C3D4E5F0A1B2C3D4E5F0A1B2C3D"
         }
       ],
       "get": {
@@ -521,14 +474,7 @@
     "/models/{modelId}/alm/comparisonReportTasks": {
       "parameters": [
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          }
+          "$ref": "#/components/parameters/ModelId"
         }
       ],
       "post": {
@@ -571,24 +517,10 @@
     "/models/{modelId}/alm/comparisonReportTasks/{taskId}": {
       "parameters": [
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          }
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "taskId",
-          "in": "path",
-          "description": "Report task identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          }
+          "$ref": "#/components/parameters/TaskId"
         }
       ],
       "get": {
@@ -618,34 +550,13 @@
     "/models/{modelId}/alm/comparisonReports/{targetRevisionId}/{sourceRevisionId}": {
       "parameters": [
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          }
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "targetRevisionId",
-          "in": "path",
-          "description": "Target revision identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          }
+          "$ref": "#/components/parameters/TargetRevisionId"
         },
         {
-          "name": "sourceRevisionId",
-          "in": "path",
-          "description": "Source revision identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          }
+          "$ref": "#/components/parameters/SourceRevisionId"
         }
       ],
       "get": {
@@ -676,14 +587,7 @@
     "/models/{modelId}/alm/summaryReportTasks": {
       "parameters": [
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          }
+          "$ref": "#/components/parameters/ModelId"
         }
       ],
       "post": {
@@ -726,24 +630,10 @@
     "/models/{modelId}/alm/summaryReportTasks/{taskId}": {
       "parameters": [
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          }
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "taskId",
-          "in": "path",
-          "description": "Report task identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          }
+          "$ref": "#/components/parameters/TaskId"
         }
       ],
       "get": {
@@ -773,34 +663,13 @@
     "/models/{modelId}/alm/summaryReports/{targetRevisionId}/{sourceRevisionId}": {
       "parameters": [
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          }
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "targetRevisionId",
-          "in": "path",
-          "description": "Target revision identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          }
+          "$ref": "#/components/parameters/TargetRevisionId"
         },
         {
-          "name": "sourceRevisionId",
-          "in": "path",
-          "description": "Source revision identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          }
+          "$ref": "#/components/parameters/SourceRevisionId"
         }
       ],
       "get": {
@@ -1242,6 +1111,52 @@
         "type": "http",
         "scheme": "bearer",
         "description": "Bearer token auth, interchangeable with AnaplanAuthToken on ALM."
+      }
+    },
+    "parameters": {
+      "TaskId": {
+        "name": "taskId",
+        "in": "path",
+        "description": "Report task identifier (32-character uppercase hex string). Returned by `POST /models/{modelId}/alm/comparisonReportTasks` or `POST /models/{modelId}/alm/summaryReportTasks`.",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9A-F]{32}$"
+        },
+        "example": "F1E2D3C4B5A6F1E2D3C4B5A6F1E2D3C4"
+      },
+      "TargetRevisionId": {
+        "name": "targetRevisionId",
+        "in": "path",
+        "description": "Target revision identifier (32-character uppercase hex string). From `GET /models/{modelId}/alm/revisions`.",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9A-F]{32}$"
+        },
+        "example": "C3D4E5F6A1B2C3D4E5F6A1B2C3D4E5F6"
+      },
+      "ModelId": {
+        "name": "modelId",
+        "in": "path",
+        "description": "Model identifier (32-character uppercase hex string). From `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2).",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9A-F]{32}$"
+        },
+        "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+      },
+      "SourceRevisionId": {
+        "name": "sourceRevisionId",
+        "in": "path",
+        "description": "Source revision identifier (32-character uppercase hex string). From `GET /models/{modelId}/alm/revisions`.",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9A-F]{32}$"
+        },
+        "example": "D4E5F6A1B2C3D4E5F6A1B2C3D4E5F6A1"
       }
     }
   }

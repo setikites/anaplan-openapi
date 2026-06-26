@@ -34,13 +34,7 @@ security:
 paths:
   /models/{modelId}/onlineStatus:
     parameters:
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
+    - $ref: '#/components/parameters/ModelId'
     post:
       summary: Change a model's online status
       description: Set a model online or offline. Requires Workspace Administrator role. Returns 400 if the status value is
@@ -86,13 +80,7 @@ paths:
           description: Model is archived.
   /models/{modelId}/alm/syncableRevisions:
     parameters:
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
+    - $ref: '#/components/parameters/ModelId'
     get:
       summary: Retrieve compatible source model revisions
       description: Returns the list of revisions from the source model that are compatible with the target model, ordered
@@ -102,6 +90,7 @@ paths:
       - name: sourceModelId
         in: query
         description: Model identifier (32-character uppercase hex string) of the source model whose revisions to evaluate.
+          From `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2).
         required: true
         schema:
           type: string
@@ -119,13 +108,7 @@ paths:
           description: Model not found or caller has no access.
   /models/{modelId}/alm/latestRevision:
     parameters:
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
+    - $ref: '#/components/parameters/ModelId'
     get:
       summary: Retrieve latest revision
       description: Returns the most recent revision for the model, if one exists. Requires Workspace Administrator role.
@@ -143,13 +126,7 @@ paths:
           description: Model not found or caller has no access.
   /models/{modelId}/alm/revisions:
     parameters:
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
+    - $ref: '#/components/parameters/ModelId'
     get:
       summary: Retrieve revisions in a model
       description: Returns all revisions for the model with optional date filtering and pagination. Requires Workspace Administrator
@@ -222,20 +199,15 @@ paths:
           description: Model is archived.
   /models/{modelId}/alm/revisions/{revisionId}/appliedToModels:
     parameters:
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
+    - $ref: '#/components/parameters/ModelId'
     - name: revisionId
       in: path
-      description: Revision identifier (32-character uppercase hex string).
+      description: Revision identifier (32-character uppercase hex string). From `GET /models/{modelId}/alm/revisions`.
       required: true
       schema:
         type: string
         pattern: ^[0-9A-F]{32}$
+      example: B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4E5
     get:
       summary: Retrieve the models for a specific revision
       description: 'Returns all models that have had this revision applied. Deleted models are included with `modelDeleted:
@@ -254,13 +226,7 @@ paths:
           description: Model or revision not found.
   /models/{modelId}/alm/syncTasks:
     parameters:
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
+    - $ref: '#/components/parameters/ModelId'
     get:
       summary: Retrieve sync tasks for a model
       description: Returns sync tasks that are in progress or completed within the last 48 hours. Up to ~20,000 results are
@@ -305,20 +271,15 @@ paths:
           description: Model is archived.
   /models/{modelId}/alm/syncTasks/{syncTaskId}:
     parameters:
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
+    - $ref: '#/components/parameters/ModelId'
     - name: syncTaskId
       in: path
-      description: Sync task identifier (32-character uppercase hex string).
+      description: Sync task identifier (32-character uppercase hex string). Returned by `POST /models/{modelId}/alm/syncTasks`.
       required: true
       schema:
         type: string
         pattern: ^[0-9A-F]{32}$
+      example: 0A1B2C3D4E5F0A1B2C3D4E5F0A1B2C3D
     get:
       summary: Retrieve model sync task info
       description: 'Returns the current status and result of a sync task. Task states: `IN_PROGRESS`, `COMPLETE`. On failure,
@@ -337,13 +298,7 @@ paths:
           description: Model or sync task not found.
   /models/{modelId}/alm/comparisonReportTasks:
     parameters:
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
+    - $ref: '#/components/parameters/ModelId'
     post:
       summary: Create a full comparison report generation task
       description: Starts an asynchronous task to generate a full comparison report between a source revision and the target
@@ -371,20 +326,8 @@ paths:
           description: Model is archived.
   /models/{modelId}/alm/comparisonReportTasks/{taskId}:
     parameters:
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-    - name: taskId
-      in: path
-      description: Report task identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/TaskId'
     get:
       summary: Retrieve full comparison report task info
       description: Returns the status of a comparison report generation task. On success, `result.successful` is true and
@@ -403,27 +346,9 @@ paths:
           description: Model or task not found.
   /models/{modelId}/alm/comparisonReports/{targetRevisionId}/{sourceRevisionId}:
     parameters:
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-    - name: targetRevisionId
-      in: path
-      description: Target revision identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-    - name: sourceRevisionId
-      in: path
-      description: Source revision identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/TargetRevisionId'
+    - $ref: '#/components/parameters/SourceRevisionId'
     get:
       summary: Retrieve full comparison report content
       description: 'Downloads the full comparison report as a tab-separated values (TSV) file. The report is available for
@@ -444,13 +369,7 @@ paths:
           description: Report not found or has expired (reports expire after 48 hours).
   /models/{modelId}/alm/summaryReportTasks:
     parameters:
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
+    - $ref: '#/components/parameters/ModelId'
     post:
       summary: Create a summary report generation task
       description: Starts an asynchronous task to generate a summary report between a source revision and the target model's
@@ -477,20 +396,8 @@ paths:
           description: Model is archived.
   /models/{modelId}/alm/summaryReportTasks/{taskId}:
     parameters:
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-    - name: taskId
-      in: path
-      description: Report task identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/TaskId'
     get:
       summary: Retrieve summary report task info
       description: Returns the status of a summary report generation task. On success, `result.successful` is true and `result.reportFileUrl`
@@ -509,27 +416,9 @@ paths:
           description: Model or task not found.
   /models/{modelId}/alm/summaryReports/{targetRevisionId}/{sourceRevisionId}:
     parameters:
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-    - name: targetRevisionId
-      in: path
-      description: Target revision identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-    - name: sourceRevisionId
-      in: path
-      description: Source revision identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/TargetRevisionId'
+    - $ref: '#/components/parameters/SourceRevisionId'
     get:
       summary: Retrieve summary report content
       description: Downloads the summary report as JSON. The report is available for 48 hours after generation. Change types
@@ -840,3 +729,41 @@ components:
       type: http
       scheme: bearer
       description: Bearer token auth, interchangeable with AnaplanAuthToken on ALM.
+  parameters:
+    TaskId:
+      name: taskId
+      in: path
+      description: Report task identifier (32-character uppercase hex string). Returned by `POST /models/{modelId}/alm/comparisonReportTasks`
+        or `POST /models/{modelId}/alm/summaryReportTasks`.
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9A-F]{32}$
+      example: F1E2D3C4B5A6F1E2D3C4B5A6F1E2D3C4
+    TargetRevisionId:
+      name: targetRevisionId
+      in: path
+      description: Target revision identifier (32-character uppercase hex string). From `GET /models/{modelId}/alm/revisions`.
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9A-F]{32}$
+      example: C3D4E5F6A1B2C3D4E5F6A1B2C3D4E5F6
+    ModelId:
+      name: modelId
+      in: path
+      description: Model identifier (32-character uppercase hex string). From `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2).
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9A-F]{32}$
+      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
+    SourceRevisionId:
+      name: sourceRevisionId
+      in: path
+      description: Source revision identifier (32-character uppercase hex string). From `GET /models/{modelId}/alm/revisions`.
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9A-F]{32}$
+      example: D4E5F6A1B2C3D4E5F6A1B2C3D4E5F6A1
