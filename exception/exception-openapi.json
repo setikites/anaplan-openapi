@@ -69,12 +69,13 @@
         {
           "name": "userGuid",
           "in": "path",
-          "description": "GUID of the user whose exception-user status is being changed.",
+          "description": "GUID of the user whose exception-user status is being changed. From `POST /permissions/exception-users/search`.",
           "required": true,
           "schema": {
             "type": "string",
             "pattern": "^[0-9a-f]{32}$"
-          }
+          },
+          "example": "7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d"
         }
       ],
       "patch": {

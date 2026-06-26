@@ -20,14 +20,7 @@
     "/odata/{tableName}": {
       "parameters": [
         {
-          "name": "tableName",
-          "in": "path",
-          "description": "Name of the client schema staging table.",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "example": "Consolidation"
-          }
+          "$ref": "#/components/parameters/TableName"
         },
         {
           "$ref": "#/components/parameters/TenantHeader"
@@ -316,24 +309,10 @@
     "/process/start/{path}/{name_of_workflow}": {
       "parameters": [
         {
-          "name": "path",
-          "in": "path",
-          "description": "Path to the workflow file in Explorer. May include nested folders separated by `/`.",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "example": "ImportsandExports"
-          }
+          "$ref": "#/components/parameters/WorkflowPath"
         },
         {
-          "name": "name_of_workflow",
-          "in": "path",
-          "description": "Name of the workflow file in Explorer. Avoid special characters such as `?`, `&`, and `/`.",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "example": "ModelExport"
-          }
+          "$ref": "#/components/parameters/WorkflowName"
         },
         {
           "$ref": "#/components/parameters/TenantHeader"
@@ -375,24 +354,10 @@
     "/process/stop/{path}/{name_of_workflow}": {
       "parameters": [
         {
-          "name": "path",
-          "in": "path",
-          "description": "Path to the workflow file in Explorer. May include nested folders separated by `/`.",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "example": "ImportsandExports"
-          }
+          "$ref": "#/components/parameters/WorkflowPath"
         },
         {
-          "name": "name_of_workflow",
-          "in": "path",
-          "description": "Name of the workflow file in Explorer. Avoid special characters such as `?`, `&`, and `/`.",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "example": "ModelExport"
-          }
+          "$ref": "#/components/parameters/WorkflowName"
         },
         {
           "$ref": "#/components/parameters/TenantHeader"
@@ -421,24 +386,10 @@
     "/process/state/{path}/{name_of_workflow}": {
       "parameters": [
         {
-          "name": "path",
-          "in": "path",
-          "description": "Path to the workflow file in Explorer. May include nested folders separated by `/`.",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "example": "Workflows/Other"
-          }
+          "$ref": "#/components/parameters/WorkflowPath"
         },
         {
-          "name": "name_of_workflow",
-          "in": "path",
-          "description": "Name of the workflow file in Explorer.",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "example": "Compliance"
-          }
+          "$ref": "#/components/parameters/WorkflowName"
         },
         {
           "$ref": "#/components/parameters/TenantHeader"
@@ -509,9 +460,9 @@
           "description": "The name of the model within the tenant.",
           "required": true,
           "schema": {
-            "type": "string",
-            "example": "Consolidation"
-          }
+            "type": "string"
+          },
+          "example": "Consolidation"
         },
         {
           "$ref": "#/components/parameters/TenantHeader"
@@ -572,12 +523,12 @@
         {
           "name": "dimensionName",
           "in": "path",
-          "description": "The name of a dimension within the tenant.",
+          "description": "The name of a dimension within the tenant. From `GET /metadata/Dimensions`.",
           "required": true,
           "schema": {
-            "type": "string",
-            "example": "Account"
-          }
+            "type": "string"
+          },
+          "example": "Account"
         },
         {
           "$ref": "#/components/parameters/TenantHeader"
@@ -635,14 +586,7 @@
     "/odata/batch/{tableName}": {
       "parameters": [
         {
-          "name": "tableName",
-          "in": "path",
-          "description": "Name of the client schema staging table.",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "example": "Consolidation"
-          }
+          "$ref": "#/components/parameters/TableName"
         },
         {
           "$ref": "#/components/parameters/TenantHeader"
@@ -794,14 +738,7 @@
     "/users/{username}": {
       "parameters": [
         {
-          "name": "username",
-          "in": "path",
-          "description": "Financial Consolidation app username (not the email address).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "example": "john.doe@fluence.app"
-          }
+          "$ref": "#/components/parameters/Username"
         },
         {
           "$ref": "#/components/parameters/TenantHeader"
@@ -821,14 +758,7 @@
     "/user/{username}/roles": {
       "parameters": [
         {
-          "name": "username",
-          "in": "path",
-          "description": "Financial Consolidation app username (not the email address).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "example": "john.doe@fluence.app"
-          }
+          "$ref": "#/components/parameters/Username"
         },
         {
           "$ref": "#/components/parameters/TenantHeader"
@@ -959,6 +889,46 @@
           "type": "string",
           "example": "CustomerTenant"
         }
+      },
+      "TableName": {
+        "name": "tableName",
+        "in": "path",
+        "description": "Name of the client schema staging table.",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "example": "Consolidation"
+      },
+      "WorkflowPath": {
+        "name": "path",
+        "in": "path",
+        "description": "Path to the workflow file in Explorer. May include nested folders separated by `/`.",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "example": "ImportsandExports"
+      },
+      "WorkflowName": {
+        "name": "name_of_workflow",
+        "in": "path",
+        "description": "Name of the workflow file in Explorer.",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "example": "Compliance"
+      },
+      "Username": {
+        "name": "username",
+        "in": "path",
+        "description": "Financial Consolidation app username (not the email address). From `GET /users`.",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "example": "john.doe@fluence.app"
       }
     },
     "schemas": {
