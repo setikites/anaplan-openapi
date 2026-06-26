@@ -1,6 +1,6 @@
 # ADR 0002: Canonical Element Ordering for OpenAPI Specs
 
-**Status**: Accepted
+**Status**: Accepted (path-parameter rule superseded by ADR 0005)
 
 **Date**: 2026-06-12
 
@@ -48,7 +48,7 @@ patch
 delete
 ```
 
-Path parameters (`in: path`) must be declared once in the path item's `parameters` list, **before** any HTTP verb object. They must not be repeated inside individual operations. `components/parameters` is not used for path parameters; definitions are always inline at the path item level.
+Path parameters (`in: path`) must be declared once in the path item's `parameters` list, **before** any HTTP verb object. They must not be repeated inside individual operations. ~~`components/parameters` is not used for path parameters; definitions are always inline at the path item level.~~ **Superseded by ADR 0005**: repeated path parameters are now defined in `components/parameters` and `$ref`'d at the path item level. The path-item-level placement requirement still holds.
 
 Non-path parameters (`in: query`, `in: header`, `in: cookie`) are declared inside the operation that uses them, not at the path item level.
 

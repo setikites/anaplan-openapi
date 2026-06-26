@@ -97,11 +97,7 @@ paths:
         schema:
           type: boolean
         example: true
-      - name: s
-        in: query
-        description: Search string
-        schema:
-          type: string
+      - $ref: '#/components/parameters/Search'
       - name: sort
         in: query
         description: Sort results by object properties. Prefix with `+` for ascending or `-` for descending order.
@@ -126,14 +122,7 @@ paths:
                       $ref: '#/components/schemas/Model'
   /models/{modelId}:
     parameters:
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
+    - $ref: '#/components/parameters/ModelId'
     get:
       summary: Get single model metadata
       tags:
@@ -160,14 +149,7 @@ paths:
                     $ref: '#/components/schemas/Model'
   /models/{modelId}/actions:
     parameters:
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
+    - $ref: '#/components/parameters/ModelId'
     get:
       summary: List the actions in the model as a JSON array
       description: Model-direct form of `GET /workspaces/{workspaceId}/models/{modelId}/actions`. Returns the same response
@@ -217,14 +199,7 @@ paths:
                       $ref: '#/components/schemas/Action'
   /models/{modelId}/currentPeriod:
     parameters:
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
+    - $ref: '#/components/parameters/ModelId'
     get:
       summary: Get current period (model-scoped)
       tags:
@@ -368,20 +343,8 @@ paths:
             field simultaneously.'
   /models/{modelId}/dimensions/{dimensionId}/items:
     parameters:
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
-    - name: dimensionId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{dimensionId}}'
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/DimensionId'
     get:
       summary: 'Model-direct form: Retrieve all items in a dimension'
       description: |-
@@ -596,14 +559,7 @@ paths:
           description: more detail in path description
   /models/{modelId}/exports:
     parameters:
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
+    - $ref: '#/components/parameters/ModelId'
     get:
       summary: List the available export definitions as a JSON array
       description: Model-direct form of `GET /workspaces/{workspaceId}/models/{modelId}/exports`. Returns the same response
@@ -652,22 +608,8 @@ paths:
                       $ref: '#/components/schemas/Export'
   /models/{modelId}/exports/{exportId}:
     parameters:
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
-    - name: exportId
-      in: path
-      description: Export definition identifier (12-digit numeric, prefix 116).
-      required: true
-      schema:
-        type: string
-        pattern: ^116[0-9]{9}$
-      example: '116000000108'
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/ExportId'
     get:
       summary: Get the metadata for an export definition
       description: Model-direct form of `GET /workspaces/{workspaceId}/models/{modelId}/exports/{exportId}`. Returns the same
@@ -726,14 +668,7 @@ paths:
                     $ref: '#/components/schemas/ExportMetadata'
   /models/{modelId}/files:
     parameters:
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
+    - $ref: '#/components/parameters/ModelId'
     get:
       summary: Get a list of files
       description: |-
@@ -849,20 +784,8 @@ paths:
                       $ref: '#/components/schemas/File'
   /models/{modelId}/files/{fileId}/chunks:
     parameters:
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
-    - name: fileId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{fileId}}'
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/FileId'
     get:
       summary: Get Chunks Details (model-direct)
       description: |-
@@ -910,14 +833,7 @@ paths:
                       $ref: '#/components/schemas/Chunk'
   /models/{modelId}/imports:
     parameters:
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
+    - $ref: '#/components/parameters/ModelId'
     get:
       summary: Get a list of import actions
       description: Model-direct form of `GET /workspaces/{workspaceId}/models/{modelId}/imports`. Returns the same response
@@ -965,22 +881,8 @@ paths:
                       $ref: '#/components/schemas/Import'
   /models/{modelId}/imports/{importId}:
     parameters:
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
-    - name: importId
-      in: path
-      description: Import definition identifier (12-digit numeric, prefix 112).
-      required: true
-      schema:
-        type: string
-        pattern: ^112[0-9]{9}$
-      example: '112000001286'
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/ImportId'
     get:
       summary: Get the metadata for an import definition
       description: Model-direct form of `GET /workspaces/{workspaceId}/models/{modelId}/imports/{importId}`. Returns the same
@@ -1036,14 +938,7 @@ paths:
                     $ref: '#/components/schemas/ImportMetadata'
   /models/{modelId}/lineItems:
     parameters:
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
+    - $ref: '#/components/parameters/ModelId'
     get:
       summary: Retrieve all line items in a model
       description: |-
@@ -1141,20 +1036,8 @@ paths:
           description: more detail in path description
   /models/{modelId}/lineItems/{lineItemId}/dimensions:
     parameters:
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
-    - name: lineItemId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{lineItemId}}'
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/LineItemId'
     get:
       summary: Retrieve dimensions IDs for a line item
       description: |-
@@ -1225,26 +1108,9 @@ paths:
                       $ref: '#/components/schemas/Dimension'
   /models/{modelId}/lineItems/{lineItemId}/dimensions/{dimensionId}/items:
     parameters:
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
-    - name: lineItemId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{lineItemId}}'
-    - name: dimensionId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{dimensionId}}'
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/LineItemId'
+    - $ref: '#/components/parameters/DimensionId'
     get:
       summary: Retrieve dimension items for a line item
       description: |-
@@ -1327,14 +1193,7 @@ paths:
                       $ref: '#/components/schemas/Dimension'
   /models/{modelId}/lists:
     parameters:
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
+    - $ref: '#/components/parameters/ModelId'
     get:
       summary: 'Model-direct form: Retrieve Lists'
       description: |-
@@ -1409,20 +1268,8 @@ paths:
                       $ref: '#/components/schemas/List'
   /models/{modelId}/lists/{listId}:
     parameters:
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
-    - name: listId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{listId}}'
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/ListId'
     get:
       summary: 'Model-direct form: Retrieve list metadata'
       description: |-
@@ -1540,14 +1387,7 @@ paths:
           description: more detail in path description
   /models/{modelId}/modelCalendar:
     parameters:
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
+    - $ref: '#/components/parameters/ModelId'
     get:
       summary: Get model calendar (model-direct)
       description: |-
@@ -1591,14 +1431,7 @@ paths:
                     $ref: '#/components/schemas/ModelCalendar'
   /models/{modelId}/modelCalendar/fiscalYear:
     parameters:
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
+    - $ref: '#/components/parameters/ModelId'
     put:
       summary: Update current fiscal year
       description: |-
@@ -1702,14 +1535,7 @@ paths:
                     $ref: '#/components/schemas/ModelCalendar'
   /models/{modelId}/modules:
     parameters:
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
+    - $ref: '#/components/parameters/ModelId'
     get:
       summary: Retrieve IDs and names for all modules in a model
       description: |-
@@ -1788,20 +1614,8 @@ paths:
           description: more detail in path description
   /models/{modelId}/modules/{moduleId}/data:
     parameters:
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
-    - name: moduleId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{moduleId}}'
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/ModuleId'
     post:
       summary: Write cell data by coordinate to module
       description: |-
@@ -1925,20 +1739,8 @@ paths:
                 $ref: '#/components/schemas/WriteCellDataResponse'
   /models/{modelId}/modules/{moduleId}/lineItems:
     parameters:
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
-    - name: moduleId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{moduleId}}'
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/ModuleId'
     get:
       summary: Retrieve all line item metadata in a module
       description: |-
@@ -1978,11 +1780,7 @@ paths:
       - Model Metadata
       - Module & Saved View Metadata
       parameters:
-      - name: includeAll
-        in: query
-        schema:
-          type: boolean
-        example: true
+      - $ref: '#/components/parameters/IncludeAll'
       responses:
         '200':
           description: Response 200
@@ -2065,20 +1863,8 @@ paths:
                       $ref: '#/components/schemas/LineItem'
   /models/{modelId}/modules/{moduleId}/views:
     parameters:
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
-    - name: moduleId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{moduleId}}'
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/ModuleId'
     get:
       summary: Retrieve IDs and names for views in a module
       description: |-
@@ -2170,14 +1956,7 @@ paths:
           description: more detail in path description
   /models/{modelId}/processes:
     parameters:
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
+    - $ref: '#/components/parameters/ModelId'
     get:
       summary: List the process definitions available in a model as a JSON array
       description: Model-direct form of `GET /workspaces/{workspaceId}/models/{modelId}/processes`. Returns the same response
@@ -2223,20 +2002,8 @@ paths:
                       $ref: '#/components/schemas/Process'
   /models/{modelId}/processes/{processId}:
     parameters:
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
-    - name: processId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{processId}}'
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/ProcessId'
     get:
       summary: Retrieve metadata for a process
       description: |-
@@ -2342,14 +2109,7 @@ paths:
                     $ref: '#/components/schemas/Process'
   /models/{modelId}/versions:
     parameters:
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
+    - $ref: '#/components/parameters/ModelId'
     get:
       summary: Retrieve version metadata
       description: |-
@@ -2443,20 +2203,8 @@ paths:
                       $ref: '#/components/schemas/Version'
   /models/{modelId}/versions/{versionId}/switchover:
     parameters:
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
-    - name: versionId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{versionId}}'
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/VersionId'
     put:
       summary: Set version switchover date
       description: |-
@@ -2551,14 +2299,7 @@ paths:
                     $ref: '#/components/schemas/Switchover'
   /models/{modelId}/views:
     parameters:
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
+    - $ref: '#/components/parameters/ModelId'
     get:
       summary: 'Model-direct form: Retrieve IDs and names for all views in a model'
       description: |-
@@ -2691,20 +2432,8 @@ paths:
           description: more detail in path description
   /models/{modelId}/views/{viewId}:
     parameters:
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
-    - name: viewId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: ''
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/ViewId'
     get:
       summary: Retrieve metadata for dimensions on a view
       description: |-
@@ -2825,22 +2554,8 @@ paths:
           description: more detail in path description
   /models/{modelId}/views/{viewId}/data:
     parameters:
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string). From GET /models.
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
-    - name: viewId
-      in: path
-      description: View identifier. From GET /models/{modelId}/views (or a lineItemId from GET /models/{modelId}/modules/{moduleId}/lineItems
-        — a line item with a subsidiary view returns that view's data).
-      required: true
-      schema:
-        type: string
-      example: '102000000000'
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/ViewId'
     get:
       summary: Retrieve cell data for a view
       description: |-
@@ -3041,26 +2756,9 @@ paths:
           description: more detail in path description
   /models/{modelId}/views/{viewId}/dimensions/{dimensionId}/items:
     parameters:
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
-    - name: viewId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: ''
-    - name: dimensionId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{dimensionId}}'
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/ViewId'
+    - $ref: '#/components/parameters/DimensionId'
     get:
       summary: Retrieve selected items in a dimension
       description: |-
@@ -3147,11 +2845,7 @@ paths:
       tags:
       - User Data
       parameters:
-      - name: s
-        in: query
-        description: Search string
-        schema:
-          type: string
+      - $ref: '#/components/parameters/Search'
       - name: sort
         in: query
         description: Sort results by object properties. Prefix with `+` for ascending or `-` for descending order.
@@ -3201,7 +2895,6 @@ paths:
         | `Accept: application/json` | <br><br>*   Required<br>*   Description: This indicates the preferred response is either `application/json` format. Note that this call only outputs in `application/json` format.<br><br> |
       tags:
       - User Data
-      parameters: []
       responses:
         '200':
           description: Response 200
@@ -3218,12 +2911,7 @@ paths:
                     $ref: '#/components/schemas/User'
   /users/{userId}:
     parameters:
-    - name: userId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{userId}}'
+    - $ref: '#/components/parameters/UserId'
     get:
       summary: Retrieve user information
       description: |-
@@ -3300,16 +2988,8 @@ paths:
       tags:
       - General Workspace & Model Metadata
       parameters:
-      - name: tenantDetails
-        in: query
-        schema:
-          type: boolean
-        example: true
-      - name: s
-        in: query
-        description: Search string
-        schema:
-          type: string
+      - $ref: '#/components/parameters/TenantDetails'
+      - $ref: '#/components/parameters/Search'
       - name: sort
         in: query
         description: Sort results by object properties. Prefix with `+` for ascending or `-` for descending order.
@@ -3355,24 +3035,13 @@ paths:
                       $ref: '#/components/schemas/Workspace'
   /workspaces/{workspaceId}:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
+    - $ref: '#/components/parameters/WorkspaceId'
     get:
       summary: Get single workspace metadata
       tags:
       - General Workspace & Model Metadata
       parameters:
-      - name: tenantDetails
-        in: query
-        schema:
-          type: boolean
-        example: true
+      - $ref: '#/components/parameters/TenantDetails'
       responses:
         '200':
           description: Response 200
@@ -3391,14 +3060,7 @@ paths:
           description: Workspace not found or caller lacks Workspace Administrator role
   /workspaces/{workspaceId}/admins:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
+    - $ref: '#/components/parameters/WorkspaceId'
     get:
       summary: List workspace administrators
       description: Returns all administrators for a workspace. Requires tenant admin privilege; workspace admin access alone
@@ -3441,14 +3103,7 @@ paths:
           description: Workspace not found.
   /workspaces/{workspaceId}/bulkDeleteModels:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1
+    - $ref: '#/components/parameters/WorkspaceId'
     post:
       summary: Bulk delete models
       description: Deletes multiple models in a workspace in a single request. Models that cannot be deleted (e.g., because
@@ -3488,14 +3143,7 @@ paths:
                 modelsDeleted: 1
   /workspaces/{workspaceId}/models:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1
+    - $ref: '#/components/parameters/WorkspaceId'
     get:
       summary: List workspace models
       description: Returns models accessible to the calling user within the specified workspace. The response shape is identical
@@ -3520,22 +3168,8 @@ paths:
                       $ref: '#/components/schemas/Model'
   /workspaces/{workspaceId}/models/{modelId}/actions:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
+    - $ref: '#/components/parameters/WorkspaceId'
+    - $ref: '#/components/parameters/ModelId'
     get:
       summary: List the actions in the model as a JSON array
       description: |-
@@ -3619,28 +3253,9 @@ paths:
                       $ref: '#/components/schemas/Action'
   /workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
-    - name: actionId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{processId}}'
+    - $ref: '#/components/parameters/WorkspaceId'
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/ActionId'
     get:
       summary: Get a list of action tasks
       description: |-
@@ -3760,34 +3375,10 @@ paths:
                     $ref: '#/components/schemas/TaskWithUrl'
   /workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks/{taskId}:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
-    - name: actionId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '117000000019'
-    - name: taskId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: F37EA1512BC448D3B223431C33B844B6
+    - $ref: '#/components/parameters/WorkspaceId'
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/ActionId'
+    - $ref: '#/components/parameters/TaskId'
     get:
       summary: Get the status of an action task
       description: |-
@@ -3826,22 +3417,8 @@ paths:
                     $ref: '#/components/schemas/Task'
   /workspaces/{workspaceId}/models/{modelId}/currentPeriod:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
+    - $ref: '#/components/parameters/WorkspaceId'
+    - $ref: '#/components/parameters/ModelId'
     get:
       summary: Retrieve current period
       description: |-
@@ -4031,22 +3608,8 @@ paths:
             field simultaneously.'
   /workspaces/{workspaceId}/models/{modelId}/dashboards:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
+    - $ref: '#/components/parameters/WorkspaceId'
+    - $ref: '#/components/parameters/ModelId'
     get:
       summary: List dashboards in a model
       description: Returns all dashboards defined in the specified model.
@@ -4085,28 +3648,9 @@ paths:
                       $ref: '#/components/schemas/Dashboard'
   /workspaces/{workspaceId}/models/{modelId}/dimensions/{dimensionId}/items:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
-    - name: dimensionId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{dimensionId}}'
+    - $ref: '#/components/parameters/WorkspaceId'
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/DimensionId'
     get:
       summary: Retrieve all items in a dimension
       description: |-
@@ -4317,22 +3861,8 @@ paths:
           description: more detail in path description
   /workspaces/{workspaceId}/models/{modelId}/exports:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
+    - $ref: '#/components/parameters/WorkspaceId'
+    - $ref: '#/components/parameters/ModelId'
     get:
       summary: List the available export definitions as a JSON array
       description: |-
@@ -4413,28 +3943,9 @@ paths:
                       $ref: '#/components/schemas/Export'
   /workspaces/{workspaceId}/models/{modelId}/exports/{exportId}:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
-    - name: exportId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{exportId}}'
+    - $ref: '#/components/parameters/WorkspaceId'
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/ExportId'
     get:
       summary: Get the metadata for an export definition
       description: |-
@@ -4527,28 +4038,9 @@ paths:
                     $ref: '#/components/schemas/ExportMetadata'
   /workspaces/{workspaceId}/models/{modelId}/exports/{exportId}/tasks:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
-    - name: exportId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{exportId}}'
+    - $ref: '#/components/parameters/WorkspaceId'
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/ExportId'
     get:
       summary: Get a list of export tasks
       parameters:
@@ -4660,34 +4152,10 @@ paths:
                     $ref: '#/components/schemas/Task'
   /workspaces/{workspaceId}/models/{modelId}/exports/{exportId}/tasks/{taskId}:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
-    - name: exportId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{exportId}}'
-    - name: taskId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{taskId}}'
+    - $ref: '#/components/parameters/WorkspaceId'
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/ExportId'
+    - $ref: '#/components/parameters/TaskId'
     get:
       summary: Monitor the export tasks
       description: |-
@@ -4777,22 +4245,8 @@ paths:
                     $ref: '#/components/schemas/Task'
   /workspaces/{workspaceId}/models/{modelId}/files:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
+    - $ref: '#/components/parameters/WorkspaceId'
+    - $ref: '#/components/parameters/ModelId'
     get:
       summary: Get a list of files (workspace-scoped)
       description: |-
@@ -4872,28 +4326,9 @@ paths:
                       $ref: '#/components/schemas/File'
   /workspaces/{workspaceId}/models/{modelId}/files/{fileId}:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
-    - name: fileId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{fileId}}'
+    - $ref: '#/components/parameters/WorkspaceId'
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/FileId'
     get:
       summary: Get file metadata
       description: Returns metadata for a specific file in the model. Requires Workspace Administrator access; standard Integration
@@ -5110,28 +4545,9 @@ paths:
           description: File deleted successfully. No response body.
   /workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
-    - name: fileId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{fileId}}'
+    - $ref: '#/components/parameters/WorkspaceId'
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/FileId'
     get:
       summary: Get Chunks Details
       description: |-
@@ -5200,28 +4616,9 @@ paths:
                       $ref: '#/components/schemas/Chunk'
   /workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks/0:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
-    - name: fileId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{fileId}}'
+    - $ref: '#/components/parameters/WorkspaceId'
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/FileId'
     get:
       summary: Get the data in a chunk
       tags:
@@ -5282,28 +4679,9 @@ paths:
           description: Chunk uploaded successfully (some regions may return 200).
   /workspaces/{workspaceId}/models/{modelId}/files/{fileId}/complete:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
-    - name: fileId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{fileId}}'
+    - $ref: '#/components/parameters/WorkspaceId'
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/FileId'
     post:
       summary: Complete the upload
       description: |-
@@ -5375,22 +4753,8 @@ paths:
                     $ref: '#/components/schemas/File'
   /workspaces/{workspaceId}/models/{modelId}/imports/:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
+    - $ref: '#/components/parameters/WorkspaceId'
+    - $ref: '#/components/parameters/ModelId'
     get:
       summary: Get a list of import actions
       description: |-
@@ -5466,28 +4830,9 @@ paths:
                       $ref: '#/components/schemas/Import'
   /workspaces/{workspaceId}/models/{modelId}/imports/{importId}:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
-    - name: importId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{importId}}'
+    - $ref: '#/components/parameters/WorkspaceId'
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/ImportId'
     get:
       summary: Get the metadata for an import definition
       description: |-
@@ -5580,28 +4925,9 @@ paths:
                     $ref: '#/components/schemas/ImportMetadata'
   /workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
-    - name: importId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{importId}}'
+    - $ref: '#/components/parameters/WorkspaceId'
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/ImportId'
     get:
       summary: Get a list of the import tasks
       description: |-
@@ -5729,34 +5055,10 @@ paths:
                 $ref: '#/components/schemas/TaskWithUrl'
   /workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
-    - name: importId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{importId}}'
-    - name: taskId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{taskId}}'
+    - $ref: '#/components/parameters/WorkspaceId'
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/ImportId'
+    - $ref: '#/components/parameters/TaskId'
     get:
       summary: Monitor the import task
       description: |-
@@ -5887,34 +5189,10 @@ paths:
                     $ref: '#/components/schemas/Task'
   /workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/dump:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
-    - name: importId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{importId}}'
-    - name: taskId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{taskId}}'
+    - $ref: '#/components/parameters/WorkspaceId'
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/ImportId'
+    - $ref: '#/components/parameters/TaskId'
     get:
       summary: Check dump file for failures
       description: |-
@@ -5960,34 +5238,10 @@ paths:
           description: Dump file not found, not yet available, or has expired (48-hour TTL after last access).
   /workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/dump/chunks:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
-    - name: importId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{importId}}'
-    - name: taskId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{taskId}}'
+    - $ref: '#/components/parameters/WorkspaceId'
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/ImportId'
+    - $ref: '#/components/parameters/TaskId'
     get:
       summary: Query the number of chunks in a dump file
       description: |-
@@ -6078,34 +5332,10 @@ paths:
           description: Dump file not found or not yet available for this task.
   /workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/dump/chunks/0:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
-    - name: importId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{importId}}'
-    - name: taskId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{taskId}}'
+    - $ref: '#/components/parameters/WorkspaceId'
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/ImportId'
+    - $ref: '#/components/parameters/TaskId'
     get:
       summary: Download dump file chunks
       description: |-
@@ -6161,22 +5391,8 @@ paths:
           description: Chunk not found or dump has expired.
   /workspaces/{workspaceId}/models/{modelId}/lineItems:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
+    - $ref: '#/components/parameters/WorkspaceId'
+    - $ref: '#/components/parameters/ModelId'
     get:
       summary: 'Workspace-scoped form: Retrieve all line items in a model'
       description: |-
@@ -6276,28 +5492,9 @@ paths:
           description: more detail in path description
   /workspaces/{workspaceId}/models/{modelId}/lineItems/{lineItemId}/dimensions:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
-    - name: lineItemId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{lineItemId}}'
+    - $ref: '#/components/parameters/WorkspaceId'
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/LineItemId'
     get:
       summary: 'Workspace-scoped form: Retrieve dimensions IDs for a line item'
       description: |-
@@ -6370,34 +5567,10 @@ paths:
                       $ref: '#/components/schemas/Dimension'
   /workspaces/{workspaceId}/models/{modelId}/lineItems/{lineItemId}/dimensions/{dimensionId}/items:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
-    - name: lineItemId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{lineItemId}}'
-    - name: dimensionId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{dimensionId}}'
+    - $ref: '#/components/parameters/WorkspaceId'
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/LineItemId'
+    - $ref: '#/components/parameters/DimensionId'
     get:
       summary: 'Workspace-scoped form: Retrieve dimension items for a line item'
       description: |-
@@ -6482,22 +5655,8 @@ paths:
                       $ref: '#/components/schemas/Dimension'
   /workspaces/{workspaceId}/models/{modelId}/lists:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
+    - $ref: '#/components/parameters/WorkspaceId'
+    - $ref: '#/components/parameters/ModelId'
     get:
       summary: Retrieve Lists
       description: |-
@@ -6570,28 +5729,9 @@ paths:
                       $ref: '#/components/schemas/List'
   /workspaces/{workspaceId}/models/{modelId}/lists/{listId}:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
-    - name: listId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{listId}}'
+    - $ref: '#/components/parameters/WorkspaceId'
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/ListId'
     get:
       summary: Retrieve list metadata
       description: |-
@@ -6707,28 +5847,9 @@ paths:
           description: more detail in path description
   /workspaces/{workspaceId}/models/{modelId}/lists/{listId}/items:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
-    - name: listId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{listId}}'
+    - $ref: '#/components/parameters/WorkspaceId'
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/ListId'
     get:
       summary: Retrieve list data
       description: |-
@@ -6907,11 +6028,7 @@ paths:
       tags:
       - Transactional Read
       parameters:
-      - name: includeAll
-        in: query
-        schema:
-          type: boolean
-        example: true
+      - $ref: '#/components/parameters/IncludeAll'
       responses:
         '429':
           description: more detail in path description
@@ -7369,28 +6486,9 @@ paths:
                           description: Human-readable details about the failure.
   /workspaces/{workspaceId}/models/{modelId}/lists/{listId}/readRequests:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
-    - name: listId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '101000000001'
+    - $ref: '#/components/parameters/WorkspaceId'
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/ListId'
     post:
       summary: Start a large-list read request
       description: Initiates an asynchronous read of all items in the specified list. Poll the returned `url` until `requestState`
@@ -7423,22 +6521,8 @@ paths:
                     $ref: '#/components/schemas/ListReadRequest'
   /workspaces/{workspaceId}/models/{modelId}/modelCalendar:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
+    - $ref: '#/components/parameters/WorkspaceId'
+    - $ref: '#/components/parameters/ModelId'
     get:
       summary: Get current fiscal year
       description: |-
@@ -7554,22 +6638,8 @@ paths:
                     $ref: '#/components/schemas/ModelCalendar'
   /workspaces/{workspaceId}/models/{modelId}/modules:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
+    - $ref: '#/components/parameters/WorkspaceId'
+    - $ref: '#/components/parameters/ModelId'
     get:
       summary: 'Workspace-scoped form: Retrieve IDs and names for all modules in a model'
       description: |-
@@ -7650,28 +6720,9 @@ paths:
           description: more detail in path description
   /workspaces/{workspaceId}/models/{modelId}/modules/{moduleId}/lineItems:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
-    - name: moduleId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{moduleId}}'
+    - $ref: '#/components/parameters/WorkspaceId'
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/ModuleId'
     get:
       summary: 'Workspace-scoped form: Retrieve all line item metadata in a module'
       description: |-
@@ -7713,11 +6764,7 @@ paths:
       - Model Metadata
       - Module & Saved View Metadata
       parameters:
-      - name: includeAll
-        in: query
-        schema:
-          type: boolean
-        example: true
+      - $ref: '#/components/parameters/IncludeAll'
       responses:
         '200':
           description: Response 200
@@ -7800,28 +6847,9 @@ paths:
                       $ref: '#/components/schemas/LineItem'
   /workspaces/{workspaceId}/models/{modelId}/modules/{moduleId}/views:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
-    - name: moduleId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{moduleId}}'
+    - $ref: '#/components/parameters/WorkspaceId'
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/ModuleId'
     get:
       summary: 'Workspace-scoped form: Retrieve IDs and names for views in a module'
       description: |-
@@ -7915,22 +6943,8 @@ paths:
           description: more detail in path description
   /workspaces/{workspaceId}/models/{modelId}/processes:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
+    - $ref: '#/components/parameters/WorkspaceId'
+    - $ref: '#/components/parameters/ModelId'
     get:
       summary: List the process definitions available in a model as a JSON array
       description: |-
@@ -8010,30 +7024,9 @@ paths:
                       $ref: '#/components/schemas/Process'
   /workspaces/{workspaceId}/models/{modelId}/processes/{processId}:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
-    - name: processId
-      in: path
-      description: Process identifier (12-digit numeric, prefix 118).
-      required: true
-      schema:
-        type: string
-        pattern: ^118[0-9]{9}$
-      example: '118000000070'
+    - $ref: '#/components/parameters/WorkspaceId'
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/ProcessId'
     get:
       summary: Retrieve metadata for a process
       description: Workspace-prefixed form of `GET /models/{modelId}/processes/{processId}`. Returns the same `processMetadata`
@@ -8096,28 +7089,9 @@ paths:
                     $ref: '#/components/schemas/Process'
   /workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
-    - name: processId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{processId}}'
+    - $ref: '#/components/parameters/WorkspaceId'
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/ProcessId'
     get:
       summary: Get the list of tasks for the process
       description: |-
@@ -8244,34 +7218,10 @@ paths:
                 $ref: '#/components/schemas/TaskWithUrl'
   /workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks/{taskId}:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
-    - name: processId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{processId}}'
-    - name: taskId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{taskId}}'
+    - $ref: '#/components/parameters/WorkspaceId'
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/ProcessId'
+    - $ref: '#/components/parameters/TaskId'
     get:
       summary: Monitor the process tasks
       description: |-
@@ -8366,22 +7316,8 @@ paths:
                     $ref: '#/components/schemas/Task'
   /workspaces/{workspaceId}/models/{modelId}/versions:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
+    - $ref: '#/components/parameters/WorkspaceId'
+    - $ref: '#/components/parameters/ModelId'
     get:
       summary: Retrieve version metadata (workspace-scoped)
       description: |-
@@ -8443,22 +7379,8 @@ paths:
                       $ref: '#/components/schemas/Version'
   /workspaces/{workspaceId}/models/{modelId}/views:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
+    - $ref: '#/components/parameters/WorkspaceId'
+    - $ref: '#/components/parameters/ModelId'
     get:
       summary: Retrieve IDs and names for all views in a model
       description: |-
@@ -8589,28 +7511,9 @@ paths:
           description: more detail in path description
   /workspaces/{workspaceId}/models/{modelId}/views/{viewId}:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
-    - name: viewId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: '{{viewId}}'
+    - $ref: '#/components/parameters/WorkspaceId'
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/ViewId'
     get:
       summary: 'Workspace-scoped form: Retrieve metadata for dimensions on a view'
       description: |-
@@ -8733,28 +7636,9 @@ paths:
           description: more detail in path description
   /workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
-    - name: viewId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: ''
+    - $ref: '#/components/parameters/WorkspaceId'
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/ViewId'
     post:
       summary: Initiate long read request
       description: |-
@@ -8847,34 +7731,10 @@ paths:
                     $ref: '#/components/schemas/ViewReadRequest'
   /workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests/{requestId}:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
-    - name: viewId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: ''
-    - name: requestId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: ''
+    - $ref: '#/components/parameters/WorkspaceId'
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/ViewId'
+    - $ref: '#/components/parameters/RequestId'
     get:
       summary: Retrieve status of large read request
       description: |-
@@ -9073,40 +7933,11 @@ paths:
                   url: https://api.anaplan.com/2/0/workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests/{requestId}
   /workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests/{requestId}/pages/{pageNo}:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
-    - name: modelId
-      in: path
-      description: Model identifier (32-character uppercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9A-F]{32}$
-      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
-    - name: viewId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: ''
-    - name: requestId
-      in: path
-      required: true
-      schema:
-        type: string
-      example: ''
-    - name: pageNo
-      in: path
-      required: true
-      schema:
-        type: string
-      example: ''
+    - $ref: '#/components/parameters/WorkspaceId'
+    - $ref: '#/components/parameters/ModelId'
+    - $ref: '#/components/parameters/ViewId'
+    - $ref: '#/components/parameters/RequestId'
+    - $ref: '#/components/parameters/PageNo'
     get:
       summary: Download Pages
       description: |-
@@ -9191,14 +8022,7 @@ paths:
                 type: string
   /workspaces/{workspaceId}/visitors:
     parameters:
-    - name: workspaceId
-      in: path
-      description: Workspace identifier (32-character lowercase hex string).
-      required: true
-      schema:
-        type: string
-        pattern: ^[0-9a-f]{32}$
-      example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
+    - $ref: '#/components/parameters/WorkspaceId'
     get:
       summary: List workspace visitors
       description: Returns all visitors for a workspace. Requires tenant admin privilege; workspace admin access alone is
@@ -9235,6 +8059,157 @@ paths:
         '404':
           description: Workspace not found.
 components:
+  parameters:
+    ModelId:
+      name: modelId
+      in: path
+      description: Model identifier (32-character uppercase hex string). From GET /models.
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9A-F]{32}$
+      example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
+    DimensionId:
+      name: dimensionId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: '{{dimensionId}}'
+    ExportId:
+      name: exportId
+      in: path
+      description: Export definition identifier (12-digit numeric, prefix 116).
+      required: true
+      schema:
+        type: string
+      example: '116000000108'
+    FileId:
+      name: fileId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: '{{fileId}}'
+    ImportId:
+      name: importId
+      in: path
+      description: Import definition identifier (12-digit numeric, prefix 112).
+      required: true
+      schema:
+        type: string
+      example: '112000001286'
+    LineItemId:
+      name: lineItemId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: '{{lineItemId}}'
+    ListId:
+      name: listId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: '{{listId}}'
+    ModuleId:
+      name: moduleId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: '{{moduleId}}'
+    ProcessId:
+      name: processId
+      in: path
+      description: Process identifier (12-digit numeric, prefix 118).
+      required: true
+      schema:
+        type: string
+      example: '{{processId}}'
+    VersionId:
+      name: versionId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: '{{versionId}}'
+    ViewId:
+      name: viewId
+      in: path
+      description: View identifier. From GET /models/{modelId}/views (or a lineItemId from GET /models/{modelId}/modules/{moduleId}/lineItems
+        — a line item with a subsidiary view returns that view's data).
+      required: true
+      schema:
+        type: string
+      example: ''
+    UserId:
+      name: userId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9a-f]{32}$
+      example: '{{userId}}'
+    WorkspaceId:
+      name: workspaceId
+      in: path
+      description: Workspace identifier (32-character lowercase hex string).
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9a-f]{32}$
+      example: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
+    ActionId:
+      name: actionId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: '{{processId}}'
+    TaskId:
+      name: taskId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: F37EA1512BC448D3B223431C33B844B6
+    RequestId:
+      name: requestId
+      in: path
+      required: true
+      schema:
+        type: string
+      example: ''
+    PageNo:
+      name: pageNo
+      in: path
+      required: true
+      schema:
+        type: string
+      example: ''
+    Search:
+      name: s
+      in: query
+      description: Search string
+      required: false
+      schema:
+        type: string
+    TenantDetails:
+      name: tenantDetails
+      in: query
+      required: false
+      schema:
+        type: boolean
+      example: true
+    IncludeAll:
+      name: includeAll
+      in: query
+      required: false
+      schema:
+        type: boolean
+      example: true
   securitySchemes:
     AnaplanAuthToken:
       type: apiKey
