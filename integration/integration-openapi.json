@@ -7745,11 +7745,13 @@
               "endDate": {
                 "type": "string"
               },
-              "fiscalYearLabel": {
-                "type": "string"
-              },
               "startDate": {
                 "type": "string"
+              },
+              "year": {
+                "type": "string",
+                "description": "The current fiscal year label, in the model's calendar format (for example, FY21).",
+                "example": "FY21"
               }
             },
             "type": "object"
