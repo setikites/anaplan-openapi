@@ -2827,7 +2827,7 @@ paths:
     parameters:
     - name: modelId
       in: path
-      description: Model identifier (32-character uppercase hex string).
+      description: Model identifier (32-character uppercase hex string). From GET /models.
       required: true
       schema:
         type: string
@@ -2835,10 +2835,12 @@ paths:
       example: A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4
     - name: viewId
       in: path
+      description: View identifier. From GET /models/{modelId}/views (or a lineItemId from GET /models/{modelId}/modules/{moduleId}/lineItems
+        — a line item with a subsidiary view returns that view's data).
       required: true
       schema:
         type: string
-      example: ''
+      example: '102000000000'
     get:
       summary: Retrieve cell data for a view
       description: |-
@@ -2977,10 +2979,26 @@ paths:
       tags:
       - Transactional Read
       parameters:
-      - name: format
-        in: query
+      - name: Accept
+        in: header
+        description: Response format. `text/csv` (default) returns a CSV grid; `application/json` returns structured cell
+          data (also requires query parameter format=v1). Append `;escaped=true` to quote sensitive CSV fields; some tenants
+          block plain text/csv for security and require the escaped form.
+        required: false
         schema:
           type: string
+          enum:
+          - text/csv
+          - text/csv;escaped=true
+          - application/json
+          default: text/csv
+      - name: format
+        in: query
+        description: 'Set to `v1` together with Accept: application/json to receive JSON. Ignored for CSV responses.'
+        schema:
+          type: string
+          enum:
+          - v1
         example: v1
       - name: pages
         in: query
@@ -7050,66 +7068,14 @@ paths:
       parameters:
       - name: action
         in: query
-        required: true
         description: 'Operation to perform: `add` appends new items, `delete` removes items identified by name, code, or id.'
+        required: true
         schema:
           type: string
           enum:
           - add
           - delete
         example: add
-      responses:
-        '200':
-          description: Operation completed; per-item failures reported inline
-          content:
-            application/json:
-              example:
-                meta:
-                  schema: https://api.anaplan.com/2/0/objects/list
-                status:
-                  code: 200
-                  message: Success
-                added: 1
-                ignored: 1
-                total: 2
-                failures:
-                - requestIndex: 1
-                  failureType: INCORRECT_FORMAT
-                  failureMessageDetails: incorrect format -- column name:p-number, value:wrong value for number
-              schema:
-                type: object
-                properties:
-                  meta:
-                    $ref: '#/components/schemas/Meta'
-                  status:
-                    $ref: '#/components/schemas/Status'
-                  added:
-                    type: integer
-                    description: Number of items successfully added. Present when action=add.
-                  ignored:
-                    type: integer
-                    description: Number of items not processed due to validation failures.
-                  total:
-                    type: integer
-                    description: Total number of items in the request.
-                  failures:
-                    type: array
-                    description: Per-item failure details. Omitted from response when all items were added successfully.
-                    items:
-                      type: object
-                      properties:
-                        requestIndex:
-                          type: integer
-                          description: Zero-based index of the failed item in the request array.
-                        failureType:
-                          type: string
-                          description: Failure category (e.g. INCORRECT_FORMAT, INCOMPLETE_DATA).
-                        failureMessageDetails:
-                          type: string
-                          description: Human-readable details about the failure.
-                  deleted:
-                    description: Number of items successfully deleted. Present when action=delete.
-                    type: integer
       requestBody:
         required: true
         content:
@@ -7162,6 +7128,58 @@ paths:
                   p-period: Sep 20
                 subsets:
                   s11: true
+      responses:
+        '200':
+          description: Operation completed; per-item failures reported inline
+          content:
+            application/json:
+              example:
+                meta:
+                  schema: https://api.anaplan.com/2/0/objects/list
+                status:
+                  code: 200
+                  message: Success
+                added: 1
+                ignored: 1
+                total: 2
+                failures:
+                - requestIndex: 1
+                  failureType: INCORRECT_FORMAT
+                  failureMessageDetails: incorrect format -- column name:p-number, value:wrong value for number
+              schema:
+                type: object
+                properties:
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                  status:
+                    $ref: '#/components/schemas/Status'
+                  added:
+                    type: integer
+                    description: Number of items successfully added. Present when action=add.
+                  ignored:
+                    type: integer
+                    description: Number of items not processed due to validation failures.
+                  total:
+                    type: integer
+                    description: Total number of items in the request.
+                  failures:
+                    type: array
+                    description: Per-item failure details. Omitted from response when all items were added successfully.
+                    items:
+                      type: object
+                      properties:
+                        requestIndex:
+                          type: integer
+                          description: Zero-based index of the failed item in the request array.
+                        failureType:
+                          type: string
+                          description: Failure category (e.g. INCORRECT_FORMAT, INCOMPLETE_DATA).
+                        failureMessageDetails:
+                          type: string
+                          description: Human-readable details about the failure.
+                  deleted:
+                    description: Number of items successfully deleted. Present when action=delete.
+                    type: integer
     put:
       summary: Update list items
       description: |-

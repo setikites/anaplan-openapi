@@ -2733,7 +2733,7 @@
         {
           "name": "modelId",
           "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
+          "description": "Model identifier (32-character uppercase hex string). From GET /models.",
           "required": true,
           "schema": {
             "type": "string",
@@ -2744,11 +2744,12 @@
         {
           "name": "viewId",
           "in": "path",
+          "description": "View identifier. From GET /models/{modelId}/views (or a lineItemId from GET /models/{modelId}/modules/{moduleId}/lineItems — a line item with a subsidiary view returns that view's data).",
           "required": true,
           "schema": {
             "type": "string"
           },
-          "example": ""
+          "example": "102000000000"
         }
       ],
       "get": {
@@ -2759,10 +2760,29 @@
         ],
         "parameters": [
           {
+            "name": "Accept",
+            "in": "header",
+            "description": "Response format. `text/csv` (default) returns a CSV grid; `application/json` returns structured cell data (also requires query parameter format=v1). Append `;escaped=true` to quote sensitive CSV fields; some tenants block plain text/csv for security and require the escaped form.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "text/csv",
+                "text/csv;escaped=true",
+                "application/json"
+              ],
+              "default": "text/csv"
+            }
+          },
+          {
             "name": "format",
             "in": "query",
+            "description": "Set to `v1` together with Accept: application/json to receive JSON. Ignored for CSV responses.",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "v1"
+              ]
             },
             "example": "v1"
           },
@@ -6446,8 +6466,8 @@
           {
             "name": "action",
             "in": "query",
-            "required": true,
             "description": "Operation to perform: `add` appends new items, `delete` removes items identified by name, code, or id.",
+            "required": true,
             "schema": {
               "type": "string",
               "enum": [
@@ -6458,6 +6478,80 @@
             "example": "add"
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "items"
+                ],
+                "properties": {
+                  "items": {
+                    "type": "array",
+                    "description": "Array of items to add or delete.",
+                    "items": {
+                      "type": "object",
+                      "description": "A list item. For add: provide name/code/parent/properties/subsets. For delete: identify by name, code, or id.",
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "description": "Item display name. Required for named lists when adding; used as identifier when deleting."
+                        },
+                        "code": {
+                          "type": "string",
+                          "description": "Item code. Used as primary identifier for numbered lists."
+                        },
+                        "id": {
+                          "type": "string",
+                          "description": "Item ID. Returned by GET list items; can be used as identifier when deleting."
+                        },
+                        "parent": {
+                          "type": "string",
+                          "description": "Parent item name for hierarchical lists."
+                        },
+                        "properties": {
+                          "type": "object",
+                          "description": "Custom list property values keyed by property name.",
+                          "additionalProperties": {
+                            "type": "string"
+                          }
+                        },
+                        "subsets": {
+                          "type": "object",
+                          "description": "Subset membership flags keyed by subset name.",
+                          "additionalProperties": {
+                            "type": "boolean"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "items": [
+                  {
+                    "name": "mike",
+                    "code": "id1",
+                    "parent": "west",
+                    "properties": {
+                      "p-text": "hello world",
+                      "p-number": "123456",
+                      "p-boolean": "true",
+                      "p-list": "east",
+                      "p-period": "Sep 20"
+                    },
+                    "subsets": {
+                      "s11": true
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Operation completed; per-item failures reported inline",
@@ -6530,80 +6624,6 @@
                     }
                   }
                 }
-              }
-            }
-          }
-        },
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "items"
-                ],
-                "properties": {
-                  "items": {
-                    "type": "array",
-                    "description": "Array of items to add or delete.",
-                    "items": {
-                      "type": "object",
-                      "description": "A list item. For add: provide name/code/parent/properties/subsets. For delete: identify by name, code, or id.",
-                      "properties": {
-                        "name": {
-                          "type": "string",
-                          "description": "Item display name. Required for named lists when adding; used as identifier when deleting."
-                        },
-                        "code": {
-                          "type": "string",
-                          "description": "Item code. Used as primary identifier for numbered lists."
-                        },
-                        "id": {
-                          "type": "string",
-                          "description": "Item ID. Returned by GET list items; can be used as identifier when deleting."
-                        },
-                        "parent": {
-                          "type": "string",
-                          "description": "Parent item name for hierarchical lists."
-                        },
-                        "properties": {
-                          "type": "object",
-                          "description": "Custom list property values keyed by property name.",
-                          "additionalProperties": {
-                            "type": "string"
-                          }
-                        },
-                        "subsets": {
-                          "type": "object",
-                          "description": "Subset membership flags keyed by subset name.",
-                          "additionalProperties": {
-                            "type": "boolean"
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              },
-              "example": {
-                "items": [
-                  {
-                    "name": "mike",
-                    "code": "id1",
-                    "parent": "west",
-                    "properties": {
-                      "p-text": "hello world",
-                      "p-number": "123456",
-                      "p-boolean": "true",
-                      "p-list": "east",
-                      "p-period": "Sep 20"
-                    },
-                    "subsets": {
-                      "s11": true
-                    }
-                  }
-                ]
               }
             }
           }
