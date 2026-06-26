@@ -1683,10 +1683,107 @@
       ],
       "post": {
         "summary": "Write cell data by coordinate to module",
-        "description": "Use this call to set cell values in a module.\n\nEnsure the request body is an array of `CellWrite` objects. Each object is for an updated individual cell and its full set of dimensions.\n\nThe response contains a summary of the number of cells updated successfully and the details of why some cells that could not be updated.\n\n**Notes:**\n\n*   Ensure the user has write access enabled.\n*   Ensure the request includes all of the required fields.\n*   Ensure the request has a `value` field that is either a string, number or boolean and is compatible with the line item format/data type.\n*   If one cell cannot update, the other cells in the request still continue to update.\n*   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html).\n*   Workspace administrators can import data into any cell (except aggregate cells, see below), including read-only and invisible cells.\n*   You can update a maximum of 1000 cells per request. For larger scale writes we recommend you use the import API.\n*   Write cell data does not apply to aggregate cells.\n    *   An aggregate cell is a cell where one of its dimension items has it’s own child items\n    *   This includes aggregate cells for line Items with breakback enabled\n    *   For a line Item that is dimensioned by a composite list, the only writeable cells are the child items, that are defined directly in the dimension list and not defined in a parent list.\n*   In the future, use of this call may be rate limited.\n\n### Request Body\n\n### The `CellWrite` Object\n\nEach `CellWrite` Object is a request to set a value in a cell. A cell is identified by the line item it belongs to as well as an item for each of the dimensions that apply to the line item (this includes **Time** and **Versions**).\n\n| **Field** | **Details** |\n| --- | --- |\n| `lineItemId` | <br><br>*   Required<br>*   Ensure you specify a `lineItemId` or `lineItemName` Description: The ID of the line item that belongs to the module<br><br> |\n| `lineItemName` | <br><br>*   Ensure you specify a `lineItemId` or `lineItemName`<br>*   Description: The name of the line item that belongs to the module<br><br> |\n| `dimensions` | <br><br>*   This field can be omitted if the line item is a single cell without any dimensions applied to it.<br>*   Description: An array of dimension coordinates<br><br> |\n| `dimensionId` | <br><br>*   Required  <br>    Ensure you specify a `dimensionId` or `dimensionName`<br>*   Description: The ID of the dimension that is on the line item<br><br> |\n| `dimensionName` | <br><br>*   Ensure you specify a `dimensionId` or `dimensionName`<br>*   Description: The name of the dimension that is on the line item<br><br> |\n| `itemId` | <br><br>*   Required<br>*   Description: The ID of the dimension item that is on the dimension<br><br> |\n| `itemName` | <br><br>*   Ensure you specify a `itemId`, `itemName` or `itemCode`<br>*   Description: The name of the item on the dimension<br><br> |\n| `itemCode` | <br><br>*   Ensure you specify a `itemId`, `itemName` or `itemCode`<br>*   Description: The name of the item on the dimension<br><br> |\n| `value` | <br><br>*   Required<br>*   Description: The value to set for the cell<br>*   Cannot be `null`<br><br> |",
+        "description": "Use this call to set cell values in a module.\n\nEnsure the request body is an array of `CellWrite` objects. Each object is for an updated individual cell and its full set of dimensions.\n\nThe response contains a summary of the number of cells updated successfully and the details of why some cells that could not be updated.\n\n**Notes:**\n\n*   Ensure the user has write access enabled.\n*   Ensure the request includes all of the required fields.\n*   Ensure the request has a `value` field that is either a string, number or boolean and is compatible with the line item format/data type.\n*   If one cell cannot update, the other cells in the request still continue to update.\n*   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html).\n*   Workspace administrators can import data into any cell (except aggregate cells, see below), including read-only and invisible cells.\n*   You can update a maximum of 1000 cells per request. For larger scale writes we recommend you use the import API.\n*   Write cell data does not apply to aggregate cells.\n    *   An aggregate cell is a cell where one of its dimension items has it’s own child items\n    *   This includes aggregate cells for line Items with breakback enabled\n    *   For a line Item that is dimensioned by a composite list, the only writeable cells are the child items, that are defined directly in the dimension list and not defined in a parent list.\n*   In the future, use of this call may be rate limited.",
         "tags": [
           "Transactional Write"
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CellWrite"
+                }
+              },
+              "examples": {
+                "byId": {
+                  "summary": "Identify line item and dimension items by ID",
+                  "value": [
+                    {
+                      "lineItemId": "206000000000",
+                      "dimensions": [
+                        {
+                          "dimensionId": "101000000001",
+                          "itemId": "202000000001"
+                        },
+                        {
+                          "dimensionId": "20000000003",
+                          "itemId": "5438300031"
+                        },
+                        {
+                          "dimensionId": "20000000020",
+                          "itemId": "107000000001"
+                        }
+                      ],
+                      "value": 1111
+                    },
+                    {
+                      "lineItemId": "206000000001",
+                      "dimensions": [
+                        {
+                          "dimensionId": "101000000001",
+                          "itemId": "202000000001"
+                        },
+                        {
+                          "dimensionId": "20000000003",
+                          "itemId": "5438300031"
+                        },
+                        {
+                          "dimensionId": "20000000020",
+                          "itemId": "107000000001"
+                        }
+                      ],
+                      "value": "Some text value"
+                    }
+                  ]
+                },
+                "byName": {
+                  "summary": "Identify line item and dimension items by name/code",
+                  "value": [
+                    {
+                      "lineItemName": "Products",
+                      "dimensions": [
+                        {
+                          "dimensionName": "Product",
+                          "itemCode": "SKU1234"
+                        },
+                        {
+                          "dimensionName": "Time",
+                          "itemName": "Jan 21"
+                        },
+                        {
+                          "dimensionName": "Version",
+                          "itemName": "Actual"
+                        }
+                      ],
+                      "value": 1111
+                    },
+                    {
+                      "lineItemName": "Sales",
+                      "dimensions": [
+                        {
+                          "dimensionName": "Region",
+                          "itemName": "UK"
+                        },
+                        {
+                          "dimensionName": "Time",
+                          "itemName": "Dec 21"
+                        },
+                        {
+                          "dimensionName": "Version",
+                          "itemName": "Forecast"
+                        }
+                      ],
+                      "value": "Some text value"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Cell data written successfully",
@@ -7162,11 +7259,12 @@
       "ModuleId": {
         "name": "moduleId",
         "in": "path",
+        "description": "Module identifier (12-digit numeric string, prefix 102). From GET /models/{modelId}/modules.",
         "required": true,
         "schema": {
           "type": "string"
         },
-        "example": "{{moduleId}}"
+        "example": "102000000001"
       },
       "ProcessId": {
         "name": "processId",
@@ -8037,6 +8135,67 @@
             "type": "integer"
           }
         }
+      },
+      "CellWrite": {
+        "type": "object",
+        "description": "A request to set the value of a single cell, identified by the line item it belongs to plus one coordinate for each dimension that applies to that line item (including Time and Versions).",
+        "properties": {
+          "lineItemId": {
+            "type": "string",
+            "description": "ID of the line item that belongs to the module. Specify either lineItemId or lineItemName."
+          },
+          "lineItemName": {
+            "type": "string",
+            "description": "Name of the line item that belongs to the module. Specify either lineItemId or lineItemName."
+          },
+          "dimensions": {
+            "type": "array",
+            "description": "Coordinate for each dimension that applies to the line item. May be omitted when the line item is a single cell with no dimensions.",
+            "items": {
+              "type": "object",
+              "description": "A dimension coordinate: the dimension plus the item selected on it.",
+              "properties": {
+                "dimensionId": {
+                  "type": "string",
+                  "description": "ID of the dimension on the line item. Specify either dimensionId or dimensionName."
+                },
+                "dimensionName": {
+                  "type": "string",
+                  "description": "Name of the dimension on the line item. Specify either dimensionId or dimensionName."
+                },
+                "itemId": {
+                  "type": "string",
+                  "description": "ID of the item selected on the dimension. Specify one of itemId, itemName, or itemCode."
+                },
+                "itemName": {
+                  "type": "string",
+                  "description": "Name of the item selected on the dimension. Specify one of itemId, itemName, or itemCode."
+                },
+                "itemCode": {
+                  "type": "string",
+                  "description": "Code of the item selected on the dimension. Specify one of itemId, itemName, or itemCode."
+                }
+              }
+            }
+          },
+          "value": {
+            "description": "The value to set for the cell. Must be a string, number, or boolean compatible with the line item's format/data type. Cannot be null.",
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              }
+            ]
+          }
+        },
+        "required": [
+          "value"
+        ]
       },
       "Chunk": {
         "description": "A unit of partial file content",

@@ -1209,26 +1209,59 @@ paths:
             *   This includes aggregate cells for line Items with breakback enabled
             *   For a line Item that is dimensioned by a composite list, the only writeable cells are the child items, that are defined directly in the dimension list and not defined in a parent list.
         *   In the future, use of this call may be rate limited.
-
-        ### Request Body
-
-        ### The `CellWrite` Object
-
-        Each `CellWrite` Object is a request to set a value in a cell. A cell is identified by the line item it belongs to as well as an item for each of the dimensions that apply to the line item (this includes **Time** and **Versions**).
-
-        | **Field** | **Details** |
-        | --- | --- |
-        | `lineItemId` | <br><br>*   Required<br>*   Ensure you specify a `lineItemId` or `lineItemName` Description: The ID of the line item that belongs to the module<br><br> |
-        | `lineItemName` | <br><br>*   Ensure you specify a `lineItemId` or `lineItemName`<br>*   Description: The name of the line item that belongs to the module<br><br> |
-        | `dimensions` | <br><br>*   This field can be omitted if the line item is a single cell without any dimensions applied to it.<br>*   Description: An array of dimension coordinates<br><br> |
-        | `dimensionId` | <br><br>*   Required  <br>    Ensure you specify a `dimensionId` or `dimensionName`<br>*   Description: The ID of the dimension that is on the line item<br><br> |
-        | `dimensionName` | <br><br>*   Ensure you specify a `dimensionId` or `dimensionName`<br>*   Description: The name of the dimension that is on the line item<br><br> |
-        | `itemId` | <br><br>*   Required<br>*   Description: The ID of the dimension item that is on the dimension<br><br> |
-        | `itemName` | <br><br>*   Ensure you specify a `itemId`, `itemName` or `itemCode`<br>*   Description: The name of the item on the dimension<br><br> |
-        | `itemCode` | <br><br>*   Ensure you specify a `itemId`, `itemName` or `itemCode`<br>*   Description: The name of the item on the dimension<br><br> |
-        | `value` | <br><br>*   Required<br>*   Description: The value to set for the cell<br>*   Cannot be `null`<br><br> |
       tags:
       - Transactional Write
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/CellWrite'
+            examples:
+              byId:
+                summary: Identify line item and dimension items by ID
+                value:
+                - lineItemId: '206000000000'
+                  dimensions:
+                  - dimensionId: '101000000001'
+                    itemId: '202000000001'
+                  - dimensionId: '20000000003'
+                    itemId: '5438300031'
+                  - dimensionId: '20000000020'
+                    itemId: '107000000001'
+                  value: 1111
+                - lineItemId: '206000000001'
+                  dimensions:
+                  - dimensionId: '101000000001'
+                    itemId: '202000000001'
+                  - dimensionId: '20000000003'
+                    itemId: '5438300031'
+                  - dimensionId: '20000000020'
+                    itemId: '107000000001'
+                  value: Some text value
+              byName:
+                summary: Identify line item and dimension items by name/code
+                value:
+                - lineItemName: Products
+                  dimensions:
+                  - dimensionName: Product
+                    itemCode: SKU1234
+                  - dimensionName: Time
+                    itemName: Jan 21
+                  - dimensionName: Version
+                    itemName: Actual
+                  value: 1111
+                - lineItemName: Sales
+                  dimensions:
+                  - dimensionName: Region
+                    itemName: UK
+                  - dimensionName: Time
+                    itemName: Dec 21
+                  - dimensionName: Version
+                    itemName: Forecast
+                  value: Some text value
       responses:
         '200':
           description: Cell data written successfully
@@ -5518,10 +5551,11 @@ components:
     ModuleId:
       name: moduleId
       in: path
+      description: Module identifier (12-digit numeric string, prefix 102). From GET /models/{modelId}/modules.
       required: true
       schema:
         type: string
-      example: '{{moduleId}}'
+      example: '102000000001'
     ProcessId:
       name: processId
       in: path
@@ -6135,6 +6169,49 @@ components:
           type: string
         viewId:
           type: integer
+    CellWrite:
+      type: object
+      description: A request to set the value of a single cell, identified by the line item it belongs to plus one coordinate
+        for each dimension that applies to that line item (including Time and Versions).
+      properties:
+        lineItemId:
+          type: string
+          description: ID of the line item that belongs to the module. Specify either lineItemId or lineItemName.
+        lineItemName:
+          type: string
+          description: Name of the line item that belongs to the module. Specify either lineItemId or lineItemName.
+        dimensions:
+          type: array
+          description: Coordinate for each dimension that applies to the line item. May be omitted when the line item is a
+            single cell with no dimensions.
+          items:
+            type: object
+            description: 'A dimension coordinate: the dimension plus the item selected on it.'
+            properties:
+              dimensionId:
+                type: string
+                description: ID of the dimension on the line item. Specify either dimensionId or dimensionName.
+              dimensionName:
+                type: string
+                description: Name of the dimension on the line item. Specify either dimensionId or dimensionName.
+              itemId:
+                type: string
+                description: ID of the item selected on the dimension. Specify one of itemId, itemName, or itemCode.
+              itemName:
+                type: string
+                description: Name of the item selected on the dimension. Specify one of itemId, itemName, or itemCode.
+              itemCode:
+                type: string
+                description: Code of the item selected on the dimension. Specify one of itemId, itemName, or itemCode.
+        value:
+          description: The value to set for the cell. Must be a string, number, or boolean compatible with the line item's
+            format/data type. Cannot be null.
+          oneOf:
+          - type: string
+          - type: number
+          - type: boolean
+      required:
+      - value
     Chunk:
       description: A unit of partial file content
       properties:
