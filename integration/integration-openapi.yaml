@@ -5497,7 +5497,7 @@ components:
     ModelId:
       name: modelId
       in: path
-      description: Model identifier (32-character uppercase hex string). From GET /models.
+      description: Model identifier (32-character uppercase hex string). From `GET /models` or `GET /workspaces/{workspaceId}/models`.
       required: true
       schema:
         type: string
@@ -5506,14 +5506,15 @@ components:
     DimensionId:
       name: dimensionId
       in: path
+      description: Dimension identifier. From `GET /models/{modelId}/lineItems/{lineItemId}/dimensions`.
       required: true
       schema:
         type: string
-      example: '{{dimensionId}}'
+      example: '101000000001'
     ExportId:
       name: exportId
       in: path
-      description: Export definition identifier (12-digit numeric, prefix 116).
+      description: Export definition identifier (12-digit numeric, prefix 116). From `GET /models/{modelId}/exports`.
       required: true
       schema:
         type: string
@@ -5521,14 +5522,15 @@ components:
     FileId:
       name: fileId
       in: path
+      description: File identifier (12-digit numeric, prefix 113). From `GET /models/{modelId}/files`.
       required: true
       schema:
         type: string
-      example: '{{fileId}}'
+      example: '113000000000'
     ImportId:
       name: importId
       in: path
-      description: Import definition identifier (12-digit numeric, prefix 112).
+      description: Import definition identifier (12-digit numeric, prefix 112). From `GET /models/{modelId}/imports`.
       required: true
       schema:
         type: string
@@ -5536,14 +5538,15 @@ components:
     LineItemId:
       name: lineItemId
       in: path
+      description: Line item identifier (12-digit numeric, prefix 206). From `GET /models/{modelId}/lineItems` or `GET /models/{modelId}/modules/{moduleId}/lineItems`.
       required: true
       schema:
         type: string
-      example: '{{lineItemId}}'
+      example: '206000000000'
     ListId:
       name: listId
       in: path
-      description: List identifier (12-digit numeric string, prefix 101). From GET /models/{modelId}/lists.
+      description: List identifier (12-digit numeric string, prefix 101). From `GET /models/{modelId}/lists`.
       required: true
       schema:
         type: string
@@ -5551,7 +5554,7 @@ components:
     ModuleId:
       name: moduleId
       in: path
-      description: Module identifier (12-digit numeric string, prefix 102). From GET /models/{modelId}/modules.
+      description: Module identifier (12-digit numeric string, prefix 102). From `GET /models/{modelId}/modules`.
       required: true
       schema:
         type: string
@@ -5559,39 +5562,42 @@ components:
     ProcessId:
       name: processId
       in: path
-      description: Process identifier (12-digit numeric, prefix 118).
+      description: Process identifier (12-digit numeric, prefix 118). From `GET /models/{modelId}/processes`.
       required: true
       schema:
         type: string
-      example: '{{processId}}'
+      example: '118000000001'
     VersionId:
       name: versionId
       in: path
+      description: Version identifier (12-digit numeric, prefix 107). From `GET /models/{modelId}/versions`.
       required: true
       schema:
         type: string
-      example: '{{versionId}}'
+      example: '107000000001'
     ViewId:
       name: viewId
       in: path
-      description: View identifier. From GET /models/{modelId}/views (or a lineItemId from GET /models/{modelId}/modules/{moduleId}/lineItems
-        — a line item with a subsidiary view returns that view's data).
+      description: View identifier. From `GET /models/{modelId}/views` or `GET /models/{modelId}/modules/{moduleId}/views`.
+        A line item ID from `GET /models/{modelId}/modules/{moduleId}/lineItems` also works when that line item has a subsidiary
+        view, returning that view's data.
       required: true
       schema:
         type: string
-      example: ''
+      example: '102000000000'
     UserId:
       name: userId
       in: path
+      description: User identifier (32-character hex string). From `GET /users`.
       required: true
       schema:
         type: string
         pattern: ^[0-9a-f]{32}$
-      example: '{{userId}}'
+      example: 8a8b8c8d8e8f1a2b3c4d5e6f78901234
     WorkspaceId:
       name: workspaceId
       in: path
-      description: Workspace identifier (32-character lowercase hex string).
+      description: Workspace identifier (32-character lowercase hex string). From `GET /workspaces`.
       required: true
       schema:
         type: string
@@ -5600,13 +5606,16 @@ components:
     ActionId:
       name: actionId
       in: path
+      description: Action identifier. From `GET /models/{modelId}/actions`.
       required: true
       schema:
         type: string
-      example: '{{processId}}'
+      example: '117000000019'
     TaskId:
       name: taskId
       in: path
+      description: Task identifier returned when a run is launched by `POST /workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks`
+        (or the equivalent exports, processes, or actions tasks endpoint).
       required: true
       schema:
         type: string
@@ -5614,17 +5623,19 @@ components:
     RequestId:
       name: requestId
       in: path
+      description: Read request identifier returned by `POST /workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests`.
       required: true
       schema:
         type: string
-      example: ''
+      example: 0A06B0739F0E47BB92E2326C603D86EC
     PageNo:
       name: pageNo
       in: path
+      description: Zero-based page index of a read request result set.
       required: true
       schema:
         type: string
-      example: ''
+      example: '0'
     Search:
       name: s
       in: query
