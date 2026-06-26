@@ -488,8 +488,7 @@
                   "codes": {
                     "type": "array",
                     "items": {
-                      "type": "string",
-                      "format": "utc-millisec"
+                      "type": "string"
                     }
                   },
                   "names": {
@@ -3713,8 +3712,7 @@
                   "codes": {
                     "type": "array",
                     "items": {
-                      "type": "string",
-                      "format": "utc-millisec"
+                      "type": "string"
                     }
                   },
                   "names": {
