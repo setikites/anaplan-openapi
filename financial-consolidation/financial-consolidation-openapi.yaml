@@ -16,13 +16,7 @@ security:
 paths:
   /odata/{tableName}:
     parameters:
-    - name: tableName
-      in: path
-      description: Name of the client schema staging table.
-      required: true
-      schema:
-        type: string
-        example: Consolidation
+    - $ref: '#/components/parameters/TableName'
     - $ref: '#/components/parameters/TenantHeader'
     get:
       summary: Get client schema table data
@@ -227,20 +221,8 @@ paths:
           description: Table not found.
   /process/start/{path}/{name_of_workflow}:
     parameters:
-    - name: path
-      in: path
-      description: Path to the workflow file in Explorer. May include nested folders separated by `/`.
-      required: true
-      schema:
-        type: string
-        example: ImportsandExports
-    - name: name_of_workflow
-      in: path
-      description: Name of the workflow file in Explorer. Avoid special characters such as `?`, `&`, and `/`.
-      required: true
-      schema:
-        type: string
-        example: ModelExport
+    - $ref: '#/components/parameters/WorkflowPath'
+    - $ref: '#/components/parameters/WorkflowName'
     - $ref: '#/components/parameters/TenantHeader'
     post:
       summary: Start a workflow process
@@ -267,20 +249,8 @@ paths:
           description: Workflow not found at the specified path.
   /process/stop/{path}/{name_of_workflow}:
     parameters:
-    - name: path
-      in: path
-      description: Path to the workflow file in Explorer. May include nested folders separated by `/`.
-      required: true
-      schema:
-        type: string
-        example: ImportsandExports
-    - name: name_of_workflow
-      in: path
-      description: Name of the workflow file in Explorer. Avoid special characters such as `?`, `&`, and `/`.
-      required: true
-      schema:
-        type: string
-        example: ModelExport
+    - $ref: '#/components/parameters/WorkflowPath'
+    - $ref: '#/components/parameters/WorkflowName'
     - $ref: '#/components/parameters/TenantHeader'
     post:
       summary: Stop a workflow process
@@ -297,20 +267,8 @@ paths:
           description: Workflow not found at the specified path.
   /process/state/{path}/{name_of_workflow}:
     parameters:
-    - name: path
-      in: path
-      description: Path to the workflow file in Explorer. May include nested folders separated by `/`.
-      required: true
-      schema:
-        type: string
-        example: Workflows/Other
-    - name: name_of_workflow
-      in: path
-      description: Name of the workflow file in Explorer.
-      required: true
-      schema:
-        type: string
-        example: Compliance
+    - $ref: '#/components/parameters/WorkflowPath'
+    - $ref: '#/components/parameters/WorkflowName'
     - $ref: '#/components/parameters/TenantHeader'
     get:
       summary: Get the state of a workflow process
@@ -357,7 +315,7 @@ paths:
       required: true
       schema:
         type: string
-        example: Consolidation
+      example: Consolidation
     - $ref: '#/components/parameters/TenantHeader'
     get:
       summary: Retrieve dimensions and properties within a model
@@ -397,11 +355,11 @@ paths:
     parameters:
     - name: dimensionName
       in: path
-      description: The name of a dimension within the tenant.
+      description: The name of a dimension within the tenant. From `GET /metadata/Dimensions`.
       required: true
       schema:
         type: string
-        example: Account
+      example: Account
     - $ref: '#/components/parameters/TenantHeader'
     get:
       summary: Retrieve members and properties within a dimension
@@ -438,13 +396,7 @@ paths:
           description: Dimension not found.
   /odata/batch/{tableName}:
     parameters:
-    - name: tableName
-      in: path
-      description: Name of the client schema staging table.
-      required: true
-      schema:
-        type: string
-        example: Consolidation
+    - $ref: '#/components/parameters/TableName'
     - $ref: '#/components/parameters/TenantHeader'
     post:
       summary: Add batch records to a client schema table
@@ -543,13 +495,7 @@ paths:
                 $ref: '#/components/schemas/User'
   /users/{username}:
     parameters:
-    - name: username
-      in: path
-      description: Financial Consolidation app username (not the email address).
-      required: true
-      schema:
-        type: string
-        example: john.doe@fluence.app
+    - $ref: '#/components/parameters/Username'
     - $ref: '#/components/parameters/TenantHeader'
     delete:
       summary: Delete user account from tenant
@@ -561,13 +507,7 @@ paths:
           description: User deleted (or was not found — no 404 is returned).
   /user/{username}/roles:
     parameters:
-    - name: username
-      in: path
-      description: Financial Consolidation app username (not the email address).
-      required: true
-      schema:
-        type: string
-        example: john.doe@fluence.app
+    - $ref: '#/components/parameters/Username'
     - $ref: '#/components/parameters/TenantHeader'
     get:
       summary: List roles for a user
@@ -666,6 +606,38 @@ components:
       schema:
         type: string
         example: CustomerTenant
+    TableName:
+      name: tableName
+      in: path
+      description: Name of the client schema staging table.
+      required: true
+      schema:
+        type: string
+      example: Consolidation
+    WorkflowPath:
+      name: path
+      in: path
+      description: Path to the workflow file in Explorer. May include nested folders separated by `/`.
+      required: true
+      schema:
+        type: string
+      example: ImportsandExports
+    WorkflowName:
+      name: name_of_workflow
+      in: path
+      description: Name of the workflow file in Explorer.
+      required: true
+      schema:
+        type: string
+      example: Compliance
+    Username:
+      name: username
+      in: path
+      description: Financial Consolidation app username (not the email address). From `GET /users`.
+      required: true
+      schema:
+        type: string
+      example: john.doe@fluence.app
   schemas:
     WorkflowStateResponse:
       type: object

@@ -217,12 +217,13 @@
         {
           "name": "id",
           "in": "path",
-          "description": "Anaplan-assigned hex-32 GUID of the user.",
+          "description": "Anaplan-assigned hex-32 GUID of the user. From `GET /Users`.",
           "required": true,
           "schema": {
             "type": "string",
             "pattern": "^[0-9a-f]{32}$"
-          }
+          },
+          "example": "8a8b8c8d8e8f1a2b3c4d5e6f78901234"
         }
       ],
       "get": {
