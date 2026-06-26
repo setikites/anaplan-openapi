@@ -382,6 +382,21 @@ answered by prior live probes — cross-referenced rather than re-derived.
   `expand` parameter; visitors/admins are separate workspace-scoped resources,
   not a projection of `/users` (Q5). `/users` description should point to the
   two workspace endpoints rather than imply visitor inclusion.
+- **`s` search parameter semantics** (feeds #147). Shared component, generic
+  wording (mechanics are identical across `/users`, `/workspaces`, …; only the
+  filtered noun changes, so "items" covers all). Behaviour: undocumented
+  feature, may behave unpredictably; requires the **Tenant Admin** role and is
+  **ignored for non-admin users**; case-insensitive; matches items whose name or
+  ID *contains* the string; supports SQL-LIKE wildcards `%` (0-n characters) and
+  `_` (exactly 1 character); omitted (default) returns all items. Canonical
+  shared description:
+
+  > Optional case-insensitive filter. Matches items whose name or ID contains
+  > this string. Supports wildcards `%` (0-n characters) and `_` (exactly 1
+  > character). Omit to return all items. **Undocumented and may behave
+  > unpredictably; requires the Tenant Admin role and is ignored for non-admin
+  > users.**
+
 - **`Accept`/`Content-Type` are modelled via `content` media-type maps, not
   header parameters** (Q6). OpenAPI 3.0 expresses them through
   `requestBody.content.<media-type>` and `responses.<code>.content.<media-type>`.
