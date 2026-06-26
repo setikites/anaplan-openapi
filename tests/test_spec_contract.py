@@ -202,7 +202,11 @@ def _resolve_param(spec: dict, param: dict) -> dict:
         ref = param["$ref"]
         if ref.startswith("#/components/parameters/"):
             name = ref.split("/")[-1]
-            return spec.get("components", {}).get("parameters", {}).get(name, param)
+            resolved = spec.get("components", {}).get("parameters", {}).get(name)
+            if resolved is not None:
+                # Keep $ref so tests asserting reference-by-ref still see it,
+                # while name/in/schema become visible for shape assertions.
+                return {**resolved, "$ref": ref}
     return param
 
 
@@ -229,8 +233,10 @@ def test_path_params_not_inside_operations(spec_path):
 
 
 @pytest.mark.parametrize("spec_path", SPEC_FILES, ids=lambda p: p.parent.name)
-def test_path_items_declare_inline_path_params(spec_path):
-    """Every path with {param} segments must declare those params inline at path item level (ADR 0002)."""
+def test_path_items_declare_path_params_at_item_level(spec_path):
+    """Every path with {param} segments must declare those params at path item level,
+    either inline or via $ref to components/parameters (ADR 0005 supersedes ADR 0002's
+    inline-only rule)."""
     spec = _load(spec_path)
     violations = []
     for path_str, path_item in spec.get("paths", {}).items():
@@ -238,16 +244,16 @@ def test_path_items_declare_inline_path_params(spec_path):
         if not expected:
             continue
         declared = {
-            p["name"]
-            for p in path_item.get("parameters", [])
-            if isinstance(p, dict) and "name" in p and p.get("in") == "path"
+            r["name"]
+            for r in (_resolve_param(spec, p) for p in path_item.get("parameters", []))
+            if isinstance(r, dict) and r.get("in") == "path" and "name" in r
         }
         for name in sorted(expected - declared):
             violations.append(
-                f"{path_str}: path param {name!r} not declared inline at path item level"
+                f"{path_str}: path param {name!r} not declared at path item level"
             )
     assert not violations, (
-        "Path parameters missing from path item level (ADR 0002):\n"
+        "Path parameters missing from path item level (ADR 0005):\n"
         + "\n".join(f"  {v}" for v in violations)
     )
 
@@ -639,9 +645,11 @@ def test_integration_response_examples_match_schemas():
 
 
 def _all_params(spec, path_str, method):
-    """Return combined path-level + operation-level parameters for an operation."""
+    """Return combined path-level + operation-level parameters for an operation,
+    with any $ref to components/parameters resolved to its definition."""
     path_item = spec.get("paths", {}).get(path_str, {})
-    return path_item.get("parameters", []) + path_item.get(method, {}).get("parameters", [])
+    raw = path_item.get("parameters", []) + path_item.get(method, {}).get("parameters", [])
+    return [_resolve_param(spec, p) for p in raw]
 
 
 @_skip_integration

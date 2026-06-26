@@ -82,12 +82,7 @@
             "example": true
           },
           {
-            "name": "s",
-            "in": "query",
-            "description": "Search string",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/components/parameters/Search"
           },
           {
             "name": "sort",
@@ -130,15 +125,7 @@
     "/models/{modelId}": {
       "parameters": [
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         }
       ],
       "get": {
@@ -184,15 +171,7 @@
     "/models/{modelId}/actions": {
       "parameters": [
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         }
       ],
       "get": {
@@ -270,15 +249,7 @@
     "/models/{modelId}/currentPeriod": {
       "parameters": [
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         }
       ],
       "get": {
@@ -412,24 +383,10 @@
     "/models/{modelId}/dimensions/{dimensionId}/items": {
       "parameters": [
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "dimensionId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "{{dimensionId}}"
+          "$ref": "#/components/parameters/DimensionId"
         }
       ],
       "get": {
@@ -612,15 +569,7 @@
     "/models/{modelId}/exports": {
       "parameters": [
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         }
       ],
       "get": {
@@ -695,26 +644,10 @@
     "/models/{modelId}/exports/{exportId}": {
       "parameters": [
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "exportId",
-          "in": "path",
-          "description": "Export definition identifier (12-digit numeric, prefix 116).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^116[0-9]{9}$"
-          },
-          "example": "116000000108"
+          "$ref": "#/components/parameters/ExportId"
         }
       ],
       "get": {
@@ -794,15 +727,7 @@
     "/models/{modelId}/files": {
       "parameters": [
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         }
       ],
       "get": {
@@ -910,24 +835,10 @@
     "/models/{modelId}/files/{fileId}/chunks": {
       "parameters": [
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "fileId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "{{fileId}}"
+          "$ref": "#/components/parameters/FileId"
         }
       ],
       "get": {
@@ -999,15 +910,7 @@
     "/models/{modelId}/imports": {
       "parameters": [
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         }
       ],
       "get": {
@@ -1081,26 +984,10 @@
     "/models/{modelId}/imports/{importId}": {
       "parameters": [
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "importId",
-          "in": "path",
-          "description": "Import definition identifier (12-digit numeric, prefix 112).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^112[0-9]{9}$"
-          },
-          "example": "112000001286"
+          "$ref": "#/components/parameters/ImportId"
         }
       ],
       "get": {
@@ -1176,15 +1063,7 @@
     "/models/{modelId}/lineItems": {
       "parameters": [
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         }
       ],
       "get": {
@@ -1283,24 +1162,10 @@
     "/models/{modelId}/lineItems/{lineItemId}/dimensions": {
       "parameters": [
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "lineItemId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "{{lineItemId}}"
+          "$ref": "#/components/parameters/LineItemId"
         }
       ],
       "get": {
@@ -1341,33 +1206,13 @@
     "/models/{modelId}/lineItems/{lineItemId}/dimensions/{dimensionId}/items": {
       "parameters": [
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "lineItemId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "{{lineItemId}}"
+          "$ref": "#/components/parameters/LineItemId"
         },
         {
-          "name": "dimensionId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "{{dimensionId}}"
+          "$ref": "#/components/parameters/DimensionId"
         }
       ],
       "get": {
@@ -1435,15 +1280,7 @@
     "/models/{modelId}/lists": {
       "parameters": [
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         }
       ],
       "get": {
@@ -1520,24 +1357,10 @@
     "/models/{modelId}/lists/{listId}": {
       "parameters": [
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "listId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "{{listId}}"
+          "$ref": "#/components/parameters/ListId"
         }
       ],
       "get": {
@@ -1624,15 +1447,7 @@
     "/models/{modelId}/modelCalendar": {
       "parameters": [
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         }
       ],
       "get": {
@@ -1694,15 +1509,7 @@
     "/models/{modelId}/modelCalendar/fiscalYear": {
       "parameters": [
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         }
       ],
       "put": {
@@ -1781,15 +1588,7 @@
     "/models/{modelId}/modules": {
       "parameters": [
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         }
       ],
       "get": {
@@ -1865,24 +1664,10 @@
     "/models/{modelId}/modules/{moduleId}/data": {
       "parameters": [
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "moduleId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "{{moduleId}}"
+          "$ref": "#/components/parameters/ModuleId"
         }
       ],
       "post": {
@@ -1912,24 +1697,10 @@
     "/models/{modelId}/modules/{moduleId}/lineItems": {
       "parameters": [
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "moduleId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "{{moduleId}}"
+          "$ref": "#/components/parameters/ModuleId"
         }
       ],
       "get": {
@@ -1941,12 +1712,7 @@
         ],
         "parameters": [
           {
-            "name": "includeAll",
-            "in": "query",
-            "schema": {
-              "type": "boolean"
-            },
-            "example": true
+            "$ref": "#/components/parameters/IncludeAll"
           }
         ],
         "responses": {
@@ -2070,24 +1836,10 @@
     "/models/{modelId}/modules/{moduleId}/views": {
       "parameters": [
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "moduleId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "{{moduleId}}"
+          "$ref": "#/components/parameters/ModuleId"
         }
       ],
       "get": {
@@ -2169,15 +1921,7 @@
     "/models/{modelId}/processes": {
       "parameters": [
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         }
       ],
       "get": {
@@ -2249,24 +1993,10 @@
     "/models/{modelId}/processes/{processId}": {
       "parameters": [
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "processId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "{{processId}}"
+          "$ref": "#/components/parameters/ProcessId"
         }
       ],
       "get": {
@@ -2361,15 +2091,7 @@
     "/models/{modelId}/versions": {
       "parameters": [
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         }
       ],
       "get": {
@@ -2455,24 +2177,10 @@
     "/models/{modelId}/versions/{versionId}/switchover": {
       "parameters": [
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "versionId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "{{versionId}}"
+          "$ref": "#/components/parameters/VersionId"
         }
       ],
       "put": {
@@ -2535,15 +2243,7 @@
     "/models/{modelId}/views": {
       "parameters": [
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         }
       ],
       "get": {
@@ -2644,24 +2344,10 @@
     "/models/{modelId}/views/{viewId}": {
       "parameters": [
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "viewId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": ""
+          "$ref": "#/components/parameters/ViewId"
         }
       ],
       "get": {
@@ -2731,25 +2417,10 @@
     "/models/{modelId}/views/{viewId}/data": {
       "parameters": [
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string). From GET /models.",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "viewId",
-          "in": "path",
-          "description": "View identifier. From GET /models/{modelId}/views (or a lineItemId from GET /models/{modelId}/modules/{moduleId}/lineItems — a line item with a subsidiary view returns that view's data).",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "102000000000"
+          "$ref": "#/components/parameters/ViewId"
         }
       ],
       "get": {
@@ -2853,33 +2524,13 @@
     "/models/{modelId}/views/{viewId}/dimensions/{dimensionId}/items": {
       "parameters": [
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "viewId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": ""
+          "$ref": "#/components/parameters/ViewId"
         },
         {
-          "name": "dimensionId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "{{dimensionId}}"
+          "$ref": "#/components/parameters/DimensionId"
         }
       ],
       "get": {
@@ -2948,12 +2599,7 @@
         ],
         "parameters": [
           {
-            "name": "s",
-            "in": "query",
-            "description": "Search string",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/components/parameters/Search"
           },
           {
             "name": "sort",
@@ -3000,7 +2646,6 @@
         "tags": [
           "User Data"
         ],
-        "parameters": [],
         "responses": {
           "200": {
             "description": "Response 200",
@@ -3029,13 +2674,7 @@
     "/users/{userId}": {
       "parameters": [
         {
-          "name": "userId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "{{userId}}"
+          "$ref": "#/components/parameters/UserId"
         }
       ],
       "get": {
@@ -3078,20 +2717,10 @@
         ],
         "parameters": [
           {
-            "name": "tenantDetails",
-            "in": "query",
-            "schema": {
-              "type": "boolean"
-            },
-            "example": true
+            "$ref": "#/components/parameters/TenantDetails"
           },
           {
-            "name": "s",
-            "in": "query",
-            "description": "Search string",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/components/parameters/Search"
           },
           {
             "name": "sort",
@@ -3165,15 +2794,7 @@
     "/workspaces/{workspaceId}": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+          "$ref": "#/components/parameters/WorkspaceId"
         }
       ],
       "get": {
@@ -3183,12 +2804,7 @@
         ],
         "parameters": [
           {
-            "name": "tenantDetails",
-            "in": "query",
-            "schema": {
-              "type": "boolean"
-            },
-            "example": true
+            "$ref": "#/components/parameters/TenantDetails"
           }
         ],
         "responses": {
@@ -3222,15 +2838,7 @@
     "/workspaces/{workspaceId}/admins": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+          "$ref": "#/components/parameters/WorkspaceId"
         }
       ],
       "get": {
@@ -3297,15 +2905,7 @@
     "/workspaces/{workspaceId}/bulkDeleteModels": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1"
+          "$ref": "#/components/parameters/WorkspaceId"
         }
       ],
       "post": {
@@ -3368,15 +2968,7 @@
     "/workspaces/{workspaceId}/models": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1"
+          "$ref": "#/components/parameters/WorkspaceId"
         }
       ],
       "get": {
@@ -3416,26 +3008,10 @@
     "/workspaces/{workspaceId}/models/{modelId}/actions": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+          "$ref": "#/components/parameters/WorkspaceId"
         },
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         }
       ],
       "get": {
@@ -3513,35 +3089,13 @@
     "/workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+          "$ref": "#/components/parameters/WorkspaceId"
         },
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "actionId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "{{processId}}"
+          "$ref": "#/components/parameters/ActionId"
         }
       ],
       "get": {
@@ -3625,44 +3179,16 @@
     "/workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks/{taskId}": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+          "$ref": "#/components/parameters/WorkspaceId"
         },
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "actionId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "117000000019"
+          "$ref": "#/components/parameters/ActionId"
         },
         {
-          "name": "taskId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "F37EA1512BC448D3B223431C33B844B6"
+          "$ref": "#/components/parameters/TaskId"
         }
       ],
       "get": {
@@ -3718,26 +3244,10 @@
     "/workspaces/{workspaceId}/models/{modelId}/currentPeriod": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+          "$ref": "#/components/parameters/WorkspaceId"
         },
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         }
       ],
       "get": {
@@ -3884,26 +3394,10 @@
     "/workspaces/{workspaceId}/models/{modelId}/dashboards": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+          "$ref": "#/components/parameters/WorkspaceId"
         },
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         }
       ],
       "get": {
@@ -3967,35 +3461,13 @@
     "/workspaces/{workspaceId}/models/{modelId}/dimensions/{dimensionId}/items": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+          "$ref": "#/components/parameters/WorkspaceId"
         },
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "dimensionId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "{{dimensionId}}"
+          "$ref": "#/components/parameters/DimensionId"
         }
       ],
       "get": {
@@ -4178,26 +3650,10 @@
     "/workspaces/{workspaceId}/models/{modelId}/exports": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+          "$ref": "#/components/parameters/WorkspaceId"
         },
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         }
       ],
       "get": {
@@ -4275,35 +3731,13 @@
     "/workspaces/{workspaceId}/models/{modelId}/exports/{exportId}": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+          "$ref": "#/components/parameters/WorkspaceId"
         },
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "exportId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "{{exportId}}"
+          "$ref": "#/components/parameters/ExportId"
         }
       ],
       "get": {
@@ -4383,35 +3817,13 @@
     "/workspaces/{workspaceId}/models/{modelId}/exports/{exportId}/tasks": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+          "$ref": "#/components/parameters/WorkspaceId"
         },
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "exportId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "{{exportId}}"
+          "$ref": "#/components/parameters/ExportId"
         }
       ],
       "get": {
@@ -4520,44 +3932,16 @@
     "/workspaces/{workspaceId}/models/{modelId}/exports/{exportId}/tasks/{taskId}": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+          "$ref": "#/components/parameters/WorkspaceId"
         },
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "exportId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "{{exportId}}"
+          "$ref": "#/components/parameters/ExportId"
         },
         {
-          "name": "taskId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "{{taskId}}"
+          "$ref": "#/components/parameters/TaskId"
         }
       ],
       "get": {
@@ -4615,26 +3999,10 @@
     "/workspaces/{workspaceId}/models/{modelId}/files": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+          "$ref": "#/components/parameters/WorkspaceId"
         },
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         }
       ],
       "get": {
@@ -4742,35 +4110,13 @@
     "/workspaces/{workspaceId}/models/{modelId}/files/{fileId}": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+          "$ref": "#/components/parameters/WorkspaceId"
         },
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "fileId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "{{fileId}}"
+          "$ref": "#/components/parameters/FileId"
         }
       ],
       "get": {
@@ -4915,35 +4261,13 @@
     "/workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+          "$ref": "#/components/parameters/WorkspaceId"
         },
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "fileId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "{{fileId}}"
+          "$ref": "#/components/parameters/FileId"
         }
       ],
       "get": {
@@ -5015,35 +4339,13 @@
     "/workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks/0": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+          "$ref": "#/components/parameters/WorkspaceId"
         },
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "fileId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "{{fileId}}"
+          "$ref": "#/components/parameters/FileId"
         }
       ],
       "get": {
@@ -5096,35 +4398,13 @@
     "/workspaces/{workspaceId}/models/{modelId}/files/{fileId}/complete": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+          "$ref": "#/components/parameters/WorkspaceId"
         },
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "fileId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "{{fileId}}"
+          "$ref": "#/components/parameters/FileId"
         }
       ],
       "post": {
@@ -5181,26 +4461,10 @@
     "/workspaces/{workspaceId}/models/{modelId}/imports/": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+          "$ref": "#/components/parameters/WorkspaceId"
         },
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         }
       ],
       "get": {
@@ -5274,35 +4538,13 @@
     "/workspaces/{workspaceId}/models/{modelId}/imports/{importId}": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+          "$ref": "#/components/parameters/WorkspaceId"
         },
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "importId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "{{importId}}"
+          "$ref": "#/components/parameters/ImportId"
         }
       ],
       "get": {
@@ -5378,35 +4620,13 @@
     "/workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+          "$ref": "#/components/parameters/WorkspaceId"
         },
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "importId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "{{importId}}"
+          "$ref": "#/components/parameters/ImportId"
         }
       ],
       "get": {
@@ -5492,44 +4712,16 @@
     "/workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+          "$ref": "#/components/parameters/WorkspaceId"
         },
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "importId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "{{importId}}"
+          "$ref": "#/components/parameters/ImportId"
         },
         {
-          "name": "taskId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "{{taskId}}"
+          "$ref": "#/components/parameters/TaskId"
         }
       ],
       "get": {
@@ -5628,44 +4820,16 @@
     "/workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/dump": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+          "$ref": "#/components/parameters/WorkspaceId"
         },
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "importId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "{{importId}}"
+          "$ref": "#/components/parameters/ImportId"
         },
         {
-          "name": "taskId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "{{taskId}}"
+          "$ref": "#/components/parameters/TaskId"
         }
       ],
       "get": {
@@ -5697,44 +4861,16 @@
     "/workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/dump/chunks": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+          "$ref": "#/components/parameters/WorkspaceId"
         },
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "importId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "{{importId}}"
+          "$ref": "#/components/parameters/ImportId"
         },
         {
-          "name": "taskId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "{{taskId}}"
+          "$ref": "#/components/parameters/TaskId"
         }
       ],
       "get": {
@@ -5777,44 +4913,16 @@
     "/workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/dump/chunks/0": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+          "$ref": "#/components/parameters/WorkspaceId"
         },
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "importId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "{{importId}}"
+          "$ref": "#/components/parameters/ImportId"
         },
         {
-          "name": "taskId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "{{taskId}}"
+          "$ref": "#/components/parameters/TaskId"
         }
       ],
       "get": {
@@ -5843,26 +4951,10 @@
     "/workspaces/{workspaceId}/models/{modelId}/lineItems": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+          "$ref": "#/components/parameters/WorkspaceId"
         },
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         }
       ],
       "get": {
@@ -5961,35 +5053,13 @@
     "/workspaces/{workspaceId}/models/{modelId}/lineItems/{lineItemId}/dimensions": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+          "$ref": "#/components/parameters/WorkspaceId"
         },
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "lineItemId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "{{lineItemId}}"
+          "$ref": "#/components/parameters/LineItemId"
         }
       ],
       "get": {
@@ -6030,44 +5100,16 @@
     "/workspaces/{workspaceId}/models/{modelId}/lineItems/{lineItemId}/dimensions/{dimensionId}/items": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+          "$ref": "#/components/parameters/WorkspaceId"
         },
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "lineItemId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "{{lineItemId}}"
+          "$ref": "#/components/parameters/LineItemId"
         },
         {
-          "name": "dimensionId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "{{dimensionId}}"
+          "$ref": "#/components/parameters/DimensionId"
         }
       ],
       "get": {
@@ -6135,26 +5177,10 @@
     "/workspaces/{workspaceId}/models/{modelId}/lists": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+          "$ref": "#/components/parameters/WorkspaceId"
         },
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         }
       ],
       "get": {
@@ -6231,35 +5257,13 @@
     "/workspaces/{workspaceId}/models/{modelId}/lists/{listId}": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+          "$ref": "#/components/parameters/WorkspaceId"
         },
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "listId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "{{listId}}"
+          "$ref": "#/components/parameters/ListId"
         }
       ],
       "get": {
@@ -6346,35 +5350,13 @@
     "/workspaces/{workspaceId}/models/{modelId}/lists/{listId}/items": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+          "$ref": "#/components/parameters/WorkspaceId"
         },
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "listId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "{{listId}}"
+          "$ref": "#/components/parameters/ListId"
         }
       ],
       "get": {
@@ -6385,12 +5367,7 @@
         ],
         "parameters": [
           {
-            "name": "includeAll",
-            "in": "query",
-            "schema": {
-              "type": "boolean"
-            },
-            "example": true
+            "$ref": "#/components/parameters/IncludeAll"
           }
         ],
         "responses": {
@@ -6712,35 +5689,13 @@
     "/workspaces/{workspaceId}/models/{modelId}/lists/{listId}/readRequests": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+          "$ref": "#/components/parameters/WorkspaceId"
         },
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "listId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "101000000001"
+          "$ref": "#/components/parameters/ListId"
         }
       ],
       "post": {
@@ -6791,26 +5746,10 @@
     "/workspaces/{workspaceId}/models/{modelId}/modelCalendar": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+          "$ref": "#/components/parameters/WorkspaceId"
         },
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         }
       ],
       "get": {
@@ -6872,26 +5811,10 @@
     "/workspaces/{workspaceId}/models/{modelId}/modules": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+          "$ref": "#/components/parameters/WorkspaceId"
         },
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         }
       ],
       "get": {
@@ -6967,35 +5890,13 @@
     "/workspaces/{workspaceId}/models/{modelId}/modules/{moduleId}/lineItems": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+          "$ref": "#/components/parameters/WorkspaceId"
         },
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "moduleId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "{{moduleId}}"
+          "$ref": "#/components/parameters/ModuleId"
         }
       ],
       "get": {
@@ -7007,12 +5908,7 @@
         ],
         "parameters": [
           {
-            "name": "includeAll",
-            "in": "query",
-            "schema": {
-              "type": "boolean"
-            },
-            "example": true
+            "$ref": "#/components/parameters/IncludeAll"
           }
         ],
         "responses": {
@@ -7136,35 +6032,13 @@
     "/workspaces/{workspaceId}/models/{modelId}/modules/{moduleId}/views": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+          "$ref": "#/components/parameters/WorkspaceId"
         },
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "moduleId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "{{moduleId}}"
+          "$ref": "#/components/parameters/ModuleId"
         }
       ],
       "get": {
@@ -7246,26 +6120,10 @@
     "/workspaces/{workspaceId}/models/{modelId}/processes": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+          "$ref": "#/components/parameters/WorkspaceId"
         },
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         }
       ],
       "get": {
@@ -7337,37 +6195,13 @@
     "/workspaces/{workspaceId}/models/{modelId}/processes/{processId}": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+          "$ref": "#/components/parameters/WorkspaceId"
         },
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "processId",
-          "in": "path",
-          "description": "Process identifier (12-digit numeric, prefix 118).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^118[0-9]{9}$"
-          },
-          "example": "118000000070"
+          "$ref": "#/components/parameters/ProcessId"
         }
       ],
       "get": {
@@ -7462,35 +6296,13 @@
     "/workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+          "$ref": "#/components/parameters/WorkspaceId"
         },
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "processId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "{{processId}}"
+          "$ref": "#/components/parameters/ProcessId"
         }
       ],
       "get": {
@@ -7569,44 +6381,16 @@
     "/workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks/{taskId}": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+          "$ref": "#/components/parameters/WorkspaceId"
         },
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "processId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "{{processId}}"
+          "$ref": "#/components/parameters/ProcessId"
         },
         {
-          "name": "taskId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "{{taskId}}"
+          "$ref": "#/components/parameters/TaskId"
         }
       ],
       "get": {
@@ -7671,26 +6455,10 @@
     "/workspaces/{workspaceId}/models/{modelId}/versions": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+          "$ref": "#/components/parameters/WorkspaceId"
         },
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         }
       ],
       "get": {
@@ -7776,26 +6544,10 @@
     "/workspaces/{workspaceId}/models/{modelId}/views": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+          "$ref": "#/components/parameters/WorkspaceId"
         },
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         }
       ],
       "get": {
@@ -7896,35 +6648,13 @@
     "/workspaces/{workspaceId}/models/{modelId}/views/{viewId}": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+          "$ref": "#/components/parameters/WorkspaceId"
         },
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "viewId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": "{{viewId}}"
+          "$ref": "#/components/parameters/ViewId"
         }
       ],
       "get": {
@@ -7994,35 +6724,13 @@
     "/workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+          "$ref": "#/components/parameters/WorkspaceId"
         },
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "viewId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": ""
+          "$ref": "#/components/parameters/ViewId"
         }
       ],
       "post": {
@@ -8073,44 +6781,16 @@
     "/workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests/{requestId}": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+          "$ref": "#/components/parameters/WorkspaceId"
         },
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "viewId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": ""
+          "$ref": "#/components/parameters/ViewId"
         },
         {
-          "name": "requestId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": ""
+          "$ref": "#/components/parameters/RequestId"
         }
       ],
       "get": {
@@ -8209,53 +6889,19 @@
     "/workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests/{requestId}/pages/{pageNo}": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+          "$ref": "#/components/parameters/WorkspaceId"
         },
         {
-          "name": "modelId",
-          "in": "path",
-          "description": "Model identifier (32-character uppercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
-          },
-          "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+          "$ref": "#/components/parameters/ModelId"
         },
         {
-          "name": "viewId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": ""
+          "$ref": "#/components/parameters/ViewId"
         },
         {
-          "name": "requestId",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": ""
+          "$ref": "#/components/parameters/RequestId"
         },
         {
-          "name": "pageNo",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "example": ""
+          "$ref": "#/components/parameters/PageNo"
         }
       ],
       "get": {
@@ -8291,15 +6937,7 @@
     "/workspaces/{workspaceId}/visitors": {
       "parameters": [
         {
-          "name": "workspaceId",
-          "in": "path",
-          "description": "Workspace identifier (32-character lowercase hex string).",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+          "$ref": "#/components/parameters/WorkspaceId"
         }
       ],
       "get": {
@@ -8356,6 +6994,197 @@
     }
   },
   "components": {
+    "parameters": {
+      "ModelId": {
+        "name": "modelId",
+        "in": "path",
+        "description": "Model identifier (32-character uppercase hex string). From GET /models.",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9A-F]{32}$"
+        },
+        "example": "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4"
+      },
+      "DimensionId": {
+        "name": "dimensionId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "example": "{{dimensionId}}"
+      },
+      "ExportId": {
+        "name": "exportId",
+        "in": "path",
+        "description": "Export definition identifier (12-digit numeric, prefix 116).",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "example": "116000000108"
+      },
+      "FileId": {
+        "name": "fileId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "example": "{{fileId}}"
+      },
+      "ImportId": {
+        "name": "importId",
+        "in": "path",
+        "description": "Import definition identifier (12-digit numeric, prefix 112).",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "example": "112000001286"
+      },
+      "LineItemId": {
+        "name": "lineItemId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "example": "{{lineItemId}}"
+      },
+      "ListId": {
+        "name": "listId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "example": "{{listId}}"
+      },
+      "ModuleId": {
+        "name": "moduleId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "example": "{{moduleId}}"
+      },
+      "ProcessId": {
+        "name": "processId",
+        "in": "path",
+        "description": "Process identifier (12-digit numeric, prefix 118).",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "example": "{{processId}}"
+      },
+      "VersionId": {
+        "name": "versionId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "example": "{{versionId}}"
+      },
+      "ViewId": {
+        "name": "viewId",
+        "in": "path",
+        "description": "View identifier. From GET /models/{modelId}/views (or a lineItemId from GET /models/{modelId}/modules/{moduleId}/lineItems — a line item with a subsidiary view returns that view's data).",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "example": ""
+      },
+      "UserId": {
+        "name": "userId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "example": "{{userId}}"
+      },
+      "WorkspaceId": {
+        "name": "workspaceId",
+        "in": "path",
+        "description": "Workspace identifier (32-character lowercase hex string).",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+      },
+      "ActionId": {
+        "name": "actionId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "example": "{{processId}}"
+      },
+      "TaskId": {
+        "name": "taskId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "example": "F37EA1512BC448D3B223431C33B844B6"
+      },
+      "RequestId": {
+        "name": "requestId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "example": ""
+      },
+      "PageNo": {
+        "name": "pageNo",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "example": ""
+      },
+      "Search": {
+        "name": "s",
+        "in": "query",
+        "description": "Search string",
+        "required": false,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "TenantDetails": {
+        "name": "tenantDetails",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "boolean"
+        },
+        "example": true
+      },
+      "IncludeAll": {
+        "name": "includeAll",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "boolean"
+        },
+        "example": true
+      }
+    },
     "securitySchemes": {
       "AnaplanAuthToken": {
         "type": "apiKey",
