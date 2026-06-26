@@ -1487,14 +1487,6 @@
         "responses": {
           "200": {
             "description": "The model calendar.",
-            "headers": {
-              "Content-Type": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "application/json"
-              }
-            },
             "content": {
               "application/json": {
                 "example": {
@@ -1541,7 +1533,7 @@
       ],
       "put": {
         "summary": "Update current fiscal year",
-        "description": "Use this call to update the current fiscal year for the model calendar. The year input value has to be a valid fiscal year supported by the model calendar in Anaplan. If successful, this call returns the updated fiscal year with start and end date associated with current model calendar type. This call returns a `400 bad request` message if the input value is out of range or model calendar type does not have an available fiscal year (for example, Weeks General).\n\n### Example: Out of range error\n\nInput value for `year`\n\nResponse",
+        "description": "Use this call to update the current fiscal year for the model calendar. The year input value has to be a valid fiscal year supported by the model calendar in Anaplan. If successful, this call returns the updated fiscal year with start and end date associated with current model calendar type. This call returns a `400 bad request` message if the input value is out of range or model calendar type does not have an available fiscal year (for example, Weeks General).",
         "tags": [
           "Transactional Write"
         ],
@@ -1553,12 +1545,12 @@
                 "properties": {
                   "year": {
                     "type": "string",
-                    "format": "utc-millisec"
+                    "description": "Fiscal year to set as current. Must be a valid fiscal year for the model's calendar type (for example, FY21)."
                   }
                 }
               },
               "example": {
-                "year": "2020"
+                "year": "FY21"
               }
             }
           }
@@ -1566,14 +1558,6 @@
         "responses": {
           "200": {
             "description": "The updated fiscal year with its start and end dates.",
-            "headers": {
-              "Content-Type": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "application/json"
-              }
-            },
             "content": {
               "application/json": {
                 "example": {
@@ -5841,7 +5825,7 @@
       ],
       "get": {
         "summary": "Get current fiscal year",
-        "description": "Use this call to get the current fiscal year with the start and end date from the model calendar. The value of the start and end date is determined by the calendar type set in the model. This value is not always a range from Jan 1 to Dec 31. The API returns an empty value If the calendar type does not have an available fiscal year (for example, Weeks General).\n\n### Model Calendar\n\n### Model Calendar",
+        "description": "Use this call to get the current fiscal year with the start and end date from the model calendar. The value of the start and end date is determined by the calendar type set in the model. This value is not always a range from Jan 1 to Dec 31. The API returns an empty value If the calendar type does not have an available fiscal year (for example, Weeks General).",
         "tags": [
           "Model Metadata",
           "Model Setting Metadata"
@@ -5849,14 +5833,6 @@
         "responses": {
           "200": {
             "description": "The current fiscal year with its start and end dates.",
-            "headers": {
-              "Content-Type": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "application/json"
-              }
-            },
             "content": {
               "application/json": {
                 "example": {
