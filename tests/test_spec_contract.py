@@ -755,7 +755,8 @@ _LIST_SEARCH_SORT = [
 @_skip_integration
 @pytest.mark.parametrize("path,sort_example", _LIST_SEARCH_SORT)
 def test_integration_list_declares_s_param(path, sort_example):
-    """List endpoints with search support must declare s (type: string, description: 'Search string')."""
+    """List endpoints with search support must declare s (type: string) with the
+    shared search-filter description (wildcard support, per ADR 0004 / issue #147)."""
     spec = _load(_INTEGRATION_SPEC)
     params = _all_params(spec, path, "get")
     names = {p["name"] for p in params if "name" in p}
@@ -763,7 +764,10 @@ def test_integration_list_declares_s_param(path, sort_example):
     p = next(p for p in params if p.get("name") == "s")
     assert p.get("in") == "query"
     assert p.get("schema", {}).get("type") == "string"
-    assert p.get("description") == "Search string"
+    desc = p.get("description", "")
+    assert "wildcards" in desc and "case-insensitive" in desc, (
+        f"GET {path} s param missing wildcard/search-filter description: {desc!r}"
+    )
 
 
 @_skip_integration

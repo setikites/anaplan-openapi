@@ -5639,13 +5639,17 @@ components:
     Search:
       name: s
       in: query
-      description: Search string
+      description: Optional case-insensitive filter. Matches items whose name or ID contains this string. Supports wildcards
+        `%` (0-n characters) and `_` (exactly 1 character). Omit to return all items. **Undocumented and may behave unpredictably;
+        requires the Tenant Admin role and is ignored for non-admin users.**
       required: false
       schema:
         type: string
     TenantDetails:
       name: tenantDetails
       in: query
+      description: When `true`, the response includes additional workspace detail fields (`sizeAllowance` and `currentSize`).
+        When `false` or omitted, only `id`, `name`, and `active` are returned.
       required: false
       schema:
         type: boolean
