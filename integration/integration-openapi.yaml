@@ -189,6 +189,12 @@ paths:
 
         *   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html)
         *   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response
+
+        ### Request body
+
+        | **Body** | **Details** |
+        | --- | --- |
+        | `{date}` | <br><br>*   Required<br>*   Type: String<br>*   Description: The date to use to set, or reset, the current period. The date format is YYYY-MM-DD.  <br>    If the `date` parameter is left blank (for example, `/currentperiod?date=`) the current period resets.  <br>    If the date is not provided in the YYYY-MM-DD format, the call returns a `400 Bad Request` response with this message: `Invalid ISO date format '{date}'. Date should match format YYYY-MM-DD`  <br>    If this value falls outside of a valid range, the call returns a `400 Bad Request` response with this message: `Specified date '{date}' is out of timescale range {start of timescale} - {end of timescale}`.<br>*   Example: 2010-05-20<br><br> |
       tags:
       - Transactional Write
       parameters:
@@ -330,6 +336,13 @@ paths:
         *   If the given workspace, model, or dimension do not exist, this call returns a `404` code.
         *   If the dimension does not support codes and codes are provided, this call returns a `400` code.
         *   In the future, use of this call may be rate limited.
+
+        ### Request body
+
+        | **JSON Element** | **Description** |
+        | --- | --- |
+        | `names` | The case-insensitive strings that match the name of a returned item. |
+        | `codes` | The case-insensitive strings that match the code of a returned item. |
 
         Note that the `names`, `codes`, or both fields in the request body must contain a non-empty value. If the request body does not include at least one of these fields, the response returns an error.
       tags:
@@ -514,6 +527,8 @@ paths:
         *   `format` is text, as opposed to a binary stream.
         *   `headerRow` is the row that contains column names.
         *   `separator` is the token that separates fields. This is typically a comma, for example, "Versions","Opportunities"," "Version 1","Opportunity 0001".
+
+        ### Headers
 
         *   `Authorization:AnaplanAuthToken {anaplan_auth_token}`
         *   `Accept:application/json`
@@ -971,6 +986,28 @@ paths:
       description: |-
         Alternate URL form — response is equivalent to `/workspaces/{workspaceId}/models/{modelId}/lists/{listId}`.
 
+        Use this call to retrieve the following metadata for a specified list:
+
+        | **Metadata** | **Description** |
+        | --- | --- |
+        | `category` | The category to which the list is assigned. |
+        | `dataTags` | The data tags associated with the list. |
+        | `hasSelectiveAccess` | If the value is true, this list uses [selective access](https://help.anaplan.com/anapedia/Content/Modeling/Users/Selective_Access.html). |
+        | `id` | The list ID.  This corresponds to the `listId` parameter. |
+        | `itemCount` | The number of list items present in the list. |
+        | `managedBy` | Not currently used. |
+        | `name` | The list name. |
+        | `nextitemIndex` | Contains the index of the next new item in the list. Used only by numbered lists. |
+        | `numberedList` | A true value indicates this is a numbered list. |
+        | `parent` | <br><br>The parent hierarchy, which includes this information for the parent list:  <br><br>*   `id`<br>*   `name`<br><br> |
+        | `permittedItems` | Indicates how many more items you can add to the existing list. This value changes when the number of items in the list change. |
+        | `productionData` | A true value indicates this is a production list in [Application Lifecycle Management (ALM)](https://help.anaplan.com/anapedia/Content/ALM/Application_Lifecycle_Management.htm). |
+        | `properties` | <br><br>The list properties, which include:  <br><br>*   `dataTags`<br>*   `format`<br>*   `formula`<br>*   `notes`<br>*   `referencedBy`<br><br> |
+        | `subsets` | <br><br>A list of subsets associated with the list hierarchy, which includes the following information for the parent list:  <br><br>*   `id`<br>*   `name`<br><br> |
+        | `topLevelItem` | If present, indicates the top level item in a hierarchy. |
+        | `useTopLevelAsPageDefault` | A true value indicates this list is the default item in a page selector. |
+        | `workflowEnabled` | A true value indicates this list is enabled for [Workflow](https://help.anaplan.com/anapedia/Content/Modeling/Manage_Models/Workflow.html). |
+
         If any of the metadata values are not set for a list (for example, no parent or no top level item), then the result omits the metadata entry.
 
         **Notes**:
@@ -1077,6 +1114,8 @@ paths:
       summary: Update current fiscal year
       description: |-
         Use this call to update the current fiscal year for the model calendar. The year input value has to be a valid fiscal year supported by the model calendar in Anaplan. If successful, this call returns the updated fiscal year with start and end date associated with current model calendar type. This call returns a `400 bad request` message if the input value is out of range or model calendar type does not have an available fiscal year (for example, Weeks General).
+
+        ### Example: Out of range error
 
         Input value for `year`
 
@@ -1205,7 +1244,23 @@ paths:
             *   For a line Item that is dimensioned by a composite list, the only writeable cells are the child items, that are defined directly in the dimension list and not defined in a parent list.
         *   In the future, use of this call may be rate limited.
 
+        ### Request Body
+
+        ### The `CellWrite` Object
+
         Each `CellWrite` Object is a request to set a value in a cell. A cell is identified by the line item it belongs to as well as an item for each of the dimensions that apply to the line item (this includes **Time** and **Versions**).
+
+        | **Field** | **Details** |
+        | --- | --- |
+        | `lineItemId` | <br><br>*   Required<br>*   Ensure you specify a `lineItemId` or `lineItemName` Description: The ID of the line item that belongs to the module<br><br> |
+        | `lineItemName` | <br><br>*   Ensure you specify a `lineItemId` or `lineItemName`<br>*   Description: The name of the line item that belongs to the module<br><br> |
+        | `dimensions` | <br><br>*   This field can be omitted if the line item is a single cell without any dimensions applied to it.<br>*   Description: An array of dimension coordinates<br><br> |
+        | `dimensionId` | <br><br>*   Required  <br>    Ensure you specify a `dimensionId` or `dimensionName`<br>*   Description: The ID of the dimension that is on the line item<br><br> |
+        | `dimensionName` | <br><br>*   Ensure you specify a `dimensionId` or `dimensionName`<br>*   Description: The name of the dimension that is on the line item<br><br> |
+        | `itemId` | <br><br>*   Required<br>*   Description: The ID of the dimension item that is on the dimension<br><br> |
+        | `itemName` | <br><br>*   Ensure you specify a `itemId`, `itemName` or `itemCode`<br>*   Description: The name of the item on the dimension<br><br> |
+        | `itemCode` | <br><br>*   Ensure you specify a `itemId`, `itemName` or `itemCode`<br>*   Description: The name of the item on the dimension<br><br> |
+        | `value` | <br><br>*   Required<br>*   Description: The value to set for the cell<br>*   Cannot be `null`<br><br> |
       tags:
       - Transactional Write
       responses:
@@ -1579,6 +1634,12 @@ paths:
         *   Ensure the switchover date is after the existing version switchover date.
         *   To reset the switchover date to Blank, pass an empty string in the request body.
         *   In the future, use of this call may be rate limited.
+
+        ### Request body
+
+        | **JSON element** | **Details** |
+        | --- | --- |
+        | `date` | <br><br>*   Required<br>*   Description: An ISO-formatted (YYYY-MM-DD) date string is used to set the switchover date. An empty string resets the switchover date.  <br>    Dates earlier than the current switchover date (for example, `2021-01-01` when the current switchover is `2021-06-01`) or dates outside the current model year return a `400 Bad Request` response.<br>*   Example: `2021-06-01`<br><br> |
       tags:
       - Transactional Write
       requestBody:
@@ -1628,10 +1689,14 @@ paths:
         *   Single quotes enclose the module and view names that have special characters
         *   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response
 
+        ### Default views
+
         For default views:
 
         *   The value of the {viewId} is identical to the value of the {moduleId}
         *   The value of the name is identical to the value of the module
+
+        ### Saved views
 
         For saved views:
 
@@ -1795,11 +1860,15 @@ paths:
         *   You can replace the `viewId` with any valid `lineItemId`. If the line item has a subsidiary view, the response returns the data as seen in that subsidiary view.
         *   For line items without a subsidiary view, the response returns data for the default view of the line item.
 
+        ### CSV responses
+
         The first line of the CSV response contains the values of the page selectors. The response omits this line when there are no dimensions on pages.
 
         When there are multiple dimensions on columns, a line for each dimension follows the first line that contains the values of the page selectors.
 
         When there are multiple dimensions on rows, a column displays on the left, before the data, for each dimension on rows.
+
+        ### JSON responses
 
         To receive a JSON-formatted response instead of a CSV-formatted response:
 
@@ -1990,6 +2059,8 @@ paths:
       summary: Retrieve user information
       description: |-
         Retrieves information about the specified user.
+
+        ### Headers
 
         *   `Authorization:AnaplanAuthToken {anaplan_auth_token}`
         *   `Content-Type:application/json`
@@ -2206,8 +2277,12 @@ paths:
         *   `id` is the Id of the action that you can carry out in the specified model.
         *   `name` is the name of the action that you can carry out. You can view these actions in the Anaplan user interface in the Action settings for the model.
 
+        ### Headers
+
         *   `Authorization:AnaplanAuthToken {anaplan_auth_token}`
         *   `Content-Type:application/json`
+
+        ### Parameters
 
         #
       tags:
@@ -2264,6 +2339,8 @@ paths:
         *   `Authorization:AnaplanAuthToken {anaplan_auth_token}`
         *   `Content-Type:application/json`
 
+        ### Parameters
+
         #
       tags:
       - Bulk Other
@@ -2300,8 +2377,12 @@ paths:
       description: |-
         You can POST a deletion task to start the delete. This returns a new `taskID`. Once you have started the delete, you can use GET to receive a list of the deletion tasks as a JSON array. You can use this to monitor the status of the delete.
 
+        ### Headers
+
         *   `Authorization:AnaplanAuthToken {anaplan_auth_token}`
         *   `Content-Type:application/json`
+
+        ### Parameters
 
         #
       tags:
@@ -2423,6 +2504,12 @@ paths:
 
         *   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html)
         *   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response
+
+        ### Request body
+
+        | **Body** | **Details** |
+        | --- | --- |
+        | `{date}` | <br><br>*   Required<br>*   Type: String<br>*   Description: The date to use to set, or reset, the current period. The date format is YYYY-MM-DD.  <br>    If the `date` parameter is left blank (for example, `/currentperiod?date=`) the current period resets.  <br>    If the date is not provided in the YYYY-MM-DD format, the call returns a `400 Bad Request` response with this message: `Invalid ISO date format '{date}'. Date should match format YYYY-MM-DD`  <br>    If this value falls outside of a valid range, the call returns a `400 Bad Request` response with this message: `Specified date '{date}' is out of timescale range {start of timescale} - {end of timescale}`.<br>*   Example: 2010-05-20<br><br> |
       tags:
       - Transactional Write
       parameters:
@@ -2602,6 +2689,13 @@ paths:
         *   If the dimension does not support codes and codes are provided, this call returns a `400` code.
         *   In the future, use of this call may be rate limited.
 
+        ### Request body
+
+        | **JSON Element** | **Description** |
+        | --- | --- |
+        | `names` | The case-insensitive strings that match the name of a returned item. |
+        | `codes` | The case-insensitive strings that match the code of a returned item. |
+
         Note that the `names`, `codes`, or both fields in the request body must contain a non-empty value. If the request body does not include at least one of these fields, the response returns an error.
       tags:
       - Model Metadata
@@ -2668,8 +2762,12 @@ paths:
       description: |-
         To run an export, you need the ID of its export definition. You can get a list of the export definitions with their ID for models in your workspace. This enables you to decide on the Export action to carry out. If you already know the ID of the export definition, you can skip this step.
 
+        ### Headers
+
         *   `Authorization:AnaplanAuthToken {anaplan_auth_token}`
         *   `Content-Type:application/json`
+
+        ### Parameters
 
         #
       tags:
@@ -2728,8 +2826,12 @@ paths:
         *   If the export has its line items in columns, `dataTypes` shows the types. `"ENTITY"` is any member of a List.
         *   If the export has its line items in rows or pages, Anaplan does not know the types and `dataTypes` shows `"MIXED"`.
 
+        ### Headers
+
         *   `Authorization:AnaplanAuthToken {anaplan_auth_token}`
         *   `Content-Type:application/json`
+
+        ### Parameters
 
         #
       tags:
@@ -2823,10 +2925,16 @@ paths:
       description: |-
         You can POST an export task to start the export. This returns a new `taskID`. Once you have started the export, you can use GET to receive a list of the export tasks as a JSON array. You can use this to monitor the status of the export tasks.
 
+        ### Run the export
+
         This creates a task with the specified exportID and returns the newly-created taskID.
+
+        ### Headers
 
         *   `Authorization:AnaplanAuthToken {anaplan_auth_token}`
         *   `Content-Type:application/json`
+
+        ### Parameters
 
         #
       tags:
@@ -2883,10 +2991,24 @@ paths:
         *   `taskId` is the ID that you specified in the request.
 
 
+        Here is a list of each possible `taskState`:
+
+        | **Status** | **Description** |
+        | --- | --- |
+        | NOT_STARTED | The task is scheduled to run, but has not started yet. |
+        | IN_PROGRESS | The task is currently running. |
+        | COMPLETE | The task has finished running whether successful or not. |
+        | CANCELLING | The task is currently being canceled. Cancellation is not yet complete. |
+        | CANCELLED | The task has been canceled and the changes have been rolled back. |
+
         If failures occur during the export task `details` contains a JSON array that contains debug information
+
+        ### Headers
 
         *   `Authorization:AnaplanAuthToken {anaplan_auth_token}`
         *   `Content-Type:application/json`
+
+        ### Parameters
 
         #
       tags:
@@ -3050,8 +3172,12 @@ paths:
         *   `headerRow` is the row that contains column names.
         *   `separator` is the token that separates fields. This is typically a comma, for example, "Versions","Opportunities"," "Version 1","Opportunity 0001".
 
+        ### Headers
+
         *   `Authorization:AnaplanAuthToken {anaplan_auth_token}`
         *   `Content-Type:application/json`
+
+        ### Parameters
 
         #
       tags:
@@ -3103,8 +3229,12 @@ paths:
 
         **Note:** You cannot compress a file that you are uploading as a single file. If the file is smaller than 1 MB, we recommend you PUT it onto the server by streaming it as an octet stream.
 
+        ### Headers
+
         *   `Authorization:AnaplanAuthToken {anaplan_auth_token}`
         *   `Content-Type:application/octet-stream`
+
+        ### Parameters
 
         #
       tags:
@@ -3127,8 +3257,12 @@ paths:
 
         **Note:** This only removes private content. Default content and the import data source model object remain.
 
+        ### Headers
+
         *   `Authorization:AnaplanAuthToken {anaplan_auth_token}`
         *   `Content-Type:application/json`
+
+        ### Parameters
 
         #
       tags:
@@ -3147,6 +3281,8 @@ paths:
       description: |-
         *   `Authorization:AnaplanAuthToken {anaplan_auth_token}`
         *   `Content-Type:application/json`
+
+        ### Parameters
 
         #
       tags:
@@ -3209,6 +3345,8 @@ paths:
         *   `Authorization:AnaplanAuthToken {anaplan_auth_token}`
         *   `Content-Type:application/octet-stream`
 
+        ### Parameters
+
         #
       tags:
       - Bulk Write
@@ -3235,8 +3373,12 @@ paths:
       description: |-
         After carrying out an upload with `chunkCount` set to -1, mark it complete.
 
+        ### Headers
+
         *   `Authorization:AnaplanAuthToken {anaplan_auth_token}`
         *   `Content-Type:application/json`
+
+        ### Parameters
 
         #
       tags:
@@ -3280,8 +3422,12 @@ paths:
       description: |-
         `/workspaces/{workspaceID}/models/{modelID}/imports/` To run an import, you need its ID. You can skip this step if you already know the import ID.
 
+        ### Headers
+
         *   `Authorization:AnaplanAuthToken {anaplan_auth_token}`
         *   `Content-Type:application/json`
+
+        ### Parameters
 
         #
       tags:
@@ -3340,8 +3486,12 @@ paths:
         *   Source
         *   Column Count
 
+        ### Headers
+
         *   `Authorization:AnaplanAuthToken {anaplan_auth_token}`
         *   `Content-Type:application/json`
+
+        ### Parameters
 
         #
       tags:
@@ -3403,8 +3553,12 @@ paths:
       description: |-
         *   Request
 
+        ### Headers
+
         *   `Authorization:AnaplanAuthToken {anaplan_auth_token}`
         *   `Content-Type:application/json`
+
+        ### Parameters
 
         #
       tags:
@@ -3452,7 +3606,15 @@ paths:
 
         **Note:** If GET does not return any tasks, the import is not running or might have completed. Tasks sort in ascending order of creation time, with the newest task at the top of the list. To sort in descending order, append `?sort =- creationTime` to the URL.
 
+        ### Run the import
+
         *   Request
+
+        ### Request Body
+
+        | **Body** | **Description** |
+        | --- | --- |
+        | `{"localeName": "en_US"}` | <br><br>*   Required<br>*   Description: Specifies the language to use for task status and error messages. `en_US` is the only supported language type.<br><br> |
 
         #
       tags:
@@ -3484,13 +3646,27 @@ paths:
         *   `taskID` is the ID that you specified in the request.
 
 
+        Here is a list of each possible `taskState`:
+
+        | **Status** | **Description** |
+        | --- | --- |
+        | `NOT_STARTED` | The task is scheduled to run, but has not started yet. |
+        | `IN_PROGRESS` | The task is currently running. |
+        | `COMPLETE` | The task has finished running whether successful or not. |
+        | `CANCELLING` | The task is currently being canceled. Cancellation is not yet complete. |
+        | `CANCELLED` | The task has been canceled and the changes have been rolled back. |
+
         If failures occur during the import task:
 
         *   `details` contains a JSON array that contains debug information
         *   If a dump file is available, `failureDumpAvailable` is true and `objectId` contains the ID of the dump file. The dump file contains details of the failures that occurred during the import. You can use the `objectId` to get the dump file.
 
+        ### Headers
+
         *   `Authorization:AnaplanAuthToken {anaplan_auth_token}`
         *   `Content-Type:application/json`
+
+        ### Parameters
 
         #
       tags:
@@ -3620,6 +3796,8 @@ paths:
 
         It is possible for a dump file to be very large. To help manage the size of a dump file and prevent timeouts, download the dump file in chunks. Chunks are 10mb or less and numbered sequentially from 0.
 
+        ### Headers
+
         *   `Authorization:AnaplanAuthToken {anaplan_auth_token}`
         *   `Content-Type:application/json`
       tags:
@@ -3652,6 +3830,8 @@ paths:
       summary: Download dump file chunks
       description: |-
         Once you have the chunk count, download them sequentially and concatenate. The request below downloads chunk 0.
+
+        ### Headers
 
         *   `Authorization:AnaplanAuthToken {anaplan_auth_token}`
         *   `Content-Type:application/json`
@@ -3908,6 +4088,28 @@ paths:
     get:
       summary: Retrieve list metadata
       description: |-
+        Use this call to retrieve the following metadata for a specified list:
+
+        | **Metadata** | **Description** |
+        | --- | --- |
+        | `category` | The category to which the list is assigned. |
+        | `dataTags` | The data tags associated with the list. |
+        | `hasSelectiveAccess` | If the value is true, this list uses [selective access](https://help.anaplan.com/anapedia/Content/Modeling/Users/Selective_Access.html). |
+        | `id` | The list ID.  This corresponds to the `listId` parameter. |
+        | `itemCount` | The number of list items present in the list. |
+        | `managedBy` | Not currently used. |
+        | `name` | The list name. |
+        | `nextitemIndex` | Contains the index of the next new item in the list. Used only by numbered lists. |
+        | `numberedList` | A true value indicates this is a numbered list. |
+        | `parent` | <br><br>The parent hierarchy, which includes this information for the parent list:  <br><br>*   `id`<br>*   `name`<br><br> |
+        | `permittedItems` | Indicates how many more items you can add to the existing list. This value changes when the number of items in the list change. |
+        | `productionData` | A true value indicates this is a production list in [Application Lifecycle Management (ALM)](https://help.anaplan.com/anapedia/Content/ALM/Application_Lifecycle_Management.htm). |
+        | `properties` | <br><br>The list properties, which include:  <br><br>*   `dataTags`<br>*   `format`<br>*   `formula`<br>*   `notes`<br>*   `referencedBy`<br><br> |
+        | `subsets` | <br><br>A list of subsets associated with the list hierarchy, which includes the following information for the parent list:  <br><br>*   `id`<br>*   `name`<br><br> |
+        | `topLevelItem` | If present, indicates the top level item in a hierarchy. |
+        | `useTopLevelAsPageDefault` | A true value indicates this list is the default item in a page selector. |
+        | `workflowEnabled` | A true value indicates this list is enabled for [Workflow](https://help.anaplan.com/anapedia/Content/Modeling/Manage_Models/Workflow.html). |
+
         If any of the metadata values are not set for a list (for example, no parent or no top level item), then the result omits the metadata entry.
 
         **Notes**:
@@ -3984,7 +4186,26 @@ paths:
         *   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response.
 
 
+        The following list data always displays in the query response:
+
+        | **Default List Data** | **Description** |
+        | --- | --- |
+        | `id` | The Anaplan ID of the item in the list. |
+        | `name` | The name of the item in the list. |
+        | `code` | The code value for an item in the list (if specified) |
+        | `parent` | The name of the parent item in the list. |
+        | `parentId` | The Anaplan ID of the parent item in the list. |
+        | `listId` | The Anaplan ID of the list to which the parent item belongs. This ID displays if the list has a **Parent Hierarchy** set under the **Configure** tab in Anaplan. |
+        | `listName` | The name of list to which the parent item belongs. The name displays if the list has a **Parent Hierarchy** set under the **Configure** tab in Anaplan. |
+
         Set the `includeAll` query parameter to true to display the following optional list data fields in the response.
+
+        | **Optional List Data** | **Description** |
+        | --- | --- |
+        | `write` | If [Selective Access](https://help.anaplan.com/anapedia/Content/Modeling/Users/Selective_Access.html) is enabled for the list, you can add individual users to provide `write` access. Users with `write` access can view and edit data associated with the list items. |
+        | `read` | If [Selective Access](https://help.anaplan.com/anapedia/Content/Modeling/Users/Selective_Access.html) is enabled for the list, you can add individual users to provide `read` access. Users with `read` access can view the data associated with the list items but not edit it. |
+        | `subsets` | If the value of the subset column is true, the associated item belongs to that subset.  You can view subsets under **Subsets** tab in Anaplan. |
+        | `properties` | The value of each custom list property. |
       tags:
       - Transactional Read
       parameters:
@@ -4038,13 +4259,38 @@ paths:
         *   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html).
         *   A maximum of 100,000 list items can be added with a single call.
 
+        ### Request body
+
+        | **List Data** | **Description** |
+        | --- | --- |
+        | `{name}` | The name value for the item in the list. |
+        | `{code}` | The code value for the item in the list. |
+        | `{parent}` | The name of the parent item in the list |
+        | `{properties}` | The value of each custom list property. |
+        | `{subsets}` | The value of each custom list subset. |
+
         ### Logic for add items
 
         The add list items behavior uses specific logic with names and codes. This logic varies between [general lists](https://help.anaplan.com/f7f01453-71bc-4046-935a-b9d7cb47d15a-General-Lists) and [numbered lists](https://help.anaplan.com/54b75174-848f-482b-a051-a9a063ece50c-Numbered-Lists) in Anaplan.
 
+        ### Add items to a general list
+
+        | **Scenario** | **Existing** | **Input in API** | **Behavior** | **Result** |
+        | --- | --- | --- | --- | --- |
+        | Add a new list Item | There are no existing items | name=n1  <br>code=c1 | Success.  <br>A new list item is created. | name=n1  <br>code=c1 |
+        | Add list item with name conflicts | name=n1  <br>code=c1 | name=n1  <br>code=c2 | There is a duplicate name. A new list item is not added. | An error message returns. |
+        | Add list item with code conflicts | name=n1  <br>code=c1 | name=n2  <br>code=c1 | There is a duplicate name. A new list item is not added. | An error message returns. |
+        | Add list item without name | There are no existing items | code=c1 | There is a missing name. A new list item is not added. | An error message returns. |
+
         ### Add items to a numbered list
 
         For a numbered list, the name column is used for the index. The name is automatically generated. When you add an item, the API does not allow a name as an input.
+
+        | **Scenario** | **Existing** | **Input in API** | **Behavior** | **Result** |
+        | --- | --- | --- | --- | --- |
+        | Add a new list Item | There are no existing items | name=n1  <br>code=c1 | A name is not a valid input. A new list item is not added. | An error message returns. |
+        | Add a new list item | There are no existing items | code=c1 | Success.  <br>A new item is added. | success code=c1 |
+        | Add a list item with a conflicting code | code=c1 | code=c1 | There is a duplicate code. A new list item is not added. | An error message returns. |
       tags:
       - Transactional Write
       parameters:
@@ -4177,9 +4423,35 @@ paths:
 
         Note: When an update to a list item completes successfully, all downstream calculations are also complete. This includes cells linked by formulas to the cells being updated.
 
+        ### Request body
+
+        | **List Data** | **Description** |
+        | --- | --- |
+        | `{name}` | The name value for the item in the list. |
+        | `{code}` | The code value for the item in the list. |
+        | `{id}` | The Anaplan ID of the item in the list. |
+        | `{parent}` | The name of the parent item in the list |
+        | `{properties}` | The value of each custom list property. |
+        | `{subsets}` | The value of each custom list subset. |
+
         ### Update logic
 
         The update list item endpoint logic varies by the update scenario.
+
+        | **Scenario** | **Existing** | **Input in API** | **Behavior** | **Result** |
+        | --- | --- | --- | --- | --- |
+        | Update list item | name=n1  <br>code=c1 | name=n1  <br>code=c1 | Success | name=n1  <br>code=c1 |
+        | Update name | name=n1  <br>code=c1 | name=n2  <br>code=c1 | Success | name=n2  <br>code=c1 |
+        | Update code | id=id1  <br>name=n1  <br>code=c1 | id=id1  <br>name=n1  <br>code=c2 | Success | id=id1  <br>name=n1  <br>code=c2 |
+        | Update code without existing code | id=id1  <br>name=n1 | id=id1  <br>name=n1  <br>code=c2 | Success | id=id1  <br>name=n1  <br>code=c2 |
+        | Update code  <br>(removing existing code) | id=id1  <br>name=n1  <br>code=c1 | id=id1  <br>name=n1  <br>code="" | This scenario does not provide a new code to replace the existing value. An error returns. | error: `INCOMPLETE_DATA` |
+        | Update code without an existing code  <br>(assign a code without the id) | name=n1 | name=n1  <br>code=c1 | Success | name=n1  <br>code=c1 |
+        | Update code with same name | name=n1  <br>code=c1 | name=n1  <br>code=c2 | The name is already used. An error returns. | error: `INCOMPLETE_DATA` |
+        | Update value with code only | name=n1  <br>code=c1  <br>properties{p1=1234} | code=c1  <br>properties{p1=1234} | Success  <br>It's valid to use the code to identify the record. | code=c1  <br>properties {p1=4321} |
+        | Update value with name only.  <br>Do not specify the code | name=n1  <br>code=c1  <br>properties{p1=1234} | name=n1  <br>properties{p1=1234} | The code is required to identify the record. An error returns. | error: `INCOMPLETE_DATA` |
+        | Update value with name only | name=n1  <br>properties{p1=1234} | name=n1  <br>properties{p1=4321} | Success  <br>When the code is not defined, the API can still update with the name. | name=n1  <br>properties{p1=4321} |
+
+        ### Response 200 body
 
         The response body contains a JSON object that contains `total` (total number of items in request), `updated` (number of items updated), `ignored` (number of items ignored), and `failures` fields. On `failures`, each field contains information about any errors encountered while performing the update action. `requestIndex` is the index in the input items array.
       tags:
@@ -4274,10 +4546,12 @@ paths:
     - $ref: '#/components/parameters/ModelId'
     get:
       summary: Get current fiscal year
-      description: Use this call to get the current fiscal year with the start and end date from the model calendar. The value
-        of the start and end date is determined by the calendar type set in the model. This value is not always a range from
-        Jan 1 to Dec 31. The API returns an empty value If the calendar type does not have an available fiscal year (for example,
-        Weeks General).
+      description: |-
+        Use this call to get the current fiscal year with the start and end date from the model calendar. The value of the start and end date is determined by the calendar type set in the model. This value is not always a range from Jan 1 to Dec 31. The API returns an empty value If the calendar type does not have an available fiscal year (for example, Weeks General).
+
+        ### Model Calendar
+
+        ### Model Calendar
       tags:
       - Model Metadata
       - Model Setting Metadata
@@ -4541,8 +4815,12 @@ paths:
         *   `id` is the Id of the process that you can run on the specified model.
         *   `name` is the name of the process that you can run.
 
+        ### Headers
+
         *   `Authorization:AnaplanAuthToken {anaplan_auth_token}`
         *   `Content-Type:application/json`
+
+        ### Parameters
 
         #
       tags:
@@ -4659,8 +4937,12 @@ paths:
       description: |-
         This lists the tasks in the process for the given processID. This returns a JSON array containing the list of tasks in the process definition.
 
+        ### Headers
+
         *   `Authorization:AnaplanAuthToken {anaplan_auth_token}`
         *   `Content-Type:application/json`
+
+        ### Parameters
 
         #
       tags:
@@ -4701,8 +4983,12 @@ paths:
       description: |-
         You can POST a process task to run a process. This returns a new `taskID`. Once you have started the process, you can use GET to receive a list of tasks as a JSON array. You can use this to monitor the status of each task.
 
+        ### Headers
+
         *   `Authorization:AnaplanAuthToken {anaplan_auth_token}`
         *   `Content-Type:application/json`
+
+        ### Parameters
 
         #
       tags:
@@ -4739,8 +5025,20 @@ paths:
 
         Here is a list of each possible `taskState`:
 
+        | **Status** | **Description** |
+        | --- | --- |
+        | NOT_STARTED | The task is scheduled to run, but has not started yet. |
+        | IN_PROGRESS | The task is currently running. |
+        | COMPLETE | The task has finished running whether successful or not. |
+        | CANCELLING | The task is currently being canceled. Cancellation is not yet complete. |
+        | CANCELLED | The task has been canceled and the changes have been rolled back. |
+
+        ### Headers
+
         *   `Authorization:AnaplanAuthToken {anaplan_auth_token}`
         *   `Content-Type:application/json`
+
+        ### Parameters
 
         #
       tags:
@@ -4853,10 +5151,14 @@ paths:
         *   Single quotes enclose the module and view names that have special characters
         *   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response
 
+        ### Default views
+
         For default views:
 
         *   The value of the {viewId} is identical to the value of the {moduleId}
         *   The value of the name is identical to the value of the module
+
+        ### Saved views
 
         For saved views:
 
@@ -5021,15 +5323,15 @@ paths:
         *   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html).
         *   As a best practice, use the Delete read requests call to clear all pages from completed exports as soon as you download all pages. Doing so will make space available for future exports.
 
-        * * *
-
-        * * *
+        ### Request Body
 
         This API supports exporting data in the following formats:
 
-        * * *
-
-        * * *
+        | **Type** | **Description** | **More information** |
+        | --- | --- | --- |
+        | `GRID_ALL_PAGES` | This layout respects the existing sorting and filtering you have imposed on a data grid before you launch the export. | [Export grid](https://help.anaplan.com/Import_and_Export/Export_Layouts/Export_Data_in_Grid_Layout.html) |
+        | `TABULAR_SINGLE_ITEMS` | This layout takes all dimensions and puts them in columns, with the final column reserved for data. | [Export tabular single column](https://help.anaplan.com/Import_and_Export/Export_Layouts/Export_Data_in_Tabular_Single_Column_Layout.html) |
+        | `TABULAR_MULTI_COLUMN` | This layout enables you to export multiple data columns. If you set up a Boolean line item, you can use it as a filter to control which data is exported. This is especially useful when exporting from large modules. It saves the manual task of marking data cells for export. | [Export Tabular Multiple Column](https://help.anaplan.com/Import_and_Export/Export_Layouts/Export_Data_in_Tabular_Multiple_Column_Layout.html) |
       tags:
       - Transactional Read
       responses:
@@ -5069,15 +5371,7 @@ paths:
 
         **Note:** To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html).
 
-        * * *
-
-        * * *
-
-        * * *
-
         ### Response scenarios
-
-        * * *
 
         *   When `requestState` is `COMPLETE` and `successful` is `true` , the export has completed successfully and the user can download all the pages.
         *   When `requestState` is `IN_PROGRESS` and `successful` is `false`, the export has not yet completed. You can download the available pages indicated by the `availablePages` field.
@@ -5126,6 +5420,8 @@ paths:
         *   To use this call, you must be a [**Workspace Administrator**](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html).
         *   As a best practice, use this call to clear all pages from completed exports as soon as you download all pages. Doing so will make space available for future exports.
         *   The system will automatically reclaim space for read requests not accessed for over 30 minutes. The same applies to failed read requests.
+
+        ### Response 200 body
       tags:
       - Transactional Read
       responses:
