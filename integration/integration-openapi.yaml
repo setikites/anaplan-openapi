@@ -5642,6 +5642,8 @@ components:
     IncludeAll:
       name: includeAll
       in: query
+      description: When `true`, optional fields are included in the response (for line items, the full metadata field set).
+        When `false` or omitted, only the default fields are returned.
       required: false
       schema:
         type: boolean
@@ -6396,30 +6398,76 @@ components:
             textEncoding:
               type: string
     LineItem:
+      type: object
       properties:
         appliesTo:
           type: array
+          description: Lists and list subsets the line item is dimensioned by.
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
         breakback:
           type: boolean
+          description: Whether breakback is enabled, allowing edits to an aggregate to distribute down to its details.
         broughtForward:
           type: boolean
         cellCount:
           type: integer
+          description: Number of cells the line item occupies across all its dimensions.
         code:
           type: string
         dataTags:
           type: array
+          description: Data tags applied to the line item.
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
         format:
           type: string
+          description: Data format of the line item (for example, NUMBER, TEXT, BOOLEAN, DATE).
         formatMetadata:
-          properties: {}
           type: object
+          description: Formatting configuration for the line item; the fields present depend on the format.
+          properties:
+            comparisonIncrease:
+              type: string
+            dataType:
+              type: string
+            decimalPlaces:
+              type: integer
+            decimalSeparator:
+              type: string
+            groupingSeparator:
+              type: string
+            minimumSignificantDigits:
+              type: integer
+            negativeNumberNotation:
+              type: string
+            unitsDisplayType:
+              type: string
+            unitsType:
+              type: string
+            zeroFormat:
+              type: string
         formula:
           type: string
         formulaScope:
           type: string
+          description: Scope the formula applies to (for example, All Versions).
+        id:
+          type: string
+          description: 12-digit numeric identifier. The prefix 206 marks this as a line item.
         isSummary:
           type: boolean
+          description: Whether the line item is a summary (calculated) line item rather than an input.
         moduleId:
           type: string
         moduleName:
@@ -6429,47 +6477,62 @@ components:
         notes:
           type: string
         parent:
+          type: object
           properties:
             id:
               type: string
             name:
               type: string
-          type: object
+          description: The parent line item, for line items nested under another.
         readAccessDriver:
+          type: object
           properties:
             id:
               type: string
             name:
               type: string
-          type: object
+          description: Line item that drives read access (cell-level access driver), when configured.
         referencedBy:
           type: array
+          description: Line items that reference this line item in their formulas.
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
         startOfSection:
           type: boolean
+          description: Whether this line item starts a new section in the module.
         style:
           type: string
         summary:
           type: string
+          description: Summary method used to aggregate the line item (for example, Sum, None).
         timeRange:
           type: string
         timeScale:
           type: string
         useSwitchover:
           type: boolean
+          description: Whether the line item uses the model's actual-to-forecast switchover.
         version:
+          type: object
           properties:
             id:
               type: string
             name:
               type: string
-          type: object
+          description: The version the line item is scoped to, when version-specific.
         writeAccessDriver:
+          type: object
           properties:
             id:
               type: string
             name:
               type: string
-          type: object
+          description: Line item that drives write access (cell-level access driver), when configured.
     WriteCellDataResponse:
       type: object
       properties:
