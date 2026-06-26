@@ -356,6 +356,56 @@ Live probe results for `INTEGRATION_FILE` (`113000001109`, Users.csv):
 
 `INTEGRATION_FILE` is an import source file. After `DELETE` teardown in write tests, the file has no content. The `chunkCount` field in the model-level file list (`GET /models/{modelId}/files`) may still show a non-zero value after DELETE (stale metadata), while `GET /chunks/0` returns 404. `test_download_first_chunk` handles this with a skip.
 
+### Open-question resolutions (issue #145)
+
+Decisions resolving review questions that block #147/#148. Several were already
+answered by prior live probes — cross-referenced rather than re-derived.
+
+- **ID types are `string`, always** (Q1/Q2). Every Anaplan ID is an opaque
+  identifier — 32-char hex or 12/13-digit prefixed numeric (see
+  [ID Format by Object Type](#id-format-by-object-type)). Even all-numeric IDs
+  (`viewId`, `listId`, model-level objects) are modelled `type: string`, not
+  `integer`: numeric typing causes int32 overflow, JS `double` precision loss
+  above 2^53, and wire-format mismatch if the API quotes them. The `integer`
+  occurrences for `viewId`/`listId` in `sources/integration/modelObjectschema.json`
+  are source bugs to normalise to `string`, not signal. No `pattern`/range
+  constraint until confirmed (ADR 0003 §5); the prefix families above are
+  descriptive, not enforced.
+- **Line items have no numeric ID range** (Q1). Line items are keyed by `code`,
+  not an `id` (see ID Format note). No `lineItemId` numeric range to document.
+- **Boolean query parameters are `type: boolean`** (Q3), consistently across all
+  paths. The wire is always text; the spec types them boolean for codegen.
+- **No workspace-scoped `/users` endpoint is needed** (Q4). The spec already
+  exposes `GET /workspaces/{workspaceId}/admins` and
+  `GET /workspaces/{workspaceId}/visitors` (with `Admin`/`Visitor` schemas).
+  `GET /users` is tenant-scoped ("all users within the tenant") and has no
+  `expand` parameter; visitors/admins are separate workspace-scoped resources,
+  not a projection of `/users` (Q5). `/users` description should point to the
+  two workspace endpoints rather than imply visitor inclusion.
+- **`s` search parameter semantics** (feeds #147). Shared component, generic
+  wording (mechanics are identical across `/users`, `/workspaces`, …; only the
+  filtered noun changes, so "items" covers all). Behaviour: undocumented
+  feature, may behave unpredictably; requires the **Tenant Admin** role and is
+  **ignored for non-admin users**; case-insensitive; matches items whose name or
+  ID *contains* the string; supports SQL-LIKE wildcards `%` (0-n characters) and
+  `_` (exactly 1 character); omitted (default) returns all items. Canonical
+  shared description:
+
+  > Optional case-insensitive filter. Matches items whose name or ID contains
+  > this string. Supports wildcards `%` (0-n characters) and `_` (exactly 1
+  > character). Omit to return all items. **Undocumented and may behave
+  > unpredictably; requires the Tenant Admin role and is ignored for non-admin
+  > users.**
+
+- **`Accept`/`Content-Type` are modelled via `content` media-type maps, not
+  header parameters** (Q6). OpenAPI 3.0 expresses them through
+  `requestBody.content.<media-type>` and `responses.<code>.content.<media-type>`.
+  When `Accept` selects an alternate response format (e.g. `views/data`
+  `format=v1` → `text/csv`, see [pages section](#pages-and-sort-query-parameters-issue-31)),
+  model each as a separate media-type key. Add an explicit `Accept`/`Content-Type`
+  header parameter only where the API deviates from standard content negotiation
+  in a way the `content` map cannot express.
+
 ## ADR 0003 Description Sweep (issue #90)
 
 Applied ADR 0003 description standards to `integration-openapi.json` (2026-06-18).
