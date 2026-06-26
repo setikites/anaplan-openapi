@@ -187,6 +187,28 @@ Live testing confirmed the following on all four task list endpoints (imports, e
 
 Format: `[prefix]field` where prefix is `-` (descending), `+` (ascending), or omitted (ascending). The API does not validate the field name — unknown fields also return 200 and appear to fall back to default ordering. Actual sort ordering could not be verified because the test model's task lists were empty at the time of testing.
 
+### `sort` on generic list endpoints (issue #161)
+
+Live testing against a populated tenant revealed **two distinct `sort` behaviors** across the generic (non-task) list endpoints. Ordering was verified by comparing the returned ID sequence under `+field` against `-field`.
+
+**Class 1 — top-level collections: `/models`, `/users`, `/workspaces`.** The field name **is** validated and the prefix **is mandatory**:
+
+- A bare field name (no `+`/`-`) returns `400 "Bad sort order format: '<field>'. Please follow (-){column_name_1},(+){column_name_2}.. format"`.
+- An unknown field returns `400 "Failed to parse sort parameter"`.
+- Multiple comma-separated columns are accepted.
+
+Confirmed sortable fields (every other response property tested returned 400, including `id`):
+
+| Endpoint | Sortable fields |
+|----------|-----------------|
+| `GET /models` | `name`, `activeState` |
+| `GET /users` | `firstName`, `lastName`, `email`, `active`, `lastLoginDate` |
+| `GET /workspaces` | `name`, `sizeAllowance` |
+
+**Class 2 — model resource lists: `/models/{modelId}/files`, `.../actions`, `.../imports`, `.../exports`, `.../processes`** (and their `/workspaces/{workspaceId}/...` forms). These behave exactly like the task-list endpoints above: the field name is **not** validated (unknown fields, e.g. `+zzzNoSuchField`, return 200 and fall back to default ordering), the prefix is optional (omitted = ascending), and comma-separated columns are accepted. `name` and `id` were observed to genuinely re-order results. Because field names are not validated, no definitive sortable-field list exists; the spec documents the no-validation behavior instead.
+
+`/workspaces/{workspaceId}/models` declares no `sort` parameter (unlike `/models`).
+
 ### `PUT /models/{modelId}/currentPeriod` — date parameter interface (issue #30)
 
 Live testing confirmed `date` is accepted as **either** a query parameter (`?date=YYYY-MM-DD`) **or** a request body field (`{"date": "YYYY-MM-DD"}`), but not both simultaneously. Sending both returns:

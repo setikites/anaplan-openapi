@@ -87,7 +87,7 @@
           {
             "name": "sort",
             "in": "query",
-            "description": "Sort results by object properties. Prefix with `+` for ascending or `-` for descending order.",
+            "description": "Sort order for the model list. Format: `[prefix]field` where prefix is `+` (ascending) or `-` (descending); the prefix is mandatory — a bare field name returns 400. Multiple comma-separated columns are accepted. Field names are validated: unknown fields return 400. Sortable fields: name, activeState.",
             "schema": {
               "type": "string"
             },
@@ -185,7 +185,7 @@
           {
             "name": "sort",
             "in": "query",
-            "description": "Sort results by object properties. Prefix with `+` for ascending or `-` for descending order.",
+            "description": "Sort order for the list. Format: `[prefix]field` where prefix is `-` (descending), `+` (ascending), or omitted (ascending); multiple comma-separated columns are accepted. The `name` and `id` fields reorder results. The API does not validate the field name — unknown fields are silently accepted and fall back to default ordering. Example: `+name`, `-id`.",
             "schema": {
               "type": "string"
             },
@@ -582,7 +582,7 @@
           {
             "name": "sort",
             "in": "query",
-            "description": "Sort results by object properties. Prefix with `+` for ascending or `-` for descending order.",
+            "description": "Sort order for the list. Format: `[prefix]field` where prefix is `-` (descending), `+` (ascending), or omitted (ascending); multiple comma-separated columns are accepted. The `name` and `id` fields reorder results. The API does not validate the field name — unknown fields are silently accepted and fall back to default ordering. Example: `+name`, `-id`.",
             "schema": {
               "type": "string"
             },
@@ -740,7 +740,7 @@
           {
             "name": "sort",
             "in": "query",
-            "description": "Sort results by object properties. Prefix with `+` for ascending or `-` for descending order.",
+            "description": "Sort order for the list. Format: `[prefix]field` where prefix is `-` (descending), `+` (ascending), or omitted (ascending); multiple comma-separated columns are accepted. The `name` and `id` fields reorder results. The API does not validate the field name — unknown fields are silently accepted and fall back to default ordering. Example: `+name`, `-id`.",
             "schema": {
               "type": "string"
             },
@@ -923,7 +923,7 @@
           {
             "name": "sort",
             "in": "query",
-            "description": "Sort results by object properties. Prefix with `+` for ascending or `-` for descending order.",
+            "description": "Sort order for the list. Format: `[prefix]field` where prefix is `-` (descending), `+` (ascending), or omitted (ascending); multiple comma-separated columns are accepted. The `name` and `id` fields reorder results. The API does not validate the field name — unknown fields are silently accepted and fall back to default ordering. Example: `+name`, `-id`.",
             "schema": {
               "type": "string"
             },
@@ -2042,7 +2042,7 @@
           {
             "name": "sort",
             "in": "query",
-            "description": "Sort results by object properties. Prefix with `+` for ascending or `-` for descending order.",
+            "description": "Sort order for the list. Format: `[prefix]field` where prefix is `-` (descending), `+` (ascending), or omitted (ascending); multiple comma-separated columns are accepted. The `name` and `id` fields reorder results. The API does not validate the field name — unknown fields are silently accepted and fall back to default ordering. Example: `+name`, `-id`.",
             "schema": {
               "type": "string"
             },
@@ -2747,7 +2747,7 @@
           {
             "name": "sort",
             "in": "query",
-            "description": "Sort results by object properties. Prefix with `+` for ascending or `-` for descending order.",
+            "description": "Sort order for the user list. Format: `[prefix]field` where prefix is `+` (ascending) or `-` (descending); the prefix is mandatory — a bare field name returns 400. Multiple comma-separated columns are accepted. Field names are validated: unknown fields return 400. Sortable fields: firstName, lastName, email, active, lastLoginDate.",
             "schema": {
               "type": "string"
             },
@@ -2868,7 +2868,7 @@
           {
             "name": "sort",
             "in": "query",
-            "description": "Sort results by object properties. Prefix with `+` for ascending or `-` for descending order.",
+            "description": "Sort order for the workspace list. Format: `[prefix]field` where prefix is `+` (ascending) or `-` (descending); the prefix is mandatory — a bare field name returns 400. Multiple comma-separated columns are accepted. Field names are validated: unknown fields return 400. Sortable fields: name, sizeAllowance.",
             "schema": {
               "type": "string"
             },
@@ -3168,7 +3168,7 @@
           {
             "name": "sort",
             "in": "query",
-            "description": "Sort results by object properties. Prefix with `+` for ascending or `-` for descending order.",
+            "description": "Sort order for the list. Format: `[prefix]field` where prefix is `-` (descending), `+` (ascending), or omitted (ascending); multiple comma-separated columns are accepted. The `name` and `id` fields reorder results. The API does not validate the field name — unknown fields are silently accepted and fall back to default ordering. Example: `+name`, `-id`.",
             "schema": {
               "type": "string"
             },
@@ -3809,7 +3809,7 @@
           {
             "name": "sort",
             "in": "query",
-            "description": "Sort results by object properties. Prefix with `+` for ascending or `-` for descending order.",
+            "description": "Sort order for the list. Format: `[prefix]field` where prefix is `-` (descending), `+` (ascending), or omitted (ascending); multiple comma-separated columns are accepted. The `name` and `id` fields reorder results. The API does not validate the field name — unknown fields are silently accepted and fall back to default ordering. Example: `+name`, `-id`.",
             "schema": {
               "type": "string"
             },
@@ -4158,7 +4158,7 @@
           {
             "name": "sort",
             "in": "query",
-            "description": "Sort results by object properties. Prefix with `+` for ascending or `-` for descending order.",
+            "description": "Sort order for the list. Format: `[prefix]field` where prefix is `-` (descending), `+` (ascending), or omitted (ascending); multiple comma-separated columns are accepted. The `name` and `id` fields reorder results. The API does not validate the field name — unknown fields are silently accepted and fall back to default ordering. Example: `+name`, `-id`.",
             "schema": {
               "type": "string"
             },
@@ -4620,7 +4620,7 @@
           {
             "name": "sort",
             "in": "query",
-            "description": "Sort results by object properties. Prefix with `+` for ascending or `-` for descending order.",
+            "description": "Sort order for the list. Format: `[prefix]field` where prefix is `-` (descending), `+` (ascending), or omitted (ascending); multiple comma-separated columns are accepted. The `name` and `id` fields reorder results. The API does not validate the field name — unknown fields are silently accepted and fall back to default ordering. Example: `+name`, `-id`.",
             "schema": {
               "type": "string"
             },
@@ -6298,7 +6298,7 @@
           {
             "name": "sort",
             "in": "query",
-            "description": "Sort results by object properties. Prefix with `+` for ascending or `-` for descending order.",
+            "description": "Sort order for the list. Format: `[prefix]field` where prefix is `-` (descending), `+` (ascending), or omitted (ascending); multiple comma-separated columns are accepted. The `name` and `id` fields reorder results. The API does not validate the field name — unknown fields are silently accepted and fall back to default ordering. Example: `+name`, `-id`.",
             "schema": {
               "type": "string"
             },
