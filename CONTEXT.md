@@ -198,6 +198,32 @@ A local copy of the collection is saved at `sources/Official Anaplan Collection.
 
 `sources/postman-spec.yaml` is a YAML conversion of the collection generated from a personal fork of the official Anaplan collection. It is produced by exporting the forked collection from Postman in OpenAPI format. This file captures the collection state at a point in time and may lag behind updates to the official collection.
 
+### Canonical API reference links
+
+Single source of truth for each API's official anaplan.com reference page. Spec
+parameter descriptions cite these when an ID is **sourced from a different API**
+(e.g. `modelId` consumed by CloudWorks/Audit/ALM but minted by Integration) —
+see [ADR 0004](docs/adr/0004-id-source-path-descriptions.md). When a URL changes,
+edit it here only.
+
+| API | Canonical reference |
+|-----|---------------------|
+| Integration | https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2 |
+| CloudWorks | https://help.anaplan.com/cloudworks-api-94bfcdc3-fff0-48d6-be9c-0e1bba2e889c |
+| SCIM | https://help.anaplan.com/scim-api-f6a801cd-c253-4ab9-ba03-dac09fd71f7c |
+| ALM | https://help.anaplan.com/application-lifecycle-management-api-2565cfa6-e0c2-4e24-884e-d0df957184d6 |
+| Audit | https://help.anaplan.com/audit-api-0dbbe4be-d5b7-4075-89ad-fa922f88e855 |
+| Financial Consolidation | https://help.anaplan.com/anaplan-financial-consolidation-api-e83345d8-0509-4228-b532-679ee398a9d5 |
+| Exception Users | https://help.anaplan.com/exception-users-api--814cd4ae-0e80-4910-8500-988ad089eef1 |
+| Administration | https://help.anaplan.com/administration-api-34c09687-9110-4672-b31b-0f959f67ea32 |
+| Authentication | https://help.anaplan.com/authentication-service-api-4060eddf-fe4e-4220-96f6-267d54502ed6 |
+| OAuth | https://help.anaplan.com/authentication-service-api-4060eddf-fe4e-4220-96f6-267d54502ed6 |
+
+OAuth and Authentication share the **Authentication service API** page; both mint
+tokens rather than chainable resource IDs, so they are rarely cited as a
+cross-API ID source. These are anaplan.com landing pages, not Apiary blueprint
+links — Apiary links are dropped from specs (ADR 0004), these replace them.
+
 ### Regional server URLs
 
 Each API has region-specific base URLs. Source: [URL, IP, and allowlist requirements](https://support.anaplan.com/url-ip-and-allowlist-requirements-c8235c7d-8af2-413b-a9ff-d465978806b9) (also saved as `sources/oauth/URL, IP, and allowlist requirements _ Anaplan Support.pdf`).
