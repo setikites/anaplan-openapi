@@ -1392,7 +1392,7 @@
       ],
       "get": {
         "summary": "Model-direct form: Retrieve list metadata",
-        "description": "Alternate URL form — response is equivalent to `/workspaces/{workspaceId}/models/{modelId}/lists/{listId}`.\n\nUse this call to retrieve the following metadata for a specified list:\n\n| **Metadata** | **Description** |\n| --- | --- |\n| `category` | The category to which the list is assigned. |\n| `dataTags` | The data tags associated with the list. |\n| `hasSelectiveAccess` | If the value is true, this list uses [selective access](https://help.anaplan.com/anapedia/Content/Modeling/Users/Selective_Access.html). |\n| `id` | The list ID.  This corresponds to the `listId` parameter. |\n| `itemCount` | The number of list items present in the list. |\n| `managedBy` | Not currently used. |\n| `name` | The list name. |\n| `nextitemIndex` | Contains the index of the next new item in the list. Used only by numbered lists. |\n| `numberedList` | A true value indicates this is a numbered list. |\n| `parent` | <br><br>The parent hierarchy, which includes this information for the parent list:  <br><br>*   `id`<br>*   `name`<br><br> |\n| `permittedItems` | Indicates how many more items you can add to the existing list. This value changes when the number of items in the list change. |\n| `productionData` | A true value indicates this is a production list in [Application Lifecycle Management (ALM)](https://help.anaplan.com/anapedia/Content/ALM/Application_Lifecycle_Management.htm). |\n| `properties` | <br><br>The list properties, which include:  <br><br>*   `dataTags`<br>*   `format`<br>*   `formula`<br>*   `notes`<br>*   `referencedBy`<br><br> |\n| `subsets` | <br><br>A list of subsets associated with the list hierarchy, which includes the following information for the parent list:  <br><br>*   `id`<br>*   `name`<br><br> |\n| `topLevelItem` | If present, indicates the top level item in a hierarchy. |\n| `useTopLevelAsPageDefault` | A true value indicates this list is the default item in a page selector. |\n| `workflowEnabled` | A true value indicates this list is enabled for [Workflow](https://help.anaplan.com/anapedia/Content/Modeling/Manage_Models/Workflow.html). |\n\nIf any of the metadata values are not set for a list (for example, no parent or no top level item), then the result omits the metadata entry.\n\n**Notes**:\n\n*   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html).\n*   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response.",
+        "description": "Alternate URL form — response is equivalent to `/workspaces/{workspaceId}/models/{modelId}/lists/{listId}`.\n\nUse this call to retrieve metadata for a specified list. Field-level descriptions are in the response schema (ListMetadata). Metadata entries that are not set for a list (for example, no parent or no top level item) are omitted from the response.\n\n**Notes**:\n\n*   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html).\n*   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response.",
         "tags": [
           "Model Metadata",
           "List Metadata"
@@ -1412,7 +1412,7 @@
               "application/json": {
                 "example": {
                   "meta": {
-                    "schema": "https://api.anaplan.com/2/0/models/102B/objects/list"
+                    "schema": "https://api.anaplan.com/2/0/models/A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4/objects/list"
                   },
                   "status": {
                     "code": 200,
@@ -1458,7 +1458,7 @@
                       "$ref": "#/components/schemas/Status"
                     },
                     "metadata": {
-                      "$ref": "#/components/schemas/List"
+                      "$ref": "#/components/schemas/ListMetadata"
                     }
                   }
                 }
@@ -5355,7 +5355,7 @@
       ],
       "get": {
         "summary": "Retrieve list metadata",
-        "description": "Use this call to retrieve the following metadata for a specified list:\n\n| **Metadata** | **Description** |\n| --- | --- |\n| `category` | The category to which the list is assigned. |\n| `dataTags` | The data tags associated with the list. |\n| `hasSelectiveAccess` | If the value is true, this list uses [selective access](https://help.anaplan.com/anapedia/Content/Modeling/Users/Selective_Access.html). |\n| `id` | The list ID.  This corresponds to the `listId` parameter. |\n| `itemCount` | The number of list items present in the list. |\n| `managedBy` | Not currently used. |\n| `name` | The list name. |\n| `nextitemIndex` | Contains the index of the next new item in the list. Used only by numbered lists. |\n| `numberedList` | A true value indicates this is a numbered list. |\n| `parent` | <br><br>The parent hierarchy, which includes this information for the parent list:  <br><br>*   `id`<br>*   `name`<br><br> |\n| `permittedItems` | Indicates how many more items you can add to the existing list. This value changes when the number of items in the list change. |\n| `productionData` | A true value indicates this is a production list in [Application Lifecycle Management (ALM)](https://help.anaplan.com/anapedia/Content/ALM/Application_Lifecycle_Management.htm). |\n| `properties` | <br><br>The list properties, which include:  <br><br>*   `dataTags`<br>*   `format`<br>*   `formula`<br>*   `notes`<br>*   `referencedBy`<br><br> |\n| `subsets` | <br><br>A list of subsets associated with the list hierarchy, which includes the following information for the parent list:  <br><br>*   `id`<br>*   `name`<br><br> |\n| `topLevelItem` | If present, indicates the top level item in a hierarchy. |\n| `useTopLevelAsPageDefault` | A true value indicates this list is the default item in a page selector. |\n| `workflowEnabled` | A true value indicates this list is enabled for [Workflow](https://help.anaplan.com/anapedia/Content/Modeling/Manage_Models/Workflow.html). |\n\nIf any of the metadata values are not set for a list (for example, no parent or no top level item), then the result omits the metadata entry.\n\n**Notes**:\n\n*   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html).\n*   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response.",
+        "description": "Use this call to retrieve metadata for a specified list. Field-level descriptions are in the response schema (ListMetadata). Metadata entries that are not set for a list (for example, no parent or no top level item) are omitted from the response.\n\n**Notes**:\n\n*   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html).\n*   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response.",
         "tags": [
           "Model Metadata",
           "List Metadata"
@@ -5375,7 +5375,7 @@
               "application/json": {
                 "example": {
                   "meta": {
-                    "schema": "https://api.anaplan.com/2/0/models/102B/objects/list"
+                    "schema": "https://api.anaplan.com/2/0/models/A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4/objects/list"
                   },
                   "status": {
                     "code": 200,
@@ -5421,7 +5421,7 @@
                       "$ref": "#/components/schemas/Status"
                     },
                     "metadata": {
-                      "$ref": "#/components/schemas/List"
+                      "$ref": "#/components/schemas/ListMetadata"
                     }
                   }
                 }
@@ -7176,11 +7176,12 @@
       "ListId": {
         "name": "listId",
         "in": "path",
+        "description": "List identifier (12-digit numeric string, prefix 101). From GET /models/{modelId}/lists.",
         "required": true,
         "schema": {
           "type": "string"
         },
-        "example": "{{listId}}"
+        "example": "101000000000"
       },
       "ModuleId": {
         "name": "moduleId",
@@ -7721,6 +7722,136 @@
           },
           "name": {
             "type": "string"
+          }
+        }
+      },
+      "ListMetadata": {
+        "type": "object",
+        "description": "Full metadata for a single list, returned by GET .../lists/{listId}. Metadata entries that are not set for a list (for example, no parent or no top level item) are omitted from the response.",
+        "properties": {
+          "category": {
+            "type": "string",
+            "description": "The category to which the list is assigned."
+          },
+          "dataTags": {
+            "type": "array",
+            "description": "The data tags associated with the list.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "hasSelectiveAccess": {
+            "type": "boolean",
+            "description": "true if this list uses selective access."
+          },
+          "id": {
+            "type": "string",
+            "description": "The list ID. Corresponds to the listId path parameter. 12-digit numeric, prefix 101."
+          },
+          "itemCount": {
+            "type": "integer",
+            "description": "The number of list items present in the list."
+          },
+          "managedBy": {
+            "type": "string",
+            "description": "Not currently used."
+          },
+          "name": {
+            "type": "string",
+            "description": "The list name."
+          },
+          "nextitemIndex": {
+            "type": "integer",
+            "description": "Index of the next new item in the list. Used only by numbered lists."
+          },
+          "numberedList": {
+            "type": "boolean",
+            "description": "true if this is a numbered list."
+          },
+          "parent": {
+            "type": "object",
+            "description": "The parent hierarchy list, when this list is part of a hierarchy.",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          },
+          "permittedItems": {
+            "type": "integer",
+            "description": "How many more items you can add to the list. Changes as the number of items in the list changes."
+          },
+          "productionData": {
+            "type": "boolean",
+            "description": "true if this is a production list in Application Lifecycle Management (ALM)."
+          },
+          "properties": {
+            "type": "array",
+            "description": "The list properties.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "dataTags": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "format": {
+                  "type": "string"
+                },
+                "formula": {
+                  "type": "string"
+                },
+                "notes": {
+                  "type": "string"
+                },
+                "referencedBy": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "subsets": {
+            "type": "array",
+            "description": "The subsets associated with the list hierarchy.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "topLevelItem": {
+            "type": "object",
+            "description": "If present, the top level item in a hierarchy.",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          },
+          "useTopLevelAsPageDefault": {
+            "type": "boolean",
+            "description": "true if this list is the default item in a page selector."
+          },
+          "workflowEnabled": {
+            "type": "boolean",
+            "description": "true if this list is enabled for Workflow."
           }
         }
       },
