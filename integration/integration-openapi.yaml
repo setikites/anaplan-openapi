@@ -1920,7 +1920,9 @@ paths:
           type: array
           items:
             type: string
-        example: 101000000026:330000000028
+        example:
+        - 101000000026:330000000028
+        - 101000000020:330000000028
         style: form
         explode: true
       responses:
