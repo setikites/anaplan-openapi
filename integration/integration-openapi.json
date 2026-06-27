@@ -2600,7 +2600,7 @@
           {
             "name": "pages",
             "in": "query",
-            "description": "Page selector values, each in the form dimensionId:itemId. Selects which item to display for each page-axis dimension. Both repeated-key form (pages=a:b&pages=c:d) and comma-separated form (pages=a:b,c:d) are accepted. Dimension items can be retrieved from GET /workspaces/{workspaceId}/models/{modelId}/dimensions/{dimensionId}/items.",
+            "description": "Page selector values, each in the form `dimensionId:itemId`, choosing which item to display for each page-axis dimension. The page-axis `dimensionId` values come from the `pages` array of `GET /models/{modelId}/views/{viewId}`; the `itemId` values for a given dimension come from `GET /workspaces/{workspaceId}/models/{modelId}/dimensions/{dimensionId}/items`. Both repeated-key form (`pages=a:b&pages=c:d`) and comma-separated form (`pages=a:b,c:d`) are accepted.",
             "required": false,
             "schema": {
               "type": "array",
