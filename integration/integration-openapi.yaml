@@ -50,9 +50,8 @@ paths:
       - $ref: '#/components/parameters/Search'
       - name: sort
         in: query
-        description: 'Sort order for the model list. Format: `[prefix]field` where prefix is `+` (ascending) or `-` (descending);
-          the prefix is mandatory — a bare field name returns 400. Multiple comma-separated columns are accepted. Field names
-          are validated: unknown fields return 400. Sortable fields: name, activeState.'
+        description: 'Sort results. `+field` ascending, `-field` descending; prefix required and field name validated (bad
+          or unknown field returns 400). Comma-separate to sort by multiple columns. Sortable fields: name, activeState.'
         schema:
           type: string
         example: +name
@@ -112,9 +111,8 @@ paths:
       parameters:
       - name: sort
         in: query
-        description: 'Sort order for the list. Format: `[prefix]field` where prefix is `-` (descending), `+` (ascending),
-          or omitted (ascending); multiple comma-separated columns are accepted. The `name` and `id` fields reorder results.
-          The API does not validate the field name — unknown fields are silently accepted and fall back to default ordering.
+        description: 'Sort results. `+field` or unprefixed ascending, `-field` descending; comma-separate for multiple columns.
+          `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order.
           Example: `+name`, `-id`.'
         schema:
           type: string
@@ -418,9 +416,8 @@ paths:
       parameters:
       - name: sort
         in: query
-        description: 'Sort order for the list. Format: `[prefix]field` where prefix is `-` (descending), `+` (ascending),
-          or omitted (ascending); multiple comma-separated columns are accepted. The `name` and `id` fields reorder results.
-          The API does not validate the field name — unknown fields are silently accepted and fall back to default ordering.
+        description: 'Sort results. `+field` or unprefixed ascending, `-field` descending; comma-separate for multiple columns.
+          `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order.
           Example: `+name`, `-id`.'
         schema:
           type: string
@@ -545,9 +542,8 @@ paths:
       parameters:
       - name: sort
         in: query
-        description: 'Sort order for the list. Format: `[prefix]field` where prefix is `-` (descending), `+` (ascending),
-          or omitted (ascending); multiple comma-separated columns are accepted. The `name` and `id` fields reorder results.
-          The API does not validate the field name — unknown fields are silently accepted and fall back to default ordering.
+        description: 'Sort results. `+field` or unprefixed ascending, `-field` descending; comma-separate for multiple columns.
+          `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order.
           Example: `+name`, `-id`.'
         schema:
           type: string
@@ -669,9 +665,8 @@ paths:
       parameters:
       - name: sort
         in: query
-        description: 'Sort order for the list. Format: `[prefix]field` where prefix is `-` (descending), `+` (ascending),
-          or omitted (ascending); multiple comma-separated columns are accepted. The `name` and `id` fields reorder results.
-          The API does not validate the field name — unknown fields are silently accepted and fall back to default ordering.
+        description: 'Sort results. `+field` or unprefixed ascending, `-field` descending; comma-separate for multiple columns.
+          `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order.
           Example: `+name`, `-id`.'
         schema:
           type: string
@@ -1454,9 +1449,8 @@ paths:
       parameters:
       - name: sort
         in: query
-        description: 'Sort order for the list. Format: `[prefix]field` where prefix is `-` (descending), `+` (ascending),
-          or omitted (ascending); multiple comma-separated columns are accepted. The `name` and `id` fields reorder results.
-          The API does not validate the field name — unknown fields are silently accepted and fall back to default ordering.
+        description: 'Sort results. `+field` or unprefixed ascending, `-field` descending; comma-separate for multiple columns.
+          `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order.
           Example: `+name`, `-id`.'
         schema:
           type: string
@@ -2029,9 +2023,9 @@ paths:
       - $ref: '#/components/parameters/Search'
       - name: sort
         in: query
-        description: 'Sort order for the user list. Format: `[prefix]field` where prefix is `+` (ascending) or `-` (descending);
-          the prefix is mandatory — a bare field name returns 400. Multiple comma-separated columns are accepted. Field names
-          are validated: unknown fields return 400. Sortable fields: firstName, lastName, email, active, lastLoginDate.'
+        description: 'Sort results. `+field` ascending, `-field` descending; prefix required and field name validated (bad
+          or unknown field returns 400). Comma-separate to sort by multiple columns. Sortable fields: firstName, lastName,
+          email, active, lastLoginDate.'
         schema:
           type: string
         example: +firstName
@@ -2110,9 +2104,8 @@ paths:
       - $ref: '#/components/parameters/Search'
       - name: sort
         in: query
-        description: 'Sort order for the workspace list. Format: `[prefix]field` where prefix is `+` (ascending) or `-` (descending);
-          the prefix is mandatory — a bare field name returns 400. Multiple comma-separated columns are accepted. Field names
-          are validated: unknown fields return 400. Sortable fields: name, sizeAllowance.'
+        description: 'Sort results. `+field` ascending, `-field` descending; prefix required and field name validated (bad
+          or unknown field returns 400). Comma-separate to sort by multiple columns. Sortable fields: name, sizeAllowance.'
         schema:
           type: string
         example: +name
@@ -2312,9 +2305,8 @@ paths:
       parameters:
       - name: sort
         in: query
-        description: 'Sort order for the list. Format: `[prefix]field` where prefix is `-` (descending), `+` (ascending),
-          or omitted (ascending); multiple comma-separated columns are accepted. The `name` and `id` fields reorder results.
-          The API does not validate the field name — unknown fields are silently accepted and fall back to default ordering.
+        description: 'Sort results. `+field` or unprefixed ascending, `-field` descending; comma-separate for multiple columns.
+          `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order.
           Example: `+name`, `-id`.'
         schema:
           type: string
@@ -2799,9 +2791,8 @@ paths:
       parameters:
       - name: sort
         in: query
-        description: 'Sort order for the list. Format: `[prefix]field` where prefix is `-` (descending), `+` (ascending),
-          or omitted (ascending); multiple comma-separated columns are accepted. The `name` and `id` fields reorder results.
-          The API does not validate the field name — unknown fields are silently accepted and fall back to default ordering.
+        description: 'Sort results. `+field` or unprefixed ascending, `-field` descending; comma-separate for multiple columns.
+          `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order.
           Example: `+name`, `-id`.'
         schema:
           type: string
@@ -3083,9 +3074,8 @@ paths:
       parameters:
       - name: sort
         in: query
-        description: 'Sort order for the list. Format: `[prefix]field` where prefix is `-` (descending), `+` (ascending),
-          or omitted (ascending); multiple comma-separated columns are accepted. The `name` and `id` fields reorder results.
-          The API does not validate the field name — unknown fields are silently accepted and fall back to default ordering.
+        description: 'Sort results. `+field` or unprefixed ascending, `-field` descending; comma-separate for multiple columns.
+          `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order.
           Example: `+name`, `-id`.'
         schema:
           type: string
@@ -3465,9 +3455,8 @@ paths:
       parameters:
       - name: sort
         in: query
-        description: 'Sort order for the list. Format: `[prefix]field` where prefix is `-` (descending), `+` (ascending),
-          or omitted (ascending); multiple comma-separated columns are accepted. The `name` and `id` fields reorder results.
-          The API does not validate the field name — unknown fields are silently accepted and fall back to default ordering.
+        description: 'Sort results. `+field` or unprefixed ascending, `-field` descending; comma-separate for multiple columns.
+          `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order.
           Example: `+name`, `-id`.'
         schema:
           type: string
@@ -4832,9 +4821,8 @@ paths:
       parameters:
       - name: sort
         in: query
-        description: 'Sort order for the list. Format: `[prefix]field` where prefix is `-` (descending), `+` (ascending),
-          or omitted (ascending); multiple comma-separated columns are accepted. The `name` and `id` fields reorder results.
-          The API does not validate the field name — unknown fields are silently accepted and fall back to default ordering.
+        description: 'Sort results. `+field` or unprefixed ascending, `-field` descending; comma-separate for multiple columns.
+          `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order.
           Example: `+name`, `-id`.'
         schema:
           type: string
