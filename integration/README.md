@@ -366,6 +366,12 @@ Full cycle confirmed:
 4. `POST /imports/{importId}/tasks` → poll to `COMPLETE`
 5. Probe dump endpoints: `GET /imports/{importId}/tasks/{taskId}/dump` returns 200/204/404; `GET .../dump/chunks` returns 200/400/404 depending on whether `failureDumpAvailable` is true.
 
+### Linking an import to its source file
+
+Each import in `GET /workspaces/{workspaceId}/models/{modelId}/imports/` carries an `importDataSourceId`. When the import's source is an **uploaded file**, `importDataSourceId` is that file's id (prefix `113`) — match it to an `id` from `GET .../files`. This is the binding between the file you upload and the import that loads it: upload to the file whose id equals `importDataSourceId`, then run that import via `POST .../imports/{importId}/tasks`. This is the primary reason to upload a file, so `importDataSourceId` is documented as a source for the `fileId` path parameter.
+
+Imports sourced from another model, list, or saved view instead carry a non-file `importDataSourceId` and populate the nested `importDataSource` object (`sourceModelId`, `sourceWorkspaceId`, …). Only file-sourced imports (`importDataSourceId` prefix `113`) correspond to an upload.
+
 ### File management response shapes (issue #111)
 
 Live probe results for `INTEGRATION_FILE` (`113000001109`, Users.csv):
