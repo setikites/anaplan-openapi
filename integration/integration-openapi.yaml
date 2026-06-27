@@ -50,7 +50,8 @@ paths:
       - $ref: '#/components/parameters/Search'
       - name: sort
         in: query
-        description: Sort results by object properties. Prefix with `+` for ascending or `-` for descending order.
+        description: 'Sort results. `+field` ascending, `-field` descending; prefix required and field name validated (bad
+          or unknown field returns 400). Comma-separate to sort by multiple columns. Sortable fields: name, activeState.'
         schema:
           type: string
         example: +name
@@ -110,7 +111,9 @@ paths:
       parameters:
       - name: sort
         in: query
-        description: Sort results by object properties. Prefix with `+` for ascending or `-` for descending order.
+        description: 'Sort results. `+field` or unprefixed ascending, `-field` descending; comma-separate for multiple columns.
+          `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order.
+          Example: `+name`, `-id`.'
         schema:
           type: string
         example: +name
@@ -413,7 +416,9 @@ paths:
       parameters:
       - name: sort
         in: query
-        description: Sort results by object properties. Prefix with `+` for ascending or `-` for descending order.
+        description: 'Sort results. `+field` or unprefixed ascending, `-field` descending; comma-separate for multiple columns.
+          `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order.
+          Example: `+name`, `-id`.'
         schema:
           type: string
         example: +name
@@ -537,7 +542,9 @@ paths:
       parameters:
       - name: sort
         in: query
-        description: Sort results by object properties. Prefix with `+` for ascending or `-` for descending order.
+        description: 'Sort results. `+field` or unprefixed ascending, `-field` descending; comma-separate for multiple columns.
+          `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order.
+          Example: `+name`, `-id`.'
         schema:
           type: string
         example: +name
@@ -658,7 +665,9 @@ paths:
       parameters:
       - name: sort
         in: query
-        description: Sort results by object properties. Prefix with `+` for ascending or `-` for descending order.
+        description: 'Sort results. `+field` or unprefixed ascending, `-field` descending; comma-separate for multiple columns.
+          `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order.
+          Example: `+name`, `-id`.'
         schema:
           type: string
         example: +name
@@ -1440,7 +1449,9 @@ paths:
       parameters:
       - name: sort
         in: query
-        description: Sort results by object properties. Prefix with `+` for ascending or `-` for descending order.
+        description: 'Sort results. `+field` or unprefixed ascending, `-field` descending; comma-separate for multiple columns.
+          `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order.
+          Example: `+name`, `-id`.'
         schema:
           type: string
         example: +name
@@ -2012,7 +2023,9 @@ paths:
       - $ref: '#/components/parameters/Search'
       - name: sort
         in: query
-        description: Sort results by object properties. Prefix with `+` for ascending or `-` for descending order.
+        description: 'Sort results. `+field` ascending, `-field` descending; prefix required and field name validated (bad
+          or unknown field returns 400). Comma-separate to sort by multiple columns. Sortable fields: firstName, lastName,
+          email, active, lastLoginDate.'
         schema:
           type: string
         example: +firstName
@@ -2091,7 +2104,8 @@ paths:
       - $ref: '#/components/parameters/Search'
       - name: sort
         in: query
-        description: Sort results by object properties. Prefix with `+` for ascending or `-` for descending order.
+        description: 'Sort results. `+field` ascending, `-field` descending; prefix required and field name validated (bad
+          or unknown field returns 400). Comma-separate to sort by multiple columns. Sortable fields: name, sizeAllowance.'
         schema:
           type: string
         example: +name
@@ -2291,7 +2305,9 @@ paths:
       parameters:
       - name: sort
         in: query
-        description: Sort results by object properties. Prefix with `+` for ascending or `-` for descending order.
+        description: 'Sort results. `+field` or unprefixed ascending, `-field` descending; comma-separate for multiple columns.
+          `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order.
+          Example: `+name`, `-id`.'
         schema:
           type: string
         example: +name
@@ -2775,7 +2791,9 @@ paths:
       parameters:
       - name: sort
         in: query
-        description: Sort results by object properties. Prefix with `+` for ascending or `-` for descending order.
+        description: 'Sort results. `+field` or unprefixed ascending, `-field` descending; comma-separate for multiple columns.
+          `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order.
+          Example: `+name`, `-id`.'
         schema:
           type: string
         example: +name
@@ -3056,7 +3074,9 @@ paths:
       parameters:
       - name: sort
         in: query
-        description: Sort results by object properties. Prefix with `+` for ascending or `-` for descending order.
+        description: 'Sort results. `+field` or unprefixed ascending, `-field` descending; comma-separate for multiple columns.
+          `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order.
+          Example: `+name`, `-id`.'
         schema:
           type: string
         example: +name
@@ -3435,7 +3455,9 @@ paths:
       parameters:
       - name: sort
         in: query
-        description: Sort results by object properties. Prefix with `+` for ascending or `-` for descending order.
+        description: 'Sort results. `+field` or unprefixed ascending, `-field` descending; comma-separate for multiple columns.
+          `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order.
+          Example: `+name`, `-id`.'
         schema:
           type: string
         example: +name
@@ -4799,7 +4821,9 @@ paths:
       parameters:
       - name: sort
         in: query
-        description: Sort results by object properties. Prefix with `+` for ascending or `-` for descending order.
+        description: 'Sort results. `+field` or unprefixed ascending, `-field` descending; comma-separate for multiple columns.
+          `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order.
+          Example: `+name`, `-id`.'
         schema:
           type: string
         example: +name
