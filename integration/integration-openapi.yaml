@@ -5548,7 +5548,9 @@ components:
     FileId:
       name: fileId
       in: path
-      description: File identifier (12-digit numeric, prefix 113). From `GET /models/{modelId}/files`.
+      description: File identifier (12-digit numeric, prefix 113). From `GET /models/{modelId}/files`, or the `importDataSourceId`
+        of `GET /workspaces/{workspaceId}/models/{modelId}/imports/` — the file an import reads, which is the file you upload
+        before running that import.
       required: true
       schema:
         type: string
@@ -6405,6 +6407,10 @@ components:
           type: object
         importDataSourceId:
           type: string
+          description: The id of the data source this import reads. When the source is an uploaded file this is its file id
+            (prefix 113, from `GET /models/{modelId}/files`); upload to this file id, then run the import. For model, list,
+            or saved-view sources it is the source object id instead.
+          example: '113000000006'
         importType:
           type: string
           description: Category of data the import processes.
