@@ -90,7 +90,9 @@ paths:
       - name: sourceModelId
         in: query
         description: Model identifier (32-character uppercase hex string) of the source model whose revisions to evaluate.
-          From `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2).
+          For a model already participating in ALM, a good choice is the **first** model in the `appliedToModels` list of
+          its latest revision — the source model where its revisions are created. Find it with `GET /models/{modelId}/alm/latestRevision`
+          (for the revision id), then `GET /models/{modelId}/alm/revisions/{revisionId}/appliedToModels`.
         required: true
         schema:
           type: string
@@ -210,8 +212,10 @@ paths:
       example: B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4E5
     get:
       summary: Retrieve the models for a specific revision
-      description: 'Returns all models that have had this revision applied. Deleted models are included with `modelDeleted:
-        true`; their `modelName` and `workspaceId` are omitted. Requires Workspace Administrator role.'
+      description: |-
+        Returns all models that have had this revision applied. Deleted models are included with `modelDeleted: true`; their `modelName` and `workspaceId` are omitted. Requires Workspace Administrator role.
+
+        The first model in this list is the source model where revisions are created. Any model in this list can be a `sourceModelId` for discovering this revision (using `GET /models/{modelId}/alm/syncableRevisions`) and syncing it (using `POST /models/{modelId}/alm/syncTasks`).
       operationId: getAppliedToModels
       responses:
         '200':
