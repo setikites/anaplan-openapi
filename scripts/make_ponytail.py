@@ -90,8 +90,22 @@ def transform(d):
 
     comps = d.get("components", {})
     schemas = comps.get("schemas", {})
+    comp_params = comps.get("parameters", {})
     seed = set()
     collect_refs(out_paths, seed)
+
+    # Carry the referenced shared parameters (paths $ref them post-ADR-0005);
+    # prune unreferenced ones like schemas, and strip ID constraints to match
+    # the inline treatment. Schemas a carried param references stay reachable.
+    kept_params = {}
+    for ref in seed:
+        if ref.startswith("#/components/parameters/"):
+            name = ref.rsplit("/", 1)[-1]
+            if name in comp_params and name not in kept_params:
+                kept_params[name] = comp_params[name]
+    strip_id_constraints(list(kept_params.values()))
+    collect_refs(kept_params, seed)
+
     queue, seen, kept = list(seed), set(), {}
     while queue:
         ref = queue.pop()
@@ -109,6 +123,8 @@ def transform(d):
     out_comps = {}
     if kept:
         out_comps["schemas"] = kept
+    if kept_params:
+        out_comps["parameters"] = kept_params
     if "securitySchemes" in comps:
         out_comps["securitySchemes"] = comps["securitySchemes"]
     if out_comps:
@@ -148,12 +164,20 @@ def _selfcheck():
                 "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Req"}}}},
                 "responses": {"200": {"description": "ok", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Resp"}}}}},
             }},
+            "/y/{fooId}": {
+                "parameters": [{"$ref": "#/components/parameters/FooId"}],
+                "get": {"responses": {"200": {"description": "ok"}}},
+            },
         },
         "components": {
             "schemas": {
                 "Req": {"type": "object", "properties": {"n": {"$ref": "#/components/schemas/Sub"}}},
                 "Sub": {"type": "string"},
                 "Resp": {"type": "object"},
+            },
+            "parameters": {
+                "FooId": {"name": "fooId", "in": "path", "schema": {"type": "string", "pattern": "^X$"}, "example": "x1"},
+                "Unused": {"name": "unused", "in": "query", "schema": {"type": "string"}},
             },
             "securitySchemes": {"B": {"type": "http", "scheme": "bearer"}},
         },
@@ -168,6 +192,9 @@ def _selfcheck():
     assert "example" not in px["modelId"]["schema"]  # opaque ID example stripped
     assert px["type"]["schema"]["example"] == "all"  # non-ID example kept
     assert set(out["components"]["schemas"]) == {"Req", "Sub"}  # Resp (response-only) pruned, Sub kept transitively
+    cp = out["components"]["parameters"]
+    assert set(cp) == {"FooId"}  # referenced param carried, Unused pruned
+    assert "example" not in cp["FooId"] and "pattern" not in cp["FooId"]["schema"]  # ID constraints stripped on carried param
     assert "securitySchemes" in out["components"]
     print("selfcheck OK")
 
