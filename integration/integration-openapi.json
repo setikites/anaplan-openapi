@@ -4478,7 +4478,7 @@
         }
       }
     },
-    "/workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks/0": {
+    "/workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks/{chunkId}": {
       "parameters": [
         {
           "$ref": "#/components/parameters/WorkspaceId"
@@ -4488,6 +4488,9 @@
         },
         {
           "$ref": "#/components/parameters/FileId"
+        },
+        {
+          "$ref": "#/components/parameters/ChunkId"
         }
       ],
       "get": {
@@ -5052,7 +5055,7 @@
         }
       }
     },
-    "/workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/dump/chunks/0": {
+    "/workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/dump/chunks/{chunkId}": {
       "parameters": [
         {
           "$ref": "#/components/parameters/WorkspaceId"
@@ -5065,11 +5068,14 @@
         },
         {
           "$ref": "#/components/parameters/TaskId"
+        },
+        {
+          "$ref": "#/components/parameters/ChunkId"
         }
       ],
       "get": {
         "summary": "Download dump file chunks",
-        "description": "Once you have the chunk count, download them sequentially and concatenate. The request below downloads chunk 0.\n\n### Headers\n\n*   `Authorization:AnaplanAuthToken {anaplan_auth_token}`\n*   `Content-Type:application/json`",
+        "description": "Once you have the chunk count, download them sequentially and concatenate. Download each chunk by its `id` (from the `.../dump/chunks` list).\n\n### Headers\n\n*   `Authorization:AnaplanAuthToken {anaplan_auth_token}`\n*   `Content-Type:application/json`",
         "tags": [
           "Bulk Write"
         ],
@@ -7229,6 +7235,16 @@
           "type": "string"
         },
         "example": "113000000000"
+      },
+      "ChunkId": {
+        "name": "chunkId",
+        "in": "path",
+        "description": "The chunk identifier. From the `id` values returned by the sibling `GET .../chunks` list endpoint for the file or dump.",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "example": "0"
       },
       "ImportId": {
         "name": "importId",

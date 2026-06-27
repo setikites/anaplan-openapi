@@ -3341,11 +3341,12 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Chunk'
-  /workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks/0:
+  /workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks/{chunkId}:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
     - $ref: '#/components/parameters/ModelId'
     - $ref: '#/components/parameters/FileId'
+    - $ref: '#/components/parameters/ChunkId'
     get:
       summary: Get the data in a chunk
       tags:
@@ -3841,16 +3842,17 @@ paths:
                       $ref: '#/components/schemas/Chunk'
         '404':
           description: Dump file not found or not yet available for this task.
-  /workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/dump/chunks/0:
+  /workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/dump/chunks/{chunkId}:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
     - $ref: '#/components/parameters/ModelId'
     - $ref: '#/components/parameters/ImportId'
     - $ref: '#/components/parameters/TaskId'
+    - $ref: '#/components/parameters/ChunkId'
     get:
       summary: Download dump file chunks
       description: |-
-        Once you have the chunk count, download them sequentially and concatenate. The request below downloads chunk 0.
+        Once you have the chunk count, download them sequentially and concatenate. Download each chunk by its `id` (from the `.../dump/chunks` list).
 
         ### Headers
 
@@ -5551,6 +5553,15 @@ components:
       schema:
         type: string
       example: '113000000000'
+    ChunkId:
+      name: chunkId
+      in: path
+      description: The chunk identifier. From the `id` values returned by the sibling `GET .../chunks` list endpoint for the
+        file or dump.
+      required: true
+      schema:
+        type: string
+      example: '0'
     ImportId:
       name: importId
       in: path

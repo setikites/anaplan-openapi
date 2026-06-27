@@ -1781,13 +1781,14 @@ def test_list_file_chunks(integration_token, file_id):
 
 @pytest.mark.live
 def test_download_first_chunk(integration_token, file_id):
-    """GET /workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks/0 downloads first chunk.
+    """GET .../files/{fileId}/chunks/{chunkId} downloads every listed chunk.
 
     Uses the model-level file list to check chunkCount (workspace-scoped metadata
-    endpoint returns 404 for non-Workspace-Administrator accounts).
+    endpoint returns 404 for non-Workspace-Administrator accounts), then lists the
+    chunks and downloads each by its id to exercise the parameterized path.
     Skipped when the file has no chunks — INTEGRATION_FILE is an import source file
     whose content is populated by the import action; it may be empty between test runs.
-    Also skips when chunks/0 returns 404 (content deleted by a prior write test teardown).
+    Also skips when a chunk returns 404 (content deleted by a prior write test teardown).
     """
     h = _auth_headers(integration_token)
     with httpx.Client() as client:
@@ -1803,24 +1804,42 @@ def test_download_first_chunk(integration_token, file_id):
         if not file_meta.get("chunkCount"):
             pytest.skip(f"File {file_id} has no chunks (chunkCount=0)")
 
-        response = client.get(
-            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/files/{file_id}/chunks/0",
+        # Drive the parameterized .../chunks/{chunkId} path: list the chunks,
+        # then download each by its id rather than assuming only chunk 0 exists.
+        list_r = client.get(
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/files/{file_id}/chunks",
             headers=h,
         )
+        if list_r.status_code != 200:
+            pytest.skip(f"GET .../chunks list returned {list_r.status_code}")
+        chunk_ids = [c["id"] for c in (list_r.json().get("chunks") or [])]
+        if not chunk_ids:
+            pytest.skip(f"File {file_id} chunk list is empty")
 
-    if response.status_code == 404:
+        responses = {
+            cid: client.get(
+                f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/files/{file_id}/chunks/{cid}",
+                headers=h,
+            )
+            for cid in chunk_ids
+        }
+
+    if any(r.status_code == 404 for r in responses.values()):
         pytest.skip(
-            f"GET .../files/{file_id}/chunks/0 returned 404 — "
+            f"GET .../files/{file_id}/chunks/{{chunkId}} returned 404 — "
             "file content was cleared by a prior write-test teardown; "
             "upload new content to re-enable this test."
         )
-    assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
-    assert len(response.content) > 0, "Chunk download must return non-empty body"
-    ct = response.headers.get("content-type", "")
-    print(f"\nGET .../chunks/0 content-type: {ct!r}, body bytes: {len(response.content)}")
-    assert "octet-stream" in ct, (
-        f"Expected application/octet-stream response; content-type: {ct!r}"
-    )
+    for cid, response in responses.items():
+        assert response.status_code == 200, (
+            f"chunk {cid}: {response.status_code}: {response.text[:200]}"
+        )
+        assert len(response.content) > 0, f"chunk {cid} download must return non-empty body"
+        ct = response.headers.get("content-type", "")
+        print(f"\nGET .../chunks/{cid} content-type: {ct!r}, body bytes: {len(response.content)}")
+        assert "octet-stream" in ct, (
+            f"chunk {cid}: expected application/octet-stream; content-type: {ct!r}"
+        )
 
 
 @pytest.mark.live
@@ -1904,14 +1923,16 @@ def test_upload_and_complete_cycle(integration_token, file_id):
             f"POST set chunk count failed: {set_count_r.status_code}: {set_count_r.text[:200]}"
         )
 
-        # Step 2: upload chunk 0 — API returns 204 No Content on success
+        # Step 2: upload a chunk via the parameterized .../chunks/{chunkId} path.
+        # A fresh staging area starts at chunk 0; the chunk id is the client's choice.
+        chunk_id = "0"
         upload_r = client.put(
-            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/files/{file_id}/chunks/0",
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/files/{file_id}/chunks/{chunk_id}",
             headers={**h, "Content-Type": "application/octet-stream"},
             content=chunk_data,
         )
         assert upload_r.status_code in (200, 204), (
-            f"PUT chunk 0 failed: {upload_r.status_code}: {upload_r.text[:200]}"
+            f"PUT chunk {chunk_id} failed: {upload_r.status_code}: {upload_r.text[:200]}"
         )
 
         # Verify the chunk is staged
@@ -2214,9 +2235,10 @@ def test_import_dump(integration_token, import_id, import_task_id):
 
 @pytest.mark.live
 def test_import_dump_chunk_download(integration_token, import_id, import_task_id):
-    """GET .../imports/{importId}/tasks/{taskId}/dump/chunks/0 downloads first dump chunk.
+    """GET .../imports/{importId}/tasks/{taskId}/dump/chunks/{chunkId} downloads each dump chunk.
 
     Only probed when failureDumpAvailable=True and dump/chunks lists at least one chunk.
+    Downloads every listed chunk by its id to exercise the parameterized path.
     Confirms the response is plain text with CSV-formatted error rows.
     """
     h = _auth_headers(integration_token)
@@ -2243,21 +2265,25 @@ def test_import_dump_chunk_download(integration_token, import_id, import_task_id
         if not chunks:
             pytest.skip("dump/chunks returned empty list — no chunks to download")
 
-        response = client.get(
-            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
-            f"/imports/{import_id}/tasks/{import_task_id}/dump/chunks/0",
-            headers=h,
-        )
+        responses = {
+            c["id"]: client.get(
+                f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+                f"/imports/{import_id}/tasks/{import_task_id}/dump/chunks/{c['id']}",
+                headers=h,
+            )
+            for c in chunks
+        }
 
-    assert response.status_code == 200, (
-        f"GET .../dump/chunks/0 returned {response.status_code}: {response.text[:200]}"
-    )
-    assert len(response.content) > 0, "Dump chunk 0 must have non-empty content"
-    ct = response.headers.get("content-type", "")
-    print(f"\nGET .../dump/chunks/0 content-type: {ct!r}, body bytes: {len(response.content)}")
-    assert "text" in ct or "octet" in ct, (
-        f"Expected text/plain or octet-stream for dump chunk; got: {ct!r}"
-    )
+    for cid, response in responses.items():
+        assert response.status_code == 200, (
+            f"GET .../dump/chunks/{cid} returned {response.status_code}: {response.text[:200]}"
+        )
+        assert len(response.content) > 0, f"Dump chunk {cid} must have non-empty content"
+        ct = response.headers.get("content-type", "")
+        print(f"\nGET .../dump/chunks/{cid} content-type: {ct!r}, body bytes: {len(response.content)}")
+        assert "text" in ct or "octet" in ct, (
+            f"Expected text/plain or octet-stream for dump chunk {cid}; got: {ct!r}"
+        )
 
 
 # ─── Exports ──────────────────────────────────────────────────────────────────
@@ -2852,12 +2878,13 @@ def test_export_import_cycle(integration_token):
         )
         if dump_available and dump_chunks_r.status_code == 200:
             dump_chunks = dump_chunks_r.json().get("chunks", [])
-            if dump_chunks:
-                chunk0_r = client.get(f"{dump_base}/chunks/0", headers=h)
-                assert chunk0_r.status_code == 200, (
-                    f"GET dump/chunks/0 failed: {chunk0_r.status_code}"
+            for c in dump_chunks:
+                cid = c["id"]
+                chunk_r = client.get(f"{dump_base}/chunks/{cid}", headers=h)
+                assert chunk_r.status_code == 200, (
+                    f"GET dump/chunks/{cid} failed: {chunk_r.status_code}"
                 )
-                assert chunk0_r.content, "Dump chunk 0 must have non-empty content"
+                assert chunk_r.content, f"Dump chunk {cid} must have non-empty content"
 
 
 # ─── List item write (issue #109) ─────────────────────────────────────────────
