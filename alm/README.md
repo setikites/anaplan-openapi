@@ -59,6 +59,17 @@ All endpoints require the **Workspace Administrator** role. The model must be un
 | GET | `/models/{modelId}/alm/syncTasks` | List sync tasks for a model (tasks in progress or completed within 48 hrs) |
 | GET | `/models/{modelId}/alm/syncTasks/{syncTaskId}` | Retrieve sync task status and result |
 
+#### Finding the source model and next revision
+
+`syncableRevisions` and `syncTasks` both need a `sourceModelId` — the model whose revisions are applied to the target. For a model already participating in ALM, the source model is discoverable entirely within this API:
+
+1. `GET /models/{modelId}/alm/latestRevision` → the target's latest `revisionId`.
+2. `GET /models/{modelId}/alm/revisions/{revisionId}/appliedToModels` → the **first** model in `appliedToModels` is the source model where revisions are created, a good default `sourceModelId`. Any model in the list can serve as `sourceModelId` for discovering and syncing this revision.
+3. `GET /models/{modelId}/alm/syncableRevisions?sourceModelId=<source>` → compatible source revisions, newest first. The first entry's `sourceRevisionId` is the next available revision.
+4. `POST /models/{modelId}/alm/syncTasks` with `{ "sourceModelId", "sourceRevisionId" }` → returns a `syncTaskId`; poll `GET .../syncTasks/{syncTaskId}` to completion.
+
+Only when a model is **not** yet in ALM (no latest revision) must `sourceModelId` come from outside this API (Integration `GET /models`).
+
 ### Comparison Reports
 
 | Method | Path | Description |
