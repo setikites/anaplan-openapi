@@ -68,8 +68,6 @@ All endpoints require the **Workspace Administrator** role. The model must be un
 3. `GET /models/{modelId}/alm/syncableRevisions?sourceModelId=<source>` → compatible source revisions, newest first. The first entry's `sourceRevisionId` is the next available revision.
 4. `POST /models/{modelId}/alm/syncTasks` with `{ "sourceModelId", "sourceRevisionId" }` → returns a `syncTaskId`; poll `GET .../syncTasks/{syncTaskId}` to completion.
 
-Only when a model is **not** yet in ALM (no latest revision) must `sourceModelId` come from outside this API (Integration `GET /models`).
-
 ### Comparison Reports
 
 | Method | Path | Description |
