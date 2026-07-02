@@ -45,7 +45,7 @@ paths:
     - name: userGuid
       in: path
       description: GUID of the user whose exception-user status is being changed; the same value as the Anaplan user ID. From
-        `GET /users` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2).
+        `GET /users` (or `GET /users/me` for your own GUID) in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2).
       required: true
       schema:
         type: string

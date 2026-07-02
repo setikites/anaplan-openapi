@@ -1117,7 +1117,7 @@
       "TaskId": {
         "name": "taskId",
         "in": "path",
-        "description": "Report task identifier (32-character uppercase hex string). Returned by `POST /models/{modelId}/alm/comparisonReportTasks` or `POST /models/{modelId}/alm/summaryReportTasks`.",
+        "description": "Report task identifier (32-character uppercase hex string), scoped to its report type: use the id from `POST /models/{modelId}/alm/comparisonReportTasks` only under `.../comparisonReportTasks/{taskId}`, and the id from `POST /models/{modelId}/alm/summaryReportTasks` only under `.../summaryReportTasks/{taskId}`. They are not interchangeable.",
         "required": true,
         "schema": {
           "type": "string",

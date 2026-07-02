@@ -7239,7 +7239,7 @@
       "ChunkId": {
         "name": "chunkId",
         "in": "path",
-        "description": "The chunk identifier. From the `id` values returned by the sibling `GET .../chunks` list endpoint for the file or dump.",
+        "description": "The chunk identifier. From the `id` values returned by the sibling `GET .../chunks` list endpoint for the file or dump. Chunk ids are zero-based; chunk `0` is always the first chunk of a file that has any content.",
         "required": true,
         "schema": {
           "type": "string"
@@ -7319,7 +7319,7 @@
       "UserId": {
         "name": "userId",
         "in": "path",
-        "description": "User identifier (32-character hex string). From `GET /users`.",
+        "description": "User identifier (32-character hex string). From `GET /users`, or `GET /users/me` for the caller's own id.",
         "required": true,
         "schema": {
           "type": "string",
@@ -7351,7 +7351,7 @@
       "TaskId": {
         "name": "taskId",
         "in": "path",
-        "description": "Task identifier returned when a run is launched by `POST /workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks` (or the equivalent exports, processes, or actions tasks endpoint).",
+        "description": "Task identifier, scoped to the parent action/import/export/process that launched it: a taskId is valid only under the same parent, so an action's taskId will not resolve under a process, import, or export. Returned when a run is launched by `POST /workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks` (or the equivalent actions, exports, or processes tasks endpoint), and listed by the matching `GET .../tasks` — `tasks[].taskId`, except the import tasks response, which nests it under `task.taskId`.",
         "required": true,
         "schema": {
           "type": "string"
