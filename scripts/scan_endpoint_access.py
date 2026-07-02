@@ -1,10 +1,23 @@
 """Scan live Anaplan API endpoints to map a user's access level, emit a CSV report.
 
 Authenticates with the OAuth Authorization Code flow on the command line (token
-kept in memory only — never stored), fetches the caller's Anaplan user id, then
-probes every operation across seven APIs (integration, cloudworks, scim, alm,
-audit, exception, administration) and records the status / outcome / response
-body for each. From the role-gated APIs it guesses the user's access level.
+kept in memory only — never stored), fetches the caller's Anaplan user id,
+discovers a workspace + model the user can actually reach, then probes every
+operation across seven APIs (integration, cloudworks, scim, alm, audit,
+exception, administration) and records the status / outcome / response body for
+each. From the role-gated APIs it guesses the user's access level.
+
+Path parameters are filled with the discovered real workspace/model IDs where
+possible; anything left (fileId, viewId, revisionId, ...) falls back to a
+fabricated non-existent ID. Each row carries a `confidence`:
+
+  real           param-free, or every path param filled from a real ID — the
+                 status reflects the user's authorization to that endpoint
+  fabricated-id  a param fell back to a non-existent ID, so a 404 means "resource
+                 not found", NOT that the user is authorized — do not trust
+                 role_held on these rows
+
+Only `real`-confidence endpoints count toward the guessed access level.
 
 Probing is tiered so it cannot mutate data by default:
 
@@ -22,6 +35,7 @@ authorization/role (403) *before* resolving the resource or acting on the body:
                                           -> role held
   ROLE_DENIED 403 (admin also 401/500) -> authenticated, role NOT held
   AUTH_FAIL   401                       -> token rejected
+  NOT_ENTITLED 452                      -> tenant lacks the entitlement
 
     uv run python scripts/scan_endpoint_access.py [--include-writes] [--include-deletes]
 
@@ -98,6 +112,8 @@ def classify_outcome(status, api):
         return "ROLE_DENIED"
     if status == 401:
         return "AUTH_FAIL"
+    if status == 452:
+        return "NOT_ENTITLED"  # tenant lacks the entitlement (not a user-auth signal)
     if 200 <= status < 300:
         return "ACCESS"
     if status in (400, 404, 405, 409, 415, 422):
@@ -107,7 +123,30 @@ def classify_outcome(status, api):
     return "OTHER"
 
 
-def build_probes(include_writes, include_deletes):
+def fill_path(path, real_ids):
+    """Substitute real discovered IDs into a path; fabricate the rest.
+
+    Returns (filled_path, confidence). ``confidence`` is "real" when every path
+    parameter was filled from a real ID the user can reach (or the path has none),
+    and "fabricated-id" when any parameter fell back to a non-existent value — in
+    which case a 404 means "resource not found" and says nothing about the user's
+    authorization to that endpoint.
+    """
+    fabricated = False
+
+    def repl(m):
+        nonlocal fabricated
+        name = m.group(0)[1:-1]
+        if real_ids.get(name):
+            return real_ids[name]
+        fabricated = True
+        return FAKE_ID
+
+    filled = _PARAM.sub(repl, path)
+    return filled, ("fabricated-id" if fabricated else "real")
+
+
+def build_probes(include_writes, include_deletes, real_ids):
     """Yield probe dicts for every in-scope operation across the seven specs."""
     for api in APIS:
         spec = json.loads(
@@ -130,15 +169,17 @@ def build_probes(include_writes, include_deletes):
                     body = {}
                 else:
                     body = None
+                filled, confidence = fill_path(path, real_ids)
                 yield {
                     "api": api,
                     "method": method.upper(),
                     "path": path,
                     "kind": kind,
                     "expected_role": ROLE[api][0],
-                    "url": base + _PARAM.sub(FAKE_ID, path),
+                    "url": base + filled,
                     "scheme": scheme,
                     "body": body,
+                    "confidence": confidence,
                 }
 
 
@@ -152,6 +193,35 @@ def fetch_user_id(client, token):
     body = r.json()
     user = body.get("user", body)
     return user.get("id") or user.get("userId") or "unknown"
+
+
+def discover_context(client, token):
+    """Find a workspace + model the user can reach, to fill {workspaceId}/{modelId}.
+
+    Returns a real-ID map for fill_path. Endpoints scoped to a real model return a
+    genuine role gate (403) instead of a fabricated-ID 404, so the scan reflects the
+    user's authorization rather than resource existence. Returns {} if the user has
+    no accessible model (falls back to fabricated IDs for every scoped path).
+    """
+    base = json.loads(
+        (REPO / "integration" / "integration-openapi.json").read_text(encoding="utf-8")
+    )["servers"][0]["url"]
+    hdr = {"Authorization": f"Bearer {token}"}
+    ids = {}
+    try:
+        ws = client.get(f"{base}/workspaces", headers=hdr).json().get("workspaces", [])
+        if ws:
+            ids["workspaceId"] = ws[0]["id"]
+        models = client.get(f"{base}/models", headers=hdr).json().get("models", [])
+        if models:
+            ids["modelId"] = models[0]["id"]
+            # Prefer the model's own workspace so the paired {workspaceId}/{modelId}
+            # endpoints resolve to a consistent, reachable pair.
+            if models[0].get("currentWorkspaceId"):
+                ids["workspaceId"] = models[0]["currentWorkspaceId"]
+    except (httpx.HTTPError, KeyError, ValueError):
+        pass
+    return ids
 
 
 def run_probe(client, token, probe):
@@ -206,26 +276,31 @@ def main():
         return
 
     token = authenticate()
-    probes = list(build_probes(args.include_writes, args.include_deletes))
 
     rows = []
     roles_held = set()
     with httpx.Client(timeout=30) as client:
         user_id = fetch_user_id(client, token)
+        real_ids = discover_context(client, token)
         print(f"\nUser id: {user_id}")
+        print("Real IDs: " + (", ".join(f"{k}={v}" for k, v in real_ids.items()) or "none — all scoped paths fabricated"))
+        probes = list(build_probes(args.include_writes, args.include_deletes, real_ids))
         print(f"Probing {len(probes)} endpoints...\n")
         for p in probes:
             status, outcome, snippet = run_probe(client, token, p)
             held = outcome in _HELD
-            if held:
+            # Only a real-ID (or param-free) endpoint proves authorization; a
+            # fabricated-ID 404 just means the resource doesn't exist.
+            if held and p["confidence"] == "real":
                 roles_held.add(p["api"])
             rows.append({
                 "api": p["api"], "method": p["method"], "path": p["path"],
-                "kind": p["kind"], "expected_role": p["expected_role"],
+                "kind": p["kind"], "confidence": p["confidence"],
+                "expected_role": p["expected_role"],
                 "status": status, "outcome": outcome, "role_held": held,
                 "response_body": snippet,
             })
-            print(f"  {outcome:11} {status:>3} {p['method']:6} {p['api']}{p['path']}")
+            print(f"  {outcome:12} {status:>3} {p['confidence']:13} {p['method']:6} {p['api']}{p['path']}")
 
     level = guess_level(roles_held)
     held_names = ", ".join(ROLE[a][0] for a in APIS if a in roles_held) or "none detected"
@@ -248,16 +323,23 @@ def _selftest():
     assert classify_outcome(401, "scim") == "AUTH_FAIL"
     assert classify_outcome(401, "administration") == "ROLE_DENIED"
     assert classify_outcome(500, "administration") == "ROLE_DENIED"
-    assert _PARAM.sub(FAKE_ID, "/Users/{id}") == f"/Users/{FAKE_ID}"
+    assert classify_outcome(452, "cloudworks") == "NOT_ENTITLED"
     assert classify_kind("post", "/events/search") == "search"
     assert classify_kind("post", "/Users") == "write"
     assert classify_kind("delete", "/Users/{id}") == "delete"
     assert guess_level({"audit", "integration"}) == "model+auditor"
     assert guess_level(set()) == "basic"
-    # default tier: no writes, no deletes
-    kinds = {p["kind"] for p in build_probes(False, False)}
-    assert kinds == {"read", "search"}, kinds
-    assert "delete" in {p["kind"] for p in build_probes(True, True)}
+    # fill_path: real IDs -> "real"; any leftover param -> "fabricated-id"
+    ids = {"workspaceId": "W1", "modelId": "M1"}
+    assert fill_path("/models/{modelId}", ids) == ("/models/M1", "real")
+    assert fill_path("/workspaces", ids) == ("/workspaces", "real")
+    assert fill_path("/models/{modelId}/files/{fileId}", ids) == (
+        f"/models/M1/files/{FAKE_ID}", "fabricated-id")
+    # default tier: no writes, no deletes; scoped paths marked
+    probes = list(build_probes(False, False, ids))
+    assert {p["kind"] for p in probes} == {"read", "search"}
+    assert {p["confidence"] for p in probes} == {"real", "fabricated-id"}
+    assert "delete" in {p["kind"] for p in build_probes(True, True, ids)}
     print("selftest OK")
 
 

@@ -82,8 +82,9 @@ You will be prompted to:
    **full** URL from the address bar (it carries the authorization code) and paste
    it back at the `Redirect URL:` prompt.
 
-The script then fetches your Anaplan user id and probes ~159 endpoints, printing
-each result as it goes.
+The script then fetches your Anaplan user id, discovers a workspace + model you
+can reach (to fill `{workspaceId}`/`{modelId}` with real IDs), and probes ~159
+endpoints, printing each result as it goes.
 
 ## 5. Output
 
@@ -102,11 +103,17 @@ if no role gate was passed). Columns:
 | `method` | HTTP verb |
 | `path` | endpoint path |
 | `kind` | `read` / `search` / `write` / `delete` |
+| `confidence` | `real` = trust this row; `fabricated-id` = a path param used a non-existent ID, so `role_held` is not meaningful (a 404 just means "resource not found") |
 | `expected_role` | the role that API is gated on |
 | `status` | HTTP status code (`0` = request error) |
-| `outcome` | `ACCESS` / `AUTHORIZED` / `ROLE_DENIED` / `AUTH_FAIL` / `SERVER_ERROR` |
-| `role_held` | `True` if the access gate was passed |
+| `outcome` | `ACCESS` / `AUTHORIZED` / `ROLE_DENIED` / `AUTH_FAIL` / `NOT_ENTITLED` / `SERVER_ERROR` |
+| `role_held` | `True` if the access gate was passed (only trustworthy when `confidence` is `real`) |
 | `response_body` | first 300 chars of the response |
+
+**Read `confidence` first.** Only `real`-confidence rows tell you whether *you*
+are authorized to an endpoint; `fabricated-id` rows (deep-nested resources like
+files, views, revisions) only tell you the endpoint exists. The guessed access
+level in the filename is computed from `real` rows only.
 
 Send the CSV back for review.
 
