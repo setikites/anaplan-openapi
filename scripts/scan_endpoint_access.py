@@ -7,15 +7,25 @@ operation across seven APIs (integration, cloudworks, scim, alm, audit,
 exception, administration) and records the status / outcome / response body for
 each. From the role-gated APIs it guesses the user's access level.
 
-Path parameters are filled with real IDs where possible. GET requests are
-read-only, so it is safe to use real IDs: GETs run first (shallow paths before
-deep) and each list response is harvested for IDs, so a collection endpoint feeds
-the item endpoint below it — e.g. GET .../lineItems yields a lineItemId for
-GET .../lineItems/{lineItemId}/dimensions, which yields a dimensionId for
-GET .../dimensions/{dimensionId}/items. Mutating verbs (POST/PUT/PATCH/DELETE)
-*always* use a fabricated non-existent ID, for safety, even when a real one is
-known. Anything still unresolved falls back to the fabricated ID. Each row
-carries a `confidence`:
+Path parameters are filled with real IDs where possible (see
+docs/scan-path-parameter-sources.md for the full map). GET requests are
+read-only, so real IDs are safe: GETs run first (shallow paths before deep) and
+each 2xx response is harvested two ways —
+
+  1. source-linked: the response of the endpoint prefix directly above a param
+     supplies it, so `.../actions/{actionId}/tasks` feeds
+     `.../actions/{actionId}/tasks/{taskId}` while `.../imports/{importId}/tasks`
+     feeds the import taskId — same param name, distinct sources, never crossed;
+  2. field pool: embedded IDs are scraped by name (cloudworks
+     `integrations[].integrationId`, `.../notificationId`), used as a fallback.
+
+Aliases cover shared identities (scim `{id}` / exception `{userGuid}` are the
+caller's user GUID; alm target/sourceRevisionId are a revisionId), `chunkId`
+defaults to `0`, and task IDs resolve *only* by source-link (never the flat pool)
+so an action's taskId can't leak into an unrelated endpoint. Mutating verbs
+(POST/PUT/PATCH/DELETE) *always* use a fabricated non-existent ID for safety.
+Anything unresolved falls back to the fabricated ID. Each row carries a
+`confidence`:
 
   real           param-free, or every path param filled from a real ID — the
                  status reflects the user's authorization to that endpoint
@@ -99,6 +109,21 @@ SEARCH_BODY = {
 _PARAM = re.compile(r"\{[^}]+\}")
 _HELD = {"ACCESS", "AUTHORIZED"}
 
+# A param that has no direct source resolves via an equivalent one instead.
+# scim {id} / exception {userGuid} are the caller's user GUID; alm compare
+# revisions are ordinary revision IDs (see docs/scan-path-parameter-sources.md).
+PARAM_ALIAS = {
+    "id": "userId",
+    "userGuid": "userId",
+    "targetRevisionId": "revisionId",
+    "sourceRevisionId": "revisionId",
+}
+
+# Task IDs are scoped to the parent that launched them (an action's taskId is not
+# valid under a process), so they resolve *only* by source-link, never the flat
+# field pool — otherwise one context's task would leak into another.
+TASK_PARAMS = {"taskId", "syncTaskId"}
+
 
 def classify_kind(method, path):
     if method == "get":
@@ -161,19 +186,129 @@ def _singular(name):
     return name  # ponytail: naive; fix if a collection name breaks it
 
 
-def harvest_ids(pool, data):
-    """Add IDs from a GET list response to the pool for later path parameters.
+def _param_names():
+    """All path-parameter names across the in-scope specs (used to scrape IDs)."""
+    names = set()
+    for api in APIS:
+        spec = json.loads((REPO / api / f"{api}-openapi.json").read_text(encoding="utf-8"))
+        for path in spec["paths"]:
+            names.update(m[1:-1] for m in _PARAM.findall(path))
+    return names
 
-    Anaplan list responses are shaped ``{"lineItems": [{"id": ...}, ...]}``; each
-    collection key maps to the ``{<singular>Id}`` param used by its item endpoints
-    (lineItems -> lineItemId, dimensions -> dimensionId, ...). Only fills a param
-    that is not already set, so discovered workspace/model IDs win.
+
+def _pick(item, param):
+    """Read a param's value from a harvested item dict, tolerant of field names.
+
+    Anaplan is inconsistent: the id field may be ``integrationId`` (cloudworks),
+    ``id`` (integration/scim), or ``taskId`` (alm syncTasks). Try the param's own
+    name first, then the two generic id fields.
     """
-    if not isinstance(data, dict):
-        return
-    for key, val in data.items():
-        if isinstance(val, list) and val and isinstance(val[0], dict) and "id" in val[0]:
-            pool.setdefault(_singular(key) + "Id", val[0]["id"])
+    for key in (param, "id", "taskId"):
+        val = item.get(key)
+        if val:
+            return str(val)
+    return None
+
+
+def _best(items):
+    """Pick a usable item from a list, skipping archived / inactive ones.
+
+    ``GET /models`` can return an archived model first; using it makes every
+    sub-resource list fail 422 ("Model is archived"), so nothing downstream can be
+    harvested. Prefer the first item that is neither archived (``activeState``) nor
+    inactive (``active``); fall back to the first item for lists without those keys.
+    """
+    for item in items:
+        state = str(item.get("activeState", "")).upper()
+        if state == "ARCHIVED" or item.get("active") is False:
+            continue
+        return item
+    return items[0]
+
+
+def _first_item(data):
+    """Return the representative item dict from a GET response, or None.
+
+    First list-of-dicts found (``{"models": [{...}]}``, SCIM ``Resources``, nested
+    ``history_of_runs.runs``); failing that, the first nested dict that carries an
+    id-ish key (the import tasks response is a single ``{"task": {"taskId": ...}}``).
+    """
+    queue = [data]
+    fallback = None
+    while queue:
+        node = queue.pop(0)
+        if isinstance(node, dict):
+            for key, val in node.items():
+                if isinstance(val, list) and val and isinstance(val[0], dict):
+                    return _best(val)
+                queue.append(val)
+            if fallback is None and any(k == "id" or k.endswith("Id") for k in node):
+                fallback = node
+        elif isinstance(node, list):
+            queue.extend(node[:5])
+    return fallback
+
+
+def _scrape(node, field_pool, known):
+    """Recursively collect IDs from a GET response into the flat fallback pool.
+
+    Two forms: a list under key K yields ``{singular(K)}Id`` from its first item;
+    a scalar whose key is itself a known param name is taken as that ID. Task IDs
+    are skipped (they must stay source-linked). First value wins (setdefault).
+    """
+    if isinstance(node, dict):
+        for key, val in node.items():
+            if isinstance(val, list) and val and isinstance(val[0], dict):
+                param = _singular(key) + "Id"
+                if param not in TASK_PARAMS:
+                    got = _pick(_best(val), param)
+                    if got:
+                        field_pool.setdefault(param, got)
+            elif (key in known and key not in TASK_PARAMS
+                  and isinstance(val, (str, int)) and str(val)):
+                field_pool.setdefault(key, str(val))
+            _scrape(val, field_pool, known)
+    elif isinstance(node, list):
+        for item in node[:5]:
+            _scrape(item, field_pool, known)
+
+
+def harvest(api, template, data, items_by_source, field_pool, known):
+    """Record IDs from one GET response: source-linked item + flat field pool."""
+    item = _first_item(data)
+    if item:
+        items_by_source[(api, template)] = item
+    _scrape(data, field_pool, known)
+
+
+def fill_get(api, template, items_by_source, field_pool):
+    """Fill a GET path with real IDs; return (filled_path, confidence).
+
+    Each param is resolved in order: (1) source-linked — the item harvested from
+    the endpoint prefix directly above it; (2) the flat field pool, directly or via
+    PARAM_ALIAS; (3) ``chunkId`` defaults to ``0``. Otherwise the fabricated ID,
+    which marks the row ``fabricated-id`` (a 404 then means "not found", not
+    "authorized").
+    """
+    fabricated = False
+
+    def repl(m):
+        nonlocal fabricated
+        param = m.group(0)[1:-1]
+        prefix = template[:m.start()].rstrip("/")
+        item = items_by_source.get((api, prefix))
+        val = _pick(item, param) if item else None
+        if not val:
+            val = field_pool.get(param) or field_pool.get(PARAM_ALIAS.get(param, ""))
+        if not val and param == "chunkId":
+            val = "0"
+        if val:
+            return val
+        fabricated = True
+        return FAKE_ID
+
+    filled = _PARAM.sub(repl, template)
+    return filled, ("fabricated-id" if fabricated else "real")
 
 
 def build_probes(include_writes, include_deletes):
@@ -221,35 +356,6 @@ def fetch_user_id(client, token):
     body = r.json()
     user = body.get("user", body)
     return user.get("id") or user.get("userId") or "unknown"
-
-
-def discover_context(client, token):
-    """Find a workspace + model the user can reach, to fill {workspaceId}/{modelId}.
-
-    Returns a real-ID map for fill_path. Endpoints scoped to a real model return a
-    genuine role gate (403) instead of a fabricated-ID 404, so the scan reflects the
-    user's authorization rather than resource existence. Returns {} if the user has
-    no accessible model (falls back to fabricated IDs for every scoped path).
-    """
-    base = json.loads(
-        (REPO / "integration" / "integration-openapi.json").read_text(encoding="utf-8")
-    )["servers"][0]["url"]
-    hdr = {"Authorization": f"Bearer {token}"}
-    ids = {}
-    try:
-        ws = client.get(f"{base}/workspaces", headers=hdr).json().get("workspaces", [])
-        if ws:
-            ids["workspaceId"] = ws[0]["id"]
-        models = client.get(f"{base}/models", headers=hdr).json().get("models", [])
-        if models:
-            ids["modelId"] = models[0]["id"]
-            # Prefer the model's own workspace so the paired {workspaceId}/{modelId}
-            # endpoints resolve to a consistent, reachable pair.
-            if models[0].get("currentWorkspaceId"):
-                ids["workspaceId"] = models[0]["currentWorkspaceId"]
-    except (httpx.HTTPError, KeyError, ValueError):
-        pass
-    return ids
 
 
 def run_probe(client, token, probe):
@@ -313,16 +419,21 @@ def main():
 
     rows = []
     roles_held = set()
+    known = _param_names() - {"id"}  # 'id' too generic to scrape safely
+    items_by_source = {}   # (api, source-template) -> first harvested item dict
+    field_pool = {}        # param name -> value, flat fallback for embedded IDs
     with httpx.Client(timeout=30) as client:
         user_id = fetch_user_id(client, token)
-        pool = discover_context(client, token)  # seeds workspaceId + modelId
+        if user_id != "unknown":
+            # Seed the caller's own GUID so scim {id} / exception {userGuid} resolve
+            # even when their user-list endpoints are not reachable.
+            field_pool["userId"] = str(user_id)
         print(f"\nUser id: {user_id}")
-        print("Seed IDs: " + (", ".join(f"{k}={v}" for k, v in pool.items()) or "none — scoped paths fabricated"))
 
         probes = list(build_probes(args.include_writes, args.include_deletes))
         # Run GETs first, shallow paths before deep, so a list endpoint's IDs are
-        # harvested into the pool before the item endpoint that needs them. Writes
-        # and deletes run last and always use synthetic IDs (never a real one).
+        # harvested before the item endpoint that needs them. Writes and deletes
+        # run last and always use synthetic IDs (never a real one).
         probes.sort(key=lambda p: (
             p["method"] != "GET", p["path"].count("/"), p["api"], p["path"]
         ))
@@ -330,12 +441,16 @@ def main():
         for p in probes:
             # GETs are read-only, so real IDs are safe and harvested along the way;
             # mutating verbs stay synthetic for safety.
-            id_map = pool if p["method"] == "GET" else {}
-            filled, confidence = fill_path(p["path"], id_map)
+            if p["method"] == "GET":
+                filled, confidence = fill_get(
+                    p["api"], p["path"], items_by_source, field_pool
+                )
+            else:
+                filled, confidence = fill_path(p["path"], {})
             p["url"] = p["base"] + filled
             status, outcome, snippet, data = run_probe(client, token, p)
             if p["method"] == "GET" and data is not None:
-                harvest_ids(pool, data)
+                harvest(p["api"], p["path"], data, items_by_source, field_pool, known)
             held = outcome in _HELD
             # Only a real-ID (or param-free) endpoint proves authorization; a
             # fabricated-ID 404 just means the resource doesn't exist.
@@ -377,24 +492,61 @@ def _selftest():
     assert classify_kind("delete", "/Users/{id}") == "delete"
     assert guess_level({"audit", "integration"}) == "model+auditor"
     assert guess_level(set()) == "basic"
-    # fill_path: real IDs -> "real"; any leftover param -> "fabricated-id"
-    ids = {"workspaceId": "W1", "modelId": "M1"}
-    assert fill_path("/models/{modelId}", ids) == ("/models/M1", "real")
-    assert fill_path("/workspaces", ids) == ("/workspaces", "real")
-    assert fill_path("/models/{modelId}/files/{fileId}", ids) == (
-        f"/models/M1/files/{FAKE_ID}", "fabricated-id")
-    # harvest chains list IDs into the pool for later path params
     assert _singular("lineItems") == "lineItem"
     assert _singular("dimensions") == "dimension"
     assert _singular("categories") == "category"
-    pool = {"modelId": "M1"}
-    harvest_ids(pool, {"lineItems": [{"id": "L1"}, {"id": "L2"}]})
-    assert pool["lineItemId"] == "L1"
-    harvest_ids(pool, {"lineItems": [{"id": "OTHER"}]})  # does not overwrite
-    assert pool["lineItemId"] == "L1"
-    harvest_ids(pool, {"error": "not a list"})  # ignored, no crash
-    assert fill_path("/models/{modelId}/lineItems/{lineItemId}/dimensions", pool) == (
-        "/models/M1/lineItems/L1/dimensions", "real")
+    # fill_path (mutating verbs): no real IDs -> every param fabricated
+    assert fill_path("/models/{modelId}", {}) == (f"/models/{FAKE_ID}", "fabricated-id")
+    assert fill_path("/workspaces", {}) == ("/workspaces", "real")
+    # _pick tolerates the field-name spread (integrationId / id / taskId)
+    assert _pick({"integrationId": "I1"}, "integrationId") == "I1"
+    assert _pick({"id": "X"}, "modelId") == "X"
+    assert _pick({"taskId": "T"}, "syncTaskId") == "T"  # alm syncTasks item field
+    assert _pick({"name": "n"}, "modelId") is None
+    # _first_item: list-of-dicts, SCIM Resources, and single nested task object
+    assert _first_item({"models": [{"id": "M1"}]}) == {"id": "M1"}
+    assert _first_item({"Resources": [{"id": "U1"}]}) == {"id": "U1"}
+    assert _first_item({"meta": 1, "task": {"taskId": "T1"}}) == {"taskId": "T1"}
+    # _best skips archived / inactive items so the seed model is usable
+    assert _best([{"id": "A", "activeState": "ARCHIVED"}, {"id": "B"}]) == {"id": "B"}
+    assert _best([{"id": "A", "active": False}, {"id": "B", "active": True}])["id"] == "B"
+    assert _best([{"id": "A", "activeState": "ARCHIVED"}])["id"] == "A"  # no choice
+    assert _first_item({"models": [{"id": "A", "activeState": "ARCHIVED"},
+                                   {"id": "B"}]}) == {"id": "B"}
+    # _scrape: embedded IDs land in the pool; task IDs and bare 'id' do not
+    known = {"integrationId", "notificationId", "modelId", "runId"}
+    fp = {}
+    _scrape({"integrations": [{"integrationId": "I1", "notificationId": "N1"}]}, fp, known)
+    assert fp == {"integrationId": "I1", "notificationId": "N1"}
+    fp = {}
+    _scrape({"tasks": [{"taskId": "T"}]}, fp, known)  # task IDs stay source-linked
+    assert fp == {}
+    fp = {}
+    _scrape({"history_of_runs": {"runs": [{"id": "R1"}]}}, fp, known)
+    assert fp == {"runId": "R1"}
+    # fill_get: source-linked, field pool, alias, chunk default
+    src = {
+        ("integration", "/models"): {"id": "M1"},
+        ("cloudworks", "/integrations"): {"integrationId": "I1"},
+        # same param name, two parents -> two sources, never crossed
+        ("integration", "/models/M1/actions/A1/tasks"): {"taskId": "AT"},
+        ("integration", "/models/M1/imports/N1/tasks"): {"taskId": "IT"},
+    }
+    assert fill_get("integration", "/models/{modelId}", src, {}) == ("/models/M1", "real")
+    assert fill_get("cloudworks", "/integrations/{integrationId}", src, {}) == (
+        "/integrations/I1", "real")
+    act = fill_get("integration", "/models/M1/actions/A1/tasks/{taskId}", src, {})
+    imp = fill_get("integration", "/models/M1/imports/N1/tasks/{taskId}", src, {})
+    assert act == ("/models/M1/actions/A1/tasks/AT", "real")
+    assert imp == ("/models/M1/imports/N1/tasks/IT", "real")  # not AT
+    # field-pool fallback + alias: scim {id} resolves from seeded userId
+    assert fill_get("scim", "/Users/{id}", {}, {"userId": "U9"}) == ("/Users/U9", "real")
+    # chunkId defaults to 0
+    assert fill_get("integration", "/f/{chunkId}", {}, {}) == ("/f/0", "real")
+    # no source at all -> fabricated
+    assert fill_get("integration", "/x/{fileId}", {}, {}) == (f"/x/{FAKE_ID}", "fabricated-id")
+    # _param_names pulls real params from the specs
+    assert {"modelId", "taskId", "integrationId", "chunkId"} <= _param_names()
     # default tier: no writes, no deletes
     probes = list(build_probes(False, False))
     assert {p["kind"] for p in probes} == {"read", "search"}
