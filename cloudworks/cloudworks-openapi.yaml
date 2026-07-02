@@ -978,7 +978,8 @@ paths:
     parameters:
     - name: notificationId
       in: path
-      description: Notification configuration identifier. From `GET /integrations/notification`.
+      description: Notification configuration identifier. From `GET /integrations/notification`, or the `notificationId` field
+        on each item of `GET /integrations`.
       required: true
       schema:
         type: string
@@ -1996,7 +1997,7 @@ components:
     RunId:
       name: runId
       in: path
-      description: Integration run identifier. From `GET /integrations/runs/{integrationId}`.
+      description: Integration run identifier — the `id` of each entry under `history_of_runs.runs` in `GET /integrations/runs/{integrationId}`.
       required: true
       schema:
         type: string
@@ -2004,7 +2005,7 @@ components:
     IntegrationId:
       name: integrationId
       in: path
-      description: Integration identifier. From `GET /integrations`.
+      description: Integration identifier — the `integrationId` field of each item in `GET /integrations` (not `id`).
       required: true
       schema:
         type: string

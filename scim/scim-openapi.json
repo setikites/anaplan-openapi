@@ -217,7 +217,7 @@
         {
           "name": "id",
           "in": "path",
-          "description": "Anaplan-assigned hex-32 GUID of the user. From `GET /Users`.",
+          "description": "Anaplan-assigned hex-32 GUID of the user — the same value as the Anaplan user ID. From `GET /Users` (`Resources[].id`); if SCIM access is unavailable, the same GUID comes from `GET /users` or `GET /users/me` in the Integration API.",
           "required": true,
           "schema": {
             "type": "string",
