@@ -22,13 +22,15 @@ Administration-specific:
     ADMINISTRATION_EMAIL      - email of a safe existing user for idempotent import tests
     ADMINISTRATION_USERID     - user ID of that user (documents which account is safe to re-import)
 
-**Confirmed behavior (live testing 2026-06-23):**
-- Both AnaplanAuthToken and Bearer schemes are accepted — the same OAuth
-  access_token with either prefix reaches the application layer.
+**Confirmed behavior (live testing 2026-06-23, re-confirmed 2026-07-02):**
+- Only the AnaplanAuthToken scheme is accepted. The same OAuth access_token
+  sent as `Bearer` is rejected at the auth layer — 401 with an empty body and a
+  `WWW-Authenticate: Bearer` challenge — before the application runs. This
+  matches the help docs (Export Users to CSV) and the Audit/Exception APIs.
 - Accounts lacking the Tenant Administrator role receive a role error (not an
   auth rejection). The error form differs by token type:
     - Basic-auth token → 500 INTERNAL_SERVER_ERROR
-    - OAuth access_token → 401 ACCESS_CONTROL_DENIED
+    - OAuth access_token → 401 ACCESS_CONTROL_DENIED (JSON body)
   The spec documents 403 for the role-denied case; both observed codes are
   confirmed discrepancies.
 """
@@ -270,13 +272,13 @@ def _region_label(url: str) -> str:
 
 @pytest.mark.live
 def test_auth_scheme_probe(admin_token):
-    """Probe whether Bearer and AnaplanAuthToken are both accepted by the Administration API.
+    """Confirm the Administration API accepts only the AnaplanAuthToken scheme.
 
-    Uses the same token value (preferably an OAuth Authorization Code access_token)
-    with both Authorization header schemes. A 200 or role-error 500 both confirm the
-    scheme was accepted by the auth layer — the 500 means the application processed the
-    request but the account lacks the Tenant Administrator role, which is distinct from
-    the scheme being rejected.
+    Sends the same token with both Authorization schemes. AnaplanAuthToken reaches
+    the application layer (200, or a role error for a non-admin account); Bearer is
+    rejected at the auth layer — an empty 401 with a ``WWW-Authenticate: Bearer``
+    challenge — so the spec correctly declares only AnaplanAuthToken. Matches the
+    help docs and the Audit/Exception APIs.
     """
     url = f"{ADMIN_URL}/users/export"
 
@@ -288,34 +290,28 @@ def test_auth_scheme_probe(admin_token):
             url, headers={"Authorization": f"Bearer {admin_token}"}
         )
 
-    anaplan_accepted = anaplan_r.status_code == 200 or _is_no_role_error(anaplan_r)
-    bearer_accepted = bearer_r.status_code == 200 or _is_no_role_error(bearer_r)
-
     print(f"\nAuth scheme probe (Administration API) — GET /users/export:")
     print(f"  AnaplanAuthToken: {anaplan_r.status_code}  {anaplan_r.text[:120]}")
-    print(f"  Bearer:           {bearer_r.status_code}  {bearer_r.text[:120]}")
+    print(f"  Bearer:           {bearer_r.status_code}  www-authenticate="
+          f"{bearer_r.headers.get('www-authenticate')!r}  body={bearer_r.text[:80]!r}")
 
-    assert anaplan_accepted, (
+    # AnaplanAuthToken must reach the application layer.
+    assert anaplan_r.status_code == 200 or _is_no_role_error(anaplan_r), (
         f"AnaplanAuthToken scheme rejected on GET /users/export: "
         f"{anaplan_r.status_code}: {anaplan_r.text[:200]}"
     )
 
-    if bearer_accepted:
-        warnings.warn(
-            f"Bearer scheme also accepted on GET /users/export "
-            f"(status {bearer_r.status_code}) — "
-            "spec BearerAuth security scheme listing is valid for OAuth access tokens",
-            UserWarning,
-            stacklevel=2,
-        )
-    else:
-        warnings.warn(
-            f"Bearer scheme rejected on GET /users/export "
-            f"(status {bearer_r.status_code}) — "
-            "spec should not declare BearerAuth; AnaplanAuthToken prefix is required",
-            UserWarning,
-            stacklevel=2,
-        )
+    # Bearer must be rejected by the auth layer, not reach the app: an empty 401,
+    # never a 200 or a role-error JSON body.
+    assert not (bearer_r.status_code == 200 or _is_no_role_error(bearer_r)), (
+        f"Bearer scheme unexpectedly reached the application layer "
+        f"(status {bearer_r.status_code}): {bearer_r.text[:200]} — "
+        "the Administration host is expected to reject Bearer"
+    )
+    assert bearer_r.status_code == 401, (
+        f"expected an auth-layer 401 for Bearer, got {bearer_r.status_code}: "
+        f"{bearer_r.text[:200]}"
+    )
 
 
 # ─── Regional server probe ─────────────────────────────────────────────────────
