@@ -7,9 +7,15 @@ operation across seven APIs (integration, cloudworks, scim, alm, audit,
 exception, administration) and records the status / outcome / response body for
 each. From the role-gated APIs it guesses the user's access level.
 
-Path parameters are filled with the discovered real workspace/model IDs where
-possible; anything left (fileId, viewId, revisionId, ...) falls back to a
-fabricated non-existent ID. Each row carries a `confidence`:
+Path parameters are filled with real IDs where possible. GET requests are
+read-only, so it is safe to use real IDs: GETs run first (shallow paths before
+deep) and each list response is harvested for IDs, so a collection endpoint feeds
+the item endpoint below it — e.g. GET .../lineItems yields a lineItemId for
+GET .../lineItems/{lineItemId}/dimensions, which yields a dimensionId for
+GET .../dimensions/{dimensionId}/items. Mutating verbs (POST/PUT/PATCH/DELETE)
+*always* use a fabricated non-existent ID, for safety, even when a real one is
+known. Anything still unresolved falls back to the fabricated ID. Each row
+carries a `confidence`:
 
   real           param-free, or every path param filled from a real ID — the
                  status reflects the user's authorization to that endpoint
@@ -146,8 +152,32 @@ def fill_path(path, real_ids):
     return filled, ("fabricated-id" if fabricated else "real")
 
 
-def build_probes(include_writes, include_deletes, real_ids):
-    """Yield probe dicts for every in-scope operation across the seven specs."""
+def _singular(name):
+    """Naive collection -> singular for the "<collection> -> <singular>Id" rule."""
+    if name.endswith("ies"):
+        return name[:-3] + "y"
+    if name.endswith("s"):
+        return name[:-1]
+    return name  # ponytail: naive; fix if a collection name breaks it
+
+
+def harvest_ids(pool, data):
+    """Add IDs from a GET list response to the pool for later path parameters.
+
+    Anaplan list responses are shaped ``{"lineItems": [{"id": ...}, ...]}``; each
+    collection key maps to the ``{<singular>Id}`` param used by its item endpoints
+    (lineItems -> lineItemId, dimensions -> dimensionId, ...). Only fills a param
+    that is not already set, so discovered workspace/model IDs win.
+    """
+    if not isinstance(data, dict):
+        return
+    for key, val in data.items():
+        if isinstance(val, list) and val and isinstance(val[0], dict) and "id" in val[0]:
+            pool.setdefault(_singular(key) + "Id", val[0]["id"])
+
+
+def build_probes(include_writes, include_deletes):
+    """Yield raw probe dicts (path unfilled) for every in-scope operation."""
     for api in APIS:
         spec = json.loads(
             (REPO / api / f"{api}-openapi.json").read_text(encoding="utf-8")
@@ -165,21 +195,19 @@ def build_probes(include_writes, include_deletes, real_ids):
                     continue
                 if kind == "search":
                     body = SEARCH_BODY.get(path, {})
-                elif kind in ("write",):
+                elif kind == "write":
                     body = {}
                 else:
                     body = None
-                filled, confidence = fill_path(path, real_ids)
                 yield {
                     "api": api,
                     "method": method.upper(),
                     "path": path,
                     "kind": kind,
                     "expected_role": ROLE[api][0],
-                    "url": base + filled,
+                    "base": base,
                     "scheme": scheme,
                     "body": body,
-                    "confidence": confidence,
                 }
 
 
@@ -226,16 +254,22 @@ def discover_context(client, token):
 
 def run_probe(client, token, probe):
     headers = {"Authorization": f"{probe['scheme']} {token}"}
+    data = None
     try:
         r = client.request(
             probe["method"], probe["url"], headers=headers, json=probe["body"]
         )
         status, text = r.status_code, r.text
+        if 200 <= status < 300:
+            try:
+                data = r.json()
+            except ValueError:
+                pass
     except httpx.HTTPError as e:
         status, text = 0, f"REQUEST_ERROR: {e}"
     outcome = classify_outcome(status, probe["api"]) if status else "REQUEST_ERROR"
     snippet = " ".join(text.split())[:300]
-    return status, outcome, snippet
+    return status, outcome, snippet, data
 
 
 def guess_level(roles_held):
@@ -281,26 +315,40 @@ def main():
     roles_held = set()
     with httpx.Client(timeout=30) as client:
         user_id = fetch_user_id(client, token)
-        real_ids = discover_context(client, token)
+        pool = discover_context(client, token)  # seeds workspaceId + modelId
         print(f"\nUser id: {user_id}")
-        print("Real IDs: " + (", ".join(f"{k}={v}" for k, v in real_ids.items()) or "none — all scoped paths fabricated"))
-        probes = list(build_probes(args.include_writes, args.include_deletes, real_ids))
+        print("Seed IDs: " + (", ".join(f"{k}={v}" for k, v in pool.items()) or "none — scoped paths fabricated"))
+
+        probes = list(build_probes(args.include_writes, args.include_deletes))
+        # Run GETs first, shallow paths before deep, so a list endpoint's IDs are
+        # harvested into the pool before the item endpoint that needs them. Writes
+        # and deletes run last and always use synthetic IDs (never a real one).
+        probes.sort(key=lambda p: (
+            p["method"] != "GET", p["path"].count("/"), p["api"], p["path"]
+        ))
         print(f"Probing {len(probes)} endpoints...\n")
         for p in probes:
-            status, outcome, snippet = run_probe(client, token, p)
+            # GETs are read-only, so real IDs are safe and harvested along the way;
+            # mutating verbs stay synthetic for safety.
+            id_map = pool if p["method"] == "GET" else {}
+            filled, confidence = fill_path(p["path"], id_map)
+            p["url"] = p["base"] + filled
+            status, outcome, snippet, data = run_probe(client, token, p)
+            if p["method"] == "GET" and data is not None:
+                harvest_ids(pool, data)
             held = outcome in _HELD
             # Only a real-ID (or param-free) endpoint proves authorization; a
             # fabricated-ID 404 just means the resource doesn't exist.
-            if held and p["confidence"] == "real":
+            if held and confidence == "real":
                 roles_held.add(p["api"])
             rows.append({
                 "api": p["api"], "method": p["method"], "path": p["path"],
-                "kind": p["kind"], "confidence": p["confidence"],
+                "kind": p["kind"], "confidence": confidence,
                 "expected_role": p["expected_role"],
                 "status": status, "outcome": outcome, "role_held": held,
                 "response_body": snippet,
             })
-            print(f"  {outcome:12} {status:>3} {p['confidence']:13} {p['method']:6} {p['api']}{p['path']}")
+            print(f"  {outcome:12} {status:>3} {confidence:13} {p['method']:6} {p['api']}{p['path']}")
 
     level = guess_level(roles_held)
     held_names = ", ".join(ROLE[a][0] for a in APIS if a in roles_held) or "none detected"
@@ -335,11 +383,23 @@ def _selftest():
     assert fill_path("/workspaces", ids) == ("/workspaces", "real")
     assert fill_path("/models/{modelId}/files/{fileId}", ids) == (
         f"/models/M1/files/{FAKE_ID}", "fabricated-id")
-    # default tier: no writes, no deletes; scoped paths marked
-    probes = list(build_probes(False, False, ids))
+    # harvest chains list IDs into the pool for later path params
+    assert _singular("lineItems") == "lineItem"
+    assert _singular("dimensions") == "dimension"
+    assert _singular("categories") == "category"
+    pool = {"modelId": "M1"}
+    harvest_ids(pool, {"lineItems": [{"id": "L1"}, {"id": "L2"}]})
+    assert pool["lineItemId"] == "L1"
+    harvest_ids(pool, {"lineItems": [{"id": "OTHER"}]})  # does not overwrite
+    assert pool["lineItemId"] == "L1"
+    harvest_ids(pool, {"error": "not a list"})  # ignored, no crash
+    assert fill_path("/models/{modelId}/lineItems/{lineItemId}/dimensions", pool) == (
+        "/models/M1/lineItems/L1/dimensions", "real")
+    # default tier: no writes, no deletes
+    probes = list(build_probes(False, False))
     assert {p["kind"] for p in probes} == {"read", "search"}
-    assert {p["confidence"] for p in probes} == {"real", "fabricated-id"}
-    assert "delete" in {p["kind"] for p in build_probes(True, True, ids)}
+    assert all("base" in p and "url" not in p for p in probes)
+    assert "delete" in {p["kind"] for p in build_probes(True, True)}
     print("selftest OK")
 
 
