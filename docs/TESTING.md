@@ -29,7 +29,7 @@ uv run --env-file .env pytest tests/ --live
 | `ANAPLAN_OAUTH_CLIENT_ID` | OAuth Authorization Code Grant | Client ID registered for the auth-code flow |
 | `ANAPLAN_OAUTH_DEVICE_CLIENT_ID` | OAuth Device Grant | Client ID registered for the device flow |
 | `ANAPLAN_OAUTH_AUTHCODE_CLIENT_ID` / `ANAPLAN_OAUTH_AUTHCODE_CLIENT_SECRET` | `scripts/oauth/` helpers | Auth-code client credentials for the manual OAuth helper scripts |
-| `ANAPLAN_OAUTH_KEYRING_SERVICE` | `scripts/oauth/` helpers + audit live tests | Keyring service name under which the Authorization Code grant token blob is stored (default `anaplan-oauth-authcode`). When a token is present, the audit live tests use its `access_token` as the bearer instead of basic auth. |
+| `ANAPLAN_OAUTH_KEYRING_SERVICE` | `scripts/oauth/` helpers + audit live tests | Keyring service name under which the Authorization Code grant token blob is stored (default `anaplan-oauth-authcode`). When a token is present, the audit live tests send its `access_token` as `AnaplanAuthToken` instead of basic auth. |
 | `ANAPLAN_INTEGRATION_WORKSPACE_ID` | Integration live tests | Workspace ID for model-scoped Integration API tests |
 | `ANAPLAN_INTEGRATION_MODEL_ID` | Integration live tests | Model ID for model-scoped Integration API tests |
 | `ANAPLAN_ALM_WORKSPACE_ID` | ALM live tests | Workspace ID for ALM API tests |
@@ -93,8 +93,9 @@ uv run python scripts/oauth/oauth_device_step2.py     # poll for approval
 
 ### Authorization Code grant → audit live tests (issue #58)
 
-The audit API's `GET /events` happy path needs a bearer token for an account
-holding the **Tenant Auditor** role, obtained via the Authorization Code grant.
+The audit API's `GET /events` happy path needs a token for an account holding
+the **Tenant Auditor** role, obtained via the Authorization Code grant and sent
+as `Authorization: AnaplanAuthToken {token}` (the audit host rejects `Bearer`).
 The flow is human-in-the-loop (the browser approval can't be automated), but is
 repeatable:
 

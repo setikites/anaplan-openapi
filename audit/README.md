@@ -17,7 +17,7 @@ The Audit API provides access to audit event logs from an Anaplan tenant. Intend
 
 ## Authentication
 
-Confirmed via live testing: requests authenticate with `Authorization: AnaplanAuthToken {token}`, where the token may be obtained from basic/certificate auth **or** an OAuth Authorization Code grant access token (Anaplan accepts an OAuth `access_token` under the same scheme). The account must hold the **Tenant Auditor** role — without it, `GET /events` returns `401 FAILURE_UNAUTHORIZED_USER_ACTION` (the token is accepted; the role is missing).
+Confirmed via live testing: requests authenticate with `Authorization: AnaplanAuthToken {token}`, where the token may be obtained from basic/certificate auth **or** an OAuth Authorization Code grant access token (Anaplan accepts an OAuth `access_token` under the same scheme). The audit host (`audit.anaplan.com`) does **not** accept the `Bearer` scheme — sending `Authorization: Bearer {token}` returns `401 "No valid token header found for the request"`. The account must hold the **Tenant Auditor** role — without it, `GET /events` returns `401 FAILURE_UNAUTHORIZED_USER_ACTION` (the token is accepted; the role is missing).
 
 | Scheme | Format |
 |--------|--------|
@@ -46,8 +46,8 @@ The spec is **hand-maintained and live-tested** (`tests/test_audit_live.py`, iss
 
 ### `GET /events` event records (live testing 2026-06-12, issue #59)
 
-Confirmed against real records with a role-enabled OAuth bearer token (Authorization
-Code grant; the account holds the Tenant Auditor role). The response matches the
+Confirmed against real records with a role-enabled OAuth token (Authorization
+Code grant, sent as `AnaplanAuthToken`; the account holds the Tenant Auditor role). The response matches the
 `AuditEventsResponse` envelope — a top-level `response` array of `AuditEvent` records
 plus `meta.paging` (`AuditPaging`). Field reconciliations:
 

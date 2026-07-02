@@ -103,7 +103,6 @@ paths:
                 $ref: '#/components/schemas/AuditErrorResponse'
       security:
       - AnaplanAuthToken: []
-      - BearerAuth: []
   /events/search:
     post:
       summary: Search audit events
@@ -170,7 +169,6 @@ paths:
                 $ref: '#/components/schemas/AuditErrorResponse'
       security:
       - AnaplanAuthToken: []
-      - BearerAuth: []
 components:
   schemas:
     AuditEvent:
@@ -327,7 +325,5 @@ components:
       type: apiKey
       in: header
       name: Authorization
-      description: 'Anaplan authentication token. Format: `AnaplanAuthToken {token}`'
-    BearerAuth:
-      type: http
-      scheme: bearer
+      description: 'Anaplan authentication token. Format: `AnaplanAuthToken {token}`. Accepts a token from basic/certificate
+        auth or an OAuth Authorization Code grant access token. The audit host does not accept the `Bearer` scheme.'

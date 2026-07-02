@@ -115,7 +115,7 @@ def _is_no_role_401(response: httpx.Response) -> bool:
 
 @pytest.fixture(scope="module")
 def audit_token():
-    """Bearer token for audit calls (module-scoped).
+    """Auth token for audit calls, sent as AnaplanAuthToken (module-scoped).
 
     Prefers an OAuth access_token from the keyring (Authorization Code grant, the
     path that can carry the Tenant Auditor role — issue #58). Falls back to a
