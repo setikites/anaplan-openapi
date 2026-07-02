@@ -38,8 +38,9 @@ from check_min_role import (
 from check_ordering import check_spec_ordering
 
 # Redundant legacy role prose the sentence replaces, e.g. "Requires Workspace
-# Administrator role." — stripped so the annotation does not duplicate it.
-_REQUIRES = re.compile(r"\s*Requires [^.]+? role\.?", re.IGNORECASE)
+# Administrator role." or "Requires ... role on both models." — the whole
+# sentence is stripped (through its period) so no trailing qualifier is orphaned.
+_REQUIRES = re.compile(r"\s*Requires\b[^.]*?\brole\b[^.]*\.", re.IGNORECASE)
 
 
 def _op_key(method: str, path: str) -> str:
