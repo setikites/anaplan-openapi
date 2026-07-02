@@ -290,6 +290,7 @@ Legacy regions (us1–us7, eu1, eu2, eu4, ap1) share the older non-prefixed `api
 ├── CONTRIBUTING.md           (tooling, build pipeline, how to run tests)
 ├── CONTEXT.md                (this file)
 ├── CLAUDE.md                 (agent instructions)
+├── SCAN.md                   (how to run the live endpoint access scanner)
 ├── LICENSE  NOTICE           (Apache-2.0 + Anaplan disclaimer)
 ├── docs/
 │   ├── TESTING.md            (live-test setup, env vars, flags)
@@ -299,6 +300,7 @@ Legacy regions (us1–us7, eu1, eu2, eu4, ap1) share the older non-prefixed `api
 ├── scripts/                  (build/maintenance tooling)
 │   ├── build_spec.py  converter.py  schema_importer.py
 │   ├── revise_spec.py  validate.py  sync_yaml.py
+│   ├── scan_endpoint_access.py  (live per-endpoint access scan -> CSV; see SCAN.md)
 │   └── oauth/                (interactive OAuth flow helpers)
 ├── sources/                  (raw source data)
 │   ├── Official Anaplan Collection.postman_collection.json
@@ -329,3 +331,8 @@ All 10 specs now exist. Ongoing work is refinement rather than initial authoring
 - Record any behavior that differs from the official docs in the relevant
   `<api>/README.md` under "Discrepancies".
 - Live-test setup is documented in [docs/TESTING.md](docs/TESTING.md).
+- To confirm the minimum role / access level required by each endpoint, run the
+  live access scanner (`scripts/scan_endpoint_access.py`): it authenticates a
+  user via OAuth, probes every operation across the seven resource APIs, and
+  writes a per-endpoint CSV of authorization outcomes. Run it from accounts with
+  different roles to establish the gates empirically. See [SCAN.md](SCAN.md).
