@@ -87,8 +87,10 @@ can reach, and probes ~159 endpoints, printing each result as it goes. GET
 requests run first and harvest real IDs from list responses to fill deeper GET
 path parameters (e.g. a `lineItemId` from `.../lineItems` feeds
 `.../lineItems/{lineItemId}/dimensions`), so more read endpoints get a trustworthy
-`real` confidence. Mutating requests (POST/PUT/PATCH/DELETE) always use synthetic
-non-existent IDs, so they can never change real data.
+`real` confidence. The full parameter→source map is
+[docs/scan-path-parameter-sources.md](docs/scan-path-parameter-sources.md).
+Mutating requests (POST/PUT/PATCH/DELETE) always use synthetic non-existent IDs,
+so they can never change real data.
 
 ## 5. Output
 
