@@ -83,9 +83,14 @@ from oauth_authcode import (  # noqa: E402  (reuse the tested auth-code flow)
 
 APIS = ["integration", "cloudworks", "scim", "alm", "audit", "exception", "administration"]
 
-# OAuth access tokens ride as Bearer everywhere except exception/administration,
-# which reject Bearer and require the AnaplanAuthToken scheme (see CONTEXT.md).
-AUTH_SCHEME = {"exception": "AnaplanAuthToken", "administration": "AnaplanAuthToken"}
+# OAuth access tokens ride as Bearer on api.anaplan.com (integration/cloudworks/
+# scim/alm). The audit, exception, and administration hosts reject Bearer and
+# require the AnaplanAuthToken scheme (the anaplan-sdk sends it for every call).
+AUTH_SCHEME = {
+    "audit": "AnaplanAuthToken",
+    "exception": "AnaplanAuthToken",
+    "administration": "AnaplanAuthToken",
+}
 
 # Each API's role gate, for the access-level guess. Short code used in the filename.
 ROLE = {
