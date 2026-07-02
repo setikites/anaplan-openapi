@@ -83,8 +83,12 @@ You will be prompted to:
    it back at the `Redirect URL:` prompt.
 
 The script then fetches your Anaplan user id, discovers a workspace + model you
-can reach (to fill `{workspaceId}`/`{modelId}` with real IDs), and probes ~159
-endpoints, printing each result as it goes.
+can reach, and probes ~159 endpoints, printing each result as it goes. GET
+requests run first and harvest real IDs from list responses to fill deeper GET
+path parameters (e.g. a `lineItemId` from `.../lineItems` feeds
+`.../lineItems/{lineItemId}/dimensions`), so more read endpoints get a trustworthy
+`real` confidence. Mutating requests (POST/PUT/PATCH/DELETE) always use synthetic
+non-existent IDs, so they can never change real data.
 
 ## 5. Output
 
