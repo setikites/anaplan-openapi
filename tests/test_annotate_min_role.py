@@ -65,6 +65,19 @@ def test_redundant_requires_prose_is_stripped():
     assert "Returns 400 on error." in desc
 
 
+def test_requires_prose_with_trailing_qualifier_stripped_cleanly():
+    # "Requires X role on both models." must be removed whole — no orphan fragment.
+    spec = _spec(("get", "/a", {
+        "description": "Returns revisions, ordered by date. Requires Workspace Administrator role on both models.",
+        "operationId": "a",
+    }))
+    annotate(spec, "Workspace Administrator", {}, set())
+    desc = spec["paths"]["/a"]["get"]["description"]
+    assert "on both models" not in desc
+    assert "Requires" not in desc
+    assert desc == "Minimum role: Workspace Administrator.\n\nReturns revisions, ordered by date."
+
+
 def test_idempotent_rerun_does_not_stack():
     spec = _spec(("get", "/a", {"description": "Do A.", "operationId": "a"}))
     annotate(spec, "Workspace Administrator", {}, set())

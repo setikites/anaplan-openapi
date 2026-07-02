@@ -4,6 +4,7 @@ See docs/adr/0006-minimum-role-annotations.md
 """
 
 import json
+import re
 import pytest
 from pathlib import Path
 from check_min_role import check_spec_min_roles
@@ -104,3 +105,39 @@ def test_spec_conforms_to_min_role_standard(spec_path):
         f"{spec_path.parent.name}: {len(violations)} min-role violation(s):\n"
         + "\n".join(f"  {v}" for v in violations)
     )
+
+
+# ─── ALM is fully annotated (issue #179) ──────────────────────────────────
+
+_HTTP = {"get", "post", "put", "patch", "delete", "head", "options", "trace"}
+
+
+def _alm_ops():
+    spec = json.loads((REPO_ROOT / "alm" / "alm-openapi.json").read_text(encoding="utf-8"))
+    for path, item in spec["paths"].items():
+        for method, op in item.items():
+            if method in _HTTP:
+                yield f"{method.upper()} {path}", op
+
+
+def test_every_alm_operation_has_a_min_role():
+    missing = [k for k, op in _alm_ops() if "x-anaplan-min-role" not in op]
+    assert not missing, f"ALM operations without a minimum role: {missing}"
+
+
+def test_alm_has_no_leftover_requires_role_prose():
+    leftover = [k for k, op in _alm_ops()
+                if re.search(r"Requires .+? role", op.get("description", ""), re.IGNORECASE)]
+    assert not leftover, f"ALM operations with ad-hoc 'Requires ... role' prose: {leftover}"
+
+
+def test_alm_report_endpoints_flagged_needs_info():
+    flagged = {k for k, op in _alm_ops() if op.get("x-anaplan-min-role-needs-info") is True}
+    expected = {
+        "GET /models/{modelId}/alm/comparisonReportTasks/{taskId}",
+        "GET /models/{modelId}/alm/comparisonReports/{targetRevisionId}/{sourceRevisionId}",
+        "POST /models/{modelId}/alm/summaryReportTasks",
+        "GET /models/{modelId}/alm/summaryReportTasks/{taskId}",
+        "GET /models/{modelId}/alm/summaryReports/{targetRevisionId}/{sourceRevisionId}",
+    }
+    assert flagged == expected
