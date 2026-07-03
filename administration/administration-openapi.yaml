@@ -37,9 +37,12 @@ paths:
   /users/export:
     get:
       summary: Export all users to CSV
-      description: 'Downloads all users in the tenant as a CSV file. Columns: `username`, `first_name`, `last_name`, `licenses`.
-        Use `Limit` and `Offset` to page through large tenants.'
+      description: |-
+        Minimum role: Tenant Administrator.
+
+        Downloads all users in the tenant as a CSV file. Columns: `username`, `first_name`, `last_name`, `licenses`. Use `Limit` and `Offset` to page through large tenants.
       operationId: exportUsers
+      x-anaplan-min-role: Tenant Administrator
       parameters:
       - name: Limit
         in: query
@@ -76,12 +79,15 @@ paths:
     put:
       summary: Import users from CSV
       description: |-
+        Minimum role: Tenant Administrator.
+
         Bulk-creates or updates users by uploading a CSV file. Users are matched by `username` (email address); existing users are updated, new addresses are created.
 
         CSV columns: `username`, `first_name`, `last_name`, `licenses`. Constraints: at least one data row, no more than 500 rows, no duplicate email addresses, no empty cells. Licenses must be quoted and comma-separated when a user holds more than one.
 
         Returns 207 Multi-Status with per-row counts and line-level errors.
       operationId: importUsers
+      x-anaplan-min-role: Tenant Administrator
       requestBody:
         required: true
         content:

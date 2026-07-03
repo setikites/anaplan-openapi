@@ -38,6 +38,8 @@ paths:
     post:
       summary: Create an Authentication Token (Basic)
       description: |-
+        Minimum role: None.
+
         Creates an AnaplanAuthToken for use with other Anaplan REST APIs. Returns 201 on success.
 
         **HTTP Basic Auth:** Send `Authorization: Basic {base64(username:password)}` with no request body.
@@ -86,10 +88,13 @@ paths:
       security:
       - BasicAuth: []
       - CACertAuth: []
+      x-anaplan-min-role: None
   /token/refresh:
     post:
       summary: Refresh Authentication Token
       description: |-
+        Minimum role: None.
+
         Extends the session for an existing AnaplanAuthToken. Tokens expire after 35 minutes; call this endpoint before expiry to maintain a session without re-authenticating.
 
         The response returns the same `tokenValue` — the token string itself does not change, but its internal expiration is reset.
@@ -128,10 +133,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+      x-anaplan-min-role: None
   /token/validate:
     get:
       summary: Get Authentication Token Details
       description: |-
+        Minimum role: None.
+
         Returns details for a valid AnaplanAuthToken, including expiry timestamp, token ID, and user/customer identifiers. Returns 401 if the token is invalid, expired, or has been revoked by logout.
 
         **Note:** `userGuid` and `customerGuid` are 32-character hexadecimal strings (no hyphens), not standard UUIDs.
@@ -195,11 +203,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+      x-anaplan-min-role: None
   /token/logout:
     post:
       summary: Log Out the User
-      description: Immediately invalidates an AnaplanAuthToken. Returns 204 with no body on success. Any subsequent use of
-        the token — including validation or refresh — returns 401.
+      description: |-
+        Minimum role: None.
+
+        Immediately invalidates an AnaplanAuthToken. Returns 204 with no body on success. Any subsequent use of the token — including validation or refresh — returns 401.
       tags:
       - Authentication
       - Other Authentication Actions
@@ -212,6 +223,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+      x-anaplan-min-role: None
 components:
   securitySchemes:
     BasicAuth:

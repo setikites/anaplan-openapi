@@ -80,8 +80,10 @@
       ],
       "patch": {
         "summary": "Assign or unassign an exception user",
-        "description": "Updates the exception-user status for a user in a specific workspace. Use `op: assign` to grant exception-user access or `op: unassign` to revoke it. A caller cannot modify their own exception-user status.",
+        "description": "Minimum role: Tenant Security Admin.\n\nUpdates the exception-user status for a user in a specific workspace. Use `op: assign` to grant exception-user access or `op: unassign` to revoke it. A caller cannot modify their own exception-user status.",
         "operationId": "patchExceptionUser",
+        "x-anaplan-min-role": "Tenant Security Admin",
+        "x-anaplan-min-role-needs-info": true,
         "requestBody": {
           "required": true,
           "content": {
@@ -168,8 +170,10 @@
     "/permissions/exception-users/search": {
       "post": {
         "summary": "Search exception users",
-        "description": "Search by workspace to list all exception users in that workspace (including visitors), or search by user to list all workspaces where that user has exception-user access (visitors' workspaces are excluded from the by-user results). Exactly one of `workspaceGuid` or `userGuid` must be provided.",
+        "description": "Minimum role: Tenant Security Admin.\n\nSearch by workspace to list all exception users in that workspace (including visitors), or search by user to list all workspaces where that user has exception-user access (visitors' workspaces are excluded from the by-user results). Exactly one of `workspaceGuid` or `userGuid` must be provided.",
         "operationId": "searchExceptionUsers",
+        "x-anaplan-min-role": "Tenant Security Admin",
+        "x-anaplan-min-role-needs-info": true,
         "requestBody": {
           "required": true,
           "content": {
