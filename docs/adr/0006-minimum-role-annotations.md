@@ -35,7 +35,7 @@ Exactly these role names are used everywhere. No other value is valid.
 | `Tenant Auditor` | Tenant-level Auditor role (read-only audit surface). |
 | `User Administrator` | Tenant User Admin role (user-management surface, e.g. workspace admins/visitors listings); narrower than full Tenant Admin. |
 | `Tenant Administrator` | Tenant Admin privilege; workspace-admin access alone is insufficient. |
-| `Tenant Security Admin` | Tenant Security Administrator (SCIM user/group provisioning). |
+| `Tenant Security Admin` | Tenant Security Administrator (Exception Users API — managing SSO-bypass exception users). |
 | `Restricted Integration User` | Workspace-scoped restricted integration role: creates and manages CloudWorks connections and integrations within assigned workspaces. The minimum for every CloudWorks operation. |
 | `None` | No role gate applies: token-issuing endpoints (authentication, oauth) where the caller is not yet an authenticated principal, and purely functional endpoints. |
 
