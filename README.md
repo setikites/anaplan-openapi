@@ -46,7 +46,7 @@ openapi-generator-cli generate -i integration/integration-openapi.json -g python
 | Authentication | [`authentication/`](authentication/) | [`authentication-openapi.json`](authentication/authentication-openapi.json) | High — live-tested |
 | OAuth 2.0 | [`oauth/`](oauth/) | [`oauth-openapi.json`](oauth/oauth-openapi.json) | High — live-tested |
 | Integration | [`integration/`](integration/) | [`integration-openapi.json`](integration/integration-openapi.json) | High — live-tested |
-| CloudWorks | [`cloudworks/`](cloudworks/) | [`cloudworks-openapi.json`](cloudworks/cloudworks-openapi.json) | Medium |
+| CloudWorks | [`cloudworks/`](cloudworks/) | [`cloudworks-openapi.json`](cloudworks/cloudworks-openapi.json) | High |
 | SCIM | [`scim/`](scim/) | [`scim-openapi.json`](scim/scim-openapi.json) | Medium |
 | ALM | [`alm/`](alm/) | [`alm-openapi.json`](alm/alm-openapi.json) | Medium |
 | Audit | [`audit/`](audit/) | [`audit-openapi.json`](audit/audit-openapi.json) | High — live-tested |
