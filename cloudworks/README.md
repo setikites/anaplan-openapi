@@ -42,6 +42,23 @@ The CloudWorks API exposes seven resource groups:
 | **Error Logs** | Retrieve import-error and process-error logs for a specific run |
 | **Integration Flows** | Create and manage multi-step workflows with step-level error control and conditional execution |
 
+## Minimum Role (live-confirmed July 2026)
+
+Every CloudWorks operation requires the **Restricted Integration User** role — live-confirmed with a three-phase certificate-auth A/B run (ADR 0006):
+
+| Role held by cert account | Result across all 30 live endpoints |
+|---|---|
+| None (Standard User) | `403 Not Permitted` (or `452 Tenant not entitled` on the schedule/dumps paths) — denied everywhere |
+| **Restricted Integration User** | reaches the app on every endpoint (200 / field-validation 400 / dummy-id 404) — no 403 |
+| Integration Admin | same endpoint access as Restricted Integration User |
+
+Findings:
+
+- **Restricted Integration User is the minimum for the whole API**, including the six `/integrationflows` operations (initially annotated Integration Admin — corrected). `Integration Admin` gates **no endpoint**; it only widens *data scope* (tenant-wide vs assigned-workspace). Under Restricted Integration User the list endpoints returned empty arrays (`connections: []`, `integrations: []`, `integrationFlows: []`) because this account's role is scoped to workspaces holding no CloudWorks resources — the endpoints are still fully reachable.
+- **Two components are required to authorize a CloudWorks call: the Restricted Integration User role *and* a workspace assignment.** The role alone admits the caller to the endpoints; workspace assignment determines which resources are visible/actionable. An account with the role but no assigned workspace reaches every endpoint yet sees an empty result set — the role is necessary but not sufficient for actual data access.
+- `GET /integrations/anaplanModels/{modelId}` returns an nginx `404` in all three phases (never reaches the app-layer role check), so its role is unconfirmable — it carries `x-anaplan-min-role-needs-info` and is likely deprecated.
+- The `452 "Tenant not entitled"` seen for a role-less caller on the four schedule operations and `GET /integrations/run/{runId}/dumps` is role denial, not a tenant entitlement gap: the Restricted Integration User role clears it to the normal 400/404.
+
 ## Spec Lifecycle
 
 Canonical lifecycle and confidence are in the [confidence table in CONTEXT.md](../CONTEXT.md#confidence-table).

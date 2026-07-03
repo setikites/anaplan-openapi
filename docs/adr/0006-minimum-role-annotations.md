@@ -46,9 +46,13 @@ Administrator, Integration Administrator, Restricted Integration User).
 `Standard User`
 and `None` are distinct: `Standard User` means "logged in, no elevated role";
 `None` means "the role model does not apply to this endpoint at all". The two
-CloudWorks roles are also distinct: `Restricted Integration User` is the
-workspace-scoped minimum; `Integration Admin` is the tenant-wide superset
-required only for cross-workspace or tenant-level integration operations.
+CloudWorks roles are also distinct in scope: `Restricted Integration User` is
+the API-access minimum — live testing (July 2026) confirmed it reaches every
+CloudWorks endpoint. `Integration Admin` gates no additional endpoint; it only
+widens *data scope* (tenant-wide vs assigned-workspace). So every CloudWorks
+operation is annotated `Restricted Integration User`, and `Integration Admin`
+is retained in the vocabulary for the broader tenant-scope / Data Orchestrator
+surface, not as a per-endpoint gate.
 
 ### 2. Representation: extension **and** sentence
 

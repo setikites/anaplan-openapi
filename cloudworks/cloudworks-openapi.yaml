@@ -35,7 +35,6 @@ paths:
         Retrieve all connections available to the authenticated user.
       operationId: getConnections
       x-anaplan-min-role: Restricted Integration User
-      x-anaplan-min-role-needs-info: true
       tags:
       - Connections
       responses:
@@ -104,7 +103,6 @@ paths:
         Create a new connection to Amazon S3, Google BigQuery, or Azure Blob Storage for use in CloudWorks integrations.
       operationId: createConnection
       x-anaplan-min-role: Restricted Integration User
-      x-anaplan-min-role-needs-info: true
       tags:
       - Connections
       requestBody:
@@ -324,7 +322,6 @@ paths:
       description: 'Minimum role: Restricted Integration User.'
       operationId: editConnection
       x-anaplan-min-role: Restricted Integration User
-      x-anaplan-min-role-needs-info: true
       tags:
       - Connections
       requestBody:
@@ -351,7 +348,6 @@ paths:
         Partially update one or more fields of an existing connection.
       operationId: patchConnection
       x-anaplan-min-role: Restricted Integration User
-      x-anaplan-min-role-needs-info: true
       tags:
       - Connections
       requestBody:
@@ -375,7 +371,6 @@ paths:
       description: 'Minimum role: Restricted Integration User.'
       operationId: deleteConnection
       x-anaplan-min-role: Restricted Integration User
-      x-anaplan-min-role-needs-info: true
       tags:
       - Connections
       responses:
@@ -396,7 +391,6 @@ paths:
         Retrieve all integrations. Returns 25 integrations if `offset` and `limit` are not provided.
       operationId: getIntegrations
       x-anaplan-min-role: Restricted Integration User
-      x-anaplan-min-role-needs-info: true
       tags:
       - Integrations
       parameters:
@@ -477,7 +471,6 @@ paths:
         Create a new import/export integration or process integration. For process integrations, include `processId` in the request body. The `jobs` array is required for import/export integrations and optional (0 or more) for process integrations.
       operationId: createIntegration
       x-anaplan-min-role: Restricted Integration User
-      x-anaplan-min-role-needs-info: true
       tags:
       - Integrations
       requestBody:
@@ -551,7 +544,6 @@ paths:
       description: 'Minimum role: Restricted Integration User.'
       operationId: getIntegrationById
       x-anaplan-min-role: Restricted Integration User
-      x-anaplan-min-role-needs-info: true
       tags:
       - Integrations
       responses:
@@ -578,7 +570,6 @@ paths:
         Full update of an integration or process integration. The request body replaces all editable fields.
       operationId: editIntegration
       x-anaplan-min-role: Restricted Integration User
-      x-anaplan-min-role-needs-info: true
       tags:
       - Integrations
       requestBody:
@@ -625,7 +616,6 @@ paths:
       description: 'Minimum role: Restricted Integration User.'
       operationId: deleteIntegration
       x-anaplan-min-role: Restricted Integration User
-      x-anaplan-min-role-needs-info: true
       tags:
       - Integrations
       responses:
@@ -683,7 +673,6 @@ paths:
       description: 'Minimum role: Restricted Integration User.'
       operationId: runIntegration
       x-anaplan-min-role: Restricted Integration User
-      x-anaplan-min-role-needs-info: true
       tags:
       - Integrations
       requestBody:
@@ -727,7 +716,6 @@ paths:
       description: 'Minimum role: Restricted Integration User.'
       operationId: cancelIntegration
       x-anaplan-min-role: Restricted Integration User
-      x-anaplan-min-role-needs-info: true
       tags:
       - Integrations
       responses:
@@ -755,7 +743,6 @@ paths:
         Create a schedule for an integration. Supports a maximum of one schedule per integration. Schedule types: `weekly`, `daily`, `hourly`, `monthly_specific_day`, `monthly_relative_weekday`.
       operationId: createSchedule
       x-anaplan-min-role: Restricted Integration User
-      x-anaplan-min-role-needs-info: true
       tags:
       - Schedules
       requestBody:
@@ -786,7 +773,6 @@ paths:
       description: 'Minimum role: Restricted Integration User.'
       operationId: updateSchedule
       x-anaplan-min-role: Restricted Integration User
-      x-anaplan-min-role-needs-info: true
       tags:
       - Schedules
       requestBody:
@@ -814,7 +800,6 @@ paths:
       description: 'Minimum role: Restricted Integration User.'
       operationId: deleteSchedule
       x-anaplan-min-role: Restricted Integration User
-      x-anaplan-min-role-needs-info: true
       tags:
       - Schedules
       responses:
@@ -844,7 +829,6 @@ paths:
         Enable or disable the schedule for an integration.
       operationId: setScheduleStatus
       x-anaplan-min-role: Restricted Integration User
-      x-anaplan-min-role-needs-info: true
       tags:
       - Schedules
       responses:
@@ -862,7 +846,6 @@ paths:
       description: 'Minimum role: Restricted Integration User.'
       operationId: getRunHistory
       x-anaplan-min-role: Restricted Integration User
-      x-anaplan-min-role-needs-info: true
       tags:
       - History
       parameters:
@@ -951,7 +934,6 @@ paths:
       description: 'Minimum role: Restricted Integration User.'
       operationId: getRunErrors
       x-anaplan-min-role: Restricted Integration User
-      x-anaplan-min-role-needs-info: true
       tags:
       - History
       responses:
@@ -1023,7 +1005,6 @@ paths:
       description: 'Minimum role: Restricted Integration User.'
       operationId: createNotification
       x-anaplan-min-role: Restricted Integration User
-      x-anaplan-min-role-needs-info: true
       tags:
       - Notifications
       requestBody:
@@ -1063,7 +1044,6 @@ paths:
       description: 'Minimum role: Restricted Integration User.'
       operationId: getNotification
       x-anaplan-min-role: Restricted Integration User
-      x-anaplan-min-role-needs-info: true
       tags:
       - Notifications
       responses:
@@ -1089,7 +1069,6 @@ paths:
       description: 'Minimum role: Restricted Integration User.'
       operationId: editNotification
       x-anaplan-min-role: Restricted Integration User
-      x-anaplan-min-role-needs-info: true
       tags:
       - Notifications
       requestBody:
@@ -1112,7 +1091,6 @@ paths:
       description: 'Minimum role: Restricted Integration User.'
       operationId: deleteNotification
       x-anaplan-min-role: Restricted Integration User
-      x-anaplan-min-role-needs-info: true
       tags:
       - Notifications
       responses:
@@ -1133,7 +1111,6 @@ paths:
         Retrieve the import error log (dump file) for a specific run. The response body contains a CSV-formatted error log.
       operationId: getImportErrorLog
       x-anaplan-min-role: Restricted Integration User
-      x-anaplan-min-role-needs-info: true
       tags:
       - Error Logs
       responses:
@@ -1168,7 +1145,6 @@ paths:
         Retrieve the process import error log (dump file) for a specific run and action.
       operationId: getProcessErrorLog
       x-anaplan-min-role: Restricted Integration User
-      x-anaplan-min-role-needs-info: true
       tags:
       - Error Logs
       responses:
@@ -1188,10 +1164,9 @@ paths:
   /integrationflows:
     get:
       summary: Get all integration flows
-      description: 'Minimum role: Integration Admin.'
+      description: 'Minimum role: Restricted Integration User.'
       operationId: getIntegrationFlows
-      x-anaplan-min-role: Integration Admin
-      x-anaplan-min-role-needs-info: true
+      x-anaplan-min-role: Restricted Integration User
       tags:
       - Integration Flows
       parameters:
@@ -1226,12 +1201,11 @@ paths:
     post:
       summary: Create an integration flow
       description: |-
-        Minimum role: Integration Admin.
+        Minimum role: Restricted Integration User.
 
         Create a new multi-step integration flow. Requires at least two enabled steps.
       operationId: createIntegrationFlow
-      x-anaplan-min-role: Integration Admin
-      x-anaplan-min-role-needs-info: true
+      x-anaplan-min-role: Restricted Integration User
       tags:
       - Integration Flows
       requestBody:
@@ -1330,10 +1304,9 @@ paths:
     - $ref: '#/components/parameters/IntegrationFlowId'
     get:
       summary: Get an integration flow by ID
-      description: 'Minimum role: Integration Admin.'
+      description: 'Minimum role: Restricted Integration User.'
       operationId: getIntegrationFlowById
-      x-anaplan-min-role: Integration Admin
-      x-anaplan-min-role-needs-info: true
+      x-anaplan-min-role: Restricted Integration User
       tags:
       - Integration Flows
       responses:
@@ -1356,10 +1329,9 @@ paths:
           $ref: '#/components/responses/NotFound'
     put:
       summary: Edit an integration flow
-      description: 'Minimum role: Integration Admin.'
+      description: 'Minimum role: Restricted Integration User.'
       operationId: editIntegrationFlow
-      x-anaplan-min-role: Integration Admin
-      x-anaplan-min-role-needs-info: true
+      x-anaplan-min-role: Restricted Integration User
       tags:
       - Integration Flows
       requestBody:
@@ -1380,10 +1352,9 @@ paths:
           $ref: '#/components/responses/NotFound'
     delete:
       summary: Delete an integration flow
-      description: 'Minimum role: Integration Admin.'
+      description: 'Minimum role: Restricted Integration User.'
       operationId: deleteIntegrationFlow
-      x-anaplan-min-role: Integration Admin
-      x-anaplan-min-role-needs-info: true
+      x-anaplan-min-role: Restricted Integration User
       tags:
       - Integration Flows
       responses:
@@ -1398,10 +1369,9 @@ paths:
     - $ref: '#/components/parameters/IntegrationFlowId'
     post:
       summary: Run an integration flow
-      description: 'Minimum role: Integration Admin.'
+      description: 'Minimum role: Restricted Integration User.'
       operationId: runIntegrationFlow
-      x-anaplan-min-role: Integration Admin
-      x-anaplan-min-role-needs-info: true
+      x-anaplan-min-role: Restricted Integration User
       tags:
       - Integration Flows
       requestBody:
