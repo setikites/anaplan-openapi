@@ -64,6 +64,31 @@ def scim_token():
         )
 
 
+@pytest.fixture(scope="module")
+def admin_token():
+    """AnaplanAuthToken for a User Admin account (issue #180 role confirmation).
+
+    Distinct from scim_token (a Standard User with no elevated role) so the two
+    can be compared against the same endpoints. Logs out on teardown.
+    """
+    username = os.getenv("ANAPLAN_ADMIN_USERNAME")
+    password = os.getenv("ANAPLAN_ADMIN_PASSWORD")
+    if not username or not password:
+        pytest.skip("ANAPLAN_ADMIN_USERNAME and ANAPLAN_ADMIN_PASSWORD not set")
+
+    token = _get_anaplan_token(username, password)
+    if not token:
+        pytest.skip("Failed to obtain AnaplanAuthToken for admin account")
+
+    yield token
+
+    with httpx.Client() as client:
+        client.post(
+            f"{AUTH_URL}/token/logout",
+            headers={"Authorization": f"AnaplanAuthToken {token}"},
+        )
+
+
 # ── Tracer bullet ────────────────────────────────────────────────────────────
 
 @pytest.mark.live
@@ -276,3 +301,70 @@ def test_scim_users_oauth_bearer_probe():
             UserWarning,
             stacklevel=2,
         )
+
+
+# ── Role confirmation (issue #180, ADR 0006) ────────────────────────────────
+# Confirms the min-role annotations by probing each endpoint class with two
+# credential sets: cert_token = the cert-auth user, now a Standard User (no
+# elevated role); admin_token = User Admin. Read-only — the USER_ADMIN gate is
+# enforced at the /Users resource level, so a GET on the collection settles the
+# gate for all six /Users ops without issuing any write.
+
+# GET-only discovery endpoints annotated "None" (public — no auth, no role).
+_METADATA_PATHS = ["/ResourceTypes", "/Schemas", "/ServiceProviderConfig"]
+
+
+def _scim_get(token: str, path: str):
+    with httpx.Client() as client:
+        return client.get(
+            f"{SCIM_BASE_URL}{path}",
+            headers={"Authorization": f"AnaplanAuthToken {token}"},
+        )
+
+
+@pytest.mark.live
+def test_scim_users_gate_denies_standard_user(cert_token):
+    """Standard User (no USER_ADMIN) is denied on GET /Users.
+
+    Confirms the /Users resource is gated: expect 403 (auth ok, no role).
+    A 200 would mean the account actually holds User Admin — re-check the
+    credential set, the cert-auth user must be a Standard User.
+    """
+    status = _scim_get(cert_token, "/Users").status_code
+    print(f"\n[std] GET /Users: {status}")
+    assert status == 403, (
+        f"expected 403 for a Standard User on GET /Users, got {status}"
+    )
+
+
+@pytest.mark.live
+def test_scim_users_gate_allows_user_admin(admin_token):
+    """User Admin passes the /Users gate → 200.
+
+    Confirms "User Administrator" is the correct minimum role for the six
+    /Users operations (Anaplan help + internal USER_ADMIN string).
+    """
+    status = _scim_get(admin_token, "/Users").status_code
+    print(f"\n[admin] GET /Users: {status}")
+    assert status == 200, (
+        f"expected 200 for a User Admin on GET /Users, got {status}"
+    )
+
+
+@pytest.mark.live
+@pytest.mark.parametrize("path", _METADATA_PATHS)
+def test_scim_metadata_requires_no_auth(path):
+    """Discovery endpoints are public → 200 with no Authorization header.
+
+    Confirms the "None" annotation (no role gate, no login) on /ResourceTypes,
+    /Schemas, and /ServiceProviderConfig. Per SCIM RFC 7644 §7 these MAY be
+    served unauthenticated; Anaplan does. A 401 here would mean auth is
+    required — re-annotate to Standard User.
+    """
+    with httpx.Client() as client:
+        status = client.get(f"{SCIM_BASE_URL}{path}").status_code
+    print(f"\n[no-auth] GET {path}: {status}")
+    assert status == 200, (
+        f"expected 200 unauthenticated on GET {path}, got {status} "
+        "(if 401, auth is required — re-annotate to Standard User)"
+    )

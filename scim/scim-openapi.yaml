@@ -37,9 +37,12 @@ paths:
   /Users:
     get:
       summary: List users
-      description: Returns a paginated list of users. Supports SCIM filtering, pagination, and count controls. Maximum 100
-        users per call.
+      description: |-
+        Minimum role: User Administrator.
+
+        Returns a paginated list of users. Supports SCIM filtering, pagination, and count controls. Maximum 100 users per call.
       operationId: listUsers
+      x-anaplan-min-role: User Administrator
       parameters:
       - name: filter
         in: query
@@ -86,9 +89,12 @@ paths:
                 $ref: '#/components/schemas/ScimError'
     post:
       summary: Create user
-      description: Creates a new user and assigns Anaplan entitlements. Maximum 50 workspaces per call. SCIM does not support
-        Visiting users.
+      description: |-
+        Minimum role: User Administrator.
+
+        Creates a new user and assigns Anaplan entitlements. Maximum 50 workspaces per call. SCIM does not support Visiting users.
       operationId: createUser
+      x-anaplan-min-role: User Administrator
       requestBody:
         required: true
         content:
@@ -139,8 +145,12 @@ paths:
       example: 8a8b8c8d8e8f1a2b3c4d5e6f78901234
     get:
       summary: Get user
-      description: Retrieves a single user by their Anaplan ID.
+      description: |-
+        Minimum role: User Administrator.
+
+        Retrieves a single user by their Anaplan ID.
       operationId: getUser
+      x-anaplan-min-role: User Administrator
       responses:
         '200':
           description: The requested user.
@@ -168,9 +178,12 @@ paths:
                 $ref: '#/components/schemas/ScimError'
     put:
       summary: Replace user
-      description: Performs a full replacement of a user resource. All mutable attributes must be provided; omitted attributes
-        are cleared.
+      description: |-
+        Minimum role: User Administrator.
+
+        Performs a full replacement of a user resource. All mutable attributes must be provided; omitted attributes are cleared.
       operationId: replaceUser
+      x-anaplan-min-role: User Administrator
       requestBody:
         required: true
         content:
@@ -210,8 +223,12 @@ paths:
                 $ref: '#/components/schemas/ScimError'
     patch:
       summary: Update user
-      description: Performs a partial update of a user resource using SCIM PatchOp semantics (RFC 7644 §3.5.2).
+      description: |-
+        Minimum role: User Administrator.
+
+        Performs a partial update of a user resource using SCIM PatchOp semantics (RFC 7644 §3.5.2).
       operationId: patchUser
+      x-anaplan-min-role: User Administrator
       requestBody:
         required: true
         content:
@@ -251,8 +268,12 @@ paths:
                 $ref: '#/components/schemas/ScimError'
     delete:
       summary: Delete user
-      description: Deletes a user by their Anaplan ID. DELETE returns 403 (not 405) when the caller lacks USER_ADMIN role.
+      description: |-
+        Minimum role: User Administrator.
+
+        Deletes a user by their Anaplan ID. DELETE returns 403 (not 405) when the caller lacks USER_ADMIN role.
       operationId: deleteUser
+      x-anaplan-min-role: User Administrator
       responses:
         '204':
           description: User deleted.
@@ -277,7 +298,10 @@ paths:
   /ResourceTypes:
     get:
       summary: Get resource types
-      description: Returns the SCIM resource types supported by this service provider.
+      description: |-
+        Minimum role: None.
+
+        Returns the SCIM resource types supported by this service provider.
       operationId: getResourceTypes
       responses:
         '200':
@@ -303,10 +327,15 @@ paths:
             application/scim+json:
               schema:
                 $ref: '#/components/schemas/ScimError'
+      security: []
+      x-anaplan-min-role: None
   /Schemas:
     get:
       summary: Get schemas
-      description: Returns the SCIM schema definitions supported by this service provider.
+      description: |-
+        Minimum role: None.
+
+        Returns the SCIM schema definitions supported by this service provider.
       operationId: getSchemas
       responses:
         '200':
@@ -321,11 +350,15 @@ paths:
             application/scim+json:
               schema:
                 $ref: '#/components/schemas/ScimError'
+      security: []
+      x-anaplan-min-role: None
   /ServiceProviderConfig:
     get:
       summary: Get service provider configuration
-      description: Returns a description of the service provider's SCIM configuration and capabilities (patch support, bulk,
-        filter, sort, etc.).
+      description: |-
+        Minimum role: None.
+
+        Returns a description of the service provider's SCIM configuration and capabilities (patch support, bulk, filter, sort, etc.).
       operationId: getServiceProviderConfig
       responses:
         '200':
@@ -392,6 +425,8 @@ paths:
             application/scim+json:
               schema:
                 $ref: '#/components/schemas/ScimError'
+      security: []
+      x-anaplan-min-role: None
 components:
   securitySchemes:
     AnaplanAuthToken:
