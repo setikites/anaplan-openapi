@@ -641,7 +641,7 @@ paths:
       description: |-
         Minimum role: Restricted Integration User.
 
-        **Deprecated (live-confirmed 2026-07-03):** This endpoint is no longer served — it returns an nginx HTML 404 at the routing layer in every case tested: a regular user, Restricted Integration User, and Integration Admin, with both a valid modelId (in an assigned workspace) and a dummy one. Documented per Apiary for historical completeness; do not call it.
+        **Deprecated:** This endpoint is no longer served — it returns an HTTP 404 from the gateway for any modelId, under every role. Retained in the spec for historical completeness; do not call it. See cloudworks/README.md for details.
       operationId: getIntegrationsByModel
       x-anaplan-min-role: Restricted Integration User
       tags:
