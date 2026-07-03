@@ -102,8 +102,9 @@ Anaplan has 10 publicly documented REST APIs, each with different characteristic
 - **Auth**: `AnaplanAuthToken` (confirmed — works with both Authentication API tokens and OAuth Authorization Code access tokens); `AnaplanApiKey` (confirmed); `Bearer` rejected with `FAILURE_BAD_HEADER` even for valid OAuth tokens
 - **Source of Truth**: Apiary docs + Postman collection (top-level "Exception Users" folder, 4 requests) + live testing (issue #51)
 - **Key Points**:
-  - Requires Tenant Security Admin role
-  - **Fully live-tested (issue #51)**: auth schemes, search by workspace, search by user, and PATCH invalid-op error probe all confirmed
+  - **Minimum role is per-operation, not API-wide (live-confirmed, #181)**: `POST /permissions/exception-users/search` = **Standard User** (returns 200 with data even after Workspace Admin is dropped; bounded only by workspace visibility); `PATCH /permissions/exception-users/users/{userGuid}` = **Tenant Security Admin** (role-laddered on one cert-auth account: Standard User → 403, Workspace Admin → 403, Tenant Security Admin → 204). The whole-API "Tenant Security Admin" assumption held only for the write path.
+  - Write-path testing note: send a **valid** body to reach the authorization gate — an invalid `op` returns 400 (body validation runs before authz) and never exercises the role check
+  - **Fully live-tested (issues #51, #181)**: auth schemes, search by workspace, search by user, and PATCH assign/unassign role gate all confirmed
   - Two endpoints: `PATCH` assign/unassign a user, `POST` search (by workspace or by user)
   - POST search uses `oneOf` request body — `workspaceGuid` or `userGuid` (mutually exclusive)
   - Error response body confirmed: `{ "status": "...", "statusMessage": "..." }` (Apiary called it `message`; live testing shows `statusMessage`)
@@ -279,7 +280,7 @@ Legacy regions (us1–us7, eu1, eu2, eu4, ap1) share the older non-prefixed `api
 | ALM | ✓ | ✓ | — | Medium | Medium | hand-maintained (do not rebuild) |
 | Audit | ✓ | ✓ | — | High (events path: auth/role, event contract, filtering/pagination, CEF — issues #58–#61) | High | hand-maintained (do not rebuild) |
 | Financial Consolidation | ✓ | — | — | Low | Low | hand-maintained (do not rebuild) |
-| Exception Users | ✓ | ✓ | ✓ | High (auth schemes, search by workspace/user, PATCH error probe — issue #51) | High | hand-maintained (do not rebuild) |
+| Exception Users | ✓ | ✓ | ✓ | High (auth schemes, search by workspace/user, PATCH error probe — #51; per-op min role role-laddered: search=Standard User, PATCH=Tenant Security Admin — #181) | High | hand-maintained (do not rebuild) |
 | Administration | — | — | — | Low (auth schemes, regional servers, role-gated error behavior — issue #120; full 200 path requires Tenant Administrator) | Low | hand-maintained (do not rebuild) |
 
 ## Project Structure
