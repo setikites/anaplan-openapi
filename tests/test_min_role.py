@@ -138,3 +138,33 @@ def test_alm_has_no_needs_info_flags():
     # role-blind 406. All needs-info flags are therefore cleared. See alm/README.md.
     flagged = {k for k, op in _alm_ops() if op.get("x-anaplan-min-role-needs-info") is True}
     assert flagged == set()
+
+
+# ─── CloudWorks is fully annotated + live-confirmed (issue #177) ──────────────
+
+def _cloudworks_ops():
+    spec = json.loads((REPO_ROOT / "cloudworks" / "cloudworks-openapi.json").read_text(encoding="utf-8"))
+    for path, item in spec["paths"].items():
+        for method, op in item.items():
+            if method in _HTTP:
+                yield f"{method.upper()} {path}", op
+
+
+def test_every_cloudworks_operation_is_restricted_integration_user():
+    # Three-phase certificate-auth A/B (2026-07-03) confirmed Restricted Integration
+    # User reaches every CloudWorks endpoint while a role-less caller gets 403/452,
+    # and Integration Admin unlocks no extra endpoint (it only widens data scope).
+    # So every operation floors at Restricted Integration User. See cloudworks/README.md.
+    wrong = {k: op.get("x-anaplan-min-role")
+             for k, op in _cloudworks_ops()
+             if op.get("x-anaplan-min-role") != "Restricted Integration User"}
+    assert not wrong, f"CloudWorks operations not Restricted Integration User: {wrong}"
+
+
+def test_cloudworks_has_no_needs_info_flags():
+    # Every role is live-confirmed. GET /integrations/anaplanModels/{modelId} returns an
+    # nginx 404 at the routing layer in every case (all three roles, valid + dummy modelId)
+    # — the endpoint is removed, not role-gated, so it is marked deprecated rather than
+    # needs-info. No CloudWorks operation carries the flag. See cloudworks/README.md.
+    flagged = {k for k, op in _cloudworks_ops() if op.get("x-anaplan-min-role-needs-info") is True}
+    assert flagged == set()

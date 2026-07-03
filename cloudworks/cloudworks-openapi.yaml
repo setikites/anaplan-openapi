@@ -29,8 +29,12 @@ paths:
   /integrations/connections:
     get:
       summary: Get connections
-      description: Retrieve all connections available to the authenticated user.
+      description: |-
+        Minimum role: Restricted Integration User.
+
+        Retrieve all connections available to the authenticated user.
       operationId: getConnections
+      x-anaplan-min-role: Restricted Integration User
       tags:
       - Connections
       responses:
@@ -93,8 +97,12 @@ paths:
           $ref: '#/components/responses/Forbidden'
     post:
       summary: Create a connection
-      description: Create a new connection to Amazon S3, Google BigQuery, or Azure Blob Storage for use in CloudWorks integrations.
+      description: |-
+        Minimum role: Restricted Integration User.
+
+        Create a new connection to Amazon S3, Google BigQuery, or Azure Blob Storage for use in CloudWorks integrations.
       operationId: createConnection
+      x-anaplan-min-role: Restricted Integration User
       tags:
       - Connections
       requestBody:
@@ -311,7 +319,9 @@ paths:
       example: b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5
     put:
       summary: Edit a connection
+      description: 'Minimum role: Restricted Integration User.'
       operationId: editConnection
+      x-anaplan-min-role: Restricted Integration User
       tags:
       - Connections
       requestBody:
@@ -332,8 +342,12 @@ paths:
           $ref: '#/components/responses/NotFound'
     patch:
       summary: Patch a connection
-      description: Partially update one or more fields of an existing connection.
+      description: |-
+        Minimum role: Restricted Integration User.
+
+        Partially update one or more fields of an existing connection.
       operationId: patchConnection
+      x-anaplan-min-role: Restricted Integration User
       tags:
       - Connections
       requestBody:
@@ -354,7 +368,9 @@ paths:
           $ref: '#/components/responses/NotFound'
     delete:
       summary: Delete a connection
+      description: 'Minimum role: Restricted Integration User.'
       operationId: deleteConnection
+      x-anaplan-min-role: Restricted Integration User
       tags:
       - Connections
       responses:
@@ -369,8 +385,12 @@ paths:
   /integrations:
     get:
       summary: Get all integrations
-      description: Retrieve all integrations. Returns 25 integrations if `offset` and `limit` are not provided.
+      description: |-
+        Minimum role: Restricted Integration User.
+
+        Retrieve all integrations. Returns 25 integrations if `offset` and `limit` are not provided.
       operationId: getIntegrations
+      x-anaplan-min-role: Restricted Integration User
       tags:
       - Integrations
       parameters:
@@ -445,10 +465,12 @@ paths:
           $ref: '#/components/responses/Forbidden'
     post:
       summary: Create an integration
-      description: Create a new import/export integration or process integration. For process integrations, include `processId`
-        in the request body. The `jobs` array is required for import/export integrations and optional (0 or more) for process
-        integrations.
+      description: |-
+        Minimum role: Restricted Integration User.
+
+        Create a new import/export integration or process integration. For process integrations, include `processId` in the request body. The `jobs` array is required for import/export integrations and optional (0 or more) for process integrations.
       operationId: createIntegration
+      x-anaplan-min-role: Restricted Integration User
       tags:
       - Integrations
       requestBody:
@@ -519,7 +541,9 @@ paths:
     - $ref: '#/components/parameters/IntegrationId'
     get:
       summary: Get integration by ID
+      description: 'Minimum role: Restricted Integration User.'
       operationId: getIntegrationById
+      x-anaplan-min-role: Restricted Integration User
       tags:
       - Integrations
       responses:
@@ -540,8 +564,12 @@ paths:
           $ref: '#/components/responses/NotFound'
     put:
       summary: Edit an integration
-      description: Full update of an integration or process integration. The request body replaces all editable fields.
+      description: |-
+        Minimum role: Restricted Integration User.
+
+        Full update of an integration or process integration. The request body replaces all editable fields.
       operationId: editIntegration
+      x-anaplan-min-role: Restricted Integration User
       tags:
       - Integrations
       requestBody:
@@ -585,7 +613,9 @@ paths:
           $ref: '#/components/responses/NotFound'
     delete:
       summary: Delete an integration
+      description: 'Minimum role: Restricted Integration User.'
       operationId: deleteIntegration
+      x-anaplan-min-role: Restricted Integration User
       tags:
       - Integrations
       responses:
@@ -608,9 +638,12 @@ paths:
       example: E559BFF3B1GD4RKE874P745BEL259711
     get:
       summary: Get integrations by model ID
-      description: '**Note (live-tested June 2026):** This endpoint returned an HTML 404 from nginx on a live tenant. It may
-        be deprecated or require a specific modelId format. Use with caution.'
+      description: |-
+        Minimum role: Restricted Integration User.
+
+        **Deprecated:** This endpoint is no longer served — it returns an HTTP 404 from the gateway for any modelId, under every role. Retained in the spec for historical completeness; do not call it. See cloudworks/README.md for details.
       operationId: getIntegrationsByModel
+      x-anaplan-min-role: Restricted Integration User
       tags:
       - Integrations
       responses:
@@ -631,12 +664,15 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+      deprecated: true
   /integrations/{integrationId}/run:
     parameters:
     - $ref: '#/components/parameters/IntegrationId'
     post:
       summary: Run an integration
+      description: 'Minimum role: Restricted Integration User.'
       operationId: runIntegration
+      x-anaplan-min-role: Restricted Integration User
       tags:
       - Integrations
       requestBody:
@@ -677,7 +713,9 @@ paths:
     - $ref: '#/components/parameters/IntegrationId'
     post:
       summary: Cancel a running integration
+      description: 'Minimum role: Restricted Integration User.'
       operationId: cancelIntegration
+      x-anaplan-min-role: Restricted Integration User
       tags:
       - Integrations
       responses:
@@ -699,9 +737,12 @@ paths:
     - $ref: '#/components/parameters/IntegrationId'
     post:
       summary: Create an integration schedule
-      description: 'Create a schedule for an integration. Supports a maximum of one schedule per integration. Schedule types:
-        `weekly`, `daily`, `hourly`, `monthly_specific_day`, `monthly_relative_weekday`.'
+      description: |-
+        Minimum role: Restricted Integration User.
+
+        Create a schedule for an integration. Supports a maximum of one schedule per integration. Schedule types: `weekly`, `daily`, `hourly`, `monthly_specific_day`, `monthly_relative_weekday`.
       operationId: createSchedule
+      x-anaplan-min-role: Restricted Integration User
       tags:
       - Schedules
       requestBody:
@@ -729,7 +770,9 @@ paths:
           $ref: '#/components/responses/NotFound'
     put:
       summary: Update an integration schedule
+      description: 'Minimum role: Restricted Integration User.'
       operationId: updateSchedule
+      x-anaplan-min-role: Restricted Integration User
       tags:
       - Schedules
       requestBody:
@@ -754,7 +797,9 @@ paths:
           $ref: '#/components/responses/NotFound'
     delete:
       summary: Delete an integration schedule
+      description: 'Minimum role: Restricted Integration User.'
       operationId: deleteSchedule
+      x-anaplan-min-role: Restricted Integration User
       tags:
       - Schedules
       responses:
@@ -778,8 +823,12 @@ paths:
         - disabled
     post:
       summary: Set schedule status
-      description: Enable or disable the schedule for an integration.
+      description: |-
+        Minimum role: Restricted Integration User.
+
+        Enable or disable the schedule for an integration.
       operationId: setScheduleStatus
+      x-anaplan-min-role: Restricted Integration User
       tags:
       - Schedules
       responses:
@@ -794,7 +843,9 @@ paths:
     - $ref: '#/components/parameters/IntegrationId'
     get:
       summary: Get integration run history
+      description: 'Minimum role: Restricted Integration User.'
       operationId: getRunHistory
+      x-anaplan-min-role: Restricted Integration User
       tags:
       - History
       parameters:
@@ -880,7 +931,9 @@ paths:
     - $ref: '#/components/parameters/RunId'
     get:
       summary: Get integration run errors
+      description: 'Minimum role: Restricted Integration User.'
       operationId: getRunErrors
+      x-anaplan-min-role: Restricted Integration User
       tags:
       - History
       responses:
@@ -949,7 +1002,9 @@ paths:
   /integrations/notification:
     post:
       summary: Create a notification configuration
+      description: 'Minimum role: Restricted Integration User.'
       operationId: createNotification
+      x-anaplan-min-role: Restricted Integration User
       tags:
       - Notifications
       requestBody:
@@ -986,7 +1041,9 @@ paths:
       example: f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3
     get:
       summary: Get a notification configuration
+      description: 'Minimum role: Restricted Integration User.'
       operationId: getNotification
+      x-anaplan-min-role: Restricted Integration User
       tags:
       - Notifications
       responses:
@@ -1009,7 +1066,9 @@ paths:
           $ref: '#/components/responses/NotFound'
     put:
       summary: Edit a notification configuration
+      description: 'Minimum role: Restricted Integration User.'
       operationId: editNotification
+      x-anaplan-min-role: Restricted Integration User
       tags:
       - Notifications
       requestBody:
@@ -1029,7 +1088,9 @@ paths:
           $ref: '#/components/responses/NotFound'
     delete:
       summary: Delete a notification configuration
+      description: 'Minimum role: Restricted Integration User.'
       operationId: deleteNotification
+      x-anaplan-min-role: Restricted Integration User
       tags:
       - Notifications
       responses:
@@ -1044,9 +1105,12 @@ paths:
     - $ref: '#/components/parameters/RunId'
     get:
       summary: Get an import error log
-      description: Retrieve the import error log (dump file) for a specific run. The response body contains a CSV-formatted
-        error log.
+      description: |-
+        Minimum role: Restricted Integration User.
+
+        Retrieve the import error log (dump file) for a specific run. The response body contains a CSV-formatted error log.
       operationId: getImportErrorLog
+      x-anaplan-min-role: Restricted Integration User
       tags:
       - Error Logs
       responses:
@@ -1075,8 +1139,12 @@ paths:
       example: '112000000011'
     get:
       summary: Get a process error log
-      description: Retrieve the process import error log (dump file) for a specific run and action.
+      description: |-
+        Minimum role: Restricted Integration User.
+
+        Retrieve the process import error log (dump file) for a specific run and action.
       operationId: getProcessErrorLog
+      x-anaplan-min-role: Restricted Integration User
       tags:
       - Error Logs
       responses:
@@ -1096,7 +1164,9 @@ paths:
   /integrationflows:
     get:
       summary: Get all integration flows
+      description: 'Minimum role: Restricted Integration User.'
       operationId: getIntegrationFlows
+      x-anaplan-min-role: Restricted Integration User
       tags:
       - Integration Flows
       parameters:
@@ -1130,8 +1200,12 @@ paths:
           $ref: '#/components/responses/Forbidden'
     post:
       summary: Create an integration flow
-      description: Create a new multi-step integration flow. Requires at least two enabled steps.
+      description: |-
+        Minimum role: Restricted Integration User.
+
+        Create a new multi-step integration flow. Requires at least two enabled steps.
       operationId: createIntegrationFlow
+      x-anaplan-min-role: Restricted Integration User
       tags:
       - Integration Flows
       requestBody:
@@ -1230,7 +1304,9 @@ paths:
     - $ref: '#/components/parameters/IntegrationFlowId'
     get:
       summary: Get an integration flow by ID
+      description: 'Minimum role: Restricted Integration User.'
       operationId: getIntegrationFlowById
+      x-anaplan-min-role: Restricted Integration User
       tags:
       - Integration Flows
       responses:
@@ -1253,7 +1329,9 @@ paths:
           $ref: '#/components/responses/NotFound'
     put:
       summary: Edit an integration flow
+      description: 'Minimum role: Restricted Integration User.'
       operationId: editIntegrationFlow
+      x-anaplan-min-role: Restricted Integration User
       tags:
       - Integration Flows
       requestBody:
@@ -1274,7 +1352,9 @@ paths:
           $ref: '#/components/responses/NotFound'
     delete:
       summary: Delete an integration flow
+      description: 'Minimum role: Restricted Integration User.'
       operationId: deleteIntegrationFlow
+      x-anaplan-min-role: Restricted Integration User
       tags:
       - Integration Flows
       responses:
@@ -1289,7 +1369,9 @@ paths:
     - $ref: '#/components/parameters/IntegrationFlowId'
     post:
       summary: Run an integration flow
+      description: 'Minimum role: Restricted Integration User.'
       operationId: runIntegrationFlow
+      x-anaplan-min-role: Restricted Integration User
       tags:
       - Integration Flows
       requestBody:
