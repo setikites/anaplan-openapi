@@ -153,3 +153,20 @@ Optional: `ANAPLAN_WORKSPACE_ID` (default: `8a868cdb8b7841a2018beedb91d644d7`), 
 - `GET /models/{modelId}/alm/latestRevision` → no `revision` key when model has no revisions
 
 Documented in the `SyncTaskListResponse` and `RevisionResponse` schema descriptions.
+
+### Report tasks require `targetRevisionId` (live testing 2026-07-02)
+
+`POST /alm/comparisonReportTasks` and `POST /alm/summaryReportTasks` reject the request with `400 "Expected mandatory fields 'sourceRevisionId', 'sourceModelId' and 'targetRevisionId'"` unless all three are present — unlike `POST /alm/syncTasks`, where `targetRevisionId` is optional. The spec models this with a dedicated `ReportTaskRequest` schema (all three required) for the report endpoints, leaving `SyncTaskRequest` unchanged for sync tasks.
+
+### Role denial returns 424, not 403 (live testing 2026-07-02)
+
+The comparison/summary report endpoints return `424 Failed Dependency` (empty message) when the caller lacks the Workspace Administrator role, rather than the `403` the spec documents. Confirmed by an A/B run: the identical dummy-id request returned `404`/`201` for a Workspace Administrator and `424` after the role was removed from the same certificate account, so `424` is driven by the missing role, not the missing resource. This established Workspace Administrator as the minimum role for all six report endpoints:
+
+- `POST /alm/comparisonReportTasks`, `POST /alm/summaryReportTasks`
+- `GET /alm/comparisonReportTasks/{taskId}`, `GET /alm/summaryReportTasks/{taskId}`
+- `GET /alm/comparisonReports/{targetRevisionId}/{sourceRevisionId}`
+- `GET /alm/summaryReports/{targetRevisionId}/{sourceRevisionId}`
+
+### Comparison-report result requires an octet-stream Accept (live testing 2026-07-02)
+
+`GET /alm/comparisonReports/{targetRevisionId}/{sourceRevisionId}` serves the report only as `application/octet-stream` (a TSV download, as the spec's 200 response documents). It returns a role-blind `406 Not Acceptable` to `Accept: application/json` or `text/plain` — content negotiation precedes the role check, which initially masked its role gate. Probed with `Accept: application/octet-stream` the role signal appears normally (admin dummy-id `404`, non-admin `424`), confirming Workspace Administrator; its `needs-info` flag is cleared.
