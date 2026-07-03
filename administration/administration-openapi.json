@@ -64,8 +64,9 @@
     "/users/export": {
       "get": {
         "summary": "Export all users to CSV",
-        "description": "Downloads all users in the tenant as a CSV file. Columns: `username`, `first_name`, `last_name`, `licenses`. Use `Limit` and `Offset` to page through large tenants.",
+        "description": "Minimum role: Tenant Administrator.\n\nDownloads all users in the tenant as a CSV file. Columns: `username`, `first_name`, `last_name`, `licenses`. Use `Limit` and `Offset` to page through large tenants.",
         "operationId": "exportUsers",
+        "x-anaplan-min-role": "Tenant Administrator",
         "parameters": [
           {
             "name": "Limit",
@@ -123,8 +124,9 @@
     "/users/import": {
       "put": {
         "summary": "Import users from CSV",
-        "description": "Bulk-creates or updates users by uploading a CSV file. Users are matched by `username` (email address); existing users are updated, new addresses are created.\n\nCSV columns: `username`, `first_name`, `last_name`, `licenses`. Constraints: at least one data row, no more than 500 rows, no duplicate email addresses, no empty cells. Licenses must be quoted and comma-separated when a user holds more than one.\n\nReturns 207 Multi-Status with per-row counts and line-level errors.",
+        "description": "Minimum role: Tenant Administrator.\n\nBulk-creates or updates users by uploading a CSV file. Users are matched by `username` (email address); existing users are updated, new addresses are created.\n\nCSV columns: `username`, `first_name`, `last_name`, `licenses`. Constraints: at least one data row, no more than 500 rows, no duplicate email addresses, no empty cells. Licenses must be quoted and comma-separated when a user holds more than one.\n\nReturns 207 Multi-Status with per-row counts and line-level errors.",
         "operationId": "importUsers",
+        "x-anaplan-min-role": "Tenant Administrator",
         "requestBody": {
           "required": true,
           "content": {
