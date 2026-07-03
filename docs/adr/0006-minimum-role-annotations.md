@@ -36,13 +36,19 @@ Exactly these role names are used everywhere. No other value is valid.
 | `User Administrator` | Tenant User Admin role (user-management surface, e.g. workspace admins/visitors listings); narrower than full Tenant Admin. |
 | `Tenant Administrator` | Tenant Admin privilege; workspace-admin access alone is insufficient. |
 | `Tenant Security Admin` | Tenant Security Administrator (SCIM user/group provisioning). |
+| `Integration Admin` | Tenant-level Integration Administrator (CloudWorks / Data Orchestrator): manages connections, integrations, notifications, and integration flows/schedules, and can move data across workspaces. Assigned by a Tenant Admin. |
+| `Restricted Integration User` | Workspace-scoped restricted integration role: creates and manages CloudWorks connections and integrations within assigned workspaces only. The lower of the two CloudWorks roles; cannot act on tenant-level resources. |
 | `None` | No role gate applies: token-issuing endpoints (authentication, oauth) where the caller is not yet an authenticated principal, and purely functional endpoints. |
 
 Names match Anaplan's own administrative terminology (Workspace Administrator,
 Tenant Administrator, Tenant Auditor, User Administrator, Security
-Administrator). `Standard User`
+Administrator, Integration Administrator, Restricted Integration User).
+`Standard User`
 and `None` are distinct: `Standard User` means "logged in, no elevated role";
-`None` means "the role model does not apply to this endpoint at all".
+`None` means "the role model does not apply to this endpoint at all". The two
+CloudWorks roles are also distinct: `Restricted Integration User` is the
+workspace-scoped minimum; `Integration Admin` is the tenant-wide superset
+required only for cross-workspace or tenant-level integration operations.
 
 ### 2. Representation: extension **and** sentence
 
