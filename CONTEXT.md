@@ -45,9 +45,9 @@ Anaplan has 10 publicly documented REST APIs, each with different characteristic
 
 #### 4. CloudWorks API
 - **Purpose**: Manage CloudWorks processes and tasks
-- **Auth**: Likely bearer token (needs confirmation)
-- **Source of Truth**: Apiary docs + (possibly) live testing
-- **Key Points**: Auth scheme and server URL still unconfirmed — see `cloudworks/README.md`
+- **Auth**: AnaplanAuthToken and Bearer both accepted (live-confirmed)
+- **Source of Truth**: Apiary docs + live testing
+- **Key Points**: Auth scheme, base URL, response shapes, and minimum role per operation all live-confirmed — see `cloudworks/README.md`
 
 ### Medium Priority (Regularly Used)
 
@@ -274,7 +274,7 @@ Legacy regions (us1–us7, eu1, eu2, eu4, ap1) share the older non-prefixed `api
 | Authentication | ✓ | ✓ | — | High | High | hand-maintained (do not rebuild) |
 | OAuth | ✓ | Partial | — | Partial (device flow happy path + error cases; auth code flow not automatable) | High | hand-maintained (do not rebuild) |
 | Integration | ✓ | ✓ | ✓ | High | High | hand-maintained (do not rebuild) |
-| CloudWorks | ✓ | ✓ | — | Medium | Medium | hand-maintained (do not rebuild) |
+| CloudWorks | ✓ | ✓ | — | High (auth, base URL, response shapes; minimum role per operation via 3-phase cert-auth A/B — Restricted Integration User throughout — #177) | High | hand-maintained (do not rebuild) |
 | SCIM | ✓ | ✓ | ✓ | Medium | Medium | hand-maintained (do not rebuild) |
 | ALM | ✓ | ✓ | — | Medium | Medium | hand-maintained (do not rebuild) |
 | Audit | ✓ | ✓ | — | High (events path: auth/role, event contract, filtering/pagination, CEF — issues #58–#61) | High | hand-maintained (do not rebuild) |
