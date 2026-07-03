@@ -38,11 +38,11 @@ paths:
     get:
       summary: List users
       description: |-
-        Minimum role: Tenant Security Admin.
+        Minimum role: User Administrator.
 
         Returns a paginated list of users. Supports SCIM filtering, pagination, and count controls. Maximum 100 users per call.
       operationId: listUsers
-      x-anaplan-min-role: Tenant Security Admin
+      x-anaplan-min-role: User Administrator
       parameters:
       - name: filter
         in: query
@@ -90,11 +90,11 @@ paths:
     post:
       summary: Create user
       description: |-
-        Minimum role: Tenant Security Admin.
+        Minimum role: User Administrator.
 
         Creates a new user and assigns Anaplan entitlements. Maximum 50 workspaces per call. SCIM does not support Visiting users.
       operationId: createUser
-      x-anaplan-min-role: Tenant Security Admin
+      x-anaplan-min-role: User Administrator
       requestBody:
         required: true
         content:
@@ -146,11 +146,11 @@ paths:
     get:
       summary: Get user
       description: |-
-        Minimum role: Tenant Security Admin.
+        Minimum role: User Administrator.
 
         Retrieves a single user by their Anaplan ID.
       operationId: getUser
-      x-anaplan-min-role: Tenant Security Admin
+      x-anaplan-min-role: User Administrator
       responses:
         '200':
           description: The requested user.
@@ -179,11 +179,11 @@ paths:
     put:
       summary: Replace user
       description: |-
-        Minimum role: Tenant Security Admin.
+        Minimum role: User Administrator.
 
         Performs a full replacement of a user resource. All mutable attributes must be provided; omitted attributes are cleared.
       operationId: replaceUser
-      x-anaplan-min-role: Tenant Security Admin
+      x-anaplan-min-role: User Administrator
       requestBody:
         required: true
         content:
@@ -224,11 +224,11 @@ paths:
     patch:
       summary: Update user
       description: |-
-        Minimum role: Tenant Security Admin.
+        Minimum role: User Administrator.
 
         Performs a partial update of a user resource using SCIM PatchOp semantics (RFC 7644 §3.5.2).
       operationId: patchUser
-      x-anaplan-min-role: Tenant Security Admin
+      x-anaplan-min-role: User Administrator
       requestBody:
         required: true
         content:
@@ -269,11 +269,11 @@ paths:
     delete:
       summary: Delete user
       description: |-
-        Minimum role: Tenant Security Admin.
+        Minimum role: User Administrator.
 
         Deletes a user by their Anaplan ID. DELETE returns 403 (not 405) when the caller lacks USER_ADMIN role.
       operationId: deleteUser
-      x-anaplan-min-role: Tenant Security Admin
+      x-anaplan-min-role: User Administrator
       responses:
         '204':
           description: User deleted.

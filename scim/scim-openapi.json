@@ -70,9 +70,9 @@
     "/Users": {
       "get": {
         "summary": "List users",
-        "description": "Minimum role: Tenant Security Admin.\n\nReturns a paginated list of users. Supports SCIM filtering, pagination, and count controls. Maximum 100 users per call.",
+        "description": "Minimum role: User Administrator.\n\nReturns a paginated list of users. Supports SCIM filtering, pagination, and count controls. Maximum 100 users per call.",
         "operationId": "listUsers",
-        "x-anaplan-min-role": "Tenant Security Admin",
+        "x-anaplan-min-role": "User Administrator",
         "parameters": [
           {
             "name": "filter",
@@ -147,9 +147,9 @@
       },
       "post": {
         "summary": "Create user",
-        "description": "Minimum role: Tenant Security Admin.\n\nCreates a new user and assigns Anaplan entitlements. Maximum 50 workspaces per call. SCIM does not support Visiting users.",
+        "description": "Minimum role: User Administrator.\n\nCreates a new user and assigns Anaplan entitlements. Maximum 50 workspaces per call. SCIM does not support Visiting users.",
         "operationId": "createUser",
-        "x-anaplan-min-role": "Tenant Security Admin",
+        "x-anaplan-min-role": "User Administrator",
         "requestBody": {
           "required": true,
           "content": {
@@ -230,9 +230,9 @@
       ],
       "get": {
         "summary": "Get user",
-        "description": "Minimum role: Tenant Security Admin.\n\nRetrieves a single user by their Anaplan ID.",
+        "description": "Minimum role: User Administrator.\n\nRetrieves a single user by their Anaplan ID.",
         "operationId": "getUser",
-        "x-anaplan-min-role": "Tenant Security Admin",
+        "x-anaplan-min-role": "User Administrator",
         "responses": {
           "200": {
             "description": "The requested user.",
@@ -278,9 +278,9 @@
       },
       "put": {
         "summary": "Replace user",
-        "description": "Minimum role: Tenant Security Admin.\n\nPerforms a full replacement of a user resource. All mutable attributes must be provided; omitted attributes are cleared.",
+        "description": "Minimum role: User Administrator.\n\nPerforms a full replacement of a user resource. All mutable attributes must be provided; omitted attributes are cleared.",
         "operationId": "replaceUser",
-        "x-anaplan-min-role": "Tenant Security Admin",
+        "x-anaplan-min-role": "User Administrator",
         "requestBody": {
           "required": true,
           "content": {
@@ -346,9 +346,9 @@
       },
       "patch": {
         "summary": "Update user",
-        "description": "Minimum role: Tenant Security Admin.\n\nPerforms a partial update of a user resource using SCIM PatchOp semantics (RFC 7644 §3.5.2).",
+        "description": "Minimum role: User Administrator.\n\nPerforms a partial update of a user resource using SCIM PatchOp semantics (RFC 7644 §3.5.2).",
         "operationId": "patchUser",
-        "x-anaplan-min-role": "Tenant Security Admin",
+        "x-anaplan-min-role": "User Administrator",
         "requestBody": {
           "required": true,
           "content": {
@@ -414,9 +414,9 @@
       },
       "delete": {
         "summary": "Delete user",
-        "description": "Minimum role: Tenant Security Admin.\n\nDeletes a user by their Anaplan ID. DELETE returns 403 (not 405) when the caller lacks USER_ADMIN role.",
+        "description": "Minimum role: User Administrator.\n\nDeletes a user by their Anaplan ID. DELETE returns 403 (not 405) when the caller lacks USER_ADMIN role.",
         "operationId": "deleteUser",
-        "x-anaplan-min-role": "Tenant Security Admin",
+        "x-anaplan-min-role": "User Administrator",
         "responses": {
           "204": {
             "description": "User deleted."
