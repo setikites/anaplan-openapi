@@ -70,8 +70,9 @@
     "/Users": {
       "get": {
         "summary": "List users",
-        "description": "Returns a paginated list of users. Supports SCIM filtering, pagination, and count controls. Maximum 100 users per call.",
+        "description": "Minimum role: Tenant Security Admin.\n\nReturns a paginated list of users. Supports SCIM filtering, pagination, and count controls. Maximum 100 users per call.",
         "operationId": "listUsers",
+        "x-anaplan-min-role": "Tenant Security Admin",
         "parameters": [
           {
             "name": "filter",
@@ -146,8 +147,9 @@
       },
       "post": {
         "summary": "Create user",
-        "description": "Creates a new user and assigns Anaplan entitlements. Maximum 50 workspaces per call. SCIM does not support Visiting users.",
+        "description": "Minimum role: Tenant Security Admin.\n\nCreates a new user and assigns Anaplan entitlements. Maximum 50 workspaces per call. SCIM does not support Visiting users.",
         "operationId": "createUser",
+        "x-anaplan-min-role": "Tenant Security Admin",
         "requestBody": {
           "required": true,
           "content": {
@@ -228,8 +230,9 @@
       ],
       "get": {
         "summary": "Get user",
-        "description": "Retrieves a single user by their Anaplan ID.",
+        "description": "Minimum role: Tenant Security Admin.\n\nRetrieves a single user by their Anaplan ID.",
         "operationId": "getUser",
+        "x-anaplan-min-role": "Tenant Security Admin",
         "responses": {
           "200": {
             "description": "The requested user.",
@@ -275,8 +278,9 @@
       },
       "put": {
         "summary": "Replace user",
-        "description": "Performs a full replacement of a user resource. All mutable attributes must be provided; omitted attributes are cleared.",
+        "description": "Minimum role: Tenant Security Admin.\n\nPerforms a full replacement of a user resource. All mutable attributes must be provided; omitted attributes are cleared.",
         "operationId": "replaceUser",
+        "x-anaplan-min-role": "Tenant Security Admin",
         "requestBody": {
           "required": true,
           "content": {
@@ -342,8 +346,9 @@
       },
       "patch": {
         "summary": "Update user",
-        "description": "Performs a partial update of a user resource using SCIM PatchOp semantics (RFC 7644 §3.5.2).",
+        "description": "Minimum role: Tenant Security Admin.\n\nPerforms a partial update of a user resource using SCIM PatchOp semantics (RFC 7644 §3.5.2).",
         "operationId": "patchUser",
+        "x-anaplan-min-role": "Tenant Security Admin",
         "requestBody": {
           "required": true,
           "content": {
@@ -409,8 +414,9 @@
       },
       "delete": {
         "summary": "Delete user",
-        "description": "Deletes a user by their Anaplan ID. DELETE returns 403 (not 405) when the caller lacks USER_ADMIN role.",
+        "description": "Minimum role: Tenant Security Admin.\n\nDeletes a user by their Anaplan ID. DELETE returns 403 (not 405) when the caller lacks USER_ADMIN role.",
         "operationId": "deleteUser",
+        "x-anaplan-min-role": "Tenant Security Admin",
         "responses": {
           "204": {
             "description": "User deleted."
@@ -451,8 +457,9 @@
     "/ResourceTypes": {
       "get": {
         "summary": "Get resource types",
-        "description": "Returns the SCIM resource types supported by this service provider.",
+        "description": "Minimum role: Standard User.\n\nReturns the SCIM resource types supported by this service provider.",
         "operationId": "getResourceTypes",
+        "x-anaplan-min-role": "Standard User",
         "responses": {
           "200": {
             "description": "List of supported resource types.",
@@ -497,8 +504,9 @@
     "/Schemas": {
       "get": {
         "summary": "Get schemas",
-        "description": "Returns the SCIM schema definitions supported by this service provider.",
+        "description": "Minimum role: Standard User.\n\nReturns the SCIM schema definitions supported by this service provider.",
         "operationId": "getSchemas",
+        "x-anaplan-min-role": "Standard User",
         "responses": {
           "200": {
             "description": "List of schema definitions.",
@@ -526,8 +534,10 @@
     "/ServiceProviderConfig": {
       "get": {
         "summary": "Get service provider configuration",
-        "description": "Returns a description of the service provider's SCIM configuration and capabilities (patch support, bulk, filter, sort, etc.).",
+        "description": "Minimum role: Standard User.\n\nReturns a description of the service provider's SCIM configuration and capabilities (patch support, bulk, filter, sort, etc.).",
         "operationId": "getServiceProviderConfig",
+        "x-anaplan-min-role": "Standard User",
+        "x-anaplan-min-role-needs-info": true,
         "responses": {
           "200": {
             "description": "Service provider configuration.",
