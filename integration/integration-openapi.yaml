@@ -37,7 +37,10 @@ paths:
   /models:
     get:
       summary: List user models
-      description: Retrieves information about all models in the user's default tenant.
+      description: |-
+        Minimum role: Standard User.
+
+        Retrieves information about all models in the user's default tenant.
       tags:
       - General Workspace & Model Metadata
       parameters:
@@ -71,11 +74,13 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Model'
+      x-anaplan-min-role: Standard User
   /models/{modelId}:
     parameters:
     - $ref: '#/components/parameters/ModelId'
     get:
       summary: Get single model metadata
+      description: 'Minimum role: Standard User.'
       tags:
       - General Workspace & Model Metadata
       parameters:
@@ -98,13 +103,16 @@ paths:
                     $ref: '#/components/schemas/Status'
                   model:
                     $ref: '#/components/schemas/Model'
+      x-anaplan-min-role: Standard User
   /models/{modelId}/actions:
     parameters:
     - $ref: '#/components/parameters/ModelId'
     get:
       summary: List the actions in the model as a JSON array
-      description: Model-direct form of `GET /workspaces/{workspaceId}/models/{modelId}/actions`. Returns the same response
-        shape without requiring a workspace ID. Lists delete actions available for the specified model.
+      description: |-
+        Minimum role: Standard User.
+
+        Model-direct form of `GET /workspaces/{workspaceId}/models/{modelId}/actions`. Returns the same response shape without requiring a workspace ID. Lists delete actions available for the specified model.
       tags:
       - Model Metadata
       - Action Metadata
@@ -150,11 +158,13 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Action'
+      x-anaplan-min-role: Standard User
   /models/{modelId}/currentPeriod:
     parameters:
     - $ref: '#/components/parameters/ModelId'
     get:
       summary: Get current period (model-scoped)
+      description: 'Minimum role: Workspace Administrator.'
       tags:
       - Model Settings
       responses:
@@ -181,16 +191,18 @@ paths:
                     $ref: '#/components/schemas/Status'
                   currentPeriod:
                     $ref: '#/components/schemas/CurrentPeriod'
+      x-anaplan-min-role: Workspace Administrator
     put:
       summary: Set current period
       description: |-
+        Minimum role: Workspace Administrator.
+
         Use this call to change or reset the current period in Anaplan. When this call contains a specified date (for example, 2020-05-20), the API determines what period range contains the specified data and sets that range as the current period.  When the date value is set to blank in this call, the API resets the current period to blank.
 
         **Warning**: A change to your time settings is a potentially destructive action and may lead to data loss.  The new range of time periods may not include previous time periods. Any data in the removed time periods is deleted from the model.
 
         **Notes**:
 
-        *   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html)
         *   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response
 
         ### Request body
@@ -255,6 +267,7 @@ paths:
             Date should match format YYYY-MM-DD"; (2) the date falls outside the model timescale — "Specified date ''{date}''
             is out of timescale range {start} - {end}"; (3) date is supplied as both a query parameter and a request body
             field simultaneously.'
+      x-anaplan-min-role: Workspace Administrator
   /models/{modelId}/dimensions/{dimensionId}/items:
     parameters:
     - $ref: '#/components/parameters/ModelId'
@@ -262,6 +275,8 @@ paths:
     get:
       summary: 'Model-direct form: Retrieve all items in a dimension'
       description: |-
+        Minimum role: Standard User.
+
         Alternate URL form — response is equivalent to `/workspaces/{workspaceId}/models/{modelId}/dimensions/{dimensionId}/items`.
 
         Use this call to retrieve the IDs, codes, and names for items in a specified dimension. The dimension must be a list, a list subset, a line item subset, or the Users dimension.
@@ -270,7 +285,6 @@ paths:
 
         **Notes**:
 
-        *   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html).
         *   This call is on the model-level. It returns all dimension items as it does not have view-level hiding, filtering, or [Selective Access](https://help.anaplan.com/anapedia/Content/Modeling/Users/Selective_Access.html). For the view-level endpoint, see Retrieve selected items in a dimension.
         *   If codes have not been set for an item, then the response excludes the `code` field.
         *   This call only supports the retrieval of dimensions and items from a dimension that contains a maximum of 1,000,000 items.
@@ -325,16 +339,18 @@ paths:
           description: Bad request — check the request parameters and body.
         '429':
           description: Rate limited — too many requests. Retry after a delay.
+      x-anaplan-min-role: Standard User
     post:
       summary: 'Model-direct form: Lookup dimension items by name or code'
       description: |-
+        Minimum role: Standard User.
+
         Model-direct alternate URL form — identical behaviour to `/workspaces/{workspaceId}/models/{modelId}/dimensions/{dimensionId}/items` POST.
 
         Retrieve the items from a dimension that match one of a list of names or a list or codes.
 
         ** Notes: **
 
-        *   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html).
         *   This call does not return results for names or codes for which an item does not exist.
         *   If the given workspace, model, or dimension do not exist, this call returns a `404` code.
         *   If the dimension does not support codes and codes are provided, this call returns a `400` code.
@@ -403,13 +419,16 @@ paths:
           description: Not found — the referenced resource does not exist.
         '400':
           description: Bad request — check the request parameters and body.
+      x-anaplan-min-role: Standard User
   /models/{modelId}/exports:
     parameters:
     - $ref: '#/components/parameters/ModelId'
     get:
       summary: List the available export definitions as a JSON array
-      description: Model-direct form of `GET /workspaces/{workspaceId}/models/{modelId}/exports`. Returns the same response
-        shape without requiring a workspace ID. Lists export definitions available for the specified model.
+      description: |-
+        Minimum role: Standard User.
+
+        Model-direct form of `GET /workspaces/{workspaceId}/models/{modelId}/exports`. Returns the same response shape without requiring a workspace ID. Lists export definitions available for the specified model.
       tags:
       - Model Metadata
       - Action Metadata
@@ -454,14 +473,17 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Export'
+      x-anaplan-min-role: Standard User
   /models/{modelId}/exports/{exportId}:
     parameters:
     - $ref: '#/components/parameters/ModelId'
     - $ref: '#/components/parameters/ExportId'
     get:
       summary: Get the metadata for an export definition
-      description: Model-direct form of `GET /workspaces/{workspaceId}/models/{modelId}/exports/{exportId}`. Returns the same
-        `exportMetadata` response shape without requiring a workspace ID.
+      description: |-
+        Minimum role: Standard User.
+
+        Model-direct form of `GET /workspaces/{workspaceId}/models/{modelId}/exports/{exportId}`. Returns the same `exportMetadata` response shape without requiring a workspace ID.
       tags:
       - Model Metadata
       - Action Metadata
@@ -514,12 +536,15 @@ paths:
                     $ref: '#/components/schemas/Status'
                   exportMetadata:
                     $ref: '#/components/schemas/ExportMetadata'
+      x-anaplan-min-role: Standard User
   /models/{modelId}/files:
     parameters:
     - $ref: '#/components/parameters/ModelId'
     get:
       summary: Get a list of files
       description: |-
+        Minimum role: Standard User.
+
         To upload a file, you need its ID in Anaplan:
 
         *   `id` is the ID that you need to upload the file.
@@ -607,14 +632,17 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/File'
+      x-anaplan-min-role: Standard User
   /models/{modelId}/files/{fileId}/chunks:
     parameters:
     - $ref: '#/components/parameters/ModelId'
     - $ref: '#/components/parameters/FileId'
     get:
       summary: Get Chunks Details (model-direct)
-      description: 'Model-direct equivalent of `GET /workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks`. Returns
-        the same response shape: a `chunks` array of `{id, name}` objects (key omitted entirely when `chunkCount` is 0).'
+      description: |-
+        Minimum role: Standard User.
+
+        Model-direct equivalent of `GET /workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks`. Returns the same response shape: a `chunks` array of `{id, name}` objects (key omitted entirely when `chunkCount` is 0).
       tags:
       - Bulk Read
       responses:
@@ -652,13 +680,16 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Chunk'
+      x-anaplan-min-role: Standard User
   /models/{modelId}/imports:
     parameters:
     - $ref: '#/components/parameters/ModelId'
     get:
       summary: Get a list of import actions
-      description: Model-direct form of `GET /workspaces/{workspaceId}/models/{modelId}/imports`. Returns the same response
-        shape without requiring a workspace ID. Lists import definitions available for the specified model.
+      description: |-
+        Minimum role: Standard User.
+
+        Model-direct form of `GET /workspaces/{workspaceId}/models/{modelId}/imports`. Returns the same response shape without requiring a workspace ID. Lists import definitions available for the specified model.
       tags:
       - Model Metadata
       - Action Metadata
@@ -702,14 +733,17 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Import'
+      x-anaplan-min-role: Standard User
   /models/{modelId}/imports/{importId}:
     parameters:
     - $ref: '#/components/parameters/ModelId'
     - $ref: '#/components/parameters/ImportId'
     get:
       summary: Get the metadata for an import definition
-      description: Model-direct form of `GET /workspaces/{workspaceId}/models/{modelId}/imports/{importId}`. Returns the same
-        `importMetadata` response shape without requiring a workspace ID.
+      description: |-
+        Minimum role: Standard User.
+
+        Model-direct form of `GET /workspaces/{workspaceId}/models/{modelId}/imports/{importId}`. Returns the same `importMetadata` response shape without requiring a workspace ID.
       tags:
       - Model Metadata
       - Action Metadata
@@ -759,17 +793,19 @@ paths:
                     $ref: '#/components/schemas/Status'
                   importMetadata:
                     $ref: '#/components/schemas/ImportMetadata'
+      x-anaplan-min-role: Standard User
   /models/{modelId}/lineItems:
     parameters:
     - $ref: '#/components/parameters/ModelId'
     get:
       summary: Retrieve all line items in a model
       description: |-
+        Minimum role: Standard User.
+
         Use this call to retrieve identifiers of all line items in a model.
 
         **Notes**:
 
-        *   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html).
         *   The returned line items are restricted just to those in modules to which the model role of the user has Read access.
         *   The response returns Items within a [flat list](https://help.anaplan.com/anapedia/Content/Modeling/Dimensions/Lists.html) (no hierarchy).
         *   This returns all the line items in the model. For line items in a specific module see Retrieve Line Items For a Module.
@@ -831,6 +867,7 @@ paths:
                       $ref: '#/components/schemas/LineItem'
         '429':
           description: Rate limited — too many requests. Retry after a delay.
+      x-anaplan-min-role: Standard User
   /models/{modelId}/lineItems/{lineItemId}/dimensions:
     parameters:
     - $ref: '#/components/parameters/ModelId'
@@ -838,6 +875,8 @@ paths:
     get:
       summary: Retrieve dimensions IDs for a line item
       description: |-
+        Minimum role: Standard User.
+
         Use this call to retrieve the IDs of dimensions that define a line item.
 
         For reference, see Retrieve dimension items for a line item.
@@ -879,6 +918,7 @@ paths:
                   name: Products
                 - id: '101000000002'
                   name: Regions
+      x-anaplan-min-role: Standard User
   /models/{modelId}/lineItems/{lineItemId}/dimensions/{dimensionId}/items:
     parameters:
     - $ref: '#/components/parameters/ModelId'
@@ -887,11 +927,12 @@ paths:
     get:
       summary: Retrieve dimension items for a line item
       description: |-
+        Minimum role: Standard User.
+
         Use this call to retrieve IDs, codes, and names for dimension items that apply for the specified line item.
 
         **Notes**:
 
-        *   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html).
         *   This call works with any dimension type.
         *   Your requesting model role must allow read access to the module the line item belongs to. Otherwise, this call returns a `404 Not Found` HTTP status.
         *   The items in the response are ordered as listed in the Anaplan model.
@@ -936,12 +977,15 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Dimension'
+      x-anaplan-min-role: Standard User
   /models/{modelId}/lists:
     parameters:
     - $ref: '#/components/parameters/ModelId'
     get:
       summary: 'Model-direct form: Retrieve Lists'
       description: |-
+        Minimum role: Standard User.
+
         Alternate URL form — response is equivalent to `/workspaces/{workspaceId}/models/{modelId}/lists`.
 
         Use this call to retrieve lists for a specified workspace and model.
@@ -985,6 +1029,7 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/List'
+      x-anaplan-min-role: Standard User
   /models/{modelId}/lists/{listId}:
     parameters:
     - $ref: '#/components/parameters/ModelId'
@@ -992,13 +1037,14 @@ paths:
     get:
       summary: 'Model-direct form: Retrieve list metadata'
       description: |-
+        Minimum role: Standard User.
+
         Alternate URL form — response is equivalent to `/workspaces/{workspaceId}/models/{modelId}/lists/{listId}`.
 
         Use this call to retrieve metadata for a specified list. Field-level descriptions are in the response schema (ListMetadata). Metadata entries that are not set for a list (for example, no parent or no top level item) are omitted from the response.
 
         **Notes**:
 
-        *   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html).
         *   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response.
       tags:
       - Model Metadata
@@ -1052,14 +1098,16 @@ paths:
                     $ref: '#/components/schemas/ListMetadata'
         '429':
           description: Rate limited — too many requests. Retry after a delay.
+      x-anaplan-min-role: Standard User
   /models/{modelId}/modelCalendar:
     parameters:
     - $ref: '#/components/parameters/ModelId'
     get:
       summary: Get model calendar (model-direct)
-      description: 'Model-direct equivalent of `GET /workspaces/{workspaceId}/models/{modelId}/modelCalendar`. Returns the
-        same response shape: a `modelCalendar` object containing the current fiscal year with start and end dates (empty object
-        when the calendar type has no fiscal year, e.g., Weeks General).'
+      description: |-
+        Minimum role: Workspace Administrator.
+
+        Model-direct equivalent of `GET /workspaces/{workspaceId}/models/{modelId}/modelCalendar`. Returns the same response shape: a `modelCalendar` object containing the current fiscal year with start and end dates (empty object when the calendar type has no fiscal year, e.g., Weeks General).
       tags:
       - Model Metadata
       - Model Setting Metadata
@@ -1088,16 +1136,16 @@ paths:
                     $ref: '#/components/schemas/Status'
                   modelCalendar:
                     $ref: '#/components/schemas/ModelCalendar'
+      x-anaplan-min-role: Workspace Administrator
   /models/{modelId}/modelCalendar/fiscalYear:
     parameters:
     - $ref: '#/components/parameters/ModelId'
     put:
       summary: Update current fiscal year
-      description: Use this call to update the current fiscal year for the model calendar. The year input value has to be
-        a valid fiscal year supported by the model calendar in Anaplan. If successful, this call returns the updated fiscal
-        year with start and end date associated with current model calendar type. This call returns a `400 bad request` message
-        if the input value is out of range or model calendar type does not have an available fiscal year (for example, Weeks
-        General).
+      description: |-
+        Minimum role: Workspace Administrator.
+
+        Use this call to update the current fiscal year for the model calendar. The year input value has to be a valid fiscal year supported by the model calendar in Anaplan. If successful, this call returns the updated fiscal year with start and end date associated with current model calendar type. This call returns a `400 bad request` message if the input value is out of range or model calendar type does not have an available fiscal year (for example, Weeks General).
       tags:
       - Transactional Write
       requestBody:
@@ -1137,17 +1185,19 @@ paths:
                     $ref: '#/components/schemas/Status'
                   modelCalendar:
                     $ref: '#/components/schemas/ModelCalendar'
+      x-anaplan-min-role: Workspace Administrator
   /models/{modelId}/modules:
     parameters:
     - $ref: '#/components/parameters/ModelId'
     get:
       summary: Retrieve IDs and names for all modules in a model
       description: |-
+        Minimum role: Standard User.
+
         Use this call to retrieve the IDs and names of all modules for a specified model.
 
         **Notes**:
 
-        *   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html)
         *   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response
       tags:
       - Model Metadata
@@ -1190,6 +1240,7 @@ paths:
                       $ref: '#/components/schemas/Module'
         '429':
           description: Rate limited — too many requests. Retry after a delay.
+      x-anaplan-min-role: Standard User
   /models/{modelId}/modules/{moduleId}/data:
     parameters:
     - $ref: '#/components/parameters/ModelId'
@@ -1197,6 +1248,8 @@ paths:
     post:
       summary: Write cell data by coordinate to module
       description: |-
+        Minimum role: Standard User.
+
         Use this call to set cell values in a module.
 
         Ensure the request body is an array of `CellWrite` objects. Each object is for an updated individual cell and its full set of dimensions.
@@ -1209,7 +1262,6 @@ paths:
         *   Ensure the request includes all of the required fields.
         *   Ensure the request has a `value` field that is either a string, number or boolean and is compatible with the line item format/data type.
         *   If one cell cannot update, the other cells in the request still continue to update.
-        *   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html).
         *   Workspace administrators can import data into any cell (except aggregate cells, see below), including read-only and invisible cells.
         *   You can update a maximum of 1000 cells per request. For larger scale writes we recommend you use the import API.
         *   Write cell data does not apply to aggregate cells.
@@ -1280,6 +1332,7 @@ paths:
                 failures: []
               schema:
                 $ref: '#/components/schemas/WriteCellDataResponse'
+      x-anaplan-min-role: Standard User
   /models/{modelId}/modules/{moduleId}/lineItems:
     parameters:
     - $ref: '#/components/parameters/ModelId'
@@ -1287,6 +1340,8 @@ paths:
     get:
       summary: Retrieve all line item metadata in a module
       description: |-
+        Minimum role: Standard User.
+
         **Note:**This is an early access endpoint and is not generally available yet.
 
         Use this call when you want to get all line items and metadata in a module.
@@ -1375,6 +1430,7 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/LineItem'
+      x-anaplan-min-role: Standard User
   /models/{modelId}/modules/{moduleId}/views:
     parameters:
     - $ref: '#/components/parameters/ModelId'
@@ -1382,11 +1438,12 @@ paths:
     get:
       summary: Retrieve IDs and names for views in a module
       description: |-
+        Minimum role: Standard User.
+
         Use this call to retrieve all view IDs and names for a specified module. This call also returns the default view for the module. If the user adds the query parameter includesubsidiaryviews=true, unsaved subsidiary views will also be included in the results.
 
         **Notes**:
 
-        *   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html)
         *   For the default view, the `{viewId}` is the same as the `{moduleId}`
         *   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response
         *   For unsaved subsidiary views, the `{viewId}` and `{viewName}` are the same as the `{lineItemId}` and `{lineItemName}` that the subsidiary view is created from
@@ -1436,13 +1493,16 @@ paths:
                       $ref: '#/components/schemas/View'
         '429':
           description: Rate limited — too many requests. Retry after a delay.
+      x-anaplan-min-role: Standard User
   /models/{modelId}/processes:
     parameters:
     - $ref: '#/components/parameters/ModelId'
     get:
       summary: List the process definitions available in a model as a JSON array
-      description: Model-direct form of `GET /workspaces/{workspaceId}/models/{modelId}/processes`. Returns the same response
-        shape without requiring a workspace ID. Lists process definitions available for the specified model.
+      description: |-
+        Minimum role: Standard User.
+
+        Model-direct form of `GET /workspaces/{workspaceId}/models/{modelId}/processes`. Returns the same response shape without requiring a workspace ID. Lists process definitions available for the specified model.
       tags:
       - Model Metadata
       - Action Metadata
@@ -1484,6 +1544,7 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Process'
+      x-anaplan-min-role: Standard User
   /models/{modelId}/processes/{processId}:
     parameters:
     - $ref: '#/components/parameters/ModelId'
@@ -1491,6 +1552,8 @@ paths:
     get:
       summary: Retrieve metadata for a process
       description: |-
+        Minimum role: Standard User.
+
         Use this call to retrieve the names and actions for a given Process in an Anaplan model.
 
         **Notes**:
@@ -1563,17 +1626,19 @@ paths:
                     $ref: '#/components/schemas/Status'
                   processMetadata:
                     $ref: '#/components/schemas/Process'
+      x-anaplan-min-role: Standard User
   /models/{modelId}/versions:
     parameters:
     - $ref: '#/components/parameters/ModelId'
     get:
       summary: Retrieve version metadata
       description: |-
+        Minimum role: Workspace Administrator.
+
         Use this call to get information about the model versions. The response contains a list of the versions that the user has access to, and the model metadata that can be viewed from the UI.
 
         **Notes:**
 
-        *   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html).
         *   The returned versions only include the user’s model role with read access or higher.
         *   If the value for a field is set, it will be returned in the results.
       tags:
@@ -1627,6 +1692,7 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Version'
+      x-anaplan-min-role: Workspace Administrator
   /models/{modelId}/versions/{versionId}/switchover:
     parameters:
     - $ref: '#/components/parameters/ModelId'
@@ -1634,11 +1700,12 @@ paths:
     put:
       summary: Set version switchover date
       description: |-
+        Minimum role: Workspace Administrator.
+
         Use this call to set the switchover date for a version. The response contains the response code, as well as the date and human-readable date period as shown in the UI.
 
         **Notes:**
 
-        *   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html).
         *   To apply a switchover date, ensure the `versionID` corresponds to a version in Anaplan that is set to either `forecast` or `variance`.
         *   Ensure the switchover date is after the existing version switchover date.
         *   To reset the switchover date to Blank, pass an empty string in the request body.
@@ -1682,19 +1749,21 @@ paths:
                     $ref: '#/components/schemas/Status'
                   versionSwitchover:
                     $ref: '#/components/schemas/Switchover'
+      x-anaplan-min-role: Workspace Administrator
   /models/{modelId}/views:
     parameters:
     - $ref: '#/components/parameters/ModelId'
     get:
       summary: 'Model-direct form: Retrieve IDs and names for all views in a model'
       description: |-
+        Minimum role: Standard User.
+
         Alternate URL form — response is equivalent to `/workspaces/{workspaceId}/models/{modelId}/views`.
 
         Use this call to retrieve the ID and name of all views for a model. The results include default and saved views. If you add the query parameter `includesubsidiaryviews=true`, this includes unsaved subsidiary views in the results. This call also retrieves the ID of the module that the views belong to.
 
         **Notes**:
 
-        *   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html)
         *   Single quotes enclose the module and view names that have special characters
         *   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response
 
@@ -1776,6 +1845,7 @@ paths:
                       $ref: '#/components/schemas/View'
         '429':
           description: Rate limited — too many requests. Retry after a delay.
+      x-anaplan-min-role: Standard User
   /models/{modelId}/views/{viewId}:
     parameters:
     - $ref: '#/components/parameters/ModelId'
@@ -1783,11 +1853,12 @@ paths:
     get:
       summary: Retrieve metadata for dimensions on a view
       description: |-
+        Minimum role: Standard User.
+
         Use this call to retrieve the name, IDs, and lists of names for the dimensions (columns, pages, rows) on a specified view.
 
         **Notes**:
 
-        *   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html)
         *   If a view has no dimensions on an axis, the call omits the axis field (for example, no `“rows”` field at all instead of `“rows”: []`)
         *   If a view is the default view, its `name` is set to be the same as the module name
         *   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response
@@ -1852,6 +1923,7 @@ paths:
                   name: Versions
         '429':
           description: Rate limited — too many requests. Retry after a delay.
+      x-anaplan-min-role: Standard User
   /models/{modelId}/views/{viewId}/data:
     parameters:
     - $ref: '#/components/parameters/ModelId'
@@ -1859,11 +1931,12 @@ paths:
     get:
       summary: Retrieve cell data for a view
       description: |-
+        Minimum role: Standard User.
+
         Use this call to retrieve the cell data for a view. You can either query for the default page, or provide page selectors to query for other pages. This call returns data in either a CSV grid response or as JSON.
 
         **Notes:**
 
-        *   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html).
         *   This call only supports the retrieval of cells from a view that contains a maximum of 1,000,000 cells. If the specified view contains more than 1,000,000 cells, then the call returns a `400 Bad Request` HTTP status, instead of a subset of the cells. Use the [quick sum bar](https://help.anaplan.com/anapedia/Content/New_User_Experience/Use/Worksheets/Grid/Quick-sum-bar.htm) in Anaplan to identify the number of cells in a view.
         *   If you call several times in a short amount of time, you may receive a `429` response.
         *   You can replace the `viewId` with any valid `lineItemId`. If the line item has a subsidiary view, the response returns the data as seen in that subsidiary view.
@@ -1962,6 +2035,7 @@ paths:
                   - '108.36'
         '429':
           description: Rate limited — too many requests. Retry after a delay.
+      x-anaplan-min-role: Standard User
   /models/{modelId}/views/{viewId}/dimensions/{dimensionId}/items:
     parameters:
     - $ref: '#/components/parameters/ModelId'
@@ -1970,11 +2044,12 @@ paths:
     get:
       summary: Retrieve selected items in a dimension
       description: |-
+        Minimum role: Standard User.
+
         Use this call to retrieve selected IDs, codes, and names for items in a specified dimension. This call returns data as filtered by the page builder when they configure the view. This call respects hidden items, filtering selections, and [Selective Access](https://help.anaplan.com/anapedia/Content/Modeling/Users/Selective_Access.html). If the view contains hidden or filtered items, these do not display in the response.
 
         **Notes**:
 
-        *   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html)
         *   This call works with any dimension type
         *   The items in the response may not be ordered
         *   The response returns Items within a [flat list](https://help.anaplan.com/anapedia/Content/Modeling/Dimensions/Lists.html) (no hierarchy)
@@ -2014,10 +2089,14 @@ paths:
                       $ref: '#/components/schemas/Dimension'
         '429':
           description: Rate limited — too many requests. Retry after a delay.
+      x-anaplan-min-role: Standard User
   /users:
     get:
       summary: List users
-      description: Retrieves all users within the tenant.
+      description: |-
+        Minimum role: Standard User.
+
+        Retrieves all users within the tenant.
       tags:
       - User Data
       parameters:
@@ -2046,10 +2125,14 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/User'
+      x-anaplan-min-role: Standard User
   /users/me:
     get:
       summary: Retrieve your user
-      description: Retrieves your user based on your Anaplan authentication token.
+      description: |-
+        Minimum role: Standard User.
+
+        Retrieves your user based on your Anaplan authentication token.
       tags:
       - User Data
       responses:
@@ -2066,12 +2149,15 @@ paths:
                     $ref: '#/components/schemas/Status'
                   user:
                     $ref: '#/components/schemas/User'
+      x-anaplan-min-role: Standard User
   /users/{userId}:
     parameters:
     - $ref: '#/components/parameters/UserId'
     get:
       summary: Retrieve user information
       description: |-
+        Minimum role: Standard User.
+
         Retrieves information about the specified user.
 
         ### Headers
@@ -2094,10 +2180,14 @@ paths:
                     $ref: '#/components/schemas/Status'
                   user:
                     $ref: '#/components/schemas/User'
+      x-anaplan-min-role: Standard User
   /workspaces:
     get:
       summary: List user workspaces
-      description: Retrieves all workspaces a user has access to within the user's default tenant
+      description: |-
+        Minimum role: Standard User.
+
+        Retrieves all workspaces a user has access to within the user's default tenant
       tags:
       - General Workspace & Model Metadata
       parameters:
@@ -2147,11 +2237,13 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Workspace'
+      x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
     get:
       summary: Get single workspace metadata
+      description: 'Minimum role: Standard User.'
       tags:
       - General Workspace & Model Metadata
       parameters:
@@ -2172,13 +2264,16 @@ paths:
                     $ref: '#/components/schemas/Workspace'
         '404':
           description: Workspace not found or caller lacks Workspace Administrator role
+      x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/admins:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
     get:
       summary: List workspace administrators
-      description: Returns all administrators for a workspace. Requires tenant admin privilege; workspace admin access alone
-        is insufficient.
+      description: |-
+        Minimum role: Tenant Administrator.
+
+        Returns all administrators for a workspace. Requires tenant admin privilege; workspace admin access alone is insufficient.
       tags:
       - General Workspace & Model Metadata
       responses:
@@ -2215,13 +2310,16 @@ paths:
                   - Sales Planning Workspace
         '404':
           description: Workspace not found.
+      x-anaplan-min-role: Tenant Administrator
   /workspaces/{workspaceId}/bulkDeleteModels:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
     post:
       summary: Bulk delete models
-      description: Deletes multiple models in a workspace in a single request. Models that cannot be deleted (e.g., because
-        they are currently open) are listed in `bulkDeleteModelsFailures`; the overall HTTP status is still 200 in that case.
+      description: |-
+        Minimum role: Standard User.
+
+        Deletes multiple models in a workspace in a single request. Models that cannot be deleted (e.g., because they are currently open) are listed in `bulkDeleteModelsFailures`; the overall HTTP status is still 200 in that case.
       tags:
       - General Workspace & Model Metadata
       requestBody:
@@ -2255,13 +2353,16 @@ paths:
                   code: 200
                   message: Success
                 modelsDeleted: 1
+      x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
     get:
       summary: List workspace models
-      description: Returns models accessible to the calling user within the specified workspace. The response shape is identical
-        to `GET /2/0/models` but filtered to models within the given workspace.
+      description: |-
+        Minimum role: Standard User.
+
+        Returns models accessible to the calling user within the specified workspace. The response shape is identical to `GET /2/0/models` but filtered to models within the given workspace.
       tags:
       - General Workspace & Model Metadata
       responses:
@@ -2280,6 +2381,7 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Model'
+      x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/actions:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
@@ -2287,6 +2389,8 @@ paths:
     get:
       summary: List the actions in the model as a JSON array
       description: |-
+        Minimum role: Standard User.
+
         This lists the delete actions available for the given model ID. This returns a JSON array containing the list of delete actions that you can carry out:
 
         *   `id` is the Id of the action that you can carry out in the specified model.
@@ -2345,6 +2449,7 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Action'
+      x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
@@ -2353,6 +2458,8 @@ paths:
     get:
       summary: Get a list of action tasks
       description: |-
+        Minimum role: Standard User.
+
         *   `Authorization:AnaplanAuthToken {anaplan_auth_token}`
         *   `Content-Type:application/json`
 
@@ -2389,9 +2496,12 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/TaskWithUrl'
+      x-anaplan-min-role: Standard User
     post:
       summary: Start Other Action
       description: |-
+        Minimum role: Standard User.
+
         You can POST a deletion task to start the delete. This returns a new `taskID`. Once you have started the delete, you can use GET to receive a list of the deletion tasks as a JSON array. You can use this to monitor the status of the delete.
 
         ### Headers
@@ -2417,6 +2527,7 @@ paths:
                 properties:
                   task:
                     $ref: '#/components/schemas/TaskWithUrl'
+      x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks/{taskId}:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
@@ -2426,6 +2537,8 @@ paths:
     get:
       summary: Get the status of an action task
       description: |-
+        Minimum role: Standard User.
+
         Returns the current state of a single action task. Poll this endpoint after starting an action via POST to monitor progress.
 
         Possible `taskState` values: `NOT_STARTED`, `IN_PROGRESS`, `COMPLETE`, `CANCELLING`, `CANCELLED`.
@@ -2459,6 +2572,7 @@ paths:
                     $ref: '#/components/schemas/Status'
                   task:
                     $ref: '#/components/schemas/Task'
+      x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/currentPeriod:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
@@ -2466,13 +2580,14 @@ paths:
     get:
       summary: Retrieve current period
       description: |-
+        Minimum role: Workspace Administrator.
+
         Use this call to determine the value of the current period in Anaplan.
 
         If the current period is not set in Anaplan, this call returns empty strings for the `periodText` and `lastDay` values of the `currentPeriod`.
 
         **Notes**:
 
-        *   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html).
         *   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response.
       tags:
       - Model Metadata
@@ -2508,9 +2623,12 @@ paths:
                     $ref: '#/components/schemas/CurrentPeriod'
         '429':
           description: Rate limited — too many requests. Retry after a delay.
+      x-anaplan-min-role: Workspace Administrator
     put:
       summary: Set current period (workspace-scoped)
       description: |-
+        Minimum role: Workspace Administrator.
+
         Workspace-scoped alternate URL form — identical behaviour to `/models/{modelId}/currentPeriod` PUT.
 
         Use this call to change or reset the current period in Anaplan. When this call contains a specified date (for example, 2020-05-20), the API determines what period range contains the specified data and sets that range as the current period.  When the date value is set to blank in this call, the API resets the current period to blank.
@@ -2519,7 +2637,6 @@ paths:
 
         **Notes**:
 
-        *   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html)
         *   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response
 
         ### Request body
@@ -2584,13 +2701,17 @@ paths:
             Date should match format YYYY-MM-DD"; (2) the date falls outside the model timescale — "Specified date ''{date}''
             is out of timescale range {start} - {end}"; (3) date is supplied as both a query parameter and a request body
             field simultaneously.'
+      x-anaplan-min-role: Workspace Administrator
   /workspaces/{workspaceId}/models/{modelId}/dashboards:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
     - $ref: '#/components/parameters/ModelId'
     get:
       summary: List dashboards in a model
-      description: Returns all dashboards defined in the specified model.
+      description: |-
+        Minimum role: Standard User.
+
+        Returns all dashboards defined in the specified model.
       tags:
       - Model Metadata
       responses:
@@ -2624,6 +2745,7 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Dashboard'
+      x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/dimensions/{dimensionId}/items:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
@@ -2632,13 +2754,14 @@ paths:
     get:
       summary: Retrieve all items in a dimension
       description: |-
+        Minimum role: Standard User.
+
         Use this call to retrieve the IDs, codes, and names for items in a specified dimension. The dimension must be a list, a list subset, a line item subset, or the Users dimension.
 
         Calls at model-level do not support the Time dimension. The calls return a `400` response. To avoid this, use the view dimension instead.
 
         **Notes**:
 
-        *   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html).
         *   This call is on the model-level. It returns all dimension items as it does not have view-level hiding, filtering, or [Selective Access](https://help.anaplan.com/anapedia/Content/Modeling/Users/Selective_Access.html). For the view-level endpoint, see Retrieve selected items in a dimension.
         *   If codes have not been set for an item, then the response excludes the `code` field.
         *   This call only supports the retrieval of dimensions and items from a dimension that contains a maximum of 1,000,000 items.
@@ -2693,14 +2816,16 @@ paths:
           description: Bad request — check the request parameters and body.
         '429':
           description: Rate limited — too many requests. Retry after a delay.
+      x-anaplan-min-role: Standard User
     post:
       summary: Lookup dimension items by name or code
       description: |-
+        Minimum role: Standard User.
+
         Retrieve the items from a dimension that match one of a list of names or a list or codes.
 
         ** Notes: **
 
-        *   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html).
         *   This call does not return results for names or codes for which an item does not exist.
         *   If the given workspace, model, or dimension do not exist, this call returns a `404` code.
         *   If the dimension does not support codes and codes are provided, this call returns a `400` code.
@@ -2769,6 +2894,7 @@ paths:
           description: Not found — the referenced resource does not exist.
         '400':
           description: Bad request — check the request parameters and body.
+      x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/exports:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
@@ -2776,6 +2902,8 @@ paths:
     get:
       summary: List the available export definitions as a JSON array
       description: |-
+        Minimum role: Standard User.
+
         To run an export, you need the ID of its export definition. You can get a list of the export definitions with their ID for models in your workspace. This enables you to decide on the Export action to carry out. If you already know the ID of the export definition, you can skip this step.
 
         ### Headers
@@ -2831,6 +2959,7 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Export'
+      x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/exports/{exportId}:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
@@ -2839,6 +2968,8 @@ paths:
     get:
       summary: Get the metadata for an export definition
       description: |-
+        Minimum role: Standard User.
+
         You can use the API obtain metadata for an export definition using its ID, such as its column names, data types and export format.
 
         *   If the export has its line items in columns, `dataTypes` shows the types. `"ENTITY"` is any member of a List.
@@ -2904,6 +3035,7 @@ paths:
                     $ref: '#/components/schemas/Status'
                   exportMetadata:
                     $ref: '#/components/schemas/ExportMetadata'
+      x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/exports/{exportId}/tasks:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
@@ -2911,6 +3043,7 @@ paths:
     - $ref: '#/components/parameters/ExportId'
     get:
       summary: Get a list of export tasks
+      description: 'Minimum role: Standard User.'
       parameters:
       - name: sort
         in: query
@@ -2938,9 +3071,12 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Task'
+      x-anaplan-min-role: Standard User
     post:
       summary: Start the export
       description: |-
+        Minimum role: Standard User.
+
         You can POST an export task to start the export. This returns a new `taskID`. Once you have started the export, you can use GET to receive a list of the export tasks as a JSON array. You can use this to monitor the status of the export tasks.
 
         ### Run the export
@@ -2991,6 +3127,7 @@ paths:
                     $ref: '#/components/schemas/Status'
                   task:
                     $ref: '#/components/schemas/Task'
+      x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/exports/{exportId}/tasks/{taskId}:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
@@ -3000,6 +3137,8 @@ paths:
     get:
       summary: Monitor the export tasks
       description: |-
+        Minimum role: Standard User.
+
         You can get the status of a specific export task. In the response:
 
         *   `currentStep` is the task associated with the specified `taskID`.
@@ -3061,14 +3200,17 @@ paths:
                     $ref: '#/components/schemas/Status'
                   task:
                     $ref: '#/components/schemas/Task'
+      x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/files:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
     - $ref: '#/components/parameters/ModelId'
     get:
       summary: Get a list of files (workspace-scoped)
-      description: 'Workspace-prefixed equivalent of `GET /models/{modelId}/files`. Returns the same response shape: an array
-        of `File` objects under the `files` key.'
+      description: |-
+        Minimum role: Standard User.
+
+        Workspace-prefixed equivalent of `GET /models/{modelId}/files`. Returns the same response shape: an array of `File` objects under the `files` key.
       tags:
       - Model Metadata
       - File Metadata
@@ -3140,6 +3282,7 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/File'
+      x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/files/{fileId}:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
@@ -3147,9 +3290,10 @@ paths:
     - $ref: '#/components/parameters/FileId'
     get:
       summary: Get file metadata
-      description: Returns metadata for a specific file in the model. Requires Workspace Administrator access; standard Integration
-        API users receive 404. Individual file metadata is also accessible via the full file list endpoint. See integration/README.md
-        for details.
+      description: |-
+        Minimum role: Standard User.
+
+        Returns metadata for a specific file in the model. Requires Workspace Administrator access; standard Integration API users receive 404. Individual file metadata is also accessible via the full file list endpoint. See integration/README.md for details.
       tags:
       - Model Metadata
       - File Metadata
@@ -3169,9 +3313,12 @@ paths:
                     $ref: '#/components/schemas/File'
         '404':
           description: File not found or endpoint not available for this account role.
+      x-anaplan-min-role: Standard User
     post:
       summary: Set the chunk count
       description: |-
+        Minimum role: Standard User.
+
         To upload a file, we recommend setting the `chunkcount` metadata of an upload so that the server knows how many chunks to process during an upload. Set the `chunkcount` to -1 if you do not know how many chunks there will be and will be marking the upload complete when all chunks have been uploaded. If you want to upload the file in a single chunk, see Upload file as a single chunk.
 
         Use chunking:
@@ -3242,9 +3389,12 @@ paths:
                     $ref: '#/components/schemas/Status'
                   file:
                     $ref: '#/components/schemas/File'
+      x-anaplan-min-role: Standard User
     put:
       summary: Upload file as a single chunk
       description: |-
+        Minimum role: Standard User.
+
         You can upload a single file to the server.
 
         **Note:** You cannot compress a file that you are uploading as a single file. If the file is smaller than 1 MB, we recommend you PUT it onto the server by streaming it as an octet stream.
@@ -3270,9 +3420,12 @@ paths:
       responses:
         '204':
           description: File uploaded successfully. No response body.
+      x-anaplan-min-role: Standard User
     delete:
       summary: Delete files
       description: |-
+        Minimum role: Standard User.
+
         You can delete files that you have uploaded using the API.
 
         **Note:** This only removes private content. Default content and the import data source model object remain.
@@ -3291,6 +3444,7 @@ paths:
       responses:
         '204':
           description: File deleted successfully. No response body.
+      x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
@@ -3299,6 +3453,8 @@ paths:
     get:
       summary: Get Chunks Details
       description: |-
+        Minimum role: Standard User.
+
         *   `Authorization:AnaplanAuthToken {anaplan_auth_token}`
         *   `Content-Type:application/json`
 
@@ -3342,6 +3498,7 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Chunk'
+      x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks/{chunkId}:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
@@ -3350,6 +3507,7 @@ paths:
     - $ref: '#/components/parameters/ChunkId'
     get:
       summary: Get the data in a chunk
+      description: 'Minimum role: Standard User.'
       tags:
       - Bulk Read
       responses:
@@ -3360,9 +3518,12 @@ paths:
               schema:
                 type: string
                 format: binary
+      x-anaplan-min-role: Standard User
     put:
       summary: Upload a file in chunks
       description: |-
+        Minimum role: Standard User.
+
         *   `Authorization:AnaplanAuthToken {anaplan_auth_token}`
         *   `Content-Type:application/octet-stream`
 
@@ -3384,6 +3545,7 @@ paths:
           description: Chunk uploaded successfully. No response body.
         '200':
           description: Chunk uploaded successfully (some regions may return 200).
+      x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/files/{fileId}/complete:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
@@ -3392,6 +3554,8 @@ paths:
     post:
       summary: Complete the upload
       description: |-
+        Minimum role: Standard User.
+
         After carrying out an upload with `chunkCount` set to -1, mark it complete.
 
         ### Headers
@@ -3434,6 +3598,7 @@ paths:
                     $ref: '#/components/schemas/Status'
                   file:
                     $ref: '#/components/schemas/File'
+      x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/imports/:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
@@ -3441,6 +3606,8 @@ paths:
     get:
       summary: Get a list of import actions
       description: |-
+        Minimum role: Standard User.
+
         `/workspaces/{workspaceID}/models/{modelID}/imports/` To run an import, you need its ID. You can skip this step if you already know the import ID.
 
         ### Headers
@@ -3494,6 +3661,7 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Import'
+      x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/imports/{importId}:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
@@ -3502,6 +3670,8 @@ paths:
     get:
       summary: Get the metadata for an import definition
       description: |-
+        Minimum role: Standard User.
+
         You can use the API to obtain metadata for an import definition for module and list imports using the import ID. This enables you to use mappings on your imports without querying the import file itself. You can retrieve:
 
         *   Name
@@ -3566,6 +3736,7 @@ paths:
                     $ref: '#/components/schemas/Status'
                   importMetadata:
                     $ref: '#/components/schemas/ImportMetadata'
+      x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
@@ -3574,6 +3745,8 @@ paths:
     get:
       summary: Get a list of the import tasks
       description: |-
+        Minimum role: Standard User.
+
         *   Request
 
         ### Headers
@@ -3622,9 +3795,12 @@ paths:
                     $ref: '#/components/schemas/Status'
                   task:
                     $ref: '#/components/schemas/Task'
+      x-anaplan-min-role: Standard User
     post:
       summary: Start the import
       description: |-
+        Minimum role: Standard User.
+
         You start the import using the POST command. This also receives the task ID value as a JSON object. Once you have started the import, you can use GET to receive a list of the import tasks as a JSON array. You can use this to monitor the status of the import tasks.
 
         **Note:** If GET does not return any tasks, the import is not running or might have completed. Tasks sort in ascending order of creation time, with the newest task at the top of the list. To sort in descending order, append `?sort =- creationTime` to the URL.
@@ -3651,6 +3827,7 @@ paths:
                 taskId: 5E6331685CC648A29B725923B8FAEA1C
               schema:
                 $ref: '#/components/schemas/TaskWithUrl'
+      x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
@@ -3660,6 +3837,8 @@ paths:
     get:
       summary: Monitor the import task
       description: |-
+        Minimum role: Standard User.
+
         In the response:
 
         *   `currentStep` is the task associated with the specified `taskID`.
@@ -3761,6 +3940,7 @@ paths:
                     $ref: '#/components/schemas/Status'
                   task:
                     $ref: '#/components/schemas/Task'
+      x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/dump:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
@@ -3770,6 +3950,8 @@ paths:
     get:
       summary: Check dump file for failures
       description: |-
+        Minimum role: Standard User.
+
         If data could not be imported for an import task, a 'dump' file is created depending on the failure. This contains details of the failures that occurred. Use this information to fix the problems and then try the import again.
 
         **Note:** To prevent timeouts on large files, download the dump file in chunks. It is possible to download dump files without chunking, but it is strongly recommended that chunking is used instead.
@@ -3806,6 +3988,7 @@ paths:
           description: No dump content available (import completed with no failures).
         '404':
           description: Dump file not found, not yet available, or has expired (48-hour TTL after last access).
+      x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/dump/chunks:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
@@ -3815,6 +3998,8 @@ paths:
     get:
       summary: Query the number of chunks in a dump file
       description: |-
+        Minimum role: Standard User.
+
         Begin by querying the number of chunks using the `/chunks` endpoint.
 
         It is possible for a dump file to be very large. To help manage the size of a dump file and prevent timeouts, download the dump file in chunks. Chunks are 10mb or less and numbered sequentially from 0.
@@ -3843,6 +4028,7 @@ paths:
                       $ref: '#/components/schemas/Chunk'
         '404':
           description: Dump file not found or not yet available for this task.
+      x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/dump/chunks/{chunkId}:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
@@ -3853,6 +4039,8 @@ paths:
     get:
       summary: Download dump file chunks
       description: |-
+        Minimum role: Standard User.
+
         Once you have the chunk count, download them sequentially and concatenate. Download each chunk by its `id` (from the `.../dump/chunks` list).
 
         ### Headers
@@ -3871,6 +4059,7 @@ paths:
                 type: string
         '404':
           description: Chunk not found or dump has expired.
+      x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/lineItems:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
@@ -3878,13 +4067,14 @@ paths:
     get:
       summary: 'Workspace-scoped form: Retrieve all line items in a model'
       description: |-
+        Minimum role: Standard User.
+
         Alternate URL form — response is equivalent to `/models/{modelId}/lineItems`.
 
         Use this call to retrieve identifiers of all line items in a model.
 
         **Notes**:
 
-        *   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html).
         *   The returned line items are restricted just to those in modules to which the model role of the user has Read access.
         *   The response returns Items within a [flat list](https://help.anaplan.com/anapedia/Content/Modeling/Dimensions/Lists.html) (no hierarchy).
         *   This returns all the line items in the model. For line items in a specific module see Retrieve Line Items For a Module.
@@ -3946,6 +4136,7 @@ paths:
                       $ref: '#/components/schemas/LineItem'
         '429':
           description: Rate limited — too many requests. Retry after a delay.
+      x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/lineItems/{lineItemId}/dimensions:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
@@ -3954,6 +4145,8 @@ paths:
     get:
       summary: 'Workspace-scoped form: Retrieve dimensions IDs for a line item'
       description: |-
+        Minimum role: Standard User.
+
         Alternate URL form — response is equivalent to `/models/{modelId}/lineItems/{lineItemId}/dimensions`.
 
         Use this call to retrieve the IDs of dimensions that define a line item.
@@ -3997,6 +4190,7 @@ paths:
                   name: Products
                 - id: '101000000002'
                   name: Regions
+      x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/lineItems/{lineItemId}/dimensions/{dimensionId}/items:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
@@ -4006,13 +4200,14 @@ paths:
     get:
       summary: 'Workspace-scoped form: Retrieve dimension items for a line item'
       description: |-
+        Minimum role: Standard User.
+
         Alternate URL form — response is equivalent to `/models/{modelId}/lineItems/{lineItemId}/dimensions/{dimensionId}/items`.
 
         Use this call to retrieve IDs, codes, and names for dimension items that apply for the specified line item.
 
         **Notes**:
 
-        *   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html).
         *   This call works with any dimension type.
         *   Your requesting model role must allow read access to the module the line item belongs to. Otherwise, this call returns a `404 Not Found` HTTP status.
         *   The items in the response are ordered as listed in the Anaplan model.
@@ -4057,13 +4252,17 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Dimension'
+      x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/lists:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
     - $ref: '#/components/parameters/ModelId'
     get:
       summary: Retrieve Lists
-      description: Use this call to retrieve lists for a specified workspace and model.
+      description: |-
+        Minimum role: Standard User.
+
+        Use this call to retrieve lists for a specified workspace and model.
       tags:
       - Model Metadata
       - List Metadata
@@ -4104,6 +4303,7 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/List'
+      x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/lists/{listId}:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
@@ -4112,11 +4312,12 @@ paths:
     get:
       summary: Retrieve list metadata
       description: |-
+        Minimum role: Standard User.
+
         Use this call to retrieve metadata for a specified list. Field-level descriptions are in the response schema (ListMetadata). Metadata entries that are not set for a list (for example, no parent or no top level item) are omitted from the response.
 
         **Notes**:
 
-        *   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html).
         *   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response.
       tags:
       - Model Metadata
@@ -4170,6 +4371,7 @@ paths:
                     $ref: '#/components/schemas/ListMetadata'
         '429':
           description: Rate limited — too many requests. Retry after a delay.
+      x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/lists/{listId}/items:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
@@ -4178,13 +4380,14 @@ paths:
     get:
       summary: Retrieve list data
       description: |-
+        Minimum role: Standard User.
+
         Use this call to retrieve list data for the items in a specified list.
 
         You can filter on optional fields by setting the `includeAll` query parameter.
 
         **Notes:**
 
-        *   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html).
         *   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response.
 
 
@@ -4251,14 +4454,16 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/ListItem'
+      x-anaplan-min-role: Standard User
     post:
       summary: Add or delete list items
       description: |-
+        Minimum role: Standard User.
+
         Use this call to add items to a list. You must provide the list ID and data for each item. You can add one or more items in each request.
 
         **Notes:**
 
-        *   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html).
         *   A maximum of 100,000 list items can be added with a single call.
 
         ### Request body
@@ -4410,16 +4615,18 @@ paths:
                   deleted:
                     description: Number of items successfully deleted. Present when action=delete.
                     type: integer
+      x-anaplan-min-role: Standard User
     put:
       summary: Update list items
       description: |-
+        Minimum role: Standard User.
+
         Use this call to update items to a list. You must provide the model ID and list ID on the request URL. There are two kinds of lists in Anaplan: standard list and numbered list. For a standard list, the API identifies the item using the id, code, or name. For numbered list, the API uses the id or code. If property or subset is not specified in the input, the existing value is not updated. You can update one or more items in each request.
 
         When you specify the list item identifier, select one of the appropriate identifiers (id, code, or name). If the request contains multiple identifiers, the API returns an error.
 
         **Notes:**
 
-        *   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html).
         *   A maximum of 100,000 list items can be updated with a single call.
 
 
@@ -4507,6 +4714,7 @@ paths:
                         failureMessageDetails:
                           type: string
                           description: Human-readable details about the failure.
+      x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/lists/{listId}/readRequests:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
@@ -4514,8 +4722,10 @@ paths:
     - $ref: '#/components/parameters/ListId'
     post:
       summary: Start a large-list read request
-      description: Initiates an asynchronous read of all items in the specified list. Poll the returned `url` until `requestState`
-        is COMPLETE, then retrieve pages via the pages sub-resource.
+      description: |-
+        Minimum role: Standard User.
+
+        Initiates an asynchronous read of all items in the specified list. Poll the returned `url` until `requestState` is COMPLETE, then retrieve pages via the pages sub-resource.
       tags:
       - Transactional Read
       responses:
@@ -4542,16 +4752,17 @@ paths:
                     $ref: '#/components/schemas/Status'
                   listReadRequest:
                     $ref: '#/components/schemas/ListReadRequest'
+      x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/modelCalendar:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
     - $ref: '#/components/parameters/ModelId'
     get:
       summary: Get current fiscal year
-      description: Use this call to get the current fiscal year with the start and end date from the model calendar. The value
-        of the start and end date is determined by the calendar type set in the model. This value is not always a range from
-        Jan 1 to Dec 31. The API returns an empty value If the calendar type does not have an available fiscal year (for example,
-        Weeks General).
+      description: |-
+        Minimum role: Workspace Administrator.
+
+        Use this call to get the current fiscal year with the start and end date from the model calendar. The value of the start and end date is determined by the calendar type set in the model. This value is not always a range from Jan 1 to Dec 31. The API returns an empty value If the calendar type does not have an available fiscal year (for example, Weeks General).
       tags:
       - Model Metadata
       - Model Setting Metadata
@@ -4580,6 +4791,7 @@ paths:
                     $ref: '#/components/schemas/Status'
                   modelCalendar:
                     $ref: '#/components/schemas/ModelCalendar'
+      x-anaplan-min-role: Workspace Administrator
   /workspaces/{workspaceId}/models/{modelId}/modules:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
@@ -4587,13 +4799,14 @@ paths:
     get:
       summary: 'Workspace-scoped form: Retrieve IDs and names for all modules in a model'
       description: |-
+        Minimum role: Standard User.
+
         Alternate URL form — response is equivalent to `/models/{modelId}/modules`.
 
         Use this call to retrieve the IDs and names of all modules for a specified model.
 
         **Notes**:
 
-        *   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html)
         *   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response
       tags:
       - Model Metadata
@@ -4636,6 +4849,7 @@ paths:
                       $ref: '#/components/schemas/Module'
         '429':
           description: Rate limited — too many requests. Retry after a delay.
+      x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/modules/{moduleId}/lineItems:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
@@ -4644,6 +4858,8 @@ paths:
     get:
       summary: 'Workspace-scoped form: Retrieve all line item metadata in a module'
       description: |-
+        Minimum role: Standard User.
+
         Alternate URL form — response is equivalent to `/models/{modelId}/modules/{moduleId}/lineItems`.
 
         **Note:**This is an early access endpoint and is not generally available yet.
@@ -4734,6 +4950,7 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/LineItem'
+      x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/modules/{moduleId}/views:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
@@ -4742,13 +4959,14 @@ paths:
     get:
       summary: 'Workspace-scoped form: Retrieve IDs and names for views in a module'
       description: |-
+        Minimum role: Standard User.
+
         Alternate URL form — response is equivalent to `/models/{modelId}/modules/{moduleId}/views`.
 
         Use this call to retrieve all view IDs and names for a specified module. This call also returns the default view for the module. If the user adds the query parameter includesubsidiaryviews=true, unsaved subsidiary views will also be included in the results.
 
         **Notes**:
 
-        *   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html)
         *   For the default view, the `{viewId}` is the same as the `{moduleId}`
         *   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response
         *   For unsaved subsidiary views, the `{viewId}` and `{viewName}` are the same as the `{lineItemId}` and `{lineItemName}` that the subsidiary view is created from
@@ -4798,6 +5016,7 @@ paths:
                       $ref: '#/components/schemas/View'
         '429':
           description: Rate limited — too many requests. Retry after a delay.
+      x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/processes:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
@@ -4805,6 +5024,8 @@ paths:
     get:
       summary: List the process definitions available in a model as a JSON array
       description: |-
+        Minimum role: Standard User.
+
         This lists the processes available for the given modelID. This returns a JSON array containing the list of processes that you can run for that model:
 
         *   `id` is the Id of the process that you can run on the specified model.
@@ -4859,6 +5080,7 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Process'
+      x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/processes/{processId}:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
@@ -4866,8 +5088,10 @@ paths:
     - $ref: '#/components/parameters/ProcessId'
     get:
       summary: Retrieve metadata for a process
-      description: Workspace-prefixed form of `GET /models/{modelId}/processes/{processId}`. Returns the same `processMetadata`
-        response shape. Use this form when a workspace ID is available; the model-direct form is also valid.
+      description: |-
+        Minimum role: Standard User.
+
+        Workspace-prefixed form of `GET /models/{modelId}/processes/{processId}`. Returns the same `processMetadata` response shape. Use this form when a workspace ID is available; the model-direct form is also valid.
       tags:
       - Model Metadata
       - Action Metadata
@@ -4924,6 +5148,7 @@ paths:
                     $ref: '#/components/schemas/Status'
                   processMetadata:
                     $ref: '#/components/schemas/Process'
+      x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
@@ -4932,6 +5157,8 @@ paths:
     get:
       summary: Get the list of tasks for the process
       description: |-
+        Minimum role: Standard User.
+
         This lists the tasks in the process for the given processID. This returns a JSON array containing the list of tasks in the process definition.
 
         ### Headers
@@ -4975,9 +5202,12 @@ paths:
                 taskId: BAB7819744034F25BF73EA1B41804478
                 taskState: IN_PROGRESS
                 creationTime: 1535145539157
+      x-anaplan-min-role: Standard User
     post:
       summary: Start the process
       description: |-
+        Minimum role: Standard User.
+
         You can POST a process task to run a process. This returns a new `taskID`. Once you have started the process, you can use GET to receive a list of tasks as a JSON array. You can use this to monitor the status of each task.
 
         ### Headers
@@ -4999,6 +5229,7 @@ paths:
                 taskId: E1F648F527AF4297B09E06C278B99F4C
               schema:
                 $ref: '#/components/schemas/TaskWithUrl'
+      x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks/{taskId}:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
@@ -5008,6 +5239,8 @@ paths:
     get:
       summary: Monitor the process tasks
       description: |-
+        Minimum role: Standard User.
+
         In the response:
 
         *   `currentStep` is the task associated with the specified `taskID`.
@@ -5074,14 +5307,17 @@ paths:
                     $ref: '#/components/schemas/Status'
                   task:
                     $ref: '#/components/schemas/Task'
+      x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/versions:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
     - $ref: '#/components/parameters/ModelId'
     get:
       summary: Retrieve version metadata (workspace-scoped)
-      description: 'Workspace-prefixed equivalent of `GET /models/{modelId}/versions`. Returns the same response shape: a
-        `versionMetadata` array of `Version` objects.'
+      description: |-
+        Minimum role: Workspace Administrator.
+
+        Workspace-prefixed equivalent of `GET /models/{modelId}/versions`. Returns the same response shape: a `versionMetadata` array of `Version` objects.
       tags:
       - Model Metadata
       - Model Setting Metadata
@@ -5133,6 +5369,7 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Version'
+      x-anaplan-min-role: Workspace Administrator
   /workspaces/{workspaceId}/models/{modelId}/views:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
@@ -5140,11 +5377,12 @@ paths:
     get:
       summary: Retrieve IDs and names for all views in a model
       description: |-
+        Minimum role: Standard User.
+
         Use this call to retrieve the ID and name of all views for a model. The results include default and saved views. If you add the query parameter `includesubsidiaryviews=true`, this includes unsaved subsidiary views in the results. This call also retrieves the ID of the module that the views belong to.
 
         **Notes**:
 
-        *   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html)
         *   Single quotes enclose the module and view names that have special characters
         *   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response
 
@@ -5226,6 +5464,7 @@ paths:
                       $ref: '#/components/schemas/View'
         '429':
           description: Rate limited — too many requests. Retry after a delay.
+      x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/views/{viewId}:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
@@ -5234,13 +5473,14 @@ paths:
     get:
       summary: 'Workspace-scoped form: Retrieve metadata for dimensions on a view'
       description: |-
+        Minimum role: Standard User.
+
         Alternate URL form — response is equivalent to `/models/{modelId}/views/{viewId}`.
 
         Use this call to retrieve the name, IDs, and lists of names for the dimensions (columns, pages, rows) on a specified view.
 
         **Notes**:
 
-        *   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html)
         *   If a view has no dimensions on an axis, the call omits the axis field (for example, no `“rows”` field at all instead of `“rows”: []`)
         *   If a view is the default view, its `name` is set to be the same as the module name
         *   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response
@@ -5305,6 +5545,7 @@ paths:
                   name: Versions
         '429':
           description: Rate limited — too many requests. Retry after a delay.
+      x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
@@ -5313,11 +5554,12 @@ paths:
     post:
       summary: Initiate long read request
       description: |-
+        Minimum role: Standard User.
+
         Use this call to initiate a large volume read request of view data. This enables you to read data from views that are larger than a million cell count.
 
         **Note:**
 
-        *   To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html).
         *   As a best practice, use the Delete read requests call to clear all pages from completed exports as soon as you download all pages. Doing so will make space available for future exports.
 
         ### Request Body
@@ -5355,6 +5597,7 @@ paths:
                     $ref: '#/components/schemas/Status'
                   viewReadRequest:
                     $ref: '#/components/schemas/ViewReadRequest'
+      x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests/{requestId}:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
@@ -5364,9 +5607,9 @@ paths:
     get:
       summary: Retrieve status of large read request
       description: |-
-        Use this call to check the status of an export action after a bulk data long request is initiated. You can use it to check how many pages are available to download.
+        Minimum role: Standard User.
 
-        **Note:** To use this call, you must be a [Workspace Administrator](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html).
+        Use this call to check the status of an export action after a bulk data long request is initiated. You can use it to check how many pages are available to download.
 
         ### Response scenarios
 
@@ -5407,14 +5650,16 @@ paths:
                     $ref: '#/components/schemas/Status'
                   viewReadRequest:
                     $ref: '#/components/schemas/ViewReadRequest'
+      x-anaplan-min-role: Standard User
     delete:
       summary: Delete Read Request
       description: |-
+        Minimum role: Standard User.
+
         Use this call to delete or cancel an initiated read request. This removes all the pages from the file store and stops the ongoing read request.
 
         **Notes**:
 
-        *   To use this call, you must be a [**Workspace Administrator**](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html).
         *   As a best practice, use this call to clear all pages from completed exports as soon as you download all pages. Doing so will make space available for future exports.
         *   The system will automatically reclaim space for read requests not accessed for over 30 minutes. The same applies to failed read requests.
 
@@ -5446,6 +5691,7 @@ paths:
                   viewId: 102000001443
                   requestState: CANCELLED
                   url: https://api.anaplan.com/2/0/workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests/{requestId}
+      x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests/{requestId}/pages/{pageNo}:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
@@ -5456,6 +5702,8 @@ paths:
     get:
       summary: Download Pages
       description: |-
+        Minimum role: Standard User.
+
         Use this call to download the available pages, either when the read request is in progress, or when the request is completed. This request returns a CSV format response of the export list items.
 
         You can download pages while the export is in progress. You can download up to `availablePages` number of pages returned by the export status API.
@@ -5464,7 +5712,6 @@ paths:
 
         **Note:**
 
-        *   To use this call, you must be a [**Workspace Administrator**](https://help.anaplan.com/anapedia/Content/Administration_and_Security/Workspace_Administration.html).
         *   As a best practice, use the **Delete read requests** call to clear all pages from completed exports as soon as you download all pages. Doing so will make space available for future exports.
       tags:
       - Transactional Read
@@ -5481,13 +5728,16 @@ paths:
             text/csv:
               schema:
                 type: string
+      x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/visitors:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
     get:
       summary: List workspace visitors
-      description: Returns all visitors for a workspace. Requires tenant admin privilege; workspace admin access alone is
-        insufficient.
+      description: |-
+        Minimum role: Tenant Administrator.
+
+        Returns all visitors for a workspace. Requires tenant admin privilege; workspace admin access alone is insufficient.
       tags:
       - General Workspace & Model Metadata
       responses:
@@ -5519,6 +5769,7 @@ paths:
                 visitors: []
         '404':
           description: Workspace not found.
+      x-anaplan-min-role: Tenant Administrator
 components:
   parameters:
     ModelId:
