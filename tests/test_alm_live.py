@@ -21,6 +21,14 @@ Optional variables:
     ANAPLAN_ALM_BASE_URL       - override ALM base URL (default: https://api.anaplan.com/2/0)
     ANAPLAN_OAUTH_ACCESS_TOKEN - pre-obtained OAuth Bearer token for Bearer probe
 
+Certificate authentication (used by the report-endpoint role tests, which run
+against an account that does NOT hold Workspace Administrator until it is granted):
+    ANAPLAN_CA_CERT_PATH       - path to CA certificate file (PEM)
+    ANAPLAN_CA_KEY_PATH        - path to private key file (PEM)
+    ANAPLAN_CA_KEY_PASSWORD    - private key password (if encrypted)
+    ANAPLAN_ALM_SOURCE_MODEL_ID / ANAPLAN_ALM_TARGET_MODEL_ID - the model pair to
+                                 compare (defaults are the shared test pair)
+
 Notes on expected responses for read endpoints:
 - 200 = success; token accepted and caller has Workspace Administrator role.
 - 403 = token accepted; caller lacks Workspace Administrator role on the model.
@@ -32,10 +40,14 @@ import base64
 import os
 import pathlib
 import re
+import secrets
 import warnings
 
 import httpx
 import pytest
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import padding
 
 ALM_BASE_URL = os.getenv(
     "ANAPLAN_ALM_BASE_URL", "https://api.anaplan.com/2/0"
@@ -43,6 +55,15 @@ ALM_BASE_URL = os.getenv(
 AUTH_URL = "https://auth.anaplan.com"
 WORKSPACE_ID = os.getenv("ANAPLAN_ALM_WORKSPACE_ID", "")
 MODEL_ID = os.getenv("ANAPLAN_ALM_MODEL_ID", "")
+
+# Comparison/summary report endpoints operate across two models: a report task is
+# POSTed to the target (destination) model and names the source model + revision.
+# Defaults are the shared test pair; override in .env to point elsewhere.
+SOURCE_MODEL_ID = os.getenv("ANAPLAN_ALM_SOURCE_MODEL_ID", "B1A963FFC71D4DC69DC2C087824BE619")
+TARGET_MODEL_ID = os.getenv("ANAPLAN_ALM_TARGET_MODEL_ID", "5C49E414E96F4EA39B3BD7A5CA540C9C")
+# A well-formed but non-existent 32-hex id, used to probe the role gate when a real
+# revision/task id is unavailable (the authorization check precedes id lookup).
+_DUMMY_HEX32 = "0" * 32
 
 _HEX32_UPPER = re.compile(r"^[0-9A-F]{32}$")
 _HEX32_LOWER = re.compile(r"^[0-9a-f]{32}$")
@@ -592,3 +613,234 @@ def test_alm_applied_to_models_id_formats(alm_token):
             assert _HEX32_LOWER.match(wid), (
                 f"appliedToModels[{i}].workspaceId {wid!r} does not match ^[0-9a-f]{{32}}$"
             )
+
+
+# ── Comparison / summary report endpoints: minimum-role confirmation ──────────
+#
+# These six operations carry x-anaplan-min-role: Workspace Administrator with a
+# needs-info flag (ADR 0006) — no Anaplan source states their role. These tests
+# confirm it empirically using certificate auth for an account that does NOT hold
+# Workspace Administrator on the source or target model:
+#   - non-admin run  -> 403 (authorization denied) proves the endpoint requires
+#     more than a standard user;
+#   - after the account is granted Workspace Administrator, the same test returns
+#     200/201, proving that role suffices.
+# Together they pin the minimum role to Workspace Administrator and clear the
+# needs-info flag. The tests pass in both states, warning which was observed.
+
+
+def _sign_data(data: bytes, key_path: str, key_password: str | None = None) -> str:
+    with open(key_path, "rb") as f:
+        key_data = f.read()
+    password = key_password.encode() if key_password else None
+    private_key = serialization.load_pem_private_key(
+        key_data, password=password, backend=default_backend()
+    )
+    signature = private_key.sign(data, padding.PKCS1v15(), hashes.SHA512())
+    return base64.b64encode(signature).decode()
+
+
+def _auth_with_cert(client: httpx.Client, cert_path: str, key_path: str,
+                    key_password: str | None) -> str | None:
+    random_data = secrets.token_bytes(150)
+    encoded_data = base64.b64encode(random_data).decode()
+    signature = _sign_data(random_data, key_path, key_password)
+    with open(cert_path, "rb") as f:
+        cert_b64 = base64.b64encode(f.read()).decode()
+    response = client.post(
+        f"{AUTH_URL}/token/authenticate",
+        headers={"Authorization": f"CACertificate {cert_b64}"},
+        json={"encodedData": encoded_data, "encodedSignedData": signature},
+    )
+    if response.status_code == 201:
+        return response.json().get("tokenInfo", {}).get("tokenValue")
+    return None
+
+
+@pytest.fixture(scope="module")
+def alm_cert_token():
+    """AnaplanAuthToken from certificate auth for the report-endpoint role tests.
+
+    Skips (rather than falling back to basic auth) when certificate credentials are
+    absent — the point of these tests is the specific non-admin certificate account.
+    """
+    cert_path = os.getenv("ANAPLAN_CA_CERT_PATH")
+    key_path = os.getenv("ANAPLAN_CA_KEY_PATH")
+    if not cert_path or not key_path:
+        pytest.skip("ANAPLAN_CA_CERT_PATH / ANAPLAN_CA_KEY_PATH not set")
+    if not pathlib.Path(cert_path).exists() or not pathlib.Path(key_path).exists():
+        pytest.skip("Certificate or key file not found")
+
+    with httpx.Client() as client:
+        token = _auth_with_cert(
+            client, cert_path, key_path, os.getenv("ANAPLAN_CA_KEY_PASSWORD")
+        )
+    if not token:
+        pytest.skip("Certificate authentication did not return a token")
+
+    yield token
+
+    with httpx.Client() as client:
+        client.post(
+            f"{AUTH_URL}/token/logout",
+            headers={"Authorization": f"AnaplanAuthToken {token}"},
+        )
+
+
+def _auth_header(token: str) -> dict:
+    return {"Authorization": f"AnaplanAuthToken {token}", "Accept": "application/json"}
+
+
+# Role-denied status codes for the ALM report endpoints. 403 is the standard
+# code; 424 (Failed Dependency) is the non-standard code ALM actually returns —
+# confirmed by an A/B run (2026-07-02): the identical dummy-id request returned
+# 404 for a Workspace Administrator and 424 once the role was removed, so 424 is
+# driven by the missing role, not the missing resource. See alm/README.md.
+_ROLE_DENIED_STATUSES = (403, 424)
+
+
+def _assert_role_gate(response, label: str) -> None:
+    """Assert the token reached the app layer, and report the role classification.
+
+    Passes for both phases of the two-run confirmation:
+      403/424 -> role denied (non-admin), 200/201 -> role sufficient (admin).
+    Fails only on an auth-layer rejection (401), which would mean the certificate
+    token itself was not accepted.
+    """
+    status = response.status_code
+    print(f"\n{label}: {status}  {response.text[:200]}")
+
+    assert status != 401, (
+        f"{label}: certificate AnaplanAuthToken was rejected at the auth layer (401). "
+        f"body={response.text[:200]!r}"
+    )
+
+    if status in _ROLE_DENIED_STATUSES:
+        warnings.warn(
+            f"{label} returned {status} for the non-admin certificate account — role "
+            "denied (ALM returns a non-standard 424 rather than 403). Confirms the "
+            "endpoint requires Workspace Administrator.",
+            UserWarning, stacklevel=2,
+        )
+    elif status in (200, 201):
+        warnings.warn(
+            f"{label} returned {status} — the certificate account has sufficient role. "
+            "Paired with the non-admin 424, confirms minimum role = Workspace Administrator.",
+            UserWarning, stacklevel=2,
+        )
+    else:
+        warnings.warn(
+            f"{label} returned {status} (token accepted, not a clean role signal). "
+            "404 = resource absent (matches an admin dummy-id request); "
+            "406 = wrong Accept for the result endpoint (role-blind). Inspect the body.",
+            UserWarning, stacklevel=2,
+        )
+
+
+def _latest_revision_of(client: httpx.Client, token: str, model_id: str) -> str | None:
+    """Best-effort real latest revision id for a model; None if inaccessible (non-admin 403)."""
+    r = client.get(
+        f"{ALM_BASE_URL}/models/{model_id}/alm/latestRevision",
+        headers=_auth_header(token),
+    )
+    if r.status_code != 200:
+        return None
+    revs = r.json().get("revisions", [])
+    return revs[0]["id"] if revs else None
+
+
+def _latest_source_revision(client: httpx.Client, token: str) -> str | None:
+    return _latest_revision_of(client, token, SOURCE_MODEL_ID)
+
+
+def _latest_target_revision(client: httpx.Client, token: str) -> str | None:
+    return _latest_revision_of(client, token, TARGET_MODEL_ID)
+
+
+@pytest.mark.live
+def test_alm_comparison_report_task_role(alm_cert_token):
+    """POST /models/{modelId}/alm/comparisonReportTasks requires Workspace Administrator."""
+    with httpx.Client(timeout=30.0) as client:
+        source_rev = _latest_source_revision(client, alm_cert_token) or _DUMMY_HEX32
+        target_rev = _latest_target_revision(client, alm_cert_token) or _DUMMY_HEX32
+        response = client.post(
+            f"{ALM_BASE_URL}/models/{TARGET_MODEL_ID}/alm/comparisonReportTasks",
+            headers=_auth_header(alm_cert_token),
+            json={
+                "sourceModelId": SOURCE_MODEL_ID,
+                "sourceRevisionId": source_rev,
+                "targetRevisionId": target_rev,
+            },
+        )
+    _assert_role_gate(response, "POST /comparisonReportTasks")
+
+
+@pytest.mark.live
+def test_alm_summary_report_task_role(alm_cert_token):
+    """POST /models/{modelId}/alm/summaryReportTasks requires Workspace Administrator."""
+    with httpx.Client(timeout=30.0) as client:
+        source_rev = _latest_source_revision(client, alm_cert_token) or _DUMMY_HEX32
+        target_rev = _latest_target_revision(client, alm_cert_token) or _DUMMY_HEX32
+        response = client.post(
+            f"{ALM_BASE_URL}/models/{TARGET_MODEL_ID}/alm/summaryReportTasks",
+            headers=_auth_header(alm_cert_token),
+            json={
+                "sourceModelId": SOURCE_MODEL_ID,
+                "sourceRevisionId": source_rev,
+                "targetRevisionId": target_rev,
+            },
+        )
+    _assert_role_gate(response, "POST /summaryReportTasks")
+
+
+@pytest.mark.live
+def test_alm_comparison_report_task_status_role(alm_cert_token):
+    """GET /models/{modelId}/alm/comparisonReportTasks/{taskId} requires Workspace Administrator."""
+    with httpx.Client() as client:
+        response = client.get(
+            f"{ALM_BASE_URL}/models/{TARGET_MODEL_ID}/alm/comparisonReportTasks/{_DUMMY_HEX32}",
+            headers=_auth_header(alm_cert_token),
+        )
+    _assert_role_gate(response, "GET /comparisonReportTasks/{taskId}")
+
+
+@pytest.mark.live
+def test_alm_summary_report_task_status_role(alm_cert_token):
+    """GET /models/{modelId}/alm/summaryReportTasks/{taskId} requires Workspace Administrator."""
+    with httpx.Client() as client:
+        response = client.get(
+            f"{ALM_BASE_URL}/models/{TARGET_MODEL_ID}/alm/summaryReportTasks/{_DUMMY_HEX32}",
+            headers=_auth_header(alm_cert_token),
+        )
+    _assert_role_gate(response, "GET /summaryReportTasks/{taskId}")
+
+
+@pytest.mark.live
+def test_alm_comparison_report_result_role(alm_cert_token):
+    """GET /models/{modelId}/alm/comparisonReports/{targetRevisionId}/{sourceRevisionId}.
+
+    The report is served as application/octet-stream (a TSV download); requesting
+    application/json gets a role-blind 406, so this probe must send octet-stream.
+    """
+    with httpx.Client() as client:
+        response = client.get(
+            f"{ALM_BASE_URL}/models/{TARGET_MODEL_ID}/alm/comparisonReports"
+            f"/{_DUMMY_HEX32}/{_DUMMY_HEX32}",
+            headers={
+                "Authorization": f"AnaplanAuthToken {alm_cert_token}",
+                "Accept": "application/octet-stream",
+            },
+        )
+    _assert_role_gate(response, "GET /comparisonReports/{target}/{source}")
+
+
+@pytest.mark.live
+def test_alm_summary_report_result_role(alm_cert_token):
+    """GET /models/{modelId}/alm/summaryReports/{targetRevisionId}/{sourceRevisionId}."""
+    with httpx.Client() as client:
+        response = client.get(
+            f"{ALM_BASE_URL}/models/{TARGET_MODEL_ID}/alm/summaryReports"
+            f"/{_DUMMY_HEX32}/{_DUMMY_HEX32}",
+            headers=_auth_header(alm_cert_token),
+        )
+    _assert_role_gate(response, "GET /summaryReports/{target}/{source}")

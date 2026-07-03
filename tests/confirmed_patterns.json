@@ -66,6 +66,21 @@
   },
   {
     "spec": "alm",
+    "path": "/components/schemas/ReportTaskRequest/properties/sourceRevisionId",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "alm",
+    "path": "/components/schemas/ReportTaskRequest/properties/sourceModelId",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "alm",
+    "path": "/components/schemas/ReportTaskRequest/properties/targetRevisionId",
+    "pattern": "^[0-9A-F]{32}$"
+  },
+  {
+    "spec": "alm",
     "path": "/components/schemas/Revision/properties/id",
     "pattern": "^[0-9A-F]{32}$"
   },

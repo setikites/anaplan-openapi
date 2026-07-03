@@ -131,13 +131,10 @@ def test_alm_has_no_leftover_requires_role_prose():
     assert not leftover, f"ALM operations with ad-hoc 'Requires ... role' prose: {leftover}"
 
 
-def test_alm_report_endpoints_flagged_needs_info():
+def test_alm_has_no_needs_info_flags():
+    # Live A/B testing (2026-07-02) confirmed Workspace Administrator on every ALM
+    # report endpoint via a 424 (non-admin) vs 404/201 (admin) role signal — the
+    # comparison-report result needed Accept: application/octet-stream to get past a
+    # role-blind 406. All needs-info flags are therefore cleared. See alm/README.md.
     flagged = {k for k, op in _alm_ops() if op.get("x-anaplan-min-role-needs-info") is True}
-    expected = {
-        "GET /models/{modelId}/alm/comparisonReportTasks/{taskId}",
-        "GET /models/{modelId}/alm/comparisonReports/{targetRevisionId}/{sourceRevisionId}",
-        "POST /models/{modelId}/alm/summaryReportTasks",
-        "GET /models/{modelId}/alm/summaryReportTasks/{taskId}",
-        "GET /models/{modelId}/alm/summaryReports/{targetRevisionId}/{sourceRevisionId}",
-    }
-    assert flagged == expected
+    assert flagged == set()

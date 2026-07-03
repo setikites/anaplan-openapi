@@ -489,7 +489,7 @@
       ],
       "post": {
         "summary": "Create a full comparison report generation task",
-        "description": "Minimum role: Workspace Administrator.\n\nStarts an asynchronous task to generate a full comparison report between a source revision and the target model's current revision. Poll the task info endpoint to check progress. The caller must hold the Workspace Administrator role on both the source and target models.",
+        "description": "Minimum role: Workspace Administrator.\n\nStarts an asynchronous task to generate a full comparison report between a source revision and a specified target revision (sourceRevisionId, sourceModelId and targetRevisionId are all required). Poll the task info endpoint to check progress. The caller must hold the Workspace Administrator role on both the source and target models.",
         "operationId": "createComparisonReportTask",
         "x-anaplan-min-role": "Workspace Administrator",
         "requestBody": {
@@ -497,7 +497,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/SyncTaskRequest"
+                "$ref": "#/components/schemas/ReportTaskRequest"
               }
             }
           }
@@ -539,7 +539,6 @@
         "description": "Minimum role: Workspace Administrator.\n\nReturns the status of a comparison report generation task. On success, `result.successful` is true and `result.reportFileUrl` contains the download URL. On failure, `result.error` contains title and messageText.",
         "operationId": "getComparisonReportTask",
         "x-anaplan-min-role": "Workspace Administrator",
-        "x-anaplan-min-role-needs-info": true,
         "responses": {
           "200": {
             "description": "Comparison report task details.",
@@ -577,7 +576,6 @@
         "description": "Minimum role: Workspace Administrator.\n\nDownloads the full comparison report as a tab-separated values (TSV) file. The report is available for 48 hours after generation and includes sections for: Lists Added, Modules Added, Roles Changed, Changes Within Lists, and Line Items Added.",
         "operationId": "getComparisonReport",
         "x-anaplan-min-role": "Workspace Administrator",
-        "x-anaplan-min-role-needs-info": true,
         "responses": {
           "200": {
             "description": "Comparison report file (TSV).",
@@ -607,16 +605,15 @@
       ],
       "post": {
         "summary": "Create a summary report generation task",
-        "description": "Minimum role: Workspace Administrator.\n\nStarts an asynchronous task to generate a summary report between a source revision and the target model's current revision. Poll the task info endpoint to check progress.",
+        "description": "Minimum role: Workspace Administrator.\n\nStarts an asynchronous task to generate a summary report between a source revision and a specified target revision (sourceRevisionId, sourceModelId and targetRevisionId are all required). Poll the task info endpoint to check progress.",
         "operationId": "createSummaryReportTask",
         "x-anaplan-min-role": "Workspace Administrator",
-        "x-anaplan-min-role-needs-info": true,
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/SyncTaskRequest"
+                "$ref": "#/components/schemas/ReportTaskRequest"
               }
             }
           }
@@ -658,7 +655,6 @@
         "description": "Minimum role: Workspace Administrator.\n\nReturns the status of a summary report generation task. On success, `result.successful` is true and `result.reportFileUrl` contains the download URL.",
         "operationId": "getSummaryReportTask",
         "x-anaplan-min-role": "Workspace Administrator",
-        "x-anaplan-min-role-needs-info": true,
         "responses": {
           "200": {
             "description": "Summary report task details.",
@@ -696,7 +692,6 @@
         "description": "Minimum role: Workspace Administrator.\n\nDownloads the summary report as JSON. The report is available for 48 hours after generation. Change types with zero differences are omitted. Properties within a change type are omitted if items were only created (not modified or deleted).",
         "operationId": "getSummaryReport",
         "x-anaplan-min-role": "Workspace Administrator",
-        "x-anaplan-min-role-needs-info": true,
         "responses": {
           "200": {
             "description": "Summary report.",
@@ -773,6 +768,30 @@
             "type": "string",
             "pattern": "^[0-9A-F]{32}$",
             "description": "Target revision identifier (32-character uppercase hex string)."
+          }
+        }
+      },
+      "ReportTaskRequest": {
+        "type": "object",
+        "required": [
+          "sourceRevisionId",
+          "sourceModelId",
+          "targetRevisionId"
+        ],
+        "properties": {
+          "sourceRevisionId": {
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$",
+            "description": "Source revision identifier (32-character uppercase hex string)."
+          },
+          "sourceModelId": {
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
+          },
+          "targetRevisionId": {
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$",
+            "description": "Target revision identifier (32-character uppercase hex string). Required for comparison and summary report tasks (optional for sync tasks)."
           }
         }
       },
