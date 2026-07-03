@@ -2271,7 +2271,7 @@ paths:
     get:
       summary: List workspace administrators
       description: |-
-        Minimum role: Tenant Administrator.
+        Minimum role: User Administrator.
 
         Returns all administrators for a workspace. Requires tenant admin privilege; workspace admin access alone is insufficient.
       tags:
@@ -2310,7 +2310,7 @@ paths:
                   - Sales Planning Workspace
         '404':
           description: Workspace not found.
-      x-anaplan-min-role: Tenant Administrator
+      x-anaplan-min-role: User Administrator
   /workspaces/{workspaceId}/bulkDeleteModels:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
@@ -5735,7 +5735,7 @@ paths:
     get:
       summary: List workspace visitors
       description: |-
-        Minimum role: Tenant Administrator.
+        Minimum role: User Administrator.
 
         Returns all visitors for a workspace. Requires tenant admin privilege; workspace admin access alone is insufficient.
       tags:
@@ -5769,7 +5769,7 @@ paths:
                 visitors: []
         '404':
           description: Workspace not found.
-      x-anaplan-min-role: Tenant Administrator
+      x-anaplan-min-role: User Administrator
 components:
   parameters:
     ModelId:

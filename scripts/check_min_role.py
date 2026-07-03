@@ -17,6 +17,7 @@ ROLE_VOCABULARY = frozenset({
     "Standard User",
     "Workspace Administrator",
     "Tenant Auditor",
+    "User Administrator",
     "Tenant Administrator",
     "Tenant Security Admin",
     "None",

@@ -3026,7 +3026,7 @@
       ],
       "get": {
         "summary": "List workspace administrators",
-        "description": "Minimum role: Tenant Administrator.\n\nReturns all administrators for a workspace. Requires tenant admin privilege; workspace admin access alone is insufficient.",
+        "description": "Minimum role: User Administrator.\n\nReturns all administrators for a workspace. Requires tenant admin privilege; workspace admin access alone is insufficient.",
         "tags": [
           "General Workspace & Model Metadata"
         ],
@@ -3083,7 +3083,7 @@
             "description": "Workspace not found."
           }
         },
-        "x-anaplan-min-role": "Tenant Administrator"
+        "x-anaplan-min-role": "User Administrator"
       }
     },
     "/workspaces/{workspaceId}/bulkDeleteModels": {
@@ -7243,7 +7243,7 @@
       ],
       "get": {
         "summary": "List workspace visitors",
-        "description": "Minimum role: Tenant Administrator.\n\nReturns all visitors for a workspace. Requires tenant admin privilege; workspace admin access alone is insufficient.",
+        "description": "Minimum role: User Administrator.\n\nReturns all visitors for a workspace. Requires tenant admin privilege; workspace admin access alone is insufficient.",
         "tags": [
           "General Workspace & Model Metadata"
         ],
@@ -7291,7 +7291,7 @@
             "description": "Workspace not found."
           }
         },
-        "x-anaplan-min-role": "Tenant Administrator"
+        "x-anaplan-min-role": "User Administrator"
       }
     }
   },
