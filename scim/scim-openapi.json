@@ -457,9 +457,8 @@
     "/ResourceTypes": {
       "get": {
         "summary": "Get resource types",
-        "description": "Minimum role: Standard User.\n\nReturns the SCIM resource types supported by this service provider.",
+        "description": "Minimum role: None.\n\nReturns the SCIM resource types supported by this service provider.",
         "operationId": "getResourceTypes",
-        "x-anaplan-min-role": "Standard User",
         "responses": {
           "200": {
             "description": "List of supported resource types.",
@@ -498,15 +497,16 @@
               }
             }
           }
-        }
+        },
+        "security": [],
+        "x-anaplan-min-role": "None"
       }
     },
     "/Schemas": {
       "get": {
         "summary": "Get schemas",
-        "description": "Minimum role: Standard User.\n\nReturns the SCIM schema definitions supported by this service provider.",
+        "description": "Minimum role: None.\n\nReturns the SCIM schema definitions supported by this service provider.",
         "operationId": "getSchemas",
-        "x-anaplan-min-role": "Standard User",
         "responses": {
           "200": {
             "description": "List of schema definitions.",
@@ -528,16 +528,16 @@
               }
             }
           }
-        }
+        },
+        "security": [],
+        "x-anaplan-min-role": "None"
       }
     },
     "/ServiceProviderConfig": {
       "get": {
         "summary": "Get service provider configuration",
-        "description": "Minimum role: Standard User.\n\nReturns a description of the service provider's SCIM configuration and capabilities (patch support, bulk, filter, sort, etc.).",
+        "description": "Minimum role: None.\n\nReturns a description of the service provider's SCIM configuration and capabilities (patch support, bulk, filter, sort, etc.).",
         "operationId": "getServiceProviderConfig",
-        "x-anaplan-min-role": "Standard User",
-        "x-anaplan-min-role-needs-info": true,
         "responses": {
           "200": {
             "description": "Service provider configuration.",
@@ -641,7 +641,9 @@
               }
             }
           }
-        }
+        },
+        "security": [],
+        "x-anaplan-min-role": "None"
       }
     }
   },

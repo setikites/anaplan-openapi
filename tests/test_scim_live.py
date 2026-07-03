@@ -310,7 +310,7 @@ def test_scim_users_oauth_bearer_probe():
 # enforced at the /Users resource level, so a GET on the collection settles the
 # gate for all six /Users ops without issuing any write.
 
-# GET-only discovery endpoints annotated "Standard User" (no role gate expected).
+# GET-only discovery endpoints annotated "None" (public — no auth, no role).
 _METADATA_PATHS = ["/ResourceTypes", "/Schemas", "/ServiceProviderConfig"]
 
 
@@ -353,16 +353,18 @@ def test_scim_users_gate_allows_user_admin(admin_token):
 
 @pytest.mark.live
 @pytest.mark.parametrize("path", _METADATA_PATHS)
-def test_scim_metadata_reachable_by_standard_user(cert_token, path):
-    """Discovery endpoints carry no role gate → reachable by a Standard User.
+def test_scim_metadata_requires_no_auth(path):
+    """Discovery endpoints are public → 200 with no Authorization header.
 
-    Confirms the "Standard User" annotation on /ResourceTypes, /Schemas, and
-    /ServiceProviderConfig. A 200 here resolves the needs-info flag on
-    /ServiceProviderConfig (the only one not previously live-captured).
+    Confirms the "None" annotation (no role gate, no login) on /ResourceTypes,
+    /Schemas, and /ServiceProviderConfig. Per SCIM RFC 7644 §7 these MAY be
+    served unauthenticated; Anaplan does. A 401 here would mean auth is
+    required — re-annotate to Standard User.
     """
-    status = _scim_get(cert_token, path).status_code
-    print(f"\n[std] GET {path}: {status}")
+    with httpx.Client() as client:
+        status = client.get(f"{SCIM_BASE_URL}{path}").status_code
+    print(f"\n[no-auth] GET {path}: {status}")
     assert status == 200, (
-        f"expected 200 for a Standard User on GET {path}, got {status} "
-        "(if 403, the endpoint is role-gated — re-annotate to User Administrator)"
+        f"expected 200 unauthenticated on GET {path}, got {status} "
+        "(if 401, auth is required — re-annotate to Standard User)"
     )
