@@ -35,7 +35,7 @@ from check_min_role import (
     _HTTP_METHODS,
     check_spec_min_roles,
 )
-from check_ordering import check_spec_ordering
+from check_ordering import check_spec_ordering, _reorder_keys, _OP_ORDER
 
 # Redundant legacy role prose the sentence replaces, e.g. "Requires Workspace
 # Administrator role." or "Requires ... role on both models." — the whole
@@ -54,7 +54,12 @@ def _norm(op_ref: str) -> str:
 
 
 def _reorder(op: dict) -> None:
-    """Move the role extension(s) to immediately after operationId (ADR 0002)."""
+    """Canonicalize op key order (ADR 0002), then place the role extension(s)
+    immediately after operationId. Adding a description to an op that had none
+    would otherwise leave it at the dict tail, out of canonical order."""
+    canon = _reorder_keys(op, _OP_ORDER)
+    op.clear()
+    op.update(canon)
     role = op.pop(_EXT, None)
     if role is None:
         return

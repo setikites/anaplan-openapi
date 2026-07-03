@@ -33,12 +33,14 @@ Exactly these role names are used everywhere. No other value is valid.
 | `Standard User` | Authenticated user with no elevated role; ordinary workspace/model access is enough. |
 | `Workspace Administrator` | Workspace Admin role on the target workspace. |
 | `Tenant Auditor` | Tenant-level Auditor role (read-only audit surface). |
+| `User Administrator` | Tenant User Admin role (user-management surface, e.g. workspace admins/visitors listings); narrower than full Tenant Admin. |
 | `Tenant Administrator` | Tenant Admin privilege; workspace-admin access alone is insufficient. |
 | `Tenant Security Admin` | Tenant Security Administrator (SCIM user/group provisioning). |
 | `None` | No role gate applies: token-issuing endpoints (authentication, oauth) where the caller is not yet an authenticated principal, and purely functional endpoints. |
 
 Names match Anaplan's own administrative terminology (Workspace Administrator,
-Tenant Administrator, Tenant Auditor, Security Administrator). `Standard User`
+Tenant Administrator, Tenant Auditor, User Administrator, Security
+Administrator). `Standard User`
 and `None` are distinct: `Standard User` means "logged in, no elevated role";
 `None` means "the role model does not apply to this endpoint at all".
 
