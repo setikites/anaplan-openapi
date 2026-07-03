@@ -161,9 +161,10 @@ def test_every_cloudworks_operation_is_restricted_integration_user():
     assert not wrong, f"CloudWorks operations not Restricted Integration User: {wrong}"
 
 
-def test_cloudworks_needs_info_only_on_deprecated_anaplanmodels():
-    # Every role was live-confirmed except GET /integrations/anaplanModels/{modelId},
-    # which returns an nginx 404 in all phases (never reaches the app-layer role check)
-    # and is likely deprecated — it keeps the needs-info flag.
+def test_cloudworks_has_no_needs_info_flags():
+    # Every role is live-confirmed. GET /integrations/anaplanModels/{modelId} returns an
+    # nginx 404 at the routing layer in every case (all three roles, valid + dummy modelId)
+    # — the endpoint is removed, not role-gated, so it is marked deprecated rather than
+    # needs-info. No CloudWorks operation carries the flag. See cloudworks/README.md.
     flagged = {k for k, op in _cloudworks_ops() if op.get("x-anaplan-min-role-needs-info") is True}
-    assert flagged == {"GET /integrations/anaplanModels/{modelId}"}
+    assert flagged == set()

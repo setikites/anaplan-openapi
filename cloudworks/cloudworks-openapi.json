@@ -873,10 +873,9 @@
       ],
       "get": {
         "summary": "Get integrations by model ID",
-        "description": "Minimum role: Restricted Integration User.\n\n**Note (live-tested June 2026):** This endpoint returned an HTML 404 from nginx on a live tenant. It may be deprecated or require a specific modelId format. Use with caution.",
+        "description": "Minimum role: Restricted Integration User.\n\n**Deprecated (live-confirmed 2026-07-03):** This endpoint is no longer served — it returns an nginx HTML 404 at the routing layer in every case tested: a regular user, Restricted Integration User, and Integration Admin, with both a valid modelId (in an assigned workspace) and a dummy one. Documented per Apiary for historical completeness; do not call it.",
         "operationId": "getIntegrationsByModel",
         "x-anaplan-min-role": "Restricted Integration User",
-        "x-anaplan-min-role-needs-info": true,
         "tags": [
           "Integrations"
         ],
@@ -908,7 +907,8 @@
           "404": {
             "$ref": "#/components/responses/NotFound"
           }
-        }
+        },
+        "deprecated": true
       }
     },
     "/integrations/{integrationId}/run": {
