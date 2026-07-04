@@ -1,15 +1,52 @@
-# Path-parameter sources for the endpoint access scan
+# Input ID source map (chaining reference + endpoint access scan)
 
-`scripts/scan_endpoint_access.py` fills GET path parameters with **real IDs**
-harvested from earlier list responses, so a GET reflects the caller's
-authorization to a resource rather than a 404 for a fabricated ID. This file
-documents, per path parameter, which endpoint's response supplies a real value
-and the exact JSON field to read.
+This file is the authoritative source map for **every input ID an MCP tool
+consumes** across the ten specs — path, query, and header parameters *and*
+request-body fields. When a spec is exposed as MCP tools, anything that becomes
+an input to an API entry point belongs here, together with the prior operation's
+output field that supplies it.
 
-Rules the table encodes:
+The map is **dual-purpose**:
+
+1. **Chaining reference.** It is the source of truth the spec `description` edits
+   cite (ADR 0004 §2/§3): for each input ID, which operation's output field
+   supplies it. This is exactly the binding a composition primitive needs — see
+   the `pipe()` / `map()` / `project()` design in
+   [mcp-agent-access.md](mcp-agent-access.md) (option D). A `pipe` binds an output
+   field of step N into an input of step N+1; each row below is one such binding
+   made explicit. Example from that note:
+
+   ```
+   getLatestRevision     → project `revision.id`
+     → getAppliedToModels → project `models[0].modelId` as sourceModelId
+     → getSyncableRevisions → project `[0].sourceRevisionId`
+     → createSyncTask
+   ```
+
+   Every arrow above is a row in the tables below.
+
+2. **Live-scanner fill rules.** `scripts/scan_endpoint_access.py` fills GET path
+   parameters with **real IDs** harvested from earlier list responses, so a GET
+   reflects the caller's authorization to a resource rather than a 404 for a
+   fabricated ID. The [harvestable-parameters](#harvestable-parameters-real-ids-for-get)
+   table below is the scanner's fill map.
+
+Cross-API sources (IDs minted by one API and consumed by another — e.g. `modelId`
+minted by Integration, consumed by ALM/CloudWorks/Audit) name the owning API,
+consistent with [ADR 0004](adr/0004-id-source-path-descriptions.md) §3. Cite the
+owner's canonical anaplan.com link from the
+[CONTEXT.md table](../CONTEXT.md#canonical-api-reference-links); do not hardcode
+URLs here.
+
+## Scanner fill rules
+
+Rules the harvest table encodes:
 
 - **GET only.** Mutating verbs (POST/PUT/PATCH/DELETE) always use the fabricated
-  ID `00000000000000000000000000000000`, so they fail before changing state.
+  ID `00000000000000000000000000000000`, so they fail before changing state. Body
+  and query IDs consumed by mutating verbs are **not** scanner-harvested; they
+  appear in the [chaining-only table](#request-body-and-query-parameter-id-inputs-chaining)
+  for description authoring, not for the scan.
 - **Field name is not always `id`.** CloudWorks and SCIM use different field
   names (`integrationId`, `connectionId`, `Resources[].id`). Reading only `id`
   was the bug that left these parameters fabricated.
@@ -25,6 +62,9 @@ Rules the table encodes:
   the file has any content, so no harvest is needed.
 
 ## Harvestable parameters (real IDs for GET)
+
+Path parameters the scanner fills, and the chaining source for the same IDs when
+they appear as path inputs to any operation.
 
 | Parameter | Source endpoint (GET) | Field to read | Notes |
 |-----------|----------------------|---------------|-------|
@@ -59,6 +99,34 @@ Rules the table encodes:
 | `id` (SCIM) | `scim /Users` | `Resources[].id` | SCIM `ListResponse` array is `Resources`; needs SCIM User Admin to return 200. Fallbacks: `integration /users` → `users[].id`, then `integration /users/me` → `user.id` |
 | `userGuid` (exception) | `integration /users` | `users[].id` | cross-API; exception has no user-list GET. Fallback: `integration /users/me` → `user.id` |
 
+## Request-body and query-parameter ID inputs (chaining)
+
+Input IDs consumed by mutating verbs (in the request body) or by query
+parameters. The scanner uses fabricated IDs for these (it never mutates state),
+so these rows exist for **description authoring** — they tell the `pipe`/`map`
+author which prior output binds into each field. `Consumed by` is the operation
+that takes the input; `Field` is the JSON path to write inside its body (or the
+query parameter name); `Source` is the operation whose output supplies the value.
+
+| Input ID | Location | Consumed by | Source endpoint (GET) | Field to read | Cross-API owner |
+|----------|----------|-------------|----------------------|---------------|-----------------|
+| `sourceModelId` | query | `alm GET /models/{modelId}/alm/syncableRevisions` | `integration /models` | `models[].id` | Integration |
+| `sourceModelId` | body | `alm POST /models/{modelId}/alm/syncTasks`, `.../comparisonReportTasks`, `.../summaryReportTasks` | `integration /models` | `models[].id` | Integration |
+| `sourceRevisionId` | body | `alm POST /models/{modelId}/alm/syncTasks`, `.../comparisonReportTasks`, `.../summaryReportTasks` | `alm /models/{sourceModelId}/alm/revisions` (or `.../syncableRevisions`) | `revisions[].id` / `[].sourceRevisionId` | — |
+| `targetRevisionId` | body | `alm POST /models/{modelId}/alm/syncTasks` (optional), `.../comparisonReportTasks`, `.../summaryReportTasks` (required) | `alm /models/{modelId}/alm/revisions` | `revisions[].id` | — |
+| `workspaceGuid` | body | `exception POST /permissions/exception-users/search` (`oneOf`), `PATCH .../users/{userGuid}` | `integration /workspaces` | `workspaces[].id` | Integration |
+| `userGuid` | body | `exception POST /permissions/exception-users/search` (`oneOf`, alternative to `workspaceGuid`) | `integration /users` | `users[].id` | Integration |
+| `workspaceId` | body | `cloudworks POST /integrations`, `PUT /integrations/{integrationId}` | `integration /workspaces` | `workspaces[].id` | Integration |
+| `modelId` | body | `cloudworks POST /integrations`, `PUT /integrations/{integrationId}` | `integration /models` | `models[].id` | Integration |
+| `processId` | body | `cloudworks POST /integrations`, `PUT /integrations/{integrationId}` | `integration /models/{modelId}/processes` | `processes[].id` | Integration |
+| `connectionId` | body | `cloudworks POST /integrations`, `PUT /integrations/{integrationId}` (inside `jobs[].sources[]` / `jobs[].targets[]`) | `cloudworks /integrations/connections` | `connections[].connectionId` | — |
+| `integrationIds[]` | body | `cloudworks POST /integrations/notification`, `PUT /integrations/notification/{notificationId}` | `cloudworks /integrations` | `integrations[].integrationId` | — |
+
+Note on `exception` `workspaceGuid`/`userGuid`: the search body is `oneOf` — supply
+exactly one. Both are the same hex-32 identifiers minted by Integration
+(`GET /workspaces`, `GET /users`); exception has no own list GET, matching the
+cross-API fallback used for the `{userGuid}` path parameter above.
+
 ## Parameters that stay fabricated (no reachable GET source)
 
 | Parameter | Why |
@@ -70,3 +138,5 @@ Rules the table encodes:
 
 Rows whose path used any fabricated ID are marked `confidence = fabricated-id`
 in the CSV and do **not** count toward the guessed access level.
+</content>
+</invoke>
