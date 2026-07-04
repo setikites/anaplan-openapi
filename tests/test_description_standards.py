@@ -284,8 +284,9 @@ _MUST_NOT_HAVE_DESCRIPTION = [
     pytest.param("alm", ["components", "schemas", "SyncTask", "properties", "creationTime"], id="alm-synctask-creationtime"),
     # ALM TaskResult — 'Whether the task completed successfully.' restates the boolean field name
     pytest.param("alm", ["components", "schemas", "TaskResult", "properties", "successful"], id="alm-taskresult-successful"),
-    # ALM SyncTaskRequest — 'ID of the source model.' adds nothing over the field name
-    pytest.param("alm", ["components", "schemas", "SyncTaskRequest", "properties", "sourceModelId"], id="alm-synctaskrequest-sourcemodelid"),
+    # ALM SyncTaskRequest.sourceModelId now carries a source-chaining description
+    # (ADR 0004 §2/§3) — a cross-API ID input must document where its value comes
+    # from, so it is deliberately no longer in this must-be-absent list.
     # ALM OnlineStatusRequest.status — enum [online, offline] is self-explanatory
     pytest.param("alm", ["components", "schemas", "OnlineStatusRequest", "properties", "status"], id="alm-onlinestatus-status"),
     # ALM AppliedModel.modelDeleted — boolean field name is self-evident
