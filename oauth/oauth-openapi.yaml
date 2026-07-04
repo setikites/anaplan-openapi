@@ -309,7 +309,7 @@ components:
         refresh_token:
           type: string
           example: PuheeaOPVlO_MvWif11qWhvQFRfh2KyGpVioOS_7EdgyC
-          description: Refresh token from a prior token response.
+          description: Refresh token from a prior `POST /oauth/token` response (`refresh_token`).
         client_secret:
           type: string
           example: XPkIavE7K0d

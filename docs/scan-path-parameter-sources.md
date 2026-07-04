@@ -127,6 +127,22 @@ exactly one. Both are the same hex-32 identifiers minted by Integration
 (`GET /workspaces`, `GET /users`); exception has no own list GET, matching the
 cross-API fallback used for the `{userGuid}` path parameter above.
 
+## Specs with no chainable input IDs
+
+Recorded so they are not re-audited for source-chaining descriptions (issue #205):
+
+| Spec | Finding |
+|------|---------|
+| `audit` | No ID-typed inputs. Query params (`type`, `dateFrom`/`dateTo`, `intervalInHours`, `limit`, `offset`) and the search body (`from`/`to`/`interval`) are enums, timestamps, and paging. All ID fields (`userId`, `tenantId`, `objectId`) are response-only. |
+| `administration` | No ID-typed inputs. `Limit`/`Offset` are paging; the import body is a CSV keyed by `username` (email), not an opaque ID. |
+| `authentication` | No ID-typed inputs. No path/query params; the only body (`CertPayload`) carries cert credentials. `userGuid`/`customerGuid`/`tokenId` are response-only. |
+| `oauth` | No cross-API resource IDs. Flow tokens (`code`, `device_code`, `refresh_token`) already cite their minting operation in-spec; `client_id`/`client_secret` are console-provisioned credentials, not API-chainable. |
+| `financial-consolidation` | Name-based, not opaque IDs. Chainable name path params (`dimensionName` ← `GET /metadata/Dimensions`, `username` ← `GET /users`) are already annotated; `tableName`/`modelName`/workflow `path`+`name_of_workflow` have no list endpoint to source from. Bodies are dimension-member-name / role-name typed. |
+
+`exception` and `scim` request-body ID fields **were** chained — see the
+[chaining table](#request-body-and-query-parameter-id-inputs-chaining) rows for
+`workspaceGuid`/`userGuid` and the SCIM `entitlements[].value` workspace GUID.
+
 ## Parameters that stay fabricated (no reachable GET source)
 
 | Parameter | Why |
@@ -138,5 +154,3 @@ cross-API fallback used for the `{userGuid}` path parameter above.
 
 Rows whose path used any fabricated ID are marked `confidence = fabricated-id`
 in the CSV and do **not** count toward the guessed access level.
-</content>
-</invoke>
