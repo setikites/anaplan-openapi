@@ -6487,7 +6487,8 @@ components:
       properties:
         lineItemId:
           type: string
-          description: ID of the line item that belongs to the module. Specify either lineItemId or lineItemName.
+          description: ID of the line item that belongs to the module. Specify either lineItemId or lineItemName. From `GET
+            /models/{modelId}/modules/{moduleId}/lineItems` (`items[].id`).
         lineItemName:
           type: string
           description: Name of the line item that belongs to the module. Specify either lineItemId or lineItemName.
@@ -6501,13 +6502,15 @@ components:
             properties:
               dimensionId:
                 type: string
-                description: ID of the dimension on the line item. Specify either dimensionId or dimensionName.
+                description: ID of the dimension on the line item. Specify either dimensionId or dimensionName. From `GET
+                  /models/{modelId}/lineItems/{lineItemId}/dimensions` (`dimensions[].id`).
               dimensionName:
                 type: string
                 description: Name of the dimension on the line item. Specify either dimensionId or dimensionName.
               itemId:
                 type: string
-                description: ID of the item selected on the dimension. Specify one of itemId, itemName, or itemCode.
+                description: ID of the item selected on the dimension. Specify one of itemId, itemName, or itemCode. From
+                  `GET /models/{modelId}/dimensions/{dimensionId}/items` (`items[].id`).
               itemName:
                 type: string
                 description: Name of the item selected on the dimension. Specify one of itemId, itemName, or itemCode.
