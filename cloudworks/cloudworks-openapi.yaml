@@ -1151,7 +1151,9 @@ paths:
     - $ref: '#/components/parameters/RunId'
     - name: actionId
       in: path
-      description: Anaplan action ID. From `GET /models/{modelId}/actions` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2).
+      description: 'Anaplan action ID of the import step whose error log to fetch. Because this endpoint returns an import
+        error log, the action is always an import: from `GET /models/{modelId}/imports` (`imports[].id`) in the [Integration
+        API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2).'
       required: true
       schema:
         type: string
@@ -1493,9 +1495,10 @@ components:
                 description: BigQuery table name. Present when source is GoogleBigQuery.
               actionId:
                 type: string
-                description: Numeric string Anaplan action ID. Present when source is Anaplan. From `GET /models/{modelId}/actions`
-                  in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2)
-                  (`actions[].id`).
+                description: Numeric string Anaplan action ID, in the generic sense — an import, an export, or a (delete/sort/etc.)
+                  action. Present when source is Anaplan. Depending on the action type, from `GET /models/{modelId}/imports`
+                  (`imports[].id`), `GET /models/{modelId}/exports` (`exports[].id`), or `GET /models/{modelId}/actions` (`actions[].id`)
+                  in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2).
               connectionName:
                 description: Display name of the connection (read-only, present in GET responses).
                 type: string
@@ -1521,9 +1524,10 @@ components:
                 - AzureBlob
               actionId:
                 type: string
-                description: Numeric string Anaplan action ID. Present when target is Anaplan. From `GET /models/{modelId}/actions`
-                  in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2)
-                  (`actions[].id`).
+                description: Numeric string Anaplan action ID, in the generic sense — an import, an export, or a (delete/sort/etc.)
+                  action. Present when target is Anaplan. Depending on the action type, from `GET /models/{modelId}/imports`
+                  (`imports[].id`), `GET /models/{modelId}/exports` (`exports[].id`), or `GET /models/{modelId}/actions` (`actions[].id`)
+                  in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2).
               fileId:
                 type: string
                 description: Anaplan file ID. Present when target is Anaplan. From `GET /models/{modelId}/files` in the [Integration
