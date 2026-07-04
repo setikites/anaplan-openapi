@@ -177,7 +177,7 @@
                           },
                           "workspaceId": {
                             "type": "string",
-                            "description": "Required for restricted integration users.",
+                            "description": "Anaplan workspace ID. Required for restricted integration users. From `GET /workspaces` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2) (`workspaces[].id`).",
                             "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
                           }
                         }
@@ -253,7 +253,7 @@
                           },
                           "workspaceId": {
                             "type": "string",
-                            "description": "Required for restricted integration users."
+                            "description": "Anaplan workspace ID. Required for restricted integration users. From `GET /workspaces` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2) (`workspaces[].id`)."
                           }
                         }
                       }
@@ -312,7 +312,7 @@
                               },
                               "workspaceId": {
                                 "type": "string",
-                                "description": "Required for restricted integration users."
+                                "description": "Anaplan workspace ID. Required for restricted integration users. From `GET /workspaces` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2) (`workspaces[].id`)."
                               }
                             }
                           },
@@ -364,7 +364,7 @@
                               },
                               "workspaceId": {
                                 "type": "string",
-                                "description": "Required for restricted integration users."
+                                "description": "Anaplan workspace ID. Required for restricted integration users. From `GET /workspaces` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2) (`workspaces[].id`)."
                               }
                             }
                           }
@@ -661,17 +661,17 @@
                   },
                   "workspaceId": {
                     "type": "string",
-                    "description": "Anaplan workspace ID.",
+                    "description": "Anaplan workspace ID. From `GET /workspaces` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2) (`workspaces[].id`).",
                     "example": "8a80db657068fjef01718955f3b3390b"
                   },
                   "modelId": {
                     "type": "string",
-                    "description": "Anaplan model ID.",
+                    "description": "Anaplan model ID. From `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2) (`models[].id`).",
                     "example": "E559BFF3B1GD4RKE874P745BEL259711"
                   },
                   "processId": {
                     "type": "string",
-                    "description": "Anaplan process ID. Required for process integrations.",
+                    "description": "Anaplan process ID. Required for process integrations. From `GET /models/{modelId}/processes` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2) (`processes[].id`).",
                     "example": "118000000001"
                   },
                   "nuxVisible": {
@@ -797,13 +797,16 @@
                     ]
                   },
                   "workspaceId": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "Anaplan workspace ID. From `GET /workspaces` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2) (`workspaces[].id`)."
                   },
                   "modelId": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "Anaplan model ID. From `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2) (`models[].id`)."
                   },
                   "processId": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "Anaplan process ID. Required for process integrations. From `GET /models/{modelId}/processes` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2) (`processes[].id`)."
                   },
                   "nuxVisible": {
                     "type": "boolean"
@@ -1043,7 +1046,7 @@
                 "properties": {
                   "integrationId": {
                     "type": "string",
-                    "description": "Integration ID (may be included in body as well as path)."
+                    "description": "Integration ID (may be included in body as well as path). From `GET /integrations` (`integrations[].integrationId`)."
                   },
                   "schedule": {
                     "$ref": "#/components/schemas/Schedule"
@@ -2091,7 +2094,7 @@
                 },
                 "connectionId": {
                   "type": "string",
-                  "description": "32-character lowercase hex connection ID. Present when source is a cloud storage type."
+                  "description": "32-character lowercase hex connection ID. Present when source is a cloud storage type. From `GET /integrations/connections` (`connections[].connectionId`)."
                 },
                 "file": {
                   "type": "string",
@@ -2103,7 +2106,7 @@
                 },
                 "actionId": {
                   "type": "string",
-                  "description": "Numeric string Anaplan action ID. Present when source is Anaplan."
+                  "description": "Numeric string Anaplan action ID. Present when source is Anaplan. From `GET /models/{modelId}/actions` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2) (`actions[].id`)."
                 },
                 "connectionName": {
                   "description": "Display name of the connection (read-only, present in GET responses).",
@@ -2135,13 +2138,16 @@
                   ]
                 },
                 "actionId": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "Numeric string Anaplan action ID. Present when target is Anaplan. From `GET /models/{modelId}/actions` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2) (`actions[].id`)."
                 },
                 "fileId": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "Anaplan file ID. Present when target is Anaplan. From `GET /models/{modelId}/files` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2) (`files[].id`)."
                 },
                 "connectionId": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "32-character lowercase hex connection ID. Present when target is a cloud storage type. From `GET /integrations/connections` (`connections[].connectionId`)."
                 },
                 "file": {
                   "type": "string"
@@ -2494,7 +2500,7 @@
         "properties": {
           "integrationIds": {
             "type": "array",
-            "description": "Integration IDs to attach this notification to. Currently supports a single ID.",
+            "description": "Integration IDs to attach this notification to. Currently supports a single ID. From `GET /integrations` (`integrations[].integrationId`).",
             "items": {
               "type": "string"
             },
