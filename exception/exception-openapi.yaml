@@ -214,7 +214,8 @@ components:
           type: string
           pattern: ^[0-9a-f]{32}$
           description: Anaplan-assigned hex-32 GUID of the workspace in which to assign or unassign the exception-user status.
-            The workspace must be SSO-enabled.
+            The workspace must be SSO-enabled. From `GET /workspaces` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2)
+            (`workspaces[].id`).
     ExceptionUserSearchRequest:
       oneOf:
       - $ref: '#/components/schemas/ExceptionUserSearchByWorkspaceRequest'
@@ -230,7 +231,8 @@ components:
           type: string
           pattern: ^[0-9a-f]{32}$
           description: Anaplan-assigned hex-32 GUID of the workspace. Returns all exception users in this workspace, including
-            visitors.
+            visitors. From `GET /workspaces` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2)
+            (`workspaces[].id`).
     ExceptionUserSearchByUserRequest:
       type: object
       required:
@@ -240,7 +242,9 @@ components:
           type: string
           pattern: ^[0-9a-f]{32}$
           description: Anaplan-assigned hex-32 GUID of the user. Returns all workspaces in the tenant where this user has
-            exception-user access. Workspaces where the user has access as a visitor are not included.
+            exception-user access. Workspaces where the user has access as a visitor are not included. From `GET /users` (or
+            `GET /users/me` for your own GUID) in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2)
+            (`users[].id`).
     ExceptionUserSearchResponse:
       type: object
       properties:
