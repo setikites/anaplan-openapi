@@ -111,6 +111,28 @@ Anaplan has 10 publicly documented REST APIs, each with different characteristic
 
 ## Key Patterns and Variations
 
+### Terminology: "action" is ambiguous
+
+The word **action** in Anaplan has two meanings, and specs must not conflate them:
+
+- **Generic**: every runnable object — imports, exports, processes, *and*
+  specific actions.
+- **Specific**: only delete/sort/optimize-type actions — **not** imports,
+  exports, or processes.
+
+A **process** is a sequence of generic actions (a process cannot contain another
+process).
+
+This matters for source-chaining descriptions (ADR 0004 §2/§3). The **CloudWorks
+`actionId` uses the generic meaning** — the `Job` schema carries only `actionId`
+(no `importId`/`exportId`) yet its jobs describe import and export data movement.
+So a generic `actionId` description must list **all** applicable Integration
+sources: `GET /models/{modelId}/imports` (`imports[].id`), `.../exports`
+(`exports[].id`), and `.../actions` (`actions[].id`). Narrow to a single source
+only when the endpoint fixes the type — e.g.
+`GET /integrations/run/{runId}/process/import/{actionId}/dumps` returns an
+*import* error log, so its `actionId` is always an import.
+
 ### Authentication
 
 Anaplan APIs use **at least two different authentication schemes**:
