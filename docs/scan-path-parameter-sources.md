@@ -112,8 +112,10 @@ query parameter name); `Source` is the operation whose output supplies the value
 |----------|----------|-------------|----------------------|---------------|-----------------|
 | `sourceModelId` | query | `alm GET /models/{modelId}/alm/syncableRevisions` | `integration /models` | `models[].id` | Integration |
 | `sourceModelId` | body | `alm POST /models/{modelId}/alm/syncTasks`, `.../comparisonReportTasks`, `.../summaryReportTasks` | `integration /models` | `models[].id` | Integration |
-| `sourceRevisionId` | body | `alm POST /models/{modelId}/alm/syncTasks`, `.../comparisonReportTasks`, `.../summaryReportTasks` | `alm /models/{sourceModelId}/alm/revisions` (or `.../syncableRevisions`) | `revisions[].id` / `[].sourceRevisionId` | — |
-| `targetRevisionId` | body | `alm POST /models/{modelId}/alm/syncTasks` (optional), `.../comparisonReportTasks`, `.../summaryReportTasks` (required) | `alm /models/{modelId}/alm/revisions` | `revisions[].id` | — |
+| `sourceRevisionId` | body | `alm POST /models/{modelId}/alm/syncTasks` | `alm /models/{modelId}/alm/syncableRevisions?sourceModelId={sourceModelId}` (path `modelId` = sync target) | `revisions[].id` | — |
+| `sourceRevisionId` | body | `alm POST .../comparisonReportTasks`, `.../summaryReportTasks` | `alm /models/{sourceModelId}/alm/revisions` (source model = body `sourceModelId`) | `revisions[].id` | — |
+| `targetRevisionId` | body | `alm POST /models/{modelId}/alm/syncTasks` (optional) | `alm /models/{modelId}/alm/latestRevision` (path `modelId` = sync target) | `revisions[0].id` | — |
+| `targetRevisionId` | body | `alm POST .../comparisonReportTasks`, `.../summaryReportTasks` (required) | `alm /models/{modelId}/alm/revisions` (path `modelId` = report model) | `revisions[].id` | — |
 | `workspaceGuid` | body | `exception POST /permissions/exception-users/search` (`oneOf`), `PATCH .../users/{userGuid}` | `integration /workspaces` | `workspaces[].id` | Integration |
 | `userGuid` | body | `exception POST /permissions/exception-users/search` (`oneOf`, alternative to `workspaceGuid`) | `integration /users` | `users[].id` | Integration |
 | `workspaceId` | body | `cloudworks POST /integrations`, `PUT /integrations/{integrationId}` | `integration /workspaces` | `workspaces[].id` | Integration |
