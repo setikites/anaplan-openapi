@@ -152,7 +152,7 @@
           {
             "name": "sourceModelId",
             "in": "query",
-            "description": "Model identifier (32-character uppercase hex string) of the source model whose revisions to evaluate. For a model already participating in ALM, a good choice is the **first** model in the `appliedToModels` list of its latest revision — the source model where its revisions are created. Find it with `GET /models/{modelId}/alm/latestRevision` (for the revision id), then `GET /models/{modelId}/alm/revisions/{revisionId}/appliedToModels`.",
+            "description": "Model identifier (32-character uppercase hex string) of the source model whose revisions to evaluate. For a model already participating in ALM, a good choice is the **first** model in the `appliedToModels` list of its latest revision — the source model where its revisions are created. Find it with `GET /models/{modelId}/alm/latestRevision` (for the revision id), then `GET /models/{modelId}/alm/revisions/{revisionId}/appliedToModels` (`appliedToModels[].modelId`). Ultimately an Anaplan model ID from `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2).",
             "required": true,
             "schema": {
               "type": "string",
@@ -758,16 +758,17 @@
           "sourceRevisionId": {
             "type": "string",
             "pattern": "^[0-9A-F]{32}$",
-            "description": "Source revision identifier (32-character uppercase hex string)."
+            "description": "Source revision identifier (32-character uppercase hex string). From `GET /models/{modelId}/alm/syncableRevisions` (`revisions[].id`)."
           },
           "sourceModelId": {
             "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
+            "pattern": "^[0-9A-F]{32}$",
+            "description": "Source model identifier (32-character uppercase hex string). From `GET /models/{modelId}/alm/revisions/{revisionId}/appliedToModels` (`appliedToModels[].modelId`) — the models a revision has been applied to. Ultimately an Anaplan model ID from `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2)."
           },
           "targetRevisionId": {
             "type": "string",
             "pattern": "^[0-9A-F]{32}$",
-            "description": "Target revision identifier (32-character uppercase hex string)."
+            "description": "Target revision identifier (32-character uppercase hex string). From `GET /models/{modelId}/alm/revisions` (`revisions[].id`) on the target model. Optional for sync tasks (omit to apply to the latest target revision)."
           }
         }
       },
@@ -782,16 +783,17 @@
           "sourceRevisionId": {
             "type": "string",
             "pattern": "^[0-9A-F]{32}$",
-            "description": "Source revision identifier (32-character uppercase hex string)."
+            "description": "Source revision identifier (32-character uppercase hex string). From `GET /models/{modelId}/alm/syncableRevisions` (`revisions[].id`)."
           },
           "sourceModelId": {
             "type": "string",
-            "pattern": "^[0-9A-F]{32}$"
+            "pattern": "^[0-9A-F]{32}$",
+            "description": "Source model identifier (32-character uppercase hex string). From `GET /models/{modelId}/alm/revisions/{revisionId}/appliedToModels` (`appliedToModels[].modelId`) — the models a revision has been applied to. Ultimately an Anaplan model ID from `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2)."
           },
           "targetRevisionId": {
             "type": "string",
             "pattern": "^[0-9A-F]{32}$",
-            "description": "Target revision identifier (32-character uppercase hex string). Required for comparison and summary report tasks (optional for sync tasks)."
+            "description": "Target revision identifier (32-character uppercase hex string). From `GET /models/{modelId}/alm/revisions` (`revisions[].id`) on the target model. Required for comparison and summary report tasks (optional for sync tasks)."
           }
         }
       },
