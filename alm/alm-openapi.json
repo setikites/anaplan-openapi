@@ -763,7 +763,7 @@
           "sourceModelId": {
             "type": "string",
             "pattern": "^[0-9A-F]{32}$",
-            "description": "Source model identifier (32-character uppercase hex string) of the model supplying the source revision. See the `sourceModelId` query parameter on `GET /models/{modelId}/alm/syncableRevisions` for the full process of identifying it (via the source revision's `appliedToModels` list). Ultimately an Anaplan model ID from `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2)."
+            "description": "Source model identifier (32-character uppercase hex string) of the model supplying the source revision. See the `sourceModelId` query parameter on `GET /models/{modelId}/alm/syncableRevisions` for the full process of identifying it (via the `appliedToModels` list of the target model's latest revision). Ultimately an Anaplan model ID from `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2)."
           },
           "targetRevisionId": {
             "type": "string",
@@ -788,7 +788,7 @@
           "sourceModelId": {
             "type": "string",
             "pattern": "^[0-9A-F]{32}$",
-            "description": "Source model identifier (32-character uppercase hex string) of the model supplying the source revision. See the `sourceModelId` query parameter on `GET /models/{modelId}/alm/syncableRevisions` for the full process of identifying it (via the source revision's `appliedToModels` list). Ultimately an Anaplan model ID from `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2)."
+            "description": "Source model identifier (32-character uppercase hex string) of the model supplying the source revision. See the `sourceModelId` query parameter on `GET /models/{modelId}/alm/syncableRevisions` for the full process of identifying it (via the `appliedToModels` list of the target model's latest revision). Ultimately an Anaplan model ID from `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2)."
           },
           "targetRevisionId": {
             "type": "string",
