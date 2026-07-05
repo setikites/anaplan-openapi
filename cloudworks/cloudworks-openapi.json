@@ -177,7 +177,7 @@
                           },
                           "workspaceId": {
                             "type": "string",
-                            "description": "Anaplan workspace ID. Required for restricted integration users. From `GET /workspaces` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2) (`workspaces[].id`).",
+                            "description": "Anaplan workspace ID. Required for restricted integration users — the workspace that contains this connection's model. Read it from that model's record: `GET /models/{modelId}` (`currentWorkspaceId`) in the Integration API, or `GET /models` matched by `name`, then take `currentWorkspaceId`. Must match the model's workspace.",
                             "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
                           }
                         }
@@ -253,7 +253,7 @@
                           },
                           "workspaceId": {
                             "type": "string",
-                            "description": "Anaplan workspace ID. Required for restricted integration users. From `GET /workspaces` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2) (`workspaces[].id`)."
+                            "description": "Anaplan workspace ID. Required for restricted integration users — the workspace that contains this connection's model. Read it from that model's record: `GET /models/{modelId}` (`currentWorkspaceId`) in the Integration API, or `GET /models` matched by `name`, then take `currentWorkspaceId`. Must match the model's workspace."
                           }
                         }
                       }
@@ -312,7 +312,7 @@
                               },
                               "workspaceId": {
                                 "type": "string",
-                                "description": "Anaplan workspace ID. Required for restricted integration users. From `GET /workspaces` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2) (`workspaces[].id`)."
+                                "description": "Anaplan workspace ID. Required for restricted integration users — the workspace that contains this connection's model. Read it from that model's record: `GET /models/{modelId}` (`currentWorkspaceId`) in the Integration API, or `GET /models` matched by `name`, then take `currentWorkspaceId`. Must match the model's workspace."
                               }
                             }
                           },
@@ -364,7 +364,7 @@
                               },
                               "workspaceId": {
                                 "type": "string",
-                                "description": "Anaplan workspace ID. Required for restricted integration users. From `GET /workspaces` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2) (`workspaces[].id`)."
+                                "description": "Anaplan workspace ID. Required for restricted integration users — the workspace that contains this connection's model. Read it from that model's record: `GET /models/{modelId}` (`currentWorkspaceId`) in the Integration API, or `GET /models` matched by `name`, then take `currentWorkspaceId`. Must match the model's workspace."
                               }
                             }
                           }
@@ -661,7 +661,7 @@
                   },
                   "workspaceId": {
                     "type": "string",
-                    "description": "Anaplan workspace ID. From `GET /workspaces` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2) (`workspaces[].id`).",
+                    "description": "Anaplan workspace ID — the workspace that contains this call's model. Read it from that model's record: `GET /models/{modelId}` (`currentWorkspaceId`) in the Integration API, or `GET /models` matched by `name`, then take `currentWorkspaceId`. Must match the model's workspace.",
                     "example": "8a80db657068fjef01718955f3b3390b"
                   },
                   "modelId": {
@@ -798,7 +798,7 @@
                   },
                   "workspaceId": {
                     "type": "string",
-                    "description": "Anaplan workspace ID. From `GET /workspaces` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2) (`workspaces[].id`)."
+                    "description": "Anaplan workspace ID — the workspace that contains this call's model. Read it from that model's record: `GET /models/{modelId}` (`currentWorkspaceId`) in the Integration API, or `GET /models` matched by `name`, then take `currentWorkspaceId`. Must match the model's workspace."
                   },
                   "modelId": {
                     "type": "string",

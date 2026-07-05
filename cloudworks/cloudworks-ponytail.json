@@ -1,0 +1,1720 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Anaplan CloudWorks API",
+    "version": "2.0.0",
+    "description": "The Anaplan CloudWorks API enables you to create your own connections and integrations with Anaplan CloudWorks, supporting data movement between cloud storage services (Amazon S3, Google BigQuery, Azure Blob Storage) and Anaplan models.\n\n**Base URL**: Both `https://api.cloudworks.anaplan.com/2/0/` and `https://api.anaplan.com/cloudworks/2/0/` are active. The `api.cloudworks.anaplan.com` form is listed first. Both `AnaplanAuthToken` and `Bearer` (with an AnaplanAuthToken value) are accepted.\n\n**Date and time formats used across this API:**\n- `startDate` / `endDate` on run records: ISO 8601 UTC with milliseconds \u2014 `YYYY-MM-DDTHH:MM:SS.sssZ`\n- `lastRun` on run records: Unix timestamp integer (seconds since epoch)\n- `createdDate` / `modifiedDate` on integration flow steps: space-separated timestamp with timezone \u2014 `YYYY-MM-DD HH:MM:SS.uuuuuu+00:00`\n- `schedule.nextScheduleDate` and similar date-only fields: ISO 8601 date \u2014 `YYYY-MM-DD`\n\n**ID formats used across this API:**\n- Most entity IDs (`integrationId`, `connectionId`, `workspaceId`, `notificationId`, flow `id`, run `id`, `traceId`, `userGuid`): 32-character lowercase hex\n- `modelId`: 32-character **uppercase** hex (the only uppercase ID in the API)\n- `processId`, `actionId`, `fileId`: numeric string"
+  },
+  "servers": [
+    {
+      "url": "https://api.cloudworks.anaplan.com/2/0",
+      "description": "CloudWorks API primary base URL"
+    },
+    {
+      "url": "https://api.anaplan.com/cloudworks/2/0",
+      "description": "CloudWorks API alternative base URL"
+    }
+  ],
+  "security": [
+    {
+      "AnaplanAuthToken": []
+    },
+    {
+      "BearerAuth": []
+    }
+  ],
+  "paths": {
+    "/integrations/connections": {
+      "get": {
+        "operationId": "getConnections",
+        "summary": "Get connections",
+        "description": "Minimum role: Restricted Integration User.\n\nRetrieve all connections available to the authenticated user.",
+        "responses": {
+          "200": {
+            "description": "List of connections."
+          },
+          "403": {
+            "description": ""
+          }
+        }
+      },
+      "post": {
+        "operationId": "createConnection",
+        "summary": "Create a connection",
+        "description": "Minimum role: Restricted Integration User.\n\nCreate a new connection to Amazon S3, Google BigQuery, or Azure Blob Storage for use in CloudWorks integrations.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "title": "Amazon S3 connection",
+                    "type": "object",
+                    "required": [
+                      "type",
+                      "body"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "AmazonS3"
+                        ],
+                        "description": "Connection type."
+                      },
+                      "body": {
+                        "type": "object",
+                        "required": [
+                          "name",
+                          "accessKeyId",
+                          "secretAccessKey",
+                          "bucketName"
+                        ],
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "description": "Unique connection name.",
+                            "example": "test_credentials_1"
+                          },
+                          "accessKeyId": {
+                            "type": "string",
+                            "description": "Amazon S3 Access Key ID.",
+                            "example": "ALMNW18ERR9QQ89SS00H"
+                          },
+                          "secretAccessKey": {
+                            "type": "string",
+                            "description": "Amazon S3 Secret Access Key."
+                          },
+                          "bucketName": {
+                            "type": "string",
+                            "description": "Amazon S3 bucket name.",
+                            "example": "samplebucket"
+                          },
+                          "roleArn": {
+                            "type": "string",
+                            "description": "Amazon S3 Role ARN (optional).",
+                            "example": "arn:aws:iam::123475742:role/sampleReadOnly"
+                          },
+                          "workspaceId": {
+                            "type": "string",
+                            "description": "Anaplan workspace ID. Required for restricted integration users \u2014 the workspace that contains this connection's model. Read it from that model's record: `GET /models/{modelId}` (`currentWorkspaceId`) in the Integration API, or `GET /models` matched by `name`, then take `currentWorkspaceId`. Must match the model's workspace.",
+                            "example": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "title": "Google BigQuery connection",
+                    "type": "object",
+                    "required": [
+                      "type",
+                      "body"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "GoogleBigQuery"
+                        ]
+                      },
+                      "body": {
+                        "type": "object",
+                        "required": [
+                          "name",
+                          "serviceAccountKey",
+                          "dataset"
+                        ],
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "description": "Unique connection name."
+                          },
+                          "serviceAccountKey": {
+                            "type": "object",
+                            "description": "Google service account key JSON.",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "example": "service_account"
+                              },
+                              "projectId": {
+                                "type": "string"
+                              },
+                              "privateKeyId": {
+                                "type": "string"
+                              },
+                              "privateKey": {
+                                "type": "string"
+                              },
+                              "clientEmail": {
+                                "type": "string"
+                              },
+                              "clientId": {
+                                "type": "string"
+                              },
+                              "authUri": {
+                                "type": "string"
+                              },
+                              "tokenUri": {
+                                "type": "string"
+                              },
+                              "authProviderX509CertUrl": {
+                                "type": "string"
+                              },
+                              "clientX509CertUrl": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "dataset": {
+                            "type": "string",
+                            "description": "BigQuery dataset name."
+                          },
+                          "workspaceId": {
+                            "type": "string",
+                            "description": "Anaplan workspace ID. Required for restricted integration users \u2014 the workspace that contains this connection's model. Read it from that model's record: `GET /models/{modelId}` (`currentWorkspaceId`) in the Integration API, or `GET /models` matched by `name`, then take `currentWorkspaceId`. Must match the model's workspace."
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "title": "Azure Blob Storage connection",
+                    "type": "object",
+                    "required": [
+                      "type",
+                      "body"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "AzureBlob"
+                        ]
+                      },
+                      "body": {
+                        "oneOf": [
+                          {
+                            "title": "SAS-based authentication",
+                            "type": "object",
+                            "required": [
+                              "name",
+                              "storageAccountName",
+                              "containerName",
+                              "auth_method",
+                              "sasToken"
+                            ],
+                            "properties": {
+                              "name": {
+                                "type": "string",
+                                "description": "Unique connection name."
+                              },
+                              "auth_method": {
+                                "type": "string",
+                                "enum": [
+                                  "SAS-based"
+                                ],
+                                "default": "SAS-based",
+                                "description": "Authentication method. `\"SAS-based\"` uses a Shared Access Signature token and is the backwards-compatible default. This field became required in a recent CloudWorks update that introduced OAuth 2.0 support."
+                              },
+                              "storageAccountName": {
+                                "type": "string",
+                                "description": "Azure Storage account name."
+                              },
+                              "sasToken": {
+                                "type": "string",
+                                "description": "Azure Shared Access Signature token. Required when `auth_method` is `\"SAS-based\"`."
+                              },
+                              "containerName": {
+                                "type": "string",
+                                "description": "Azure Blob container name."
+                              },
+                              "workspaceId": {
+                                "type": "string",
+                                "description": "Anaplan workspace ID. Required for restricted integration users \u2014 the workspace that contains this connection's model. Read it from that model's record: `GET /models/{modelId}` (`currentWorkspaceId`) in the Integration API, or `GET /models` matched by `name`, then take `currentWorkspaceId`. Must match the model's workspace."
+                              }
+                            }
+                          },
+                          {
+                            "title": "OAuth 2.0 authentication (property names unconfirmed)",
+                            "type": "object",
+                            "required": [
+                              "name",
+                              "storageAccountName",
+                              "containerName",
+                              "auth_method",
+                              "clientId",
+                              "clientSecret",
+                              "tenantId"
+                            ],
+                            "properties": {
+                              "name": {
+                                "type": "string",
+                                "description": "Unique connection name."
+                              },
+                              "auth_method": {
+                                "type": "string",
+                                "not": {
+                                  "enum": [
+                                    "SAS-based"
+                                  ]
+                                },
+                                "description": "Authentication method for OAuth 2.0. The Anaplan UI selects `\"Oauth2\"` for this variant, but the exact API-level value has not been confirmed via live testing. Must not be `\"SAS-based\"`."
+                              },
+                              "storageAccountName": {
+                                "type": "string",
+                                "description": "Azure Storage account name."
+                              },
+                              "containerName": {
+                                "type": "string",
+                                "description": "Azure Blob container name."
+                              },
+                              "clientId": {
+                                "type": "string",
+                                "description": "Azure app registration Client ID (from Microsoft Entra ID application Overview). Property name inferred from Anaplan UI docs \u2014 exact API key name unconfirmed."
+                              },
+                              "clientSecret": {
+                                "type": "string",
+                                "description": "Azure app registration client secret (from Certificates & secrets). Property name inferred from Anaplan UI docs \u2014 exact API key name unconfirmed."
+                              },
+                              "tenantId": {
+                                "type": "string",
+                                "description": "Azure Tenant ID (from Microsoft Entra ID application Overview). Property name inferred from Anaplan UI docs \u2014 exact API key name unconfirmed."
+                              },
+                              "workspaceId": {
+                                "type": "string",
+                                "description": "Anaplan workspace ID. Required for restricted integration users \u2014 the workspace that contains this connection's model. Read it from that model's record: `GET /models/{modelId}` (`currentWorkspaceId`) in the Integration API, or `GET /models` matched by `name`, then take `currentWorkspaceId`. Must match the model's workspace."
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Connection created."
+          },
+          "400": {
+            "description": ""
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/integrations/connections/{connectionId}": {
+      "parameters": [
+        {
+          "name": "connectionId",
+          "in": "path",
+          "description": "Connection identifier. From `GET /integrations/connections`.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "put": {
+        "operationId": "editConnection",
+        "summary": "Edit a connection",
+        "description": "Minimum role: Restricted Integration User.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "Updated connection details. Shape mirrors the create request body for the relevant connection type."
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": ""
+          },
+          "403": {
+            "description": ""
+          },
+          "404": {
+            "description": ""
+          }
+        }
+      },
+      "patch": {
+        "operationId": "patchConnection",
+        "summary": "Patch a connection",
+        "description": "Minimum role: Restricted Integration User.\n\nPartially update one or more fields of an existing connection.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "Fields to update. Only supplied fields are modified."
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": ""
+          },
+          "403": {
+            "description": ""
+          },
+          "404": {
+            "description": ""
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteConnection",
+        "summary": "Delete a connection",
+        "description": "Minimum role: Restricted Integration User.",
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "403": {
+            "description": ""
+          },
+          "404": {
+            "description": ""
+          },
+          "409": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/integrations": {
+      "get": {
+        "operationId": "getIntegrations",
+        "summary": "Get all integrations",
+        "description": "Minimum role: Restricted Integration User.\n\nRetrieve all integrations. Returns 25 integrations if `offset` and `limit` are not provided.",
+        "parameters": [
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Number of items to skip. First element is 0.",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 0
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Number of integrations to return.",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 10
+          },
+          {
+            "name": "myIntegrations",
+            "in": "query",
+            "description": "Set to `1` to return only the current user's integrations.",
+            "schema": {
+              "type": "integer",
+              "enum": [
+                0,
+                1
+              ]
+            }
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "description": "Sort field. Prefix with `-` for descending order. Example: `name` (ascending) or `-name` (descending).",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of integrations."
+          },
+          "403": {
+            "description": ""
+          }
+        }
+      },
+      "post": {
+        "operationId": "createIntegration",
+        "summary": "Create an integration",
+        "description": "Minimum role: Restricted Integration User.\n\nCreate a new import/export integration or process integration. For process integrations, include `processId` in the request body. The `jobs` array is required for import/export integrations and optional (0 or more) for process integrations.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "version",
+                  "workspaceId",
+                  "modelId"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Integration name.",
+                    "example": "sample import integration"
+                  },
+                  "version": {
+                    "type": "string",
+                    "description": "Schema version. Must be `2.0`.",
+                    "enum": [
+                      "2.0"
+                    ]
+                  },
+                  "workspaceId": {
+                    "type": "string",
+                    "description": "Anaplan workspace ID \u2014 the workspace that contains this call's model. Read it from that model's record: `GET /models/{modelId}` (`currentWorkspaceId`) in the Integration API, or `GET /models` matched by `name`, then take `currentWorkspaceId`. Must match the model's workspace.",
+                    "example": "8a80db657068fjef01718955f3b3390b"
+                  },
+                  "modelId": {
+                    "type": "string",
+                    "description": "Anaplan model ID. From `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2) (`models[].id`).",
+                    "example": "E559BFF3B1GD4RKE874P745BEL259711"
+                  },
+                  "processId": {
+                    "type": "string",
+                    "description": "Anaplan process ID. Required for process integrations. From `GET /models/{modelId}/processes` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2) (`processes[].id`).",
+                    "example": "118000000001"
+                  },
+                  "nuxVisible": {
+                    "type": "boolean",
+                    "description": "Whether the integration is visible in the CloudWorks UI.",
+                    "default": false
+                  },
+                  "jobs": {
+                    "type": "array",
+                    "description": "Import/export job definitions. Required for import/export integrations; optional for process integrations.",
+                    "items": {
+                      "$ref": "#/components/schemas/Job"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Integration created."
+          },
+          "400": {
+            "description": ""
+          },
+          "403": {
+            "description": ""
+          },
+          "409": {
+            "description": ""
+          },
+          "500": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/integrations/{integrationId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/IntegrationId"
+        }
+      ],
+      "get": {
+        "operationId": "getIntegrationById",
+        "summary": "Get integration by ID",
+        "description": "Minimum role: Restricted Integration User.",
+        "responses": {
+          "200": {
+            "description": "Integration details."
+          },
+          "403": {
+            "description": ""
+          },
+          "404": {
+            "description": ""
+          }
+        }
+      },
+      "put": {
+        "operationId": "editIntegration",
+        "summary": "Edit an integration",
+        "description": "Minimum role: Restricted Integration User.\n\nFull update of an integration or process integration. The request body replaces all editable fields.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "version",
+                  "workspaceId",
+                  "modelId"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "version": {
+                    "type": "string",
+                    "enum": [
+                      "2.0"
+                    ]
+                  },
+                  "workspaceId": {
+                    "type": "string",
+                    "description": "Anaplan workspace ID \u2014 the workspace that contains this call's model. Read it from that model's record: `GET /models/{modelId}` (`currentWorkspaceId`) in the Integration API, or `GET /models` matched by `name`, then take `currentWorkspaceId`. Must match the model's workspace."
+                  },
+                  "modelId": {
+                    "type": "string",
+                    "description": "Anaplan model ID. From `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2) (`models[].id`)."
+                  },
+                  "processId": {
+                    "type": "string",
+                    "description": "Anaplan process ID. Required for process integrations. From `GET /models/{modelId}/processes` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2) (`processes[].id`)."
+                  },
+                  "nuxVisible": {
+                    "type": "boolean"
+                  },
+                  "jobs": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Job"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": ""
+          },
+          "403": {
+            "description": ""
+          },
+          "404": {
+            "description": ""
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteIntegration",
+        "summary": "Delete an integration",
+        "description": "Minimum role: Restricted Integration User.",
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "403": {
+            "description": ""
+          },
+          "404": {
+            "description": ""
+          },
+          "500": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/integrations/anaplanModels/{modelId}": {
+      "parameters": [
+        {
+          "name": "modelId",
+          "in": "path",
+          "description": "Anaplan model ID. From `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2).",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "getIntegrationsByModel",
+        "summary": "Get integrations by model ID",
+        "description": "Minimum role: Restricted Integration User.\n\n**Deprecated:** This endpoint is no longer served \u2014 it returns an HTTP 404 from the gateway for any modelId, under every role. Retained in the spec for historical completeness; do not call it. See cloudworks/README.md for details.",
+        "responses": {
+          "200": {
+            "description": "Integrations associated with the model."
+          },
+          "403": {
+            "description": ""
+          },
+          "404": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/integrations/{integrationId}/run": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/IntegrationId"
+        }
+      ],
+      "post": {
+        "operationId": "runIntegration",
+        "summary": "Run an integration",
+        "description": "Minimum role: Restricted Integration User.",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "No request body required."
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Integration run started."
+          },
+          "403": {
+            "description": ""
+          },
+          "404": {
+            "description": ""
+          },
+          "409": {
+            "description": ""
+          },
+          "500": {
+            "description": ""
+          },
+          "503": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/integrations/{integrationId}/cancel": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/IntegrationId"
+        }
+      ],
+      "post": {
+        "operationId": "cancelIntegration",
+        "summary": "Cancel a running integration",
+        "description": "Minimum role: Restricted Integration User.",
+        "responses": {
+          "200": {
+            "description": "Integration cancelled."
+          },
+          "403": {
+            "description": ""
+          },
+          "404": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/integrations/{integrationId}/schedule": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/IntegrationId"
+        }
+      ],
+      "post": {
+        "operationId": "createSchedule",
+        "summary": "Create an integration schedule",
+        "description": "Minimum role: Restricted Integration User.\n\nCreate a schedule for an integration. Supports a maximum of one schedule per integration. Schedule types: `weekly`, `daily`, `hourly`, `monthly_specific_day`, `monthly_relative_weekday`.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "schedule"
+                ],
+                "properties": {
+                  "integrationId": {
+                    "type": "string",
+                    "description": "Integration ID (may be included in body as well as path). From `GET /integrations` (`integrations[].integrationId`)."
+                  },
+                  "schedule": {
+                    "$ref": "#/components/schemas/Schedule"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": ""
+          },
+          "403": {
+            "description": ""
+          },
+          "404": {
+            "description": ""
+          }
+        }
+      },
+      "put": {
+        "operationId": "updateSchedule",
+        "summary": "Update an integration schedule",
+        "description": "Minimum role: Restricted Integration User.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "schedule"
+                ],
+                "properties": {
+                  "schedule": {
+                    "$ref": "#/components/schemas/Schedule"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": ""
+          },
+          "403": {
+            "description": ""
+          },
+          "404": {
+            "description": ""
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteSchedule",
+        "summary": "Delete an integration schedule",
+        "description": "Minimum role: Restricted Integration User.",
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "403": {
+            "description": ""
+          },
+          "404": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/integrations/{integrationId}/schedule/status/{status}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/IntegrationId"
+        },
+        {
+          "name": "status",
+          "in": "path",
+          "description": "Desired schedule status.",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "enabled",
+              "disabled"
+            ]
+          }
+        }
+      ],
+      "post": {
+        "operationId": "setScheduleStatus",
+        "summary": "Set schedule status",
+        "description": "Minimum role: Restricted Integration User.\n\nEnable or disable the schedule for an integration.",
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "403": {
+            "description": ""
+          },
+          "404": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/integrations/runs/{integrationId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/IntegrationId"
+        }
+      ],
+      "get": {
+        "operationId": "getRunHistory",
+        "summary": "Get integration run history",
+        "description": "Minimum role: Restricted Integration User.",
+        "parameters": [
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Number of items to skip. First element is 0.",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "example": 0
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Number of run records to return.",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "example": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Run history."
+          },
+          "403": {
+            "description": ""
+          },
+          "404": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/integrations/runerror/{runId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/RunId"
+        }
+      ],
+      "get": {
+        "operationId": "getRunErrors",
+        "summary": "Get integration run errors",
+        "description": "Minimum role: Restricted Integration User.",
+        "responses": {
+          "200": {
+            "description": "Run error details."
+          },
+          "403": {
+            "description": ""
+          },
+          "404": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/integrations/notification": {
+      "post": {
+        "operationId": "createNotification",
+        "summary": "Create a notification configuration",
+        "description": "Minimum role: Restricted Integration User.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NotificationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Notification configuration created."
+          },
+          "400": {
+            "description": ""
+          },
+          "403": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/integrations/notification/{notificationId}": {
+      "parameters": [
+        {
+          "name": "notificationId",
+          "in": "path",
+          "description": "Notification configuration identifier. From `GET /integrations/notification`, or the `notificationId` field on each item of `GET /integrations`.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "getNotification",
+        "summary": "Get a notification configuration",
+        "description": "Minimum role: Restricted Integration User.",
+        "responses": {
+          "200": {
+            "description": "Notification configuration."
+          },
+          "403": {
+            "description": ""
+          },
+          "404": {
+            "description": ""
+          }
+        }
+      },
+      "put": {
+        "operationId": "editNotification",
+        "summary": "Edit a notification configuration",
+        "description": "Minimum role: Restricted Integration User.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NotificationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": ""
+          },
+          "403": {
+            "description": ""
+          },
+          "404": {
+            "description": ""
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteNotification",
+        "summary": "Delete a notification configuration",
+        "description": "Minimum role: Restricted Integration User.",
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "403": {
+            "description": ""
+          },
+          "404": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/integrations/run/{runId}/dumps": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/RunId"
+        }
+      ],
+      "get": {
+        "operationId": "getImportErrorLog",
+        "summary": "Get an import error log",
+        "description": "Minimum role: Restricted Integration User.\n\nRetrieve the import error log (dump file) for a specific run. The response body contains a CSV-formatted error log.",
+        "responses": {
+          "200": {
+            "description": "Import error log."
+          },
+          "403": {
+            "description": ""
+          },
+          "404": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/integrations/run/{runId}/process/import/{actionId}/dumps": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/RunId"
+        },
+        {
+          "name": "actionId",
+          "in": "path",
+          "description": "Anaplan action ID of the import step whose error log to fetch. Because this endpoint returns an import error log, the action is always an import: from `GET /models/{modelId}/imports` (`imports[].id`) in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2).",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "getProcessErrorLog",
+        "summary": "Get a process error log",
+        "description": "Minimum role: Restricted Integration User.\n\nRetrieve the process import error log (dump file) for a specific run and action.",
+        "responses": {
+          "200": {
+            "description": "Process error log."
+          },
+          "403": {
+            "description": ""
+          },
+          "404": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/integrationflows": {
+      "get": {
+        "operationId": "getIntegrationFlows",
+        "summary": "Get all integration flows",
+        "description": "Minimum role: Restricted Integration User.",
+        "parameters": [
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Number of items to skip.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Number of flows to return.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of integration flows."
+          },
+          "403": {
+            "description": ""
+          }
+        }
+      },
+      "post": {
+        "operationId": "createIntegrationFlow",
+        "summary": "Create an integration flow",
+        "description": "Minimum role: Restricted Integration User.\n\nCreate a new multi-step integration flow. Requires at least two enabled steps.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "version",
+                  "type",
+                  "steps"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Name of the integration flow.",
+                    "example": "test-integration-flow-name"
+                  },
+                  "version": {
+                    "type": "string",
+                    "enum": [
+                      "2.0"
+                    ]
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "IntegrationFlow"
+                    ]
+                  },
+                  "steps": {
+                    "type": "array",
+                    "description": "Flow steps. Minimum 2 items.",
+                    "minItems": 2,
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "type",
+                        "referrer",
+                        "isSkipped",
+                        "exceptionBehavior"
+                      ],
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "description": "Step resource type.",
+                          "enum": [
+                            "Integration"
+                          ]
+                        },
+                        "referrer": {
+                          "type": "string",
+                          "description": "The integration ID that this step references."
+                        },
+                        "dependsOn": {
+                          "type": "array",
+                          "description": "IDs of steps this step depends on.",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "isSkipped": {
+                          "type": "boolean",
+                          "description": "Whether to skip this step.",
+                          "default": false
+                        },
+                        "exceptionBehavior": {
+                          "type": "array",
+                          "description": "Defines flow behavior when this step fails or partially succeeds.",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "failure",
+                                  "partial_success"
+                                ]
+                              },
+                              "strategy": {
+                                "type": "string",
+                                "enum": [
+                                  "stop",
+                                  "continue"
+                                ],
+                                "description": "Default for `failure` is `stop`; default for `partial_success` is `continue`."
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Integration flow created."
+          },
+          "400": {
+            "description": ""
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/integrationflows/{integrationFlowId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/IntegrationFlowId"
+        }
+      ],
+      "get": {
+        "operationId": "getIntegrationFlowById",
+        "summary": "Get an integration flow by ID",
+        "description": "Minimum role: Restricted Integration User.",
+        "responses": {
+          "200": {
+            "description": "Integration flow details including all step definitions."
+          },
+          "403": {
+            "description": ""
+          },
+          "404": {
+            "description": ""
+          }
+        }
+      },
+      "put": {
+        "operationId": "editIntegrationFlow",
+        "summary": "Edit an integration flow",
+        "description": "Minimum role: Restricted Integration User.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "Updated integration flow. Shape mirrors the create request body."
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": ""
+          },
+          "403": {
+            "description": ""
+          },
+          "404": {
+            "description": ""
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteIntegrationFlow",
+        "summary": "Delete an integration flow",
+        "description": "Minimum role: Restricted Integration User.",
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "403": {
+            "description": ""
+          },
+          "404": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/integrationflows/{integrationFlowId}/run": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/IntegrationFlowId"
+        }
+      ],
+      "post": {
+        "operationId": "runIntegrationFlow",
+        "summary": "Run an integration flow",
+        "description": "Minimum role: Restricted Integration User.",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "stepsToRun": {
+                    "type": "array",
+                    "description": "Optional subset of step IDs to run. If omitted, all steps run.",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Integration flow run started."
+          },
+          "400": {
+            "description": ""
+          },
+          "403": {
+            "description": ""
+          },
+          "404": {
+            "description": ""
+          },
+          "409": {
+            "description": ""
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Job": {
+        "type": "object",
+        "required": [
+          "type",
+          "sources",
+          "targets"
+        ],
+        "description": "An import or export job within an integration.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "AmazonS3ToAnaplan",
+              "AnaplanToAmazonS3",
+              "GoogleBigQueryToAnaplan",
+              "AnaplanToGoogleBigQuery",
+              "AzureBlobToAnaplan",
+              "AnaplanToAzureBlob"
+            ]
+          },
+          "sources": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "AmazonS3",
+                    "GoogleBigQuery",
+                    "AzureBlob",
+                    "Anaplan"
+                  ]
+                },
+                "connectionId": {
+                  "type": "string",
+                  "description": "32-character lowercase hex connection ID. Present when source is a cloud storage type. From `GET /integrations/connections` (`connections[].connectionId`)."
+                },
+                "file": {
+                  "type": "string",
+                  "description": "File path within the cloud storage container."
+                },
+                "table": {
+                  "type": "string",
+                  "description": "BigQuery table name. Present when source is GoogleBigQuery."
+                },
+                "actionId": {
+                  "type": "string",
+                  "description": "Numeric string Anaplan action ID, in the generic sense \u2014 an import, an export, or a (delete/sort/etc.) action. Present when source is Anaplan. Depending on the action type, from `GET /models/{modelId}/imports` (`imports[].id`), `GET /models/{modelId}/exports` (`exports[].id`), or `GET /models/{modelId}/actions` (`actions[].id`) in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2)."
+                },
+                "connectionName": {
+                  "description": "Display name of the connection (read-only, present in GET responses).",
+                  "type": "string"
+                },
+                "isConnectionDeleted": {
+                  "description": "True if the referenced connection has been deleted (read-only, present in GET responses).",
+                  "type": "boolean"
+                },
+                "bucketName": {
+                  "description": "Container or bucket name for the cloud storage connection (read-only, present in GET responses). Named `bucketName` regardless of connection type \u2014 represents the Azure Blob container name for AzureBlob connections.",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "targets": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "Anaplan",
+                    "AmazonS3",
+                    "GoogleBigQuery",
+                    "AzureBlob"
+                  ]
+                },
+                "actionId": {
+                  "type": "string",
+                  "description": "Numeric string Anaplan action ID, in the generic sense \u2014 an import, an export, or a (delete/sort/etc.) action. Present when target is Anaplan. Depending on the action type, from `GET /models/{modelId}/imports` (`imports[].id`), `GET /models/{modelId}/exports` (`exports[].id`), or `GET /models/{modelId}/actions` (`actions[].id`) in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2)."
+                },
+                "fileId": {
+                  "type": "string",
+                  "description": "Anaplan file ID. Present when target is Anaplan. From `GET /models/{modelId}/files` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2) (`files[].id`)."
+                },
+                "connectionId": {
+                  "type": "string",
+                  "description": "32-character lowercase hex connection ID. Present when target is a cloud storage type. From `GET /integrations/connections` (`connections[].connectionId`)."
+                },
+                "file": {
+                  "type": "string"
+                },
+                "table": {
+                  "type": "string"
+                },
+                "overwrite": {
+                  "type": "boolean"
+                },
+                "connectionName": {
+                  "description": "Display name of the connection (read-only, present in GET responses).",
+                  "type": "string"
+                },
+                "isConnectionDeleted": {
+                  "description": "True if the referenced connection has been deleted (read-only, present in GET responses).",
+                  "type": "boolean"
+                },
+                "bucketName": {
+                  "description": "Container or bucket name for the cloud storage connection (read-only, present in GET responses). Named `bucketName` regardless of connection type.",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "mapping": {
+            "type": "array",
+            "description": "Column mapping for BigQuery exports.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "sourceName": {
+                  "type": "string"
+                },
+                "targetName": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "NotificationRequest": {
+        "type": "object",
+        "required": [
+          "integrationIds",
+          "channels",
+          "notifications"
+        ],
+        "properties": {
+          "integrationIds": {
+            "type": "array",
+            "description": "Integration IDs to attach this notification to. Currently supports a single ID. From `GET /integrations` (`integrations[].integrationId`).",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b4"
+            ]
+          },
+          "channels": {
+            "type": "array",
+            "description": "Notification channels.",
+            "items": {
+              "type": "string",
+              "enum": [
+                "email",
+                "in_app"
+              ]
+            },
+            "example": [
+              "email",
+              "in_app"
+            ]
+          },
+          "notifications": {
+            "description": "Notification rules; each entry in config maps an outcome type to the users to notify.",
+            "type": "object",
+            "required": [
+              "config"
+            ],
+            "properties": {
+              "config": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "description": "The integration outcome that triggers notification: success, partial_failure, or full_failure.",
+                      "type": "string",
+                      "enum": [
+                        "success",
+                        "partial_failure",
+                        "full_failure"
+                      ]
+                    },
+                    "users": {
+                      "type": "array",
+                      "description": "User GUIDs to notify.",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "Schedule": {
+        "type": "object",
+        "required": [
+          "name",
+          "type",
+          "startDate",
+          "endDate",
+          "timezone"
+        ],
+        "description": "Schedule definition. Required fields vary by `type`.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "test schedule"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "weekly",
+              "daily",
+              "hourly",
+              "monthly_specific_day",
+              "monthly_relative_weekday"
+            ]
+          },
+          "time": {
+            "type": "string",
+            "description": "Run time in HH:MM format. Required for `weekly`, `daily`, `monthly_specific_day`, `monthly_relative_weekday`.",
+            "example": "12:45"
+          },
+          "fromTime": {
+            "type": "string",
+            "description": "Start of hourly window in HH:MM format. Required for `hourly`.",
+            "example": "20:00"
+          },
+          "toTime": {
+            "type": "string",
+            "description": "End of hourly window in HH:MM format. Required for `hourly`.",
+            "example": "23:20"
+          },
+          "daysOfWeek": {
+            "type": "array",
+            "description": "Days of the week (0=Sunday). Required for `weekly`, `hourly`, `monthly_relative_weekday`.",
+            "items": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6
+            },
+            "example": [
+              0,
+              6
+            ]
+          },
+          "dayOfMonth": {
+            "type": "integer",
+            "description": "Day of the month (1\u201331). Required for `monthly_specific_day`.",
+            "minimum": 1,
+            "maximum": 31,
+            "example": 12
+          },
+          "dayOfWeek": {
+            "type": "integer",
+            "description": "Day of the week (0=Sunday). Required for `monthly_relative_weekday`.",
+            "minimum": 0,
+            "maximum": 6
+          },
+          "repeatEvery": {
+            "type": "integer",
+            "description": "Repeat interval. Required for `monthly_relative_weekday` (nth weekday of month) and `hourly` (every N hours).",
+            "example": 2
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Schedule start date.",
+            "example": "2020-07-03"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Schedule end date.",
+            "example": "2020-12-01"
+          },
+          "timezone": {
+            "type": "string",
+            "description": "IANA timezone name.",
+            "example": "Europe/Paris"
+          },
+          "status": {
+            "description": "Schedule enabled/disabled state. Present in GET responses; not required in create/update requests.",
+            "type": "string",
+            "enum": [
+              "Active",
+              "Inactive"
+            ]
+          }
+        }
+      }
+    },
+    "parameters": {
+      "RunId": {
+        "name": "runId",
+        "in": "path",
+        "description": "Integration run identifier \u2014 the `id` of each entry under `history_of_runs.runs` in `GET /integrations/runs/{integrationId}`.",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "IntegrationFlowId": {
+        "name": "integrationFlowId",
+        "in": "path",
+        "description": "Integration flow identifier. From `GET /integrationflows`.",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "IntegrationId": {
+        "name": "integrationId",
+        "in": "path",
+        "description": "Integration identifier \u2014 the `integrationId` field of each item in `GET /integrations` (not `id`).",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      }
+    },
+    "securitySchemes": {
+      "AnaplanAuthToken": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "Anaplan authentication token. Format: `AnaplanAuthToken {token}`"
+      },
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  }
+}

@@ -5886,7 +5886,9 @@ components:
     WorkspaceId:
       name: workspaceId
       in: path
-      description: Workspace identifier (32-character lowercase hex string). From `GET /workspaces`.
+      description: Workspace identifier (32-char lowercase hex). When the path also has a `modelId`, use that model's `currentWorkspaceId`
+        (`GET /models/{modelId}`, or `GET /models` matched by `name`). For workspace-only endpoints, scan `GET /workspaces`
+        by `name`.
       required: true
       schema:
         type: string
