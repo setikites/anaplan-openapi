@@ -1536,8 +1536,11 @@ components:
                   in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2).
               fileId:
                 type: string
-                description: Anaplan file ID. Present when target is Anaplan. From `GET /models/{modelId}/files` in the [Integration
-                  API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2) (`files[].id`).
+                description: Anaplan file ID. Present when target is Anaplan. For an import (`*ToAnaplan`), this is the file
+                  the import action reads — from that import's metadata via `GET /models/{modelId}/imports/{importId}` (`importDataSourceId`)
+                  in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2),
+                  not the model-wide `GET /models/{modelId}/files` list. For an export (`AnaplanTo*`), the file is identified
+                  by the export action itself — `fileId` equals the `exportId`, with no separate file lookup.
               connectionId:
                 type: string
                 description: 32-character lowercase hex connection ID. Present when target is a cloud storage type. From `GET
