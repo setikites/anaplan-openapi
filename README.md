@@ -5,7 +5,7 @@ Anaplan REST APIs.
 
 Anaplan's official API documentation is spread across an outdated
 Apiary site and a new Postman collection, without detailed
-machind-readable OpenAPI specs. This project fills that gap: accurate,
+machine-readable OpenAPI specs. This project fills that gap: accurate,
 testable OpenAPI 3.0 specs you can feed directly to code generators,
 MCP server tooling, and your own documentation.
 

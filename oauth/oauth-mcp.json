@@ -1,0 +1,334 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Anaplan OAuth 2.0 Service API",
+    "version": "1.0.0",
+    "description": "Anaplan's OAuth 2.0 service supports two authorization flows: Authorization Code Grant (supports SSO/SAML and basic authentication) and Device Authorization Grant (basic authentication only). Use these endpoints to obtain access tokens, ID tokens, and refresh tokens for Anaplan APIs."
+  },
+  "servers": [
+    {
+      "url": "https://us1a.app.anaplan.com",
+      "description": "US1 (Data Center - US East), US2 (Data Center - US West), US5 (Cloud - US East), US7 (Cloud - US), AP1 (Cloud - Japan), EU1 (Data Center - Netherlands), EU2 (Data Center - Germany), EU4 (Cloud - Europe)"
+    },
+    {
+      "url": "https://us9.app.anaplan.com",
+      "description": "US9 (Cloud - US)"
+    },
+    {
+      "url": "https://eu3.app.anaplan.com",
+      "description": "EU3 (Cloud - Europe)"
+    },
+    {
+      "url": "https://eu5.app.anaplan.com",
+      "description": "EU5 (Cloud - Europe)"
+    },
+    {
+      "url": "https://gb1.app.anaplan.com",
+      "description": "GB1 (Cloud - UK)"
+    },
+    {
+      "url": "https://ca1a.app.anaplan.com",
+      "description": "CA1 (Cloud - Canada)"
+    },
+    {
+      "url": "https://sg1.app.anaplan.com",
+      "description": "SG1 (Cloud - Singapore)"
+    },
+    {
+      "url": "https://ae1.app.anaplan.com",
+      "description": "AE1 (Cloud - UAE)"
+    },
+    {
+      "url": "https://me1.app.anaplan.com",
+      "description": "ME1 (Cloud - Saudi Arabia)"
+    },
+    {
+      "url": "https://in1.app.anaplan.com",
+      "description": "IN1 (Cloud - India)"
+    },
+    {
+      "url": "https://id1.app.anaplan.com",
+      "description": "ID1 (Cloud - Indonesia)"
+    },
+    {
+      "url": "https://au1a.app2.anaplan.com",
+      "description": "AU1 (Cloud - Australia)"
+    }
+  ],
+  "security": [],
+  "paths": {
+    "/auth/authorize": {
+      "get": {
+        "operationId": "authorizeAuthCode",
+        "summary": "Initiate Authorization Code Grant",
+        "description": "Minimum role: None.\n\nRedirects the user's browser to the Anaplan login page to begin the Authorization Code flow. On successful authentication, the browser is redirected to `redirect_uri` with an authorization `code` query parameter. Exchange that code for tokens via `POST /oauth/token`.\n\n**SSO:** If the user's workspace enforces SAML SSO, this endpoint initiates the SSO login. SSO is not available via the Device Authorization Grant flow.\n\n**Note:** This endpoint does not accept an Authorization header. Authentication occurs interactively via the browser redirect.\n\n**Implementation note:** The `anaplan-sdk` library uses `GET /auth/prelogin` (same query parameters) as its `authorization_url` instead of this endpoint. `/auth/prelogin` returns the login page HTML directly (200) whereas `/auth/authorize` returns a 302 redirect to it. Both paths are valid entry points for the Authorization Code flow.",
+        "parameters": [
+          {
+            "name": "response_type",
+            "in": "query",
+            "description": "Must be `code` to initiate the Authorization Code flow.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "code"
+              ]
+            }
+          },
+          {
+            "name": "client_id",
+            "in": "query",
+            "description": "Your application's OAuth client ID, found in Anaplan Administration > OAuth.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4",
+              "pattern": "^[0-9a-f]{32}$"
+            }
+          },
+          {
+            "name": "redirect_uri",
+            "in": "query",
+            "description": "Callback URL. Must match the redirect URI registered for this client in Anaplan Administration.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uri",
+              "example": "https://www.example.com/callback"
+            }
+          },
+          {
+            "name": "scope",
+            "in": "query",
+            "description": "Space-separated list of requested scopes.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "openid profile email offline_access"
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "description": "Opaque value used to protect against CSRF attacks. The authorization server returns this value unchanged in the redirect.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "CCFKPwXcnMsQ5UAfQmPRfqyIPvpghT"
+            }
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "Redirect to the Anaplan login page. On successful user authentication, the browser is redirected to `redirect_uri?code={authorization_code}&state={state}`."
+          },
+          "400": {
+            "description": ""
+          },
+          "401": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/oauth/device/code": {
+      "post": {
+        "operationId": "requestDeviceCode",
+        "summary": "Request Device Authorization Code",
+        "description": "Minimum role: None.\n\nStarts the Device Authorization flow. The client sends its `client_id` and requested `scope`. The response contains a `device_code` (for polling) and a `user_code` the user must enter at `verification_uri` to approve access.\n\nAfter receiving this response, the client polls `POST /oauth/token` with `grant_type: urn:ietf:params:oauth:grant-type:device_code` at the `interval` frequency until the user approves or the code expires.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "client_id"
+                ],
+                "properties": {
+                  "client_id": {
+                    "type": "string",
+                    "example": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4",
+                    "pattern": "^[0-9a-f]{32}$",
+                    "description": "Your device grant OAuth client ID."
+                  },
+                  "scope": {
+                    "type": "string",
+                    "example": "openid profile email offline_access",
+                    "description": "Space-separated list of requested scopes. Optional - the server applies a default scope if omitted (RFC 8628)."
+                  },
+                  "audience": {
+                    "type": "string",
+                    "description": "Target audience for the issued token. Optional.",
+                    "example": "https://api.anaplan.com"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Device authorization started. Display `user_code` and `verification_uri` to the user and poll `POST /oauth/token` until approval or expiry."
+          },
+          "400": {
+            "description": ""
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/oauth/token": {
+      "post": {
+        "operationId": "issueToken",
+        "summary": "Exchange Code or Refresh Token for Access Token",
+        "description": "Minimum role: None.\n\nIssues access tokens, ID tokens, and refresh tokens. Supports three grant types:\n\n- **`authorization_code`**: Exchange the code from `GET /auth/authorize` for tokens. Requires `client_secret`.\n- **`urn:ietf:params:oauth:grant-type:device_code`**: Poll during the Device Authorization flow. Returns `authorization_pending` while awaiting user approval; returns tokens once approved. If polling too fast, returns `slow_down`.\n- **`refresh_token`**: Obtain a new access token from a valid refresh token. `client_secret` required for Authorization Code clients; omit for Device Grant clients.\n\nRefresh tokens may be rotatable (new refresh token issued on each use, 30-day rotation) or non-rotatable, depending on client configuration.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/AuthCodePayload"
+                  },
+                  {
+                    "$ref": "#/components/schemas/DevicePayload"
+                  },
+                  {
+                    "$ref": "#/components/schemas/RefreshPayload"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Tokens issued successfully."
+          },
+          "400": {
+            "description": ""
+          },
+          "401": {
+            "description": ""
+          },
+          "403": {
+            "description": ""
+          },
+          "500": {
+            "description": ""
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AuthCodePayload": {
+        "type": "object",
+        "required": [
+          "grant_type",
+          "code",
+          "client_id",
+          "client_secret",
+          "redirect_uri"
+        ],
+        "properties": {
+          "grant_type": {
+            "type": "string",
+            "enum": [
+              "authorization_code"
+            ]
+          },
+          "code": {
+            "type": "string",
+            "example": "M5mbhGs5Xy7f5ptGYe_Mt8Enh18bCencyV2K70VMpRVmn",
+            "description": "Authorization code received from the `GET /auth/authorize` redirect callback."
+          },
+          "client_id": {
+            "type": "string",
+            "example": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4",
+            "pattern": "^[0-9a-f]{32}$",
+            "description": "Your application's OAuth client ID."
+          },
+          "client_secret": {
+            "type": "string",
+            "example": "XPkIavE7K0d",
+            "description": "Your application's client secret, found in Anaplan Administration > OAuth."
+          },
+          "redirect_uri": {
+            "type": "string",
+            "format": "uri",
+            "example": "https://www.example.com/callback",
+            "description": "Must exactly match the redirect URI used in the `GET /auth/authorize` request."
+          }
+        }
+      },
+      "DevicePayload": {
+        "type": "object",
+        "required": [
+          "grant_type",
+          "device_code",
+          "client_id"
+        ],
+        "properties": {
+          "grant_type": {
+            "type": "string",
+            "enum": [
+              "urn:ietf:params:oauth:grant-type:device_code"
+            ]
+          },
+          "device_code": {
+            "type": "string",
+            "example": "_XPkIavE7K0d-28sD6-TapQ",
+            "description": "`device_code` received from the `POST /oauth/device/code` response."
+          },
+          "client_id": {
+            "type": "string",
+            "example": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4",
+            "pattern": "^[0-9a-f]{32}$",
+            "description": "Your device grant OAuth client ID."
+          }
+        }
+      },
+      "RefreshPayload": {
+        "type": "object",
+        "required": [
+          "grant_type",
+          "client_id",
+          "refresh_token"
+        ],
+        "properties": {
+          "grant_type": {
+            "type": "string",
+            "enum": [
+              "refresh_token"
+            ]
+          },
+          "client_id": {
+            "type": "string",
+            "example": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4",
+            "pattern": "^[0-9a-f]{32}$",
+            "description": "Your application's OAuth client ID."
+          },
+          "refresh_token": {
+            "type": "string",
+            "example": "PuheeaOPVlO_MvWif11qWhvQFRfh2KyGpVioOS_7EdgyC",
+            "description": "Refresh token from a prior `POST /oauth/token` response (`refresh_token`)."
+          },
+          "client_secret": {
+            "type": "string",
+            "example": "XPkIavE7K0d",
+            "description": "Client secret. Required for Authorization Code Grant clients; omit for Device Grant clients."
+          }
+        }
+      }
+    }
+  }
+}

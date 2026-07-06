@@ -1,0 +1,733 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Application Lifecycle Management API",
+    "version": "1.0.0",
+    "description": "Anaplan ALM API for managing model revisions, sync tasks, and comparison reports."
+  },
+  "servers": [
+    {
+      "url": "https://api.anaplan.com/2/0",
+      "description": "US1, US2, US5, US7, EU1, EU2, EU4, AP1"
+    },
+    {
+      "url": "https://us9.api.anaplan.com/2/0",
+      "description": "US9"
+    },
+    {
+      "url": "https://eu3.api.anaplan.com/2/0",
+      "description": "EU3"
+    },
+    {
+      "url": "https://eu5.api.anaplan.com/2/0",
+      "description": "EU5"
+    },
+    {
+      "url": "https://gb1.api.anaplan.com/2/0",
+      "description": "GB1"
+    },
+    {
+      "url": "https://ca1a.api.anaplan.com/2/0",
+      "description": "CA1"
+    },
+    {
+      "url": "https://sg1.api.anaplan.com/2/0",
+      "description": "SG1"
+    },
+    {
+      "url": "https://ae1.api.anaplan.com/2/0",
+      "description": "AE1"
+    },
+    {
+      "url": "https://in1.api.anaplan.com/2/0",
+      "description": "IN1"
+    },
+    {
+      "url": "https://id1.api.anaplan.com/2/0",
+      "description": "ID1"
+    },
+    {
+      "url": "https://me1.api.anaplan.com/2/0",
+      "description": "ME1"
+    },
+    {
+      "url": "https://au1a.api2.anaplan.com/2/0",
+      "description": "AU1"
+    }
+  ],
+  "security": [
+    {
+      "AnaplanAuthToken": []
+    },
+    {
+      "BearerAuth": []
+    }
+  ],
+  "paths": {
+    "/models/{modelId}/onlineStatus": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ModelId"
+        }
+      ],
+      "post": {
+        "operationId": "postModelOnlineStatus",
+        "summary": "Change a model's online status",
+        "description": "Minimum role: Workspace Administrator.\n\nSet a model online or offline. Returns 400 if the status value is invalid or the model is locked, 422 if the model is archived.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OnlineStatusRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Online status updated successfully."
+          },
+          "400": {
+            "description": "Invalid status value or model is locked."
+          },
+          "403": {
+            "description": "Forbidden. Caller lacks Workspace Administrator role."
+          },
+          "404": {
+            "description": "Model not found or caller has no access."
+          },
+          "422": {
+            "description": "Model is archived."
+          }
+        }
+      },
+      "put": {
+        "operationId": "putModelOnlineStatus",
+        "summary": "Change a model's online status (PUT)",
+        "description": "Minimum role: Workspace Administrator.\n\nSet a model online or offline. Identical semantics to POST.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OnlineStatusRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Online status updated successfully."
+          },
+          "400": {
+            "description": "Invalid status value or model is locked."
+          },
+          "403": {
+            "description": "Forbidden. Caller lacks Workspace Administrator role."
+          },
+          "404": {
+            "description": "Model not found or caller has no access."
+          },
+          "422": {
+            "description": "Model is archived."
+          }
+        }
+      }
+    },
+    "/models/{modelId}/alm/syncableRevisions": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ModelId"
+        }
+      ],
+      "get": {
+        "operationId": "getSyncableRevisions",
+        "summary": "Retrieve compatible source model revisions",
+        "description": "Minimum role: Workspace Administrator.\n\nReturns the list of revisions from the source model that are compatible with the target model, ordered by date descending. The caller must hold the Workspace Administrator role on both the source and target models.",
+        "parameters": [
+          {
+            "name": "sourceModelId",
+            "in": "query",
+            "description": "Model identifier (32-character uppercase hex string) of the source model whose revisions to evaluate. For a model already participating in ALM, a good choice is the **first** model in the `appliedToModels` list of its latest revision \u2014 the source model where its revisions are created. Find it with `GET /models/{modelId}/alm/latestRevision` (for the revision id), then `GET /models/{modelId}/alm/revisions/{revisionId}/appliedToModels` (`appliedToModels[].modelId`). Ultimately an Anaplan model ID from `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2).",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of compatible source model revisions."
+          },
+          "403": {
+            "description": "Forbidden. Caller lacks Workspace Administrator role on one or both models."
+          },
+          "404": {
+            "description": "Model not found or caller has no access."
+          }
+        }
+      }
+    },
+    "/models/{modelId}/alm/latestRevision": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ModelId"
+        }
+      ],
+      "get": {
+        "operationId": "getLatestRevision",
+        "summary": "Retrieve latest revision",
+        "description": "Minimum role: Workspace Administrator.\n\nReturns the most recent revision for the model, if one exists.",
+        "responses": {
+          "200": {
+            "description": "Latest revision, or an empty result if no revisions exist."
+          },
+          "403": {
+            "description": "Forbidden. Caller lacks Workspace Administrator role."
+          },
+          "404": {
+            "description": "Model not found or caller has no access."
+          }
+        }
+      }
+    },
+    "/models/{modelId}/alm/revisions": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ModelId"
+        }
+      ],
+      "get": {
+        "operationId": "getRevisions",
+        "summary": "Retrieve revisions in a model",
+        "description": "Minimum role: Workspace Administrator.\n\nReturns all revisions for the model with optional date filtering and pagination.",
+        "parameters": [
+          {
+            "name": "appliedAfter",
+            "in": "query",
+            "description": "Filter to revisions applied on or after this date (YYYY-MM-DD).",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "appliedBefore",
+            "in": "query",
+            "description": "Filter to revisions applied on or before this date (YYYY-MM-DD).",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Property name to sort by. Prefix with `-` for descending order.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of results to return.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Zero-based starting position for results.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated list of revisions."
+          },
+          "403": {
+            "description": "Forbidden. Caller lacks Workspace Administrator role."
+          },
+          "404": {
+            "description": "Model not found or caller has no access."
+          }
+        }
+      },
+      "post": {
+        "operationId": "createRevision",
+        "summary": "Create a revision",
+        "description": "Minimum role: Workspace Administrator.\n\nCreates a new revision for the model. The model must be in standard mode and have structural changes since the last revision.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RevisionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Revision created."
+          },
+          "400": {
+            "description": "name exceeds 60 characters or description exceeds 250 characters."
+          },
+          "403": {
+            "description": "Forbidden. Caller lacks Workspace Administrator role."
+          },
+          "404": {
+            "description": "Model not found or caller has no access."
+          },
+          "422": {
+            "description": "Model is archived."
+          }
+        }
+      }
+    },
+    "/models/{modelId}/alm/revisions/{revisionId}/appliedToModels": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ModelId"
+        },
+        {
+          "name": "revisionId",
+          "in": "path",
+          "description": "Revision identifier (32-character uppercase hex string). From `GET /models/{modelId}/alm/revisions`.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "getAppliedToModels",
+        "summary": "Retrieve the models for a specific revision",
+        "description": "Minimum role: Workspace Administrator.\n\nReturns all models that have had this revision applied. Deleted models are included with `modelDeleted: true`; their `modelName` and `workspaceId` are omitted.\n\nThe first model in this list is the source model where revisions are created. Any model in this list can be a `sourceModelId` for discovering this revision (using `GET /models/{modelId}/alm/syncableRevisions`) and syncing it (using `POST /models/{modelId}/alm/syncTasks`).",
+        "responses": {
+          "200": {
+            "description": "List of models the revision has been applied to."
+          },
+          "403": {
+            "description": "Forbidden. Caller lacks Workspace Administrator role."
+          },
+          "404": {
+            "description": "Model or revision not found."
+          }
+        }
+      }
+    },
+    "/models/{modelId}/alm/syncTasks": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ModelId"
+        }
+      ],
+      "get": {
+        "operationId": "getSyncTasks",
+        "summary": "Retrieve sync tasks for a model",
+        "description": "Minimum role: Workspace Administrator.\n\nReturns sync tasks that are in progress or completed within the last 48 hours. Up to ~20,000 results are retained per model before oldest tasks are removed.",
+        "responses": {
+          "200": {
+            "description": "List of sync tasks."
+          },
+          "403": {
+            "description": "Forbidden. Caller lacks Workspace Administrator role."
+          },
+          "404": {
+            "description": "Model not found or caller has no access."
+          }
+        }
+      },
+      "post": {
+        "operationId": "createSyncTask",
+        "summary": "Create a model sync task",
+        "description": "Minimum role: Workspace Administrator.\n\nInitiates a sync task to apply a source model revision to the target model.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SyncTaskRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Sync task created and running."
+          },
+          "400": {
+            "description": "Missing required fields in request body."
+          },
+          "403": {
+            "description": "Forbidden. Caller lacks Workspace Administrator role."
+          },
+          "404": {
+            "description": "Model not found or caller has no access."
+          },
+          "422": {
+            "description": "Model is archived."
+          }
+        }
+      }
+    },
+    "/models/{modelId}/alm/syncTasks/{syncTaskId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ModelId"
+        },
+        {
+          "name": "syncTaskId",
+          "in": "path",
+          "description": "Sync task identifier (32-character uppercase hex string). Returned by `POST /models/{modelId}/alm/syncTasks`.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "getSyncTask",
+        "summary": "Retrieve model sync task info",
+        "description": "Minimum role: Workspace Administrator.\n\nReturns the current status and result of a sync task. Task states: `IN_PROGRESS`, `COMPLETE`. On failure, `result.successful` is false and `result.error` contains details.",
+        "responses": {
+          "200": {
+            "description": "Sync task details."
+          },
+          "403": {
+            "description": "Forbidden. Caller lacks Workspace Administrator role."
+          },
+          "404": {
+            "description": "Model or sync task not found."
+          }
+        }
+      }
+    },
+    "/models/{modelId}/alm/comparisonReportTasks": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ModelId"
+        }
+      ],
+      "post": {
+        "operationId": "createComparisonReportTask",
+        "summary": "Create a full comparison report generation task",
+        "description": "Minimum role: Workspace Administrator.\n\nStarts an asynchronous task to generate a full comparison report between a source revision and a specified target revision (sourceRevisionId, sourceModelId and targetRevisionId are all required). Poll the task info endpoint to check progress. The caller must hold the Workspace Administrator role on both the source and target models.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportTaskRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Comparison report task created."
+          },
+          "403": {
+            "description": "Forbidden. Caller lacks Workspace Administrator role on one or both models."
+          },
+          "404": {
+            "description": "Model not found or caller has no access."
+          },
+          "422": {
+            "description": "Model is archived."
+          }
+        }
+      }
+    },
+    "/models/{modelId}/alm/comparisonReportTasks/{taskId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ModelId"
+        },
+        {
+          "$ref": "#/components/parameters/TaskId"
+        }
+      ],
+      "get": {
+        "operationId": "getComparisonReportTask",
+        "summary": "Retrieve full comparison report task info",
+        "description": "Minimum role: Workspace Administrator.\n\nReturns the status of a comparison report generation task. On success, `result.successful` is true and `result.reportFileUrl` contains the download URL. On failure, `result.error` contains title and messageText.",
+        "responses": {
+          "200": {
+            "description": "Comparison report task details."
+          },
+          "403": {
+            "description": "Forbidden."
+          },
+          "404": {
+            "description": "Model or task not found."
+          }
+        }
+      }
+    },
+    "/models/{modelId}/alm/comparisonReports/{targetRevisionId}/{sourceRevisionId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ModelId"
+        },
+        {
+          "$ref": "#/components/parameters/TargetRevisionId"
+        },
+        {
+          "$ref": "#/components/parameters/SourceRevisionId"
+        }
+      ],
+      "get": {
+        "operationId": "getComparisonReport",
+        "summary": "Retrieve full comparison report content",
+        "description": "Minimum role: Workspace Administrator.\n\nDownloads the full comparison report as a tab-separated values (TSV) file. The report is available for 48 hours after generation and includes sections for: Lists Added, Modules Added, Roles Changed, Changes Within Lists, and Line Items Added.",
+        "responses": {
+          "200": {
+            "description": "Comparison report file (TSV)."
+          },
+          "403": {
+            "description": "Forbidden."
+          },
+          "404": {
+            "description": "Report not found or has expired (reports expire after 48 hours)."
+          }
+        }
+      }
+    },
+    "/models/{modelId}/alm/summaryReportTasks": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ModelId"
+        }
+      ],
+      "post": {
+        "operationId": "createSummaryReportTask",
+        "summary": "Create a summary report generation task",
+        "description": "Minimum role: Workspace Administrator.\n\nStarts an asynchronous task to generate a summary report between a source revision and a specified target revision (sourceRevisionId, sourceModelId and targetRevisionId are all required). Poll the task info endpoint to check progress.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportTaskRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Summary report task created."
+          },
+          "403": {
+            "description": "Forbidden. Caller lacks Workspace Administrator role."
+          },
+          "404": {
+            "description": "Model not found or caller has no access."
+          },
+          "422": {
+            "description": "Model is archived."
+          }
+        }
+      }
+    },
+    "/models/{modelId}/alm/summaryReportTasks/{taskId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ModelId"
+        },
+        {
+          "$ref": "#/components/parameters/TaskId"
+        }
+      ],
+      "get": {
+        "operationId": "getSummaryReportTask",
+        "summary": "Retrieve summary report task info",
+        "description": "Minimum role: Workspace Administrator.\n\nReturns the status of a summary report generation task. On success, `result.successful` is true and `result.reportFileUrl` contains the download URL.",
+        "responses": {
+          "200": {
+            "description": "Summary report task details."
+          },
+          "403": {
+            "description": "Forbidden."
+          },
+          "404": {
+            "description": "Model or task not found."
+          }
+        }
+      }
+    },
+    "/models/{modelId}/alm/summaryReports/{targetRevisionId}/{sourceRevisionId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ModelId"
+        },
+        {
+          "$ref": "#/components/parameters/TargetRevisionId"
+        },
+        {
+          "$ref": "#/components/parameters/SourceRevisionId"
+        }
+      ],
+      "get": {
+        "operationId": "getSummaryReport",
+        "summary": "Retrieve summary report content",
+        "description": "Minimum role: Workspace Administrator.\n\nDownloads the summary report as JSON. The report is available for 48 hours after generation. Change types with zero differences are omitted. Properties within a change type are omitted if items were only created (not modified or deleted).",
+        "responses": {
+          "200": {
+            "description": "Summary report."
+          },
+          "403": {
+            "description": "Forbidden."
+          },
+          "404": {
+            "description": "Report not found or has expired (reports expire after 48 hours)."
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ReportTaskRequest": {
+        "type": "object",
+        "required": [
+          "sourceRevisionId",
+          "sourceModelId",
+          "targetRevisionId"
+        ],
+        "properties": {
+          "sourceRevisionId": {
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$",
+            "description": "Source revision identifier (32-character uppercase hex string). From `GET /models/{sourceModelId}/alm/revisions` (`revisions[].id`) \u2014 a revision of the source model, where `{sourceModelId}` is this body's `sourceModelId`."
+          },
+          "sourceModelId": {
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$",
+            "description": "Source model identifier (32-character uppercase hex string) of the model supplying the source revision. See the `sourceModelId` query parameter on `GET /models/{modelId}/alm/syncableRevisions` for the full process of identifying it (via the `appliedToModels` list of the target model's latest revision). Ultimately an Anaplan model ID from `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2)."
+          },
+          "targetRevisionId": {
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$",
+            "description": "Target revision identifier (32-character uppercase hex string). From `GET /models/{modelId}/alm/revisions` (`revisions[].id`) on the request-path model (`{modelId}`). Required for comparison and summary report tasks."
+          }
+        }
+      },
+      "RevisionRequest": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 60,
+            "description": "Revision name. Maximum 60 characters."
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 250,
+            "description": "Optional revision description. Maximum 250 characters."
+          }
+        }
+      },
+      "SyncTaskRequest": {
+        "type": "object",
+        "required": [
+          "sourceRevisionId",
+          "sourceModelId"
+        ],
+        "properties": {
+          "sourceRevisionId": {
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$",
+            "description": "Source revision identifier (32-character uppercase hex string). From `GET /models/{targetModelId}/alm/syncableRevisions?sourceModelId={sourceModelId}` (`revisions[].id`) \u2014 the source model's revisions that can be synced into the target model, where `{targetModelId}` is the request-path model and `{sourceModelId}` is this body's `sourceModelId`."
+          },
+          "sourceModelId": {
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$",
+            "description": "Source model identifier (32-character uppercase hex string) of the model supplying the source revision. See the `sourceModelId` query parameter on `GET /models/{modelId}/alm/syncableRevisions` for the full process of identifying it (via the `appliedToModels` list of the target model's latest revision). Ultimately an Anaplan model ID from `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2)."
+          },
+          "targetRevisionId": {
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$",
+            "description": "Target revision identifier (32-character uppercase hex string). From `GET /models/{targetModelId}/alm/latestRevision` (`revisions[0].id`) \u2014 the target model's latest revision, where `{targetModelId}` is the request-path model. Optional for sync tasks (omit to apply to the target's latest revision)."
+          }
+        }
+      },
+      "OnlineStatusRequest": {
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "online",
+              "offline"
+            ]
+          }
+        }
+      }
+    },
+    "parameters": {
+      "TargetRevisionId": {
+        "name": "targetRevisionId",
+        "in": "path",
+        "description": "Target revision identifier (32-character uppercase hex string). From `GET /models/{modelId}/alm/revisions`.",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "SourceRevisionId": {
+        "name": "sourceRevisionId",
+        "in": "path",
+        "description": "Source revision identifier (32-character uppercase hex string). From `GET /models/{modelId}/alm/revisions`.",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "TaskId": {
+        "name": "taskId",
+        "in": "path",
+        "description": "Report task identifier (32-character uppercase hex string), scoped to its report type: use the id from `POST /models/{modelId}/alm/comparisonReportTasks` only under `.../comparisonReportTasks/{taskId}`, and the id from `POST /models/{modelId}/alm/summaryReportTasks` only under `.../summaryReportTasks/{taskId}`. They are not interchangeable.",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "ModelId": {
+        "name": "modelId",
+        "in": "path",
+        "description": "Model identifier (32-character uppercase hex string). From `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2).",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      }
+    },
+    "securitySchemes": {
+      "AnaplanAuthToken": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "Anaplan authentication token. Format: `AnaplanAuthToken {token}`"
+      },
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Bearer token auth, interchangeable with AnaplanAuthToken on ALM."
+      }
+    }
+  }
+}

@@ -1,0 +1,184 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Audit API",
+    "version": "1.0.0",
+    "description": "Retrieve audit events from an Anaplan tenant. Supports filtering by event type and date range. Responses are available in JSON or Common Event Format (CEF) via the `Accept` header. Requires the Tenant Auditor role."
+  },
+  "servers": [
+    {
+      "url": "https://audit.anaplan.com/audit/api/1",
+      "description": "Production base URL. The Audit API is served only from this dedicated host; the regional api.anaplan.com data-plane hosts return 404 for /audit/api/1."
+    }
+  ],
+  "paths": {
+    "/events": {
+      "get": {
+        "operationId": "getAuditEvents",
+        "summary": "Retrieve audit events",
+        "description": "Minimum role: Tenant Auditor.\n\nRetrieves audit events for the tenant associated with the authenticated user. Use `type` to filter by event category. Use `dateFrom`/`dateTo` for a specific date range, or `intervalInHours` for a rolling window; the queried range cannot exceed 30 days. If no date filter is supplied, the previous 30 days are returned. Use `limit` and `offset` for pagination (the documented limit cap of 10000 is not enforced server-side \u2014 see the `limit` parameter).\n\nSet `Accept: text/plain` to receive results in Common Event Format (CEF). Default is `application/json`.",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "description": "Type of events to return. Each value filters to events whose `eventTypeId` carries a matching prefix. Accepted values: `all` (every event), `user_activity` (`USR-*`), `access_control` (`AUTHZ-*`), `int` (integrations, `INT-*`), `conn_mgmt` (connection / SAML management, `CONN-*`), `comment` (`COMMENT-*`), `byok` (Bring Your Own Key encryption), `plan_iq` (PlanIQ), and `forecaster`. A `workflow` category exists for the Workflow product but is omitted from the enum (product not enabled on the test tenant). The enum is not enforced server-side \u2014 an unrecognised value is treated as `all` rather than rejected.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "all",
+                "user_activity",
+                "access_control",
+                "int",
+                "conn_mgmt",
+                "comment",
+                "byok",
+                "plan_iq",
+                "forecaster"
+              ]
+            }
+          },
+          {
+            "name": "dateFrom",
+            "in": "query",
+            "description": "Start of the event date range (Unix timestamp in milliseconds, UTC). The span between `dateFrom` and `dateTo` cannot exceed 30 days \u2014 a wider range returns 400 `FAILURE_BAD_REQUEST`.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "dateTo",
+            "in": "query",
+            "description": "End of the event date range (Unix timestamp in milliseconds, UTC). The span between `dateFrom` and `dateTo` cannot exceed 30 days \u2014 a wider range returns 400 `FAILURE_BAD_REQUEST`.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "intervalInHours",
+            "in": "query",
+            "description": "Return events from the previous N hours. For example, `2` returns the last two hours of events. Bound by the same 30-day cap as the date range: a value above `720` (30 days) returns 400 `FAILURE_BAD_REQUEST`.",
+            "schema": {
+              "type": "integer",
+              "maximum": 720
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of results to return per page. The documented cap of 10000 is not enforced server-side \u2014 larger limits are honored and return more than 10000 records.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Zero-based index of the first result to return. Use with `limit` for pagination.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "security": [
+          {
+            "AnaplanAuthToken": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Audit events retrieved successfully."
+          },
+          "400": {
+            "description": "Bad request \u2014 the query parameters or request body are invalid. For example, a queried date range longer than 30 days (`dateFrom`/`dateTo`, or `intervalInHours`/`interval` above 720 hours) returns `status` `FAILURE_BAD_REQUEST` with message `Date range cannot exceed 30 days`."
+          },
+          "401": {
+            "description": "Authentication failed, or the authenticated user is not authorized. The Audit API returns 401 (not 403) when the user lacks the Tenant Auditor role \u2014 check `status` in the response body to distinguish an invalid token from a missing role."
+          }
+        }
+      }
+    },
+    "/events/search": {
+      "post": {
+        "operationId": "searchAuditEvents",
+        "summary": "Search audit events",
+        "description": "Minimum role: Tenant Auditor.\n\nRetrieves audit events for the tenant associated with the authenticated user using a JSON request body to specify the time range. Use `from`/`to` for a specific date range, or `interval` for a rolling window in hours. Use `type` query parameter to filter by event category.\n\nSet `Accept: text/plain` to receive results in Common Event Format (CEF). Default is `application/json`.",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "description": "Type of events to return. Same vocabulary as the `type` filter on `GET /events` (each value matches an `eventTypeId` prefix): `all`, `user_activity`, `access_control`, `int`, `conn_mgmt`, `comment`, `byok`, `plan_iq`, `forecaster`. The enum is not enforced server-side.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "all",
+                "user_activity",
+                "access_control",
+                "int",
+                "conn_mgmt",
+                "comment",
+                "byok",
+                "plan_iq",
+                "forecaster"
+              ]
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuditSearchRequest"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AnaplanAuthToken": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Audit events retrieved successfully."
+          },
+          "400": {
+            "description": "Bad request \u2014 the query parameters or request body are invalid. For example, a queried date range longer than 30 days (`dateFrom`/`dateTo`, or `intervalInHours`/`interval` above 720 hours) returns `status` `FAILURE_BAD_REQUEST` with message `Date range cannot exceed 30 days`."
+          },
+          "401": {
+            "description": "Authentication failed, or the authenticated user is not authorized. The Audit API returns 401 (not 403) when the user lacks the Tenant Auditor role \u2014 check `status` in the response body to distinguish an invalid token from a missing role."
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AuditSearchRequest": {
+        "type": "object",
+        "description": "Request body for the POST /events/search endpoint. Specify `from`/`to` for a date range or `interval` for a rolling window. If `to` is omitted, results up to the current time are returned. If `from` is omitted, results from the earliest available event are returned.",
+        "properties": {
+          "from": {
+            "type": "integer",
+            "description": "Start of the event date range (Unix timestamp in milliseconds, UTC)."
+          },
+          "to": {
+            "type": "integer",
+            "description": "End of the event date range (Unix timestamp in milliseconds, UTC)."
+          },
+          "interval": {
+            "type": "integer",
+            "description": "Return events from the previous N hours."
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "AnaplanAuthToken": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "Anaplan authentication token. Format: `AnaplanAuthToken {token}`. Accepts a token from basic/certificate auth or an OAuth Authorization Code grant access token. The audit host does not accept the `Bearer` scheme."
+      }
+    }
+  }
+}

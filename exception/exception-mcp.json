@@ -1,0 +1,262 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Anaplan Exception Users API",
+    "version": "1.0.0",
+    "description": "Manage exception users \u2014 users who can bypass SSO enforcement \u2014 in Anaplan workspaces. Requires the Tenant Security Admin role.\n\nTwo authentication schemes are accepted:\n- **AnaplanAuthToken** \u2014 token obtained via the Authentication API (username/password or CA certificate), or an OAuth Authorization Code access token passed with the `AnaplanAuthToken` prefix.\n- **AnaplanApiKey** \u2014 Anaplan API key (`AnaplanApiKey auk_<region>_<value>`).\n\nNote: the `Bearer` prefix is rejected with `FAILURE_BAD_HEADER` even for valid OAuth tokens."
+  },
+  "servers": [
+    {
+      "url": "https://api.anaplan.com/admin/1/0",
+      "description": "US1 (Data Center - US East), US2 (Data Center - US West), US5 (Cloud - US East), US7 (Cloud - US), EU1 (Data Center - Netherlands), EU2 (Data Center - Germany), EU4 (Cloud - Europe), AP1 (Cloud - Japan)"
+    },
+    {
+      "url": "https://us9.api.anaplan.com/admin/1/0",
+      "description": "US9 (Cloud - US)"
+    },
+    {
+      "url": "https://eu3.api.anaplan.com/admin/1/0",
+      "description": "EU3 (Cloud - Europe)"
+    },
+    {
+      "url": "https://eu5.api.anaplan.com/admin/1/0",
+      "description": "EU5 (Cloud - Europe)"
+    },
+    {
+      "url": "https://gb1.api.anaplan.com/admin/1/0",
+      "description": "GB1 (Cloud - UK)"
+    },
+    {
+      "url": "https://ca1a.api.anaplan.com/admin/1/0",
+      "description": "CA1 (Cloud - Canada)"
+    },
+    {
+      "url": "https://sg1.api.anaplan.com/admin/1/0",
+      "description": "SG1 (Cloud - Singapore)"
+    },
+    {
+      "url": "https://ae1.api.anaplan.com/admin/1/0",
+      "description": "AE1 (Cloud - UAE)"
+    },
+    {
+      "url": "https://me1.api.anaplan.com/admin/1/0",
+      "description": "ME1 (Cloud - Saudi Arabia)"
+    },
+    {
+      "url": "https://in1.api.anaplan.com/admin/1/0",
+      "description": "IN1 (Cloud - India)"
+    },
+    {
+      "url": "https://id1.api.anaplan.com/admin/1/0",
+      "description": "ID1 (Cloud - Indonesia)"
+    },
+    {
+      "url": "https://au1a.api2.anaplan.com/admin/1/0",
+      "description": "AU1 (Cloud - Australia)"
+    }
+  ],
+  "security": [
+    {
+      "AnaplanApiKey": []
+    },
+    {
+      "AnaplanAuthToken": []
+    }
+  ],
+  "paths": {
+    "/permissions/exception-users/users/{userGuid}": {
+      "parameters": [
+        {
+          "name": "userGuid",
+          "in": "path",
+          "description": "GUID of the user whose exception-user status is being changed; the same value as the Anaplan user ID. From `GET /users` (or `GET /users/me` for your own GUID) in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2).",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
+          },
+          "example": "7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d"
+        }
+      ],
+      "patch": {
+        "operationId": "patchExceptionUser",
+        "summary": "Assign or unassign an exception user",
+        "description": "Minimum role: Tenant Security Admin.\n\nUpdates the exception-user status for a user in a specific workspace. Use `op: assign` to grant exception-user access or `op: unassign` to revoke it. A caller cannot modify their own exception-user status.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExceptionUserPatchRequest"
+              },
+              "examples": {
+                "assign": {
+                  "summary": "Assign exception-user access",
+                  "value": {
+                    "op": "assign",
+                    "workspaceGuid": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+                  }
+                },
+                "unassign": {
+                  "summary": "Revoke exception-user access",
+                  "value": {
+                    "op": "unassign",
+                    "workspaceGuid": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Request processed successfully. No response body."
+          },
+          "400": {
+            "description": "Bad request. Possible causes: missing or invalid `op` value; missing or invalid `workspaceGuid`; workspace is not SSO-enabled; requested user not found in workspace."
+          },
+          "401": {
+            "description": "Invalid or missing token."
+          },
+          "403": {
+            "description": "Caller lacks Tenant Security Admin role, or is attempting to change their own exception-user status."
+          },
+          "404": {
+            "description": "User or workspace not found."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
+        }
+      }
+    },
+    "/permissions/exception-users/search": {
+      "post": {
+        "operationId": "searchExceptionUsers",
+        "summary": "Search exception users",
+        "description": "Minimum role: Standard User.\n\nSearch by workspace to list all exception users in that workspace (including visitors), or search by user to list all workspaces where that user has exception-user access (visitors' workspaces are excluded from the by-user results). Exactly one of `workspaceGuid` or `userGuid` must be provided.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExceptionUserSearchRequest"
+              },
+              "examples": {
+                "byWorkspace": {
+                  "summary": "List all exception users in a workspace",
+                  "value": {
+                    "workspaceGuid": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+                  }
+                },
+                "byUser": {
+                  "summary": "List all workspaces where a user has exception-user access",
+                  "value": {
+                    "userGuid": "b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful search. Returns a list of workspace records, each containing the exception users in that workspace."
+          },
+          "400": {
+            "description": "Bad request. Possible causes: neither `workspaceGuid` nor `userGuid` provided (search criteria not provided); invalid field values."
+          },
+          "401": {
+            "description": "Invalid or missing token."
+          },
+          "403": {
+            "description": "Caller lacks Tenant Security Admin role."
+          },
+          "404": {
+            "description": "User or workspace not found."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ExceptionUserPatchRequest": {
+        "type": "object",
+        "required": [
+          "op",
+          "workspaceGuid"
+        ],
+        "properties": {
+          "op": {
+            "type": "string",
+            "enum": [
+              "assign",
+              "unassign"
+            ],
+            "description": "Operation to perform: `assign` grants exception-user access; `unassign` revokes it."
+          },
+          "workspaceGuid": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$",
+            "description": "Anaplan-assigned hex-32 GUID of the workspace in which to assign or unassign the exception-user status. The workspace must be SSO-enabled. From `GET /workspaces` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2) (`workspaces[].id`)."
+          }
+        }
+      },
+      "ExceptionUserSearchRequest": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/ExceptionUserSearchByWorkspaceRequest"
+          },
+          {
+            "$ref": "#/components/schemas/ExceptionUserSearchByUserRequest"
+          }
+        ],
+        "description": "Search criteria. Provide exactly one of `workspaceGuid` (to list exception users in a workspace) or `userGuid` (to list workspaces where a user has exception-user access)."
+      },
+      "ExceptionUserSearchByWorkspaceRequest": {
+        "type": "object",
+        "required": [
+          "workspaceGuid"
+        ],
+        "properties": {
+          "workspaceGuid": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$",
+            "description": "Anaplan-assigned hex-32 GUID of the workspace. Returns all exception users in this workspace, including visitors. From `GET /workspaces` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2) (`workspaces[].id`)."
+          }
+        }
+      },
+      "ExceptionUserSearchByUserRequest": {
+        "type": "object",
+        "required": [
+          "userGuid"
+        ],
+        "properties": {
+          "userGuid": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$",
+            "description": "Anaplan-assigned hex-32 GUID of the user. Returns all workspaces in the tenant where this user has exception-user access. Workspaces where the user has access as a visitor are not included. From `GET /users` (or `GET /users/me` for your own GUID) in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2) (`users[].id`)."
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "AnaplanApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "Anaplan API key authentication. Header value format: `AnaplanApiKey auk_<region>_<value>`. API keys satisfy the service-to-service requirement."
+      },
+      "AnaplanAuthToken": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "Anaplan token authentication. Header value format: `AnaplanAuthToken <token>`. Accepted tokens: Authentication API token (username/password or CA certificate) or an OAuth Authorization Code access token. Note: the `Bearer` prefix is rejected even for valid OAuth tokens \u2014 always use `AnaplanAuthToken`."
+      }
+    }
+  }
+}
