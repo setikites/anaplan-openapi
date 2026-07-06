@@ -1376,138 +1376,6 @@
   },
   "components": {
     "schemas": {
-      "Job": {
-        "type": "object",
-        "required": [
-          "type",
-          "sources",
-          "targets"
-        ],
-        "description": "An import or export job within an integration.",
-        "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "AmazonS3ToAnaplan",
-              "AnaplanToAmazonS3",
-              "GoogleBigQueryToAnaplan",
-              "AnaplanToGoogleBigQuery",
-              "AzureBlobToAnaplan",
-              "AnaplanToAzureBlob"
-            ]
-          },
-          "sources": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "type": {
-                  "type": "string",
-                  "enum": [
-                    "AmazonS3",
-                    "GoogleBigQuery",
-                    "AzureBlob",
-                    "Anaplan"
-                  ]
-                },
-                "connectionId": {
-                  "type": "string",
-                  "description": "32-character lowercase hex connection ID. Present when source is a cloud storage type. From `GET /integrations/connections` (`connections[].connectionId`)."
-                },
-                "file": {
-                  "type": "string",
-                  "description": "File path within the cloud storage container."
-                },
-                "table": {
-                  "type": "string",
-                  "description": "BigQuery table name. Present when source is GoogleBigQuery."
-                },
-                "actionId": {
-                  "type": "string",
-                  "description": "Numeric string Anaplan action ID, in the generic sense \u2014 an import, an export, or a (delete/sort/etc.) action. Present when source is Anaplan. Depending on the action type, from `GET /models/{modelId}/imports` (`imports[].id`), `GET /models/{modelId}/exports` (`exports[].id`), or `GET /models/{modelId}/actions` (`actions[].id`) in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2)."
-                },
-                "connectionName": {
-                  "description": "Display name of the connection (read-only, present in GET responses).",
-                  "type": "string"
-                },
-                "isConnectionDeleted": {
-                  "description": "True if the referenced connection has been deleted (read-only, present in GET responses).",
-                  "type": "boolean"
-                },
-                "bucketName": {
-                  "description": "Container or bucket name for the cloud storage connection (read-only, present in GET responses). Named `bucketName` regardless of connection type \u2014 represents the Azure Blob container name for AzureBlob connections.",
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "targets": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "type": {
-                  "type": "string",
-                  "enum": [
-                    "Anaplan",
-                    "AmazonS3",
-                    "GoogleBigQuery",
-                    "AzureBlob"
-                  ]
-                },
-                "actionId": {
-                  "type": "string",
-                  "description": "Numeric string Anaplan action ID, in the generic sense \u2014 an import, an export, or a (delete/sort/etc.) action. Present when target is Anaplan. Depending on the action type, from `GET /models/{modelId}/imports` (`imports[].id`), `GET /models/{modelId}/exports` (`exports[].id`), or `GET /models/{modelId}/actions` (`actions[].id`) in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2)."
-                },
-                "fileId": {
-                  "type": "string",
-                  "description": "Anaplan file ID. Present when target is Anaplan. From `GET /models/{modelId}/files` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2) (`files[].id`)."
-                },
-                "connectionId": {
-                  "type": "string",
-                  "description": "32-character lowercase hex connection ID. Present when target is a cloud storage type. From `GET /integrations/connections` (`connections[].connectionId`)."
-                },
-                "file": {
-                  "type": "string"
-                },
-                "table": {
-                  "type": "string"
-                },
-                "overwrite": {
-                  "type": "boolean"
-                },
-                "connectionName": {
-                  "description": "Display name of the connection (read-only, present in GET responses).",
-                  "type": "string"
-                },
-                "isConnectionDeleted": {
-                  "description": "True if the referenced connection has been deleted (read-only, present in GET responses).",
-                  "type": "boolean"
-                },
-                "bucketName": {
-                  "description": "Container or bucket name for the cloud storage connection (read-only, present in GET responses). Named `bucketName` regardless of connection type.",
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "mapping": {
-            "type": "array",
-            "description": "Column mapping for BigQuery exports.",
-            "items": {
-              "type": "object",
-              "properties": {
-                "sourceName": {
-                  "type": "string"
-                },
-                "targetName": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        }
-      },
       "NotificationRequest": {
         "type": "object",
         "required": [
@@ -1671,6 +1539,138 @@
               "Active",
               "Inactive"
             ]
+          }
+        }
+      },
+      "Job": {
+        "type": "object",
+        "required": [
+          "type",
+          "sources",
+          "targets"
+        ],
+        "description": "An import or export job within an integration.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "AmazonS3ToAnaplan",
+              "AnaplanToAmazonS3",
+              "GoogleBigQueryToAnaplan",
+              "AnaplanToGoogleBigQuery",
+              "AzureBlobToAnaplan",
+              "AnaplanToAzureBlob"
+            ]
+          },
+          "sources": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "AmazonS3",
+                    "GoogleBigQuery",
+                    "AzureBlob",
+                    "Anaplan"
+                  ]
+                },
+                "connectionId": {
+                  "type": "string",
+                  "description": "32-character lowercase hex connection ID. Present when source is a cloud storage type. From `GET /integrations/connections` (`connections[].connectionId`)."
+                },
+                "file": {
+                  "type": "string",
+                  "description": "File path within the cloud storage container."
+                },
+                "table": {
+                  "type": "string",
+                  "description": "BigQuery table name. Present when source is GoogleBigQuery."
+                },
+                "actionId": {
+                  "type": "string",
+                  "description": "Numeric string Anaplan action ID, in the generic sense \u2014 an import, an export, or a (delete/sort/etc.) action. Present when source is Anaplan. Depending on the action type, from `GET /models/{modelId}/imports` (`imports[].id`), `GET /models/{modelId}/exports` (`exports[].id`), or `GET /models/{modelId}/actions` (`actions[].id`) in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2)."
+                },
+                "connectionName": {
+                  "description": "Display name of the connection (read-only, present in GET responses).",
+                  "type": "string"
+                },
+                "isConnectionDeleted": {
+                  "description": "True if the referenced connection has been deleted (read-only, present in GET responses).",
+                  "type": "boolean"
+                },
+                "bucketName": {
+                  "description": "Container or bucket name for the cloud storage connection (read-only, present in GET responses). Named `bucketName` regardless of connection type \u2014 represents the Azure Blob container name for AzureBlob connections.",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "targets": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "Anaplan",
+                    "AmazonS3",
+                    "GoogleBigQuery",
+                    "AzureBlob"
+                  ]
+                },
+                "actionId": {
+                  "type": "string",
+                  "description": "Numeric string Anaplan action ID, in the generic sense \u2014 an import, an export, or a (delete/sort/etc.) action. Present when target is Anaplan. Depending on the action type, from `GET /models/{modelId}/imports` (`imports[].id`), `GET /models/{modelId}/exports` (`exports[].id`), or `GET /models/{modelId}/actions` (`actions[].id`) in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2)."
+                },
+                "fileId": {
+                  "type": "string",
+                  "description": "Anaplan file ID. Present when target is Anaplan. For an import (`*ToAnaplan`), this is the file the import action reads \u2014 from that import's metadata via `GET /models/{modelId}/imports/{importId}` (`importDataSourceId`) in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2), not the model-wide `GET /models/{modelId}/files` list. For an export (`AnaplanTo*`), the file is identified by the export action itself \u2014 `fileId` equals the `exportId`, with no separate file lookup."
+                },
+                "connectionId": {
+                  "type": "string",
+                  "description": "32-character lowercase hex connection ID. Present when target is a cloud storage type. From `GET /integrations/connections` (`connections[].connectionId`)."
+                },
+                "file": {
+                  "type": "string"
+                },
+                "table": {
+                  "type": "string"
+                },
+                "overwrite": {
+                  "type": "boolean"
+                },
+                "connectionName": {
+                  "description": "Display name of the connection (read-only, present in GET responses).",
+                  "type": "string"
+                },
+                "isConnectionDeleted": {
+                  "description": "True if the referenced connection has been deleted (read-only, present in GET responses).",
+                  "type": "boolean"
+                },
+                "bucketName": {
+                  "description": "Container or bucket name for the cloud storage connection (read-only, present in GET responses). Named `bucketName` regardless of connection type.",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "mapping": {
+            "type": "array",
+            "description": "Column mapping for BigQuery exports.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "sourceName": {
+                  "type": "string"
+                },
+                "targetName": {
+                  "type": "string"
+                }
+              }
+            }
           }
         }
       }

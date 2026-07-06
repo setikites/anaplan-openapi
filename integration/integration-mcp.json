@@ -2160,6 +2160,43 @@
       }
     },
     "parameters": {
+      "TaskId": {
+        "name": "taskId",
+        "in": "path",
+        "description": "Task identifier, scoped to the parent action/import/export/process that launched it: a taskId is valid only under the same parent, so an action's taskId will not resolve under a process, import, or export. Returned when a run is launched by `POST /workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks` (or the equivalent actions, exports, or processes tasks endpoint), and listed by the matching `GET .../tasks` \u2014 `tasks[].taskId`, except the import tasks response, which nests it under `task.taskId`.",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "TenantDetails": {
+        "name": "tenantDetails",
+        "in": "query",
+        "description": "When `true`, the response includes additional workspace detail fields (`sizeAllowance` and `currentSize`). When `false` or omitted, only `id`, `name`, and `active` are returned.",
+        "required": false,
+        "schema": {
+          "type": "boolean"
+        },
+        "example": true
+      },
+      "FileId": {
+        "name": "fileId",
+        "in": "path",
+        "description": "File identifier (12-digit numeric, prefix 113). From `GET /models/{modelId}/files`, or the `importDataSourceId` of `GET /workspaces/{workspaceId}/models/{modelId}/imports/` \u2014 the file an import reads, which is the file you upload before running that import.",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "ModelId": {
+        "name": "modelId",
+        "in": "path",
+        "description": "Model identifier (32-character uppercase hex string). From `GET /models` or `GET /workspaces/{workspaceId}/models`.",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
       "ListId": {
         "name": "listId",
         "in": "path",
@@ -2173,6 +2210,69 @@
         "name": "userId",
         "in": "path",
         "description": "User identifier (32-character hex string). From `GET /users`, or `GET /users/me` for the caller's own id.",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "ModuleId": {
+        "name": "moduleId",
+        "in": "path",
+        "description": "Module identifier (12-digit numeric string, prefix 102). From `GET /models/{modelId}/modules`.",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "Search": {
+        "name": "s",
+        "in": "query",
+        "description": "Optional case-insensitive filter. Matches items whose name or ID contains this string. Supports wildcards `%` (0-n characters) and `_` (exactly 1 character). Omit to return all items. **Undocumented and may behave unpredictably; requires the Tenant Admin role and is ignored for non-admin users.**",
+        "required": false,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "ProcessId": {
+        "name": "processId",
+        "in": "path",
+        "description": "Process identifier (12-digit numeric, prefix 118). From `GET /models/{modelId}/processes`.",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "ImportId": {
+        "name": "importId",
+        "in": "path",
+        "description": "Import definition identifier (12-digit numeric, prefix 112). From `GET /models/{modelId}/imports`.",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "VersionId": {
+        "name": "versionId",
+        "in": "path",
+        "description": "Version identifier (12-digit numeric, prefix 107). From `GET /models/{modelId}/versions`.",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "WorkspaceId": {
+        "name": "workspaceId",
+        "in": "path",
+        "description": "Workspace identifier (32-char lowercase hex). When the path also has a `modelId`, use that model's `currentWorkspaceId` (`GET /models/{modelId}`, or `GET /models` matched by `name`). For workspace-only endpoints, scan `GET /workspaces` by `name`.",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "ActionId": {
+        "name": "actionId",
+        "in": "path",
+        "description": "Action identifier. From `GET /models/{modelId}/actions`.",
         "required": true,
         "schema": {
           "type": "string"
@@ -2196,19 +2296,10 @@
           "type": "string"
         }
       },
-      "WorkspaceId": {
-        "name": "workspaceId",
+      "DimensionId": {
+        "name": "dimensionId",
         "in": "path",
-        "description": "Workspace identifier (32-char lowercase hex). When the path also has a `modelId`, use that model's `currentWorkspaceId` (`GET /models/{modelId}`, or `GET /models` matched by `name`). For workspace-only endpoints, scan `GET /workspaces` by `name`.",
-        "required": true,
-        "schema": {
-          "type": "string"
-        }
-      },
-      "ModuleId": {
-        "name": "moduleId",
-        "in": "path",
-        "description": "Module identifier (12-digit numeric string, prefix 102). From `GET /models/{modelId}/modules`.",
+        "description": "Dimension identifier. From `GET /models/{modelId}/lineItems/{lineItemId}/dimensions`.",
         "required": true,
         "schema": {
           "type": "string"
@@ -2223,10 +2314,10 @@
           "type": "string"
         }
       },
-      "DimensionId": {
-        "name": "dimensionId",
+      "ExportId": {
+        "name": "exportId",
         "in": "path",
-        "description": "Dimension identifier. From `GET /models/{modelId}/lineItems/{lineItemId}/dimensions`.",
+        "description": "Export definition identifier (12-digit numeric, prefix 116). From `GET /models/{modelId}/exports`.",
         "required": true,
         "schema": {
           "type": "string"
@@ -2241,34 +2332,6 @@
           "type": "string"
         }
       },
-      "TenantDetails": {
-        "name": "tenantDetails",
-        "in": "query",
-        "description": "When `true`, the response includes additional workspace detail fields (`sizeAllowance` and `currentSize`). When `false` or omitted, only `id`, `name`, and `active` are returned.",
-        "required": false,
-        "schema": {
-          "type": "boolean"
-        },
-        "example": true
-      },
-      "ProcessId": {
-        "name": "processId",
-        "in": "path",
-        "description": "Process identifier (12-digit numeric, prefix 118). From `GET /models/{modelId}/processes`.",
-        "required": true,
-        "schema": {
-          "type": "string"
-        }
-      },
-      "ExportId": {
-        "name": "exportId",
-        "in": "path",
-        "description": "Export definition identifier (12-digit numeric, prefix 116). From `GET /models/{modelId}/exports`.",
-        "required": true,
-        "schema": {
-          "type": "string"
-        }
-      },
       "IncludeAll": {
         "name": "includeAll",
         "in": "query",
@@ -2278,69 +2341,6 @@
           "type": "boolean"
         },
         "example": true
-      },
-      "ImportId": {
-        "name": "importId",
-        "in": "path",
-        "description": "Import definition identifier (12-digit numeric, prefix 112). From `GET /models/{modelId}/imports`.",
-        "required": true,
-        "schema": {
-          "type": "string"
-        }
-      },
-      "VersionId": {
-        "name": "versionId",
-        "in": "path",
-        "description": "Version identifier (12-digit numeric, prefix 107). From `GET /models/{modelId}/versions`.",
-        "required": true,
-        "schema": {
-          "type": "string"
-        }
-      },
-      "TaskId": {
-        "name": "taskId",
-        "in": "path",
-        "description": "Task identifier, scoped to the parent action/import/export/process that launched it: a taskId is valid only under the same parent, so an action's taskId will not resolve under a process, import, or export. Returned when a run is launched by `POST /workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks` (or the equivalent actions, exports, or processes tasks endpoint), and listed by the matching `GET .../tasks` \u2014 `tasks[].taskId`, except the import tasks response, which nests it under `task.taskId`.",
-        "required": true,
-        "schema": {
-          "type": "string"
-        }
-      },
-      "ActionId": {
-        "name": "actionId",
-        "in": "path",
-        "description": "Action identifier. From `GET /models/{modelId}/actions`.",
-        "required": true,
-        "schema": {
-          "type": "string"
-        }
-      },
-      "ModelId": {
-        "name": "modelId",
-        "in": "path",
-        "description": "Model identifier (32-character uppercase hex string). From `GET /models` or `GET /workspaces/{workspaceId}/models`.",
-        "required": true,
-        "schema": {
-          "type": "string"
-        }
-      },
-      "FileId": {
-        "name": "fileId",
-        "in": "path",
-        "description": "File identifier (12-digit numeric, prefix 113). From `GET /models/{modelId}/files`, or the `importDataSourceId` of `GET /workspaces/{workspaceId}/models/{modelId}/imports/` \u2014 the file an import reads, which is the file you upload before running that import.",
-        "required": true,
-        "schema": {
-          "type": "string"
-        }
-      },
-      "Search": {
-        "name": "s",
-        "in": "query",
-        "description": "Optional case-insensitive filter. Matches items whose name or ID contains this string. Supports wildcards `%` (0-n characters) and `_` (exactly 1 character). Omit to return all items. **Undocumented and may behave unpredictably; requires the Tenant Admin role and is ignored for non-admin users.**",
-        "required": false,
-        "schema": {
-          "type": "string"
-        }
       },
       "PageNo": {
         "name": "pageNo",

@@ -7,7 +7,7 @@ each, nothing configured in CloudWorks yet.
 Written against the **D-style meta-programming** agent design in
 [mcp-agent-access.md](./mcp-agent-access.md): the only tools are `search` /
 `execute` plus the frozen composition primitives `pipe` / `map` / `project`. It
-reads the `*-ponytail.json` specs only. Assumes the MCP server is already
+reads the `*-mcp.json` specs only. Assumes the MCP server is already
 authenticated.
 
 `pipe([opId...], bindings)` chains calls; `map(opId, listExpr, paramMapping)`

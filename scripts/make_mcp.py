@@ -1,4 +1,4 @@
-"""Transform <api>-openapi.json -> minimal <api>-ponytail.json for MCP tool generation.
+"""Transform <api>-openapi.json -> minimal <api>-mcp.json for MCP tool generation.
 
 Keeps what an MCP server needs to expose one tool per operation: operationId (synthesized
 when absent), summary, description, parameters, requestBody, security, plus servers,
@@ -11,7 +11,7 @@ is dropped. Specs without that duality are unaffected (regex just never matches)
 
 Descriptions are kept verbatim — prose can't be auto-summarized reliably; trim by hand if needed.
 
-Usage: uv run python scripts/make_ponytail.py integration/integration-openapi.json
+Usage: uv run python scripts/make_mcp.py integration/integration-openapi.json
 """
 
 import json
@@ -135,7 +135,7 @@ def transform(d):
 def main(src):
     if not src.endswith("-openapi.json"):
         sys.exit(f"expected a *-openapi.json file, got: {src}")
-    dst = src.replace("-openapi.json", "-ponytail.json")
+    dst = src.replace("-openapi.json", "-mcp.json")
     d = json.load(open(src, encoding="utf-8"))
     out = transform(d)
     with open(dst, "w", encoding="utf-8") as f:
