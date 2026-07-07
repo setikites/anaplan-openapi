@@ -595,6 +595,49 @@
   },
   "components": {
     "schemas": {
+      "RevisionRequest": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 60,
+            "description": "Revision name. Maximum 60 characters."
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 250,
+            "description": "Optional revision description. Maximum 250 characters."
+          }
+        }
+      },
+      "SyncTaskRequest": {
+        "type": "object",
+        "required": [
+          "sourceRevisionId",
+          "sourceModelId",
+          "targetRevisionId"
+        ],
+        "properties": {
+          "sourceRevisionId": {
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$",
+            "description": "Source revision identifier (32-character uppercase hex string). From `GET /models/{targetModelId}/alm/syncableRevisions?sourceModelId={sourceModelId}` (`revisions[].id`) \u2014 the source model's revisions that can be synced into the target model, where `{targetModelId}` is the request-path model and `{sourceModelId}` is this body's `sourceModelId`."
+          },
+          "sourceModelId": {
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$",
+            "description": "Source model identifier (32-character uppercase hex string) of the model supplying the source revision. See the `sourceModelId` query parameter on `GET /models/{modelId}/alm/syncableRevisions` for the full process of identifying it (via the `appliedToModels` list of the target model's latest revision). Ultimately an Anaplan model ID from `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2)."
+          },
+          "targetRevisionId": {
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$",
+            "description": "Target revision identifier (32-character uppercase hex string). From `GET /models/{targetModelId}/alm/latestRevision` (`revisions[0].id`) \u2014 the target model's latest revision, where `{targetModelId}` is the request-path model. Required."
+          }
+        }
+      },
       "ReportTaskRequest": {
         "type": "object",
         "required": [
@@ -620,48 +663,6 @@
           }
         }
       },
-      "RevisionRequest": {
-        "type": "object",
-        "required": [
-          "name"
-        ],
-        "properties": {
-          "name": {
-            "type": "string",
-            "maxLength": 60,
-            "description": "Revision name. Maximum 60 characters."
-          },
-          "description": {
-            "type": "string",
-            "maxLength": 250,
-            "description": "Optional revision description. Maximum 250 characters."
-          }
-        }
-      },
-      "SyncTaskRequest": {
-        "type": "object",
-        "required": [
-          "sourceRevisionId",
-          "sourceModelId"
-        ],
-        "properties": {
-          "sourceRevisionId": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$",
-            "description": "Source revision identifier (32-character uppercase hex string). From `GET /models/{targetModelId}/alm/syncableRevisions?sourceModelId={sourceModelId}` (`revisions[].id`) \u2014 the source model's revisions that can be synced into the target model, where `{targetModelId}` is the request-path model and `{sourceModelId}` is this body's `sourceModelId`."
-          },
-          "sourceModelId": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$",
-            "description": "Source model identifier (32-character uppercase hex string) of the model supplying the source revision. See the `sourceModelId` query parameter on `GET /models/{modelId}/alm/syncableRevisions` for the full process of identifying it (via the `appliedToModels` list of the target model's latest revision). Ultimately an Anaplan model ID from `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2)."
-          },
-          "targetRevisionId": {
-            "type": "string",
-            "pattern": "^[0-9A-F]{32}$",
-            "description": "Target revision identifier (32-character uppercase hex string). From `GET /models/{targetModelId}/alm/latestRevision` (`revisions[0].id`) \u2014 the target model's latest revision, where `{targetModelId}` is the request-path model. Optional for sync tasks (omit to apply to the target's latest revision)."
-          }
-        }
-      },
       "OnlineStatusRequest": {
         "type": "object",
         "required": [
@@ -679,24 +680,6 @@
       }
     },
     "parameters": {
-      "TargetRevisionId": {
-        "name": "targetRevisionId",
-        "in": "path",
-        "description": "Target revision identifier (32-character uppercase hex string). From `GET /models/{modelId}/alm/revisions`.",
-        "required": true,
-        "schema": {
-          "type": "string"
-        }
-      },
-      "SourceRevisionId": {
-        "name": "sourceRevisionId",
-        "in": "path",
-        "description": "Source revision identifier (32-character uppercase hex string). From `GET /models/{modelId}/alm/revisions`.",
-        "required": true,
-        "schema": {
-          "type": "string"
-        }
-      },
       "TaskId": {
         "name": "taskId",
         "in": "path",
@@ -710,6 +693,24 @@
         "name": "modelId",
         "in": "path",
         "description": "Model identifier (32-character uppercase hex string). From `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2).",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "TargetRevisionId": {
+        "name": "targetRevisionId",
+        "in": "path",
+        "description": "Target revision identifier (32-character uppercase hex string). From `GET /models/{modelId}/alm/revisions`.",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "SourceRevisionId": {
+        "name": "sourceRevisionId",
+        "in": "path",
+        "description": "Source revision identifier (32-character uppercase hex string). From `GET /models/{modelId}/alm/revisions`.",
         "required": true,
         "schema": {
           "type": "string"

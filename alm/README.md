@@ -154,9 +154,11 @@ Optional: `ANAPLAN_WORKSPACE_ID` (default: `8a868cdb8b7841a2018beedb91d644d7`), 
 
 Documented in the `SyncTaskListResponse` and `RevisionResponse` schema descriptions.
 
-### Report tasks require `targetRevisionId` (live testing 2026-07-02)
+### Sync and report tasks require `targetRevisionId` (live testing 2026-07-02, corrected 2026-07-07)
 
-`POST /alm/comparisonReportTasks` and `POST /alm/summaryReportTasks` reject the request with `400 "Expected mandatory fields 'sourceRevisionId', 'sourceModelId' and 'targetRevisionId'"` unless all three are present — unlike `POST /alm/syncTasks`, where `targetRevisionId` is optional. The spec models this with a dedicated `ReportTaskRequest` schema (all three required) for the report endpoints, leaving `SyncTaskRequest` unchanged for sync tasks.
+`POST /alm/syncTasks`, `POST /alm/comparisonReportTasks`, and `POST /alm/summaryReportTasks` all reject the request with `400 "Expected mandatory fields 'sourceRevisionId', 'sourceModelId' and 'targetRevisionId'"` unless all three fields are present. Both `SyncTaskRequest` and `ReportTaskRequest` mark all three as required.
+
+The original 2026-07-02 note claimed `targetRevisionId` was optional for `POST /alm/syncTasks`; a re-test on 2026-07-07 (omit `targetRevisionId`, dummy source IDs) returned the same `400 "Expected mandatory fields..."`, so the field is required for sync tasks too.
 
 ### Role denial returns 424, not 403 (live testing 2026-07-02)
 

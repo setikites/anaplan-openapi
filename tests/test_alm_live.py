@@ -483,6 +483,43 @@ def test_alm_get_sync_tasks_response_shape(alm_token):
         )
 
 
+# ── POST /models/{modelId}/alm/syncTasks ──────────────────────────────────────
+
+@pytest.mark.live
+def test_alm_sync_task_requires_target_revision_id(alm_token):
+    """POST /alm/syncTasks without targetRevisionId returns 400 (targetRevisionId required).
+
+    Regression for the SyncTaskRequest schema: all three of sourceRevisionId,
+    sourceModelId and targetRevisionId are mandatory. Non-destructive — dummy
+    32-hex IDs make the field-presence check fail (400 "Expected mandatory
+    fields...") before any real revision sync could occur.
+
+    Confirmed live 2026-07-07, correcting an earlier note that called
+    targetRevisionId optional for sync tasks (see alm/README.md).
+    """
+    with httpx.Client() as client:
+        response = client.post(
+            f"{ALM_BASE_URL}/models/{MODEL_ID}/alm/syncTasks",
+            headers={
+                "Authorization": f"AnaplanAuthToken {alm_token}",
+                "Content-Type": "application/json",
+            },
+            json={"sourceRevisionId": _DUMMY_HEX32, "sourceModelId": _DUMMY_HEX32},
+            timeout=60,
+        )
+
+    print(f"\nPOST /syncTasks (omit targetRevisionId): {response.status_code}")
+    print(f"Body: {response.text[:300]}")
+
+    assert response.status_code == 400, (
+        f"Expected 400 for missing targetRevisionId, got {response.status_code}: "
+        f"{response.text[:200]}"
+    )
+    assert "targetRevisionId" in response.text, (
+        f"400 body should name the missing 'targetRevisionId': {response.text[:200]}"
+    )
+
+
 # ── GET /models/{modelId}/alm/syncableRevisions ───────────────────────────────
 
 @pytest.mark.live

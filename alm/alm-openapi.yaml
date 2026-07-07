@@ -518,6 +518,7 @@ components:
       required:
       - sourceRevisionId
       - sourceModelId
+      - targetRevisionId
       properties:
         sourceRevisionId:
           type: string
@@ -536,8 +537,7 @@ components:
           type: string
           pattern: ^[0-9A-F]{32}$
           description: Target revision identifier (32-character uppercase hex string). From `GET /models/{targetModelId}/alm/latestRevision`
-            (`revisions[0].id`) — the target model's latest revision, where `{targetModelId}` is the request-path model. Optional
-            for sync tasks (omit to apply to the target's latest revision).
+            (`revisions[0].id`) — the target model's latest revision, where `{targetModelId}` is the request-path model. Required.
     ReportTaskRequest:
       type: object
       required:
