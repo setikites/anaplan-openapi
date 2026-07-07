@@ -660,7 +660,7 @@
       "get": {
         "summary": "List users in tenant",
         "description": "Retrieve a roster of all users within the tenant, including their identifiers, names, contact information, enabled/disabled status, and assigned roles.",
-        "operationId": "listUsers",
+        "operationId": "listConsolidationUsers",
         "responses": {
           "200": {
             "description": "Array of user objects.",
@@ -747,7 +747,7 @@
       "delete": {
         "summary": "Delete user account from tenant",
         "description": "Remove a user account from the tenant. The API returns 200 OK regardless of whether the user exists — use GET /users to validate the deletion.",
-        "operationId": "deleteUser",
+        "operationId": "deleteConsolidationUser",
         "responses": {
           "200": {
             "description": "User deleted (or was not found — no 404 is returned)."
