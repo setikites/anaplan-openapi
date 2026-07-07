@@ -595,6 +595,24 @@
   },
   "components": {
     "schemas": {
+      "RevisionRequest": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 60,
+            "description": "Revision name. Maximum 60 characters."
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 250,
+            "description": "Optional revision description. Maximum 250 characters."
+          }
+        }
+      },
       "SyncTaskRequest": {
         "type": "object",
         "required": [
@@ -616,25 +634,7 @@
           "targetRevisionId": {
             "type": "string",
             "pattern": "^[0-9A-F]{32}$",
-            "description": "Target revision identifier (32-character uppercase hex string). From `GET /models/{targetModelId}/alm/latestRevision` (`revisions[0].id`) \u2014 the target model's latest revision, where `{targetModelId}` is the request-path model. Required (live-confirmed 2026-07-07: omitting it returns `400 \"Expected mandatory fields 'sourceRevisionId', 'sourceModelId' and 'targetRevisionId'\"`)."
-          }
-        }
-      },
-      "RevisionRequest": {
-        "type": "object",
-        "required": [
-          "name"
-        ],
-        "properties": {
-          "name": {
-            "type": "string",
-            "maxLength": 60,
-            "description": "Revision name. Maximum 60 characters."
-          },
-          "description": {
-            "type": "string",
-            "maxLength": 250,
-            "description": "Optional revision description. Maximum 250 characters."
+            "description": "Target revision identifier (32-character uppercase hex string). From `GET /models/{targetModelId}/alm/latestRevision` (`revisions[0].id`) \u2014 the target model's latest revision, where `{targetModelId}` is the request-path model. Required."
           }
         }
       },
@@ -680,10 +680,10 @@
       }
     },
     "parameters": {
-      "TargetRevisionId": {
-        "name": "targetRevisionId",
+      "TaskId": {
+        "name": "taskId",
         "in": "path",
-        "description": "Target revision identifier (32-character uppercase hex string). From `GET /models/{modelId}/alm/revisions`.",
+        "description": "Report task identifier (32-character uppercase hex string), scoped to its report type: use the id from `POST /models/{modelId}/alm/comparisonReportTasks` only under `.../comparisonReportTasks/{taskId}`, and the id from `POST /models/{modelId}/alm/summaryReportTasks` only under `.../summaryReportTasks/{taskId}`. They are not interchangeable.",
         "required": true,
         "schema": {
           "type": "string"
@@ -698,10 +698,10 @@
           "type": "string"
         }
       },
-      "TaskId": {
-        "name": "taskId",
+      "TargetRevisionId": {
+        "name": "targetRevisionId",
         "in": "path",
-        "description": "Report task identifier (32-character uppercase hex string), scoped to its report type: use the id from `POST /models/{modelId}/alm/comparisonReportTasks` only under `.../comparisonReportTasks/{taskId}`, and the id from `POST /models/{modelId}/alm/summaryReportTasks` only under `.../summaryReportTasks/{taskId}`. They are not interchangeable.",
+        "description": "Target revision identifier (32-character uppercase hex string). From `GET /models/{modelId}/alm/revisions`.",
         "required": true,
         "schema": {
           "type": "string"

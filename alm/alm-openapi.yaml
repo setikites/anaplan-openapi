@@ -536,10 +536,8 @@ components:
         targetRevisionId:
           type: string
           pattern: ^[0-9A-F]{32}$
-          description: 'Target revision identifier (32-character uppercase hex string). From `GET /models/{targetModelId}/alm/latestRevision`
-            (`revisions[0].id`) — the target model''s latest revision, where `{targetModelId}` is the request-path model.
-            Required (live-confirmed 2026-07-07: omitting it returns `400 "Expected mandatory fields ''sourceRevisionId'',
-            ''sourceModelId'' and ''targetRevisionId''"`).'
+          description: Target revision identifier (32-character uppercase hex string). From `GET /models/{targetModelId}/alm/latestRevision`
+            (`revisions[0].id`) — the target model's latest revision, where `{targetModelId}` is the request-path model. Required.
     ReportTaskRequest:
       type: object
       required:
