@@ -53,6 +53,39 @@ Live testing (`test_auth_scheme_probe`) confirmed both schemes are accepted on `
 
 Both schemes are declared as `securitySchemes` and applied via the global `security` array.
 
+## Pagination
+
+List endpoints accept `offset` and `limit` query parameters and return paging
+state in `meta.paging`. The spec originally declared neither the params nor the
+full paging schema; both were added from live testing (issue #220).
+
+Live-tested against `GET /models` (cert auth, 3847-model tenant, 2026-07-08):
+
+| Query | Rows returned | `meta.paging` |
+|-------|:-:|--------|
+| (none) | 3847 | `offset=0`, `next=?limit=20&offset=20` |
+| `?limit=2` | 2 | `offset=0`, `next=?limit=2&offset=2` |
+| `?limit=2&offset=2` | 2 | `offset=2`, `previous=?limit=2&offset=0`, `next=?limit=2&offset=4` |
+| `?limit=3&offset=0` | 3 | `offset=0`, `next=?limit=3&offset=3` |
+
+Confirmed behavior:
+
+- **Both params are honored** — `limit` bounds the page, `offset` skips rows.
+- The server **echoes** the applied `limit`/`offset` in the `next` (and, once
+  `offset > 0`, `previous`) URLs, so a client can page by following those URLs
+  without constructing them.
+- `meta.paging` carries `currentPageSize`, `totalSize`, `offset`, `next`, and
+  `previous`. `previous` appears only past the first page.
+- **Default page size is 5000** when `limit` is omitted. This tenant's 3847
+  models fit under the cap and all returned; the larger tenant in issue #220
+  (7370 models) was truncated to 5000 with a `next` URL for the remainder.
+
+`offset`/`limit` are documented on the 39 GET list endpoints whose response
+carries `meta.paging`. They are **not** added to the `.../dimensions/{dimensionId}/items`
+bulk reads (documented "returns all", hard 1,000,000-item cap, no paging), the
+`/views/{viewId}` axis-metadata reads (single object, not a collection), or the
+list-item write endpoints.
+
 ## Live Test Coverage
 
 Setup and how to run live tests (credentials, `.env`, flags) are documented in
