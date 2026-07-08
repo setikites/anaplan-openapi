@@ -103,6 +103,7 @@ Endpoints covered (all paths relative to the `/2/0` base URL):
 | `test_get_workspace_admins` | `GET /workspaces/{workspaceId}/admins` (warns — 500 without tenant admin privilege) |
 | `test_get_workspace_visitors` | `GET /workspaces/{workspaceId}/visitors` (warns — 500 without tenant admin privilege) |
 | `test_list_models` | `GET /models` |
+| `test_models_pagination` | `GET /models?limit=&offset=` (offset/limit paging — issue #220) |
 | `test_get_model` | `GET /models/{modelId}` |
 | `test_list_workspace_models` | `GET /workspaces/{workspaceId}/models` |
 | `test_get_workspace_model` | `GET /workspaces/{workspaceId}/models/{modelId}` (skipped — 405) |

@@ -373,6 +373,58 @@ def test_list_models(integration_token):
 
 
 @pytest.mark.live
+def test_models_pagination(integration_token):
+    """GET /models honors offset/limit and echoes them in meta.paging (issue #220)."""
+    headers = {"Authorization": f"AnaplanAuthToken {integration_token}"}
+    with httpx.Client() as client:
+        first = client.get(f"{API_URL}/models", headers=headers, params={"limit": 2})
+        assert first.status_code == 200, (
+            f"Expected 200, got {first.status_code}: {first.text[:200]}"
+        )
+        body1 = first.json()
+        page1 = body1.get("models") or []
+        paging1 = body1.get("meta", {}).get("paging", {})
+
+        total = paging1.get("totalSize")
+        assert total is not None, f"meta.paging.totalSize missing; paging was {paging1}"
+        # limit is honored: the page never exceeds the requested size.
+        assert len(page1) <= 2, f"limit=2 returned {len(page1)} models"
+        assert paging1.get("offset") == 0, f"first page offset should be 0: {paging1}"
+        assert paging1.get("currentPageSize") == len(page1), (
+            f"currentPageSize {paging1.get('currentPageSize')} != returned {len(page1)}"
+        )
+
+        if total <= 2:
+            pytest.skip(f"tenant has {total} model(s); need >2 to exercise offset paging")
+
+        # When more results remain, the server hands back a next URL echoing the params.
+        nxt = paging1.get("next")
+        assert nxt and "limit=2" in nxt and "offset=2" in nxt, (
+            f"next URL should echo limit/offset: {nxt!r}"
+        )
+
+        # offset skips into the collection and exposes a previous URL back to page 1.
+        second = client.get(
+            f"{API_URL}/models", headers=headers, params={"limit": 2, "offset": 2}
+        )
+        assert second.status_code == 200, (
+            f"Expected 200, got {second.status_code}: {second.text[:200]}"
+        )
+        body2 = second.json()
+        paging2 = body2.get("meta", {}).get("paging", {})
+        assert paging2.get("offset") == 2, f"offset=2 not honored: {paging2}"
+        prev = paging2.get("previous")
+        assert prev and "offset=0" in prev, f"previous URL missing/wrong: {prev!r}"
+
+        # The offset window actually moved: page 2's first model differs from page 1's.
+        page2 = body2.get("models") or []
+        if page1 and page2:
+            assert page1[0].get("id") != page2[0].get("id"), (
+                "offset did not shift the result window"
+            )
+
+
+@pytest.mark.live
 def test_get_model(integration_token):
     """GET /models/{modelId} returns model detail."""
     with httpx.Client() as client:
