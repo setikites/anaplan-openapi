@@ -58,6 +58,8 @@ paths:
         schema:
           type: string
         example: +name
+      - $ref: '#/components/parameters/Offset'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: All models in the user's default tenant.
@@ -125,6 +127,8 @@ paths:
         schema:
           type: string
         example: +name
+      - $ref: '#/components/parameters/Offset'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: Actions retrieved successfully
@@ -441,6 +445,8 @@ paths:
         schema:
           type: string
         example: +name
+      - $ref: '#/components/parameters/Offset'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: Exports retrieved successfully
@@ -573,6 +579,8 @@ paths:
         schema:
           type: string
         example: +name
+      - $ref: '#/components/parameters/Offset'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: Files in the model, each with the ID needed to upload.
@@ -645,6 +653,9 @@ paths:
         Model-direct equivalent of `GET /workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks`. Returns the same response shape: a `chunks` array of `{id, name}` objects (key omitted entirely when `chunkCount` is 0).
       tags:
       - Bulk Read
+      parameters:
+      - $ref: '#/components/parameters/Offset'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: Chunk IDs and names for the file.
@@ -702,6 +713,8 @@ paths:
         schema:
           type: string
         example: +name
+      - $ref: '#/components/parameters/Offset'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: Imports retrieved successfully
@@ -813,6 +826,9 @@ paths:
       tags:
       - Model Metadata
       - Line Item Metadata
+      parameters:
+      - $ref: '#/components/parameters/Offset'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: All line items in the model.
@@ -887,6 +903,9 @@ paths:
       tags:
       - Model Metadata
       - Line Item Metadata
+      parameters:
+      - $ref: '#/components/parameters/Offset'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: Dimensions that define the line item
@@ -992,6 +1011,9 @@ paths:
       tags:
       - Model Metadata
       - List Metadata
+      parameters:
+      - $ref: '#/components/parameters/Offset'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: Lists in the model.
@@ -1202,6 +1224,9 @@ paths:
       tags:
       - Model Metadata
       - Module & Saved View Metadata
+      parameters:
+      - $ref: '#/components/parameters/Offset'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: IDs and names of all modules in the model.
@@ -1350,6 +1375,8 @@ paths:
       - Module & Saved View Metadata
       parameters:
       - $ref: '#/components/parameters/IncludeAll'
+      - $ref: '#/components/parameters/Offset'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: Line items and metadata in the module.
@@ -1456,6 +1483,8 @@ paths:
         schema:
           type: boolean
         example: true
+      - $ref: '#/components/parameters/Offset'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: IDs and names of views in the module.
@@ -1515,6 +1544,8 @@ paths:
         schema:
           type: string
         example: +name
+      - $ref: '#/components/parameters/Offset'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: Processes retrieved successfully
@@ -1644,6 +1675,9 @@ paths:
       tags:
       - Model Metadata
       - Model Setting Metadata
+      parameters:
+      - $ref: '#/components/parameters/Offset'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: Version metadata for the model.
@@ -1796,6 +1830,8 @@ paths:
         schema:
           type: string
         example: 'true'
+      - $ref: '#/components/parameters/Offset'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: IDs and names of all views in the model.
@@ -2109,6 +2145,8 @@ paths:
         schema:
           type: string
         example: +firstName
+      - $ref: '#/components/parameters/Offset'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: All users in the tenant.
@@ -2200,6 +2238,8 @@ paths:
         schema:
           type: string
         example: +name
+      - $ref: '#/components/parameters/Offset'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: All workspaces the user can access.
@@ -2276,6 +2316,9 @@ paths:
         Returns all administrators for a workspace. Requires tenant admin privilege; workspace admin access alone is insufficient.
       tags:
       - General Workspace & Model Metadata
+      parameters:
+      - $ref: '#/components/parameters/Offset'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: Administrators retrieved successfully.
@@ -2365,6 +2408,9 @@ paths:
         Returns models accessible to the calling user within the specified workspace. The response shape is identical to `GET /2/0/models` but filtered to models within the given workspace.
       tags:
       - General Workspace & Model Metadata
+      parameters:
+      - $ref: '#/components/parameters/Offset'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: Models in the workspace accessible to the user.
@@ -2416,6 +2462,8 @@ paths:
         schema:
           type: string
         example: +name
+      - $ref: '#/components/parameters/Offset'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: Delete actions available in the model.
@@ -2714,6 +2762,9 @@ paths:
         Returns all dashboards defined in the specified model.
       tags:
       - Model Metadata
+      parameters:
+      - $ref: '#/components/parameters/Offset'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: Dashboards retrieved successfully
@@ -2926,6 +2977,8 @@ paths:
         schema:
           type: string
         example: +name
+      - $ref: '#/components/parameters/Offset'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: Export definitions in the model.
@@ -3055,6 +3108,8 @@ paths:
         schema:
           type: string
         example: -creationDate
+      - $ref: '#/components/parameters/Offset'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: List of export tasks
@@ -3223,6 +3278,8 @@ paths:
         schema:
           type: string
         example: +name
+      - $ref: '#/components/parameters/Offset'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: Files in the model.
@@ -3463,6 +3520,9 @@ paths:
         #
       tags:
       - Bulk Read
+      parameters:
+      - $ref: '#/components/parameters/Offset'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: Chunk IDs and names for the file.
@@ -3630,6 +3690,8 @@ paths:
         schema:
           type: string
         example: +name
+      - $ref: '#/components/parameters/Offset'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: Import definitions in the model.
@@ -4010,6 +4072,9 @@ paths:
         *   `Content-Type:application/json`
       tags:
       - Bulk Write
+      parameters:
+      - $ref: '#/components/parameters/Offset'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: List of chunks in the import failure dump file.
@@ -4082,6 +4147,9 @@ paths:
       tags:
       - Model Metadata
       - Line Item Metadata
+      parameters:
+      - $ref: '#/components/parameters/Offset'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: All line items in the model.
@@ -4159,6 +4227,9 @@ paths:
       tags:
       - Model Metadata
       - Line Item Metadata
+      parameters:
+      - $ref: '#/components/parameters/Offset'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: Dimensions that define the line item
@@ -4266,6 +4337,9 @@ paths:
       tags:
       - Model Metadata
       - List Metadata
+      parameters:
+      - $ref: '#/components/parameters/Offset'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: Lists in the model.
@@ -4415,6 +4489,8 @@ paths:
       - Transactional Read
       parameters:
       - $ref: '#/components/parameters/IncludeAll'
+      - $ref: '#/components/parameters/Offset'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '429':
           description: Rate limited — too many requests. Retry after a delay.
@@ -4811,6 +4887,9 @@ paths:
       tags:
       - Model Metadata
       - Module & Saved View Metadata
+      parameters:
+      - $ref: '#/components/parameters/Offset'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: IDs and names of all modules in the model.
@@ -4870,6 +4949,8 @@ paths:
       - Module & Saved View Metadata
       parameters:
       - $ref: '#/components/parameters/IncludeAll'
+      - $ref: '#/components/parameters/Offset'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: Line items and metadata in the module.
@@ -4979,6 +5060,8 @@ paths:
         schema:
           type: boolean
         example: true
+      - $ref: '#/components/parameters/Offset'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: IDs and names of views in the module.
@@ -5051,6 +5134,8 @@ paths:
         schema:
           type: string
         example: +name
+      - $ref: '#/components/parameters/Offset'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: Process definitions in the model.
@@ -5182,6 +5267,8 @@ paths:
         schema:
           type: string
         example: -creationDate
+      - $ref: '#/components/parameters/Offset'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: Tasks in the process.
@@ -5321,6 +5408,9 @@ paths:
       tags:
       - Model Metadata
       - Model Setting Metadata
+      parameters:
+      - $ref: '#/components/parameters/Offset'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: Version metadata for the model.
@@ -5415,6 +5505,8 @@ paths:
         schema:
           type: string
         example: 'true'
+      - $ref: '#/components/parameters/Offset'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: IDs and names of all views in the model.
@@ -5740,6 +5832,9 @@ paths:
         Returns all visitors for a workspace. Requires tenant admin privilege; workspace admin access alone is insufficient.
       tags:
       - General Workspace & Model Metadata
+      parameters:
+      - $ref: '#/components/parameters/Offset'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: Visitors retrieved successfully.
@@ -5939,6 +6034,29 @@ components:
       required: false
       schema:
         type: string
+    Offset:
+      name: offset
+      in: query
+      description: Zero-based index of the first result to return. Use with `limit` to page through results. The response
+        echoes the applied offset in `meta.paging.offset`, and when more results remain the server supplies a ready-to-use
+        next-page URL (the `next` field of `meta.paging`, e.g. `.../models?limit=20&offset=20`).
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+      example: 0
+    Limit:
+      name: limit
+      in: query
+      description: Maximum number of results to return per page. Use with `offset` to page through results. Live testing shows
+        a default page size of 5000 when `limit` is omitted (`GET /models`); the server-generated `meta.paging.next` URL uses
+        `limit=20`. Compare `meta.paging.currentPageSize` against `meta.paging.totalSize` to detect whether further pages
+        exist.
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+      example: 100
     TenantDetails:
       name: tenantDetails
       in: query
@@ -6972,8 +7090,14 @@ components:
           type: integer
         totalSize:
           type: integer
+          description: Total number of results matching the query, across all pages.
         offset:
           type: integer
+          description: Zero-based index of the first result in this page.
+        next:
+          type: string
+          description: Ready-to-use URL for the next page of results, echoing the `limit` and `offset` query parameters (e.g.
+            `.../models?limit=20&offset=20`). Present only when further results remain.
     Status:
       description: Response status object present in every Anaplan API response envelope. `code` is the Anaplan-specific status
         code (not the HTTP status code); `message` is the human-readable outcome.

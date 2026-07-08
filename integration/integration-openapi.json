@@ -92,6 +92,12 @@
               "type": "string"
             },
             "example": "+name"
+          },
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
           }
         ],
         "responses": {
@@ -193,6 +199,12 @@
               "type": "string"
             },
             "example": "+name"
+          },
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
           }
         ],
         "responses": {
@@ -596,6 +608,12 @@
               "type": "string"
             },
             "example": "+name"
+          },
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
           }
         ],
         "responses": {
@@ -756,6 +774,12 @@
               "type": "string"
             },
             "example": "+name"
+          },
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
           }
         ],
         "responses": {
@@ -858,6 +882,14 @@
         "tags": [
           "Bulk Read"
         ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Chunk IDs and names for the file.",
@@ -941,6 +973,12 @@
               "type": "string"
             },
             "example": "+name"
+          },
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
           }
         ],
         "responses": {
@@ -1087,6 +1125,14 @@
           "Model Metadata",
           "Line Item Metadata"
         ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
+        ],
         "responses": {
           "200": {
             "description": "All line items in the model.",
@@ -1189,6 +1235,14 @@
         "tags": [
           "Model Metadata",
           "Line Item Metadata"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
         ],
         "responses": {
           "200": {
@@ -1333,6 +1387,14 @@
         "tags": [
           "Model Metadata",
           "List Metadata"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
         ],
         "responses": {
           "200": {
@@ -1630,6 +1692,14 @@
           "Model Metadata",
           "Module & Saved View Metadata"
         ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
+        ],
         "responses": {
           "200": {
             "description": "IDs and names of all modules in the model.",
@@ -1844,6 +1914,12 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/IncludeAll"
+          },
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
           }
         ],
         "responses": {
@@ -1989,6 +2065,12 @@
               "type": "boolean"
             },
             "example": true
+          },
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
           }
         ],
         "responses": {
@@ -2073,6 +2155,12 @@
               "type": "string"
             },
             "example": "+name"
+          },
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
           }
         ],
         "responses": {
@@ -2235,6 +2323,14 @@
         "tags": [
           "Model Metadata",
           "Model Setting Metadata"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
         ],
         "responses": {
           "200": {
@@ -2399,6 +2495,12 @@
               "type": "string"
             },
             "example": "true"
+          },
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
           }
         ],
         "responses": {
@@ -2786,6 +2888,12 @@
               "type": "string"
             },
             "example": "+firstName"
+          },
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
           }
         ],
         "responses": {
@@ -2910,6 +3018,12 @@
               "type": "string"
             },
             "example": "+name"
+          },
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
           }
         ],
         "responses": {
@@ -3029,6 +3143,14 @@
         "description": "Minimum role: User Administrator.\n\nReturns all administrators for a workspace. Requires tenant admin privilege; workspace admin access alone is insufficient.",
         "tags": [
           "General Workspace & Model Metadata"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
         ],
         "responses": {
           "200": {
@@ -3162,6 +3284,14 @@
         "tags": [
           "General Workspace & Model Metadata"
         ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Models in the workspace accessible to the user.",
@@ -3216,6 +3346,12 @@
               "type": "string"
             },
             "example": "+name"
+          },
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
           }
         ],
         "responses": {
@@ -3598,6 +3734,14 @@
         "tags": [
           "Model Metadata"
         ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Dashboards retrieved successfully",
@@ -3866,6 +4010,12 @@
               "type": "string"
             },
             "example": "+name"
+          },
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
           }
         ],
         "responses": {
@@ -4035,6 +4185,12 @@
               "type": "string"
             },
             "example": "-creationDate"
+          },
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
           }
         ],
         "responses": {
@@ -4221,6 +4377,12 @@
               "type": "string"
             },
             "example": "+name"
+          },
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
           }
         ],
         "responses": {
@@ -4481,6 +4643,14 @@
         "tags": [
           "Bulk Read"
         ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Chunk IDs and names for the file.",
@@ -4696,6 +4866,12 @@
               "type": "string"
             },
             "example": "+name"
+          },
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
           }
         ],
         "responses": {
@@ -5098,6 +5274,14 @@
         "tags": [
           "Bulk Write"
         ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
+        ],
         "responses": {
           "200": {
             "description": "List of chunks in the import failure dump file.",
@@ -5187,6 +5371,14 @@
         "tags": [
           "Model Metadata",
           "Line Item Metadata"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
         ],
         "responses": {
           "200": {
@@ -5293,6 +5485,14 @@
         "tags": [
           "Model Metadata",
           "Line Item Metadata"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
         ],
         "responses": {
           "200": {
@@ -5443,6 +5643,14 @@
         "tags": [
           "Model Metadata",
           "List Metadata"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
         ],
         "responses": {
           "200": {
@@ -5624,6 +5832,12 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/IncludeAll"
+          },
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
           }
         ],
         "responses": {
@@ -6077,6 +6291,14 @@
           "Model Metadata",
           "Module & Saved View Metadata"
         ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
+        ],
         "responses": {
           "200": {
             "description": "IDs and names of all modules in the model.",
@@ -6163,6 +6385,12 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/IncludeAll"
+          },
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
           }
         ],
         "responses": {
@@ -6311,6 +6539,12 @@
               "type": "boolean"
             },
             "example": true
+          },
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
           }
         ],
         "responses": {
@@ -6398,6 +6632,12 @@
               "type": "string"
             },
             "example": "+name"
+          },
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
           }
         ],
         "responses": {
@@ -6579,6 +6819,12 @@
               "type": "string"
             },
             "example": "-creationDate"
+          },
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
           }
         ],
         "responses": {
@@ -6729,6 +6975,14 @@
           "Model Metadata",
           "Model Setting Metadata"
         ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Version metadata for the model.",
@@ -6828,6 +7082,12 @@
               "type": "string"
             },
             "example": "true"
+          },
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
           }
         ],
         "responses": {
@@ -7247,6 +7507,14 @@
         "tags": [
           "General Workspace & Model Metadata"
         ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Visitors retrieved successfully.",
@@ -7488,6 +7756,28 @@
         "schema": {
           "type": "string"
         }
+      },
+      "Offset": {
+        "name": "offset",
+        "in": "query",
+        "description": "Zero-based index of the first result to return. Use with `limit` to page through results. The response echoes the applied offset in `meta.paging.offset`, and when more results remain the server supplies a ready-to-use next-page URL (the `next` field of `meta.paging`, e.g. `.../models?limit=20&offset=20`).",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "example": 0
+      },
+      "Limit": {
+        "name": "limit",
+        "in": "query",
+        "description": "Maximum number of results to return per page. Use with `offset` to page through results. Live testing shows a default page size of 5000 when `limit` is omitted (`GET /models`); the server-generated `meta.paging.next` URL uses `limit=20`. Compare `meta.paging.currentPageSize` against `meta.paging.totalSize` to detect whether further pages exist.",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "example": 100
       },
       "TenantDetails": {
         "name": "tenantDetails",
@@ -8954,10 +9244,16 @@
             "type": "integer"
           },
           "totalSize": {
-            "type": "integer"
+            "type": "integer",
+            "description": "Total number of results matching the query, across all pages."
           },
           "offset": {
-            "type": "integer"
+            "type": "integer",
+            "description": "Zero-based index of the first result in this page."
+          },
+          "next": {
+            "type": "string",
+            "description": "Ready-to-use URL for the next page of results, echoing the `limit` and `offset` query parameters (e.g. `.../models?limit=20&offset=20`). Present only when further results remain."
           }
         }
       },
