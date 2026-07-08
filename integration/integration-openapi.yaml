@@ -7088,6 +7088,8 @@ components:
       properties:
         currentPageSize:
           type: integer
+          description: Number of results in this page. When `limit` is omitted the server returns up to a default page size
+            of 5000.
         totalSize:
           type: integer
           description: Total number of results matching the query, across all pages.
@@ -7098,6 +7100,10 @@ components:
           type: string
           description: Ready-to-use URL for the next page of results, echoing the `limit` and `offset` query parameters (e.g.
             `.../models?limit=20&offset=20`). Present only when further results remain.
+        previous:
+          type: string
+          description: Ready-to-use URL for the previous page of results, echoing `limit` and `offset`. Present only when
+            paging past the first page (offset > 0).
     Status:
       description: Response status object present in every Anaplan API response envelope. `code` is the Anaplan-specific status
         code (not the HTTP status code); `message` is the human-readable outcome.
