@@ -317,50 +317,6 @@
   },
   "components": {
     "schemas": {
-      "PatchOp": {
-        "type": "object",
-        "description": "SCIM PATCH request body (RFC 7644 \u00a73.5.2).",
-        "required": [
-          "schemas",
-          "Operations"
-        ],
-        "properties": {
-          "schemas": {
-            "type": "array",
-            "description": "List of SCIM schema URNs declaring the patch request type; must include `urn:ietf:params:scim:api:messages:2.0:PatchOp`.",
-            "items": {
-              "type": "string"
-            }
-          },
-          "Operations": {
-            "type": "array",
-            "description": "List of PATCH operations to apply.",
-            "items": {
-              "type": "object",
-              "required": [
-                "op"
-              ],
-              "properties": {
-                "op": {
-                  "type": "string",
-                  "enum": [
-                    "add",
-                    "remove",
-                    "replace"
-                  ]
-                },
-                "path": {
-                  "type": "string",
-                  "description": "SCIM attribute path to operate on."
-                },
-                "value": {
-                  "description": "New value for `add` or `replace` operations."
-                }
-              }
-            }
-          }
-        }
-      },
       "User": {
         "type": "object",
         "description": "Anaplan SCIM User resource. Implements the SCIM core User schema plus Anaplan-specific entitlements.",
@@ -484,6 +440,50 @@
               },
               "location": {
                 "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "PatchOp": {
+        "type": "object",
+        "description": "SCIM PATCH request body (RFC 7644 \u00a73.5.2).",
+        "required": [
+          "schemas",
+          "Operations"
+        ],
+        "properties": {
+          "schemas": {
+            "type": "array",
+            "description": "List of SCIM schema URNs declaring the patch request type; must include `urn:ietf:params:scim:api:messages:2.0:PatchOp`.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "Operations": {
+            "type": "array",
+            "description": "List of PATCH operations to apply.",
+            "items": {
+              "type": "object",
+              "required": [
+                "op"
+              ],
+              "properties": {
+                "op": {
+                  "type": "string",
+                  "enum": [
+                    "add",
+                    "remove",
+                    "replace"
+                  ]
+                },
+                "path": {
+                  "type": "string",
+                  "description": "SCIM attribute path to operate on."
+                },
+                "value": {
+                  "description": "New value for `add` or `replace` operations."
+                }
               }
             }
           }

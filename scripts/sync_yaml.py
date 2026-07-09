@@ -27,6 +27,19 @@ class _LiteralDumper(yaml.Dumper):
 _LiteralDumper.add_representer(str, _literal_representer)
 
 
+def render_yaml(spec: dict) -> str:
+    """Serialize a spec dict to the canonical YAML text. Single source of truth so the
+    drift check (scripts/check_generated.py) and the writer below never diverge."""
+    return yaml.dump(
+        spec,
+        Dumper=_LiteralDumper,
+        allow_unicode=True,
+        default_flow_style=False,
+        sort_keys=False,
+        width=120,
+    )
+
+
 def sync_yaml(json_path: Path) -> Path:
     yaml_path = json_path.with_suffix(".yaml")
 
@@ -34,15 +47,7 @@ def sync_yaml(json_path: Path) -> Path:
         spec = json.load(f)
 
     with yaml_path.open("w", encoding="utf-8", newline="\n") as f:
-        yaml.dump(
-            spec,
-            f,
-            Dumper=_LiteralDumper,
-            allow_unicode=True,
-            default_flow_style=False,
-            sort_keys=False,
-            width=120,
-        )
+        f.write(render_yaml(spec))
 
     return yaml_path
 

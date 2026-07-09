@@ -97,28 +97,23 @@ def transform(d):
     # Carry the referenced shared parameters (paths $ref them post-ADR-0005);
     # prune unreferenced ones like schemas, and strip ID constraints to match
     # the inline treatment. Schemas a carried param references stay reachable.
-    kept_params = {}
-    for ref in seed:
-        if ref.startswith("#/components/parameters/"):
-            name = ref.rsplit("/", 1)[-1]
-            if name in comp_params and name not in kept_params:
-                kept_params[name] = comp_params[name]
+    # Emit in source order (not seed-set order) so output is deterministic.
+    param_names = {r.rsplit("/", 1)[-1] for r in seed if r.startswith("#/components/parameters/")}
+    kept_params = {name: comp_params[name] for name in comp_params if name in param_names}
     strip_id_constraints(list(kept_params.values()))
     collect_refs(kept_params, seed)
 
-    queue, seen, kept = list(seed), set(), {}
+    # Transitive closure of reachable schema names, then emit in source order.
+    reachable, queue = set(), [r for r in seed if r.startswith("#/components/schemas/")]
     while queue:
-        ref = queue.pop()
-        if ref in seen:
+        name = queue.pop().rsplit("/", 1)[-1]
+        if name in reachable or name not in schemas:
             continue
-        seen.add(ref)
-        if ref.startswith("#/components/schemas/"):
-            name = ref.rsplit("/", 1)[-1]
-            if name in schemas and name not in kept:
-                kept[name] = schemas[name]
-                sub = set()
-                collect_refs(schemas[name], sub)
-                queue.extend(sub)
+        reachable.add(name)
+        sub = set()
+        collect_refs(schemas[name], sub)
+        queue.extend(r for r in sub if r.startswith("#/components/schemas/"))
+    kept = {name: schemas[name] for name in schemas if name in reachable}
 
     out_comps = {}
     if kept:
@@ -132,15 +127,20 @@ def transform(d):
     return out
 
 
+def render_mcp(spec):
+    """Serialize a *-openapi.json spec dict to its canonical *-mcp.json text. Single source of
+    truth so the drift check (scripts/check_generated.py) and the writer below never diverge."""
+    return json.dumps(transform(spec), indent=2) + "\n"
+
+
 def main(src):
     if not src.endswith("-openapi.json"):
         sys.exit(f"expected a *-openapi.json file, got: {src}")
     dst = src.replace("-openapi.json", "-mcp.json")
     d = json.load(open(src, encoding="utf-8"))
-    out = transform(d)
     with open(dst, "w", encoding="utf-8") as f:
-        json.dump(out, f, indent=2)
-        f.write("\n")
+        f.write(render_mcp(d))
+    out = transform(d)
     n_tools = sum(1 for it in out["paths"].values() for k in it if k in METHODS)
     print(f"{dst}: {len(out['paths'])} paths, {n_tools} tools, {len(out.get('components', {}).get('schemas', {}))} schemas")
 

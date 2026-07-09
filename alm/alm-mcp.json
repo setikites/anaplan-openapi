@@ -595,6 +595,21 @@
   },
   "components": {
     "schemas": {
+      "OnlineStatusRequest": {
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "online",
+              "offline"
+            ]
+          }
+        }
+      },
       "RevisionRequest": {
         "type": "object",
         "required": [
@@ -662,21 +677,6 @@
             "description": "Target revision identifier (32-character uppercase hex string). From `GET /models/{modelId}/alm/revisions` (`revisions[].id`) on the request-path model (`{modelId}`). Required for comparison and summary report tasks."
           }
         }
-      },
-      "OnlineStatusRequest": {
-        "type": "object",
-        "required": [
-          "status"
-        ],
-        "properties": {
-          "status": {
-            "type": "string",
-            "enum": [
-              "online",
-              "offline"
-            ]
-          }
-        }
       }
     },
     "parameters": {
@@ -689,19 +689,19 @@
           "type": "string"
         }
       },
-      "ModelId": {
-        "name": "modelId",
+      "TargetRevisionId": {
+        "name": "targetRevisionId",
         "in": "path",
-        "description": "Model identifier (32-character uppercase hex string). From `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2).",
+        "description": "Target revision identifier (32-character uppercase hex string). From `GET /models/{modelId}/alm/revisions`.",
         "required": true,
         "schema": {
           "type": "string"
         }
       },
-      "TargetRevisionId": {
-        "name": "targetRevisionId",
+      "ModelId": {
+        "name": "modelId",
         "in": "path",
-        "description": "Target revision identifier (32-character uppercase hex string). From `GET /models/{modelId}/alm/revisions`.",
+        "description": "Model identifier (32-character uppercase hex string). From `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2).",
         "required": true,
         "schema": {
           "type": "string"

@@ -722,6 +722,39 @@
   },
   "components": {
     "schemas": {
+      "ODataRecord": {
+        "type": "object",
+        "description": "A row in a client schema staging table. Field names and types are defined by the table's schema and vary by client configuration.\n\nSupported data types per field:\n- **string** \u2014 alphanumeric text (dimension member names such as `Scenario_Name`)\n- **number** \u2014 integer or decimal (e.g. `Amount`, `Periodic_Amount`)\n- **boolean** \u2014 `1` for true, `0` for false\n\nDimension fields conventionally end with `_Name`; measure fields use bare names.",
+        "additionalProperties": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "boolean"
+            }
+          ]
+        },
+        "example": {
+          "Account_Name": "6001",
+          "Audit_Name": "Reclassification",
+          "CostCenter_Name": "000",
+          "Currency_Name": "USD",
+          "DataView_Name": "Value",
+          "Date_Name": "2023 Dec",
+          "Entity_Name": "120",
+          "Intercompany_Name": "No Intercompany",
+          "Movement_Name": "Closing",
+          "Product_Name": "No product",
+          "Scenario_Name": "Budget",
+          "Amount": 25000.0,
+          "Text": null,
+          "Periodic_Amount": null
+        }
+      },
       "UserInput": {
         "type": "object",
         "properties": {
@@ -755,42 +788,19 @@
             ]
           }
         }
-      },
-      "ODataRecord": {
-        "type": "object",
-        "description": "A row in a client schema staging table. Field names and types are defined by the table's schema and vary by client configuration.\n\nSupported data types per field:\n- **string** \u2014 alphanumeric text (dimension member names such as `Scenario_Name`)\n- **number** \u2014 integer or decimal (e.g. `Amount`, `Periodic_Amount`)\n- **boolean** \u2014 `1` for true, `0` for false\n\nDimension fields conventionally end with `_Name`; measure fields use bare names.",
-        "additionalProperties": {
-          "oneOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "number"
-            },
-            {
-              "type": "boolean"
-            }
-          ]
-        },
-        "example": {
-          "Account_Name": "6001",
-          "Audit_Name": "Reclassification",
-          "CostCenter_Name": "000",
-          "Currency_Name": "USD",
-          "DataView_Name": "Value",
-          "Date_Name": "2023 Dec",
-          "Entity_Name": "120",
-          "Intercompany_Name": "No Intercompany",
-          "Movement_Name": "Closing",
-          "Product_Name": "No product",
-          "Scenario_Name": "Budget",
-          "Amount": 25000.0,
-          "Text": null,
-          "Periodic_Amount": null
-        }
       }
     },
     "parameters": {
+      "TenantHeader": {
+        "name": "TENANT",
+        "in": "header",
+        "required": true,
+        "description": "Tenant name as displayed in the Financial Consolidation UI. Must match exactly, including spaces and underscores. Required on every request.",
+        "schema": {
+          "type": "string",
+          "example": "CustomerTenant"
+        }
+      },
       "TableName": {
         "name": "tableName",
         "in": "path",
@@ -810,16 +820,6 @@
           "type": "string"
         },
         "example": "ImportsandExports"
-      },
-      "TenantHeader": {
-        "name": "TENANT",
-        "in": "header",
-        "required": true,
-        "description": "Tenant name as displayed in the Financial Consolidation UI. Must match exactly, including spaces and underscores. Required on every request.",
-        "schema": {
-          "type": "string",
-          "example": "CustomerTenant"
-        }
       },
       "WorkflowName": {
         "name": "name_of_workflow",

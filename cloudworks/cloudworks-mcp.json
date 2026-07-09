@@ -1376,172 +1376,6 @@
   },
   "components": {
     "schemas": {
-      "NotificationRequest": {
-        "type": "object",
-        "required": [
-          "integrationIds",
-          "channels",
-          "notifications"
-        ],
-        "properties": {
-          "integrationIds": {
-            "type": "array",
-            "description": "Integration IDs to attach this notification to. Currently supports a single ID. From `GET /integrations` (`integrations[].integrationId`).",
-            "items": {
-              "type": "string"
-            },
-            "example": [
-              "e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b4"
-            ]
-          },
-          "channels": {
-            "type": "array",
-            "description": "Notification channels.",
-            "items": {
-              "type": "string",
-              "enum": [
-                "email",
-                "in_app"
-              ]
-            },
-            "example": [
-              "email",
-              "in_app"
-            ]
-          },
-          "notifications": {
-            "description": "Notification rules; each entry in config maps an outcome type to the users to notify.",
-            "type": "object",
-            "required": [
-              "config"
-            ],
-            "properties": {
-              "config": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "description": "The integration outcome that triggers notification: success, partial_failure, or full_failure.",
-                      "type": "string",
-                      "enum": [
-                        "success",
-                        "partial_failure",
-                        "full_failure"
-                      ]
-                    },
-                    "users": {
-                      "type": "array",
-                      "description": "User GUIDs to notify.",
-                      "items": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "Schedule": {
-        "type": "object",
-        "required": [
-          "name",
-          "type",
-          "startDate",
-          "endDate",
-          "timezone"
-        ],
-        "description": "Schedule definition. Required fields vary by `type`.",
-        "properties": {
-          "name": {
-            "type": "string",
-            "example": "test schedule"
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "weekly",
-              "daily",
-              "hourly",
-              "monthly_specific_day",
-              "monthly_relative_weekday"
-            ]
-          },
-          "time": {
-            "type": "string",
-            "description": "Run time in HH:MM format. Required for `weekly`, `daily`, `monthly_specific_day`, `monthly_relative_weekday`.",
-            "example": "12:45"
-          },
-          "fromTime": {
-            "type": "string",
-            "description": "Start of hourly window in HH:MM format. Required for `hourly`.",
-            "example": "20:00"
-          },
-          "toTime": {
-            "type": "string",
-            "description": "End of hourly window in HH:MM format. Required for `hourly`.",
-            "example": "23:20"
-          },
-          "daysOfWeek": {
-            "type": "array",
-            "description": "Days of the week (0=Sunday). Required for `weekly`, `hourly`, `monthly_relative_weekday`.",
-            "items": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 6
-            },
-            "example": [
-              0,
-              6
-            ]
-          },
-          "dayOfMonth": {
-            "type": "integer",
-            "description": "Day of the month (1\u201331). Required for `monthly_specific_day`.",
-            "minimum": 1,
-            "maximum": 31,
-            "example": 12
-          },
-          "dayOfWeek": {
-            "type": "integer",
-            "description": "Day of the week (0=Sunday). Required for `monthly_relative_weekday`.",
-            "minimum": 0,
-            "maximum": 6
-          },
-          "repeatEvery": {
-            "type": "integer",
-            "description": "Repeat interval. Required for `monthly_relative_weekday` (nth weekday of month) and `hourly` (every N hours).",
-            "example": 2
-          },
-          "startDate": {
-            "type": "string",
-            "format": "date",
-            "description": "Schedule start date.",
-            "example": "2020-07-03"
-          },
-          "endDate": {
-            "type": "string",
-            "format": "date",
-            "description": "Schedule end date.",
-            "example": "2020-12-01"
-          },
-          "timezone": {
-            "type": "string",
-            "description": "IANA timezone name.",
-            "example": "Europe/Paris"
-          },
-          "status": {
-            "description": "Schedule enabled/disabled state. Present in GET responses; not required in create/update requests.",
-            "type": "string",
-            "enum": [
-              "Active",
-              "Inactive"
-            ]
-          }
-        }
-      },
       "Job": {
         "type": "object",
         "required": [
@@ -1673,6 +1507,172 @@
             }
           }
         }
+      },
+      "Schedule": {
+        "type": "object",
+        "required": [
+          "name",
+          "type",
+          "startDate",
+          "endDate",
+          "timezone"
+        ],
+        "description": "Schedule definition. Required fields vary by `type`.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "test schedule"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "weekly",
+              "daily",
+              "hourly",
+              "monthly_specific_day",
+              "monthly_relative_weekday"
+            ]
+          },
+          "time": {
+            "type": "string",
+            "description": "Run time in HH:MM format. Required for `weekly`, `daily`, `monthly_specific_day`, `monthly_relative_weekday`.",
+            "example": "12:45"
+          },
+          "fromTime": {
+            "type": "string",
+            "description": "Start of hourly window in HH:MM format. Required for `hourly`.",
+            "example": "20:00"
+          },
+          "toTime": {
+            "type": "string",
+            "description": "End of hourly window in HH:MM format. Required for `hourly`.",
+            "example": "23:20"
+          },
+          "daysOfWeek": {
+            "type": "array",
+            "description": "Days of the week (0=Sunday). Required for `weekly`, `hourly`, `monthly_relative_weekday`.",
+            "items": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6
+            },
+            "example": [
+              0,
+              6
+            ]
+          },
+          "dayOfMonth": {
+            "type": "integer",
+            "description": "Day of the month (1\u201331). Required for `monthly_specific_day`.",
+            "minimum": 1,
+            "maximum": 31,
+            "example": 12
+          },
+          "dayOfWeek": {
+            "type": "integer",
+            "description": "Day of the week (0=Sunday). Required for `monthly_relative_weekday`.",
+            "minimum": 0,
+            "maximum": 6
+          },
+          "repeatEvery": {
+            "type": "integer",
+            "description": "Repeat interval. Required for `monthly_relative_weekday` (nth weekday of month) and `hourly` (every N hours).",
+            "example": 2
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Schedule start date.",
+            "example": "2020-07-03"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Schedule end date.",
+            "example": "2020-12-01"
+          },
+          "timezone": {
+            "type": "string",
+            "description": "IANA timezone name.",
+            "example": "Europe/Paris"
+          },
+          "status": {
+            "description": "Schedule enabled/disabled state. Present in GET responses; not required in create/update requests.",
+            "type": "string",
+            "enum": [
+              "Active",
+              "Inactive"
+            ]
+          }
+        }
+      },
+      "NotificationRequest": {
+        "type": "object",
+        "required": [
+          "integrationIds",
+          "channels",
+          "notifications"
+        ],
+        "properties": {
+          "integrationIds": {
+            "type": "array",
+            "description": "Integration IDs to attach this notification to. Currently supports a single ID. From `GET /integrations` (`integrations[].integrationId`).",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b4"
+            ]
+          },
+          "channels": {
+            "type": "array",
+            "description": "Notification channels.",
+            "items": {
+              "type": "string",
+              "enum": [
+                "email",
+                "in_app"
+              ]
+            },
+            "example": [
+              "email",
+              "in_app"
+            ]
+          },
+          "notifications": {
+            "description": "Notification rules; each entry in config maps an outcome type to the users to notify.",
+            "type": "object",
+            "required": [
+              "config"
+            ],
+            "properties": {
+              "config": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "description": "The integration outcome that triggers notification: success, partial_failure, or full_failure.",
+                      "type": "string",
+                      "enum": [
+                        "success",
+                        "partial_failure",
+                        "full_failure"
+                      ]
+                    },
+                    "users": {
+                      "type": "array",
+                      "description": "User GUIDs to notify.",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
     "parameters": {
@@ -1685,19 +1685,19 @@
           "type": "string"
         }
       },
-      "IntegrationFlowId": {
-        "name": "integrationFlowId",
+      "IntegrationId": {
+        "name": "integrationId",
         "in": "path",
-        "description": "Integration flow identifier. From `GET /integrationflows`.",
+        "description": "Integration identifier \u2014 the `integrationId` field of each item in `GET /integrations` (not `id`).",
         "required": true,
         "schema": {
           "type": "string"
         }
       },
-      "IntegrationId": {
-        "name": "integrationId",
+      "IntegrationFlowId": {
+        "name": "integrationFlowId",
         "in": "path",
-        "description": "Integration identifier \u2014 the `integrationId` field of each item in `GET /integrations` (not `id`).",
+        "description": "Integration flow identifier. From `GET /integrationflows`.",
         "required": true,
         "schema": {
           "type": "string"
