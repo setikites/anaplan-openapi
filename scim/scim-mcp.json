@@ -76,10 +76,24 @@
           {
             "name": "filter",
             "in": "query",
-            "description": "SCIM filter expression.",
+            "description": "SCIM filter expression. The Anaplan implementation supports only a subset; unsupported operators or attributes return 400 with scimType `invalidValue`.\n\n**Operators:** `eq`, `ne`, `pr`, `gt`, `ge`, `lt`, `le`.\n\n**Logical operators / grouping:** `and`, `or`, and precedence grouping with `( )` (including nested groups).\n\n**Filterable attributes:** `userName`, `active`, `id`, `externalId`, and `name` sub-attributes via dot notation (e.g. `name.familyName`).",
             "schema": {
               "type": "string",
               "example": "userName eq \"john@example.com\""
+            },
+            "examples": {
+              "byUserName": {
+                "summary": "Match a user by email (userName)",
+                "value": "userName eq \"john@example.com\""
+              },
+              "activeOnly": {
+                "summary": "Active users only",
+                "value": "active eq true"
+              },
+              "andGrouped": {
+                "summary": "Combine conditions with and + grouping",
+                "value": "(userName eq \"john@example.com\") and (active eq true)"
+              }
             }
           },
           {
