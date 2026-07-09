@@ -85,9 +85,13 @@ Calls require an active, non-SSO Anaplan user with the `USER_ADMIN` role.
 | `startIndex` | integer | 1 | 1-based start index for pagination |
 | `count` | integer | 50 | Results per page; max 100 |
 
-**Filterable fields:** `id`, `externalId`, `userName`, `name.familyName`, `name.givenName`, `active`
+Filter support was probed live against `GET /Users` with a `USER_ADMIN` token (issue #223). Anything outside the supported set returns `400` with scimType `invalidValue` and detail *"The specified filter syntax was invalid, or the specified attribute and filter comparison combination is not supported"*.
 
-**Supported filter operators:** `Eq`, `Ne`, `Pr`, `Gt`, `Ge`, `Lt`, `Le`
+**Supported operators:** `eq`, `ne`, `pr`, `gt`, `ge`, `lt`, `le`. The substring operators `co` (contains), `sw` (starts with), and `ew` (ends with) return 400.
+
+**Logical operators / grouping:** `and`, `or`, and precedence grouping with `( )` (including nested groups) are supported. `not` returns 400. Multi-valued complex-attribute filters using `[ ]` (e.g. `emails[type eq "work"]`) return 400.
+
+**Filterable attributes:** `userName`, `active`, `id`, `externalId`, and `name` sub-attributes via dot notation (`name.familyName` confirmed). `displayName` and `emails` value paths (`emails.value`) return 400.
 
 ## Entitlements
 
@@ -139,7 +143,7 @@ Accept: application/json
 
 | Endpoint | Happy Path | Error Cases | Notes |
 |----------|-----------|-------------|-------|
-| `GET /Users` | Partial | — | Auth schemes confirmed (issue #44); full response not yet tested (needs USER_ADMIN role) |
+| `GET /Users` | Partial | ✓ | Auth schemes confirmed (issue #44); filter operators/attributes probed live with USER_ADMIN token (issue #223) |
 | `POST /Users` | — | — | Not yet tested |
 | `GET /Users/{id}` | — | — | Not yet tested |
 | `PUT /Users/{id}` | — | — | Not yet tested |
