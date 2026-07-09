@@ -53,7 +53,7 @@ paths:
 
           **Logical operators / grouping:** `and`, `or`, and precedence grouping with `( )` (including nested groups).
 
-          **Filterable attributes:** `userName`, `active`, `id`, `externalId`, and `name` sub-attributes via dot notation (e.g. `name.familyName`).
+          **Filterable attributes:** `userName`, `active`, `id`, `externalId`, and `name` sub-attributes via dot notation such as `name.familyName`.
         schema:
           type: string
           example: userName eq "john@example.com"
