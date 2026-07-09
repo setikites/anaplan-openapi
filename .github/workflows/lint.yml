@@ -21,5 +21,8 @@ jobs:
       - name: Check for unused components
         run: uv run python scripts/check_unused_components.py
 
+      - name: Check generated specs are in sync (YAML + MCP)
+        run: uv run python scripts/check_generated.py
+
       - name: Run tests
         run: uv run pytest tests/ -v --tb=short -m "not live"
