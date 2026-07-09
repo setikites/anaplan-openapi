@@ -90,6 +90,12 @@
               "type": "string"
             },
             "example": "+name"
+          },
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
           }
         ],
         "responses": {
@@ -145,6 +151,12 @@
               "type": "string"
             },
             "example": "+name"
+          },
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
           }
         ],
         "responses": {
@@ -305,6 +317,12 @@
               "type": "string"
             },
             "example": "+name"
+          },
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
           }
         ],
         "responses": {
@@ -353,6 +371,12 @@
               "type": "string"
             },
             "example": "+name"
+          },
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
           }
         ],
         "responses": {
@@ -375,6 +399,14 @@
         "operationId": "getModelsByModelidFilesByFileidChunks",
         "summary": "Get Chunks Details (model-direct)",
         "description": "Minimum role: Standard User.\n\nModel-direct equivalent of `GET /workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks`. Returns the same response shape: a `chunks` array of `{id, name}` objects (key omitted entirely when `chunkCount` is 0).",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Chunk IDs and names for the file."
@@ -401,6 +433,12 @@
               "type": "string"
             },
             "example": "+name"
+          },
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
           }
         ],
         "responses": {
@@ -440,6 +478,14 @@
         "operationId": "getModelsByModelidLineitems",
         "summary": "Retrieve all line items in a model",
         "description": "Minimum role: Standard User.\n\nUse this call to retrieve identifiers of all line items in a model.\n\n**Notes**:\n\n*   The returned line items are restricted just to those in modules to which the model role of the user has Read access.\n*   The response returns Items within a [flat list](https://help.anaplan.com/anapedia/Content/Modeling/Dimensions/Lists.html) (no hierarchy).\n*   This returns all the line items in the model. For line items in a specific module see Retrieve Line Items For a Module.\n*   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
+        ],
         "responses": {
           "200": {
             "description": "All line items in the model."
@@ -463,6 +509,14 @@
         "operationId": "getModelsByModelidLineitemsByLineitemidDimensions",
         "summary": "Retrieve dimensions IDs for a line item",
         "description": "Minimum role: Standard User.\n\nUse this call to retrieve the IDs of dimensions that define a line item.\n\nFor reference, see Retrieve dimension items for a line item.\n\nNotes:\n\n*   This returns a list of all the dimensions that apply to that line item.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Dimensions that define the line item"
@@ -503,6 +557,14 @@
         "operationId": "getModelsByModelidLists",
         "summary": "Model-direct form: Retrieve Lists",
         "description": "Minimum role: Standard User.\n\nAlternate URL form \u2014 response is equivalent to `/workspaces/{workspaceId}/models/{modelId}/lists`.\n\nUse this call to retrieve lists for a specified workspace and model.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Lists in the model."
@@ -595,6 +657,14 @@
         "operationId": "getModelsByModelidModules",
         "summary": "Retrieve IDs and names for all modules in a model",
         "description": "Minimum role: Standard User.\n\nUse this call to retrieve the IDs and names of all modules for a specified model.\n\n**Notes**:\n\n*   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
+        ],
         "responses": {
           "200": {
             "description": "IDs and names of all modules in the model."
@@ -738,6 +808,12 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/IncludeAll"
+          },
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
           }
         ],
         "responses": {
@@ -768,6 +844,12 @@
               "type": "boolean"
             },
             "example": true
+          },
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
           }
         ],
         "responses": {
@@ -799,6 +881,12 @@
               "type": "string"
             },
             "example": "+name"
+          },
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
           }
         ],
         "responses": {
@@ -849,6 +937,14 @@
         "operationId": "getModelsByModelidVersions",
         "summary": "Retrieve version metadata",
         "description": "Minimum role: Workspace Administrator.\n\nUse this call to get information about the model versions. The response contains a list of the versions that the user has access to, and the model metadata that can be viewed from the UI.\n\n**Notes:**\n\n*   The returned versions only include the user\u2019s model role with read access or higher.\n*   If the value for a field is set, it will be returned in the results.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Version metadata for the model."
@@ -907,6 +1003,12 @@
               "type": "string"
             },
             "example": "true"
+          },
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
           }
         ],
         "responses": {
@@ -1055,6 +1157,12 @@
               "type": "string"
             },
             "example": "+firstName"
+          },
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
           }
         ],
         "responses": {
@@ -1113,6 +1221,12 @@
               "type": "string"
             },
             "example": "+name"
+          },
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
           }
         ],
         "responses": {
@@ -1157,6 +1271,14 @@
         "operationId": "getWorkspacesByWorkspaceidAdmins",
         "summary": "List workspace administrators",
         "description": "Minimum role: User Administrator.\n\nReturns all administrators for a workspace. Requires tenant admin privilege; workspace admin access alone is insufficient.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Administrators retrieved successfully."
@@ -1221,6 +1343,14 @@
         "operationId": "getWorkspacesByWorkspaceidModels",
         "summary": "List workspace models",
         "description": "Minimum role: Standard User.\n\nReturns models accessible to the calling user within the specified workspace. The response shape is identical to `GET /2/0/models` but filtered to models within the given workspace.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Models in the workspace accessible to the user."
@@ -1312,6 +1442,14 @@
         "operationId": "getWorkspacesByWorkspaceidModelsByModelidDashboards",
         "summary": "List dashboards in a model",
         "description": "Minimum role: Standard User.\n\nReturns all dashboards defined in the specified model.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Dashboards retrieved successfully"
@@ -1345,6 +1483,12 @@
               "type": "string"
             },
             "example": "-creationDate"
+          },
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
           }
         ],
         "responses": {
@@ -1690,6 +1834,14 @@
         "operationId": "getWorkspacesByWorkspaceidModelsByModelidImportsByImportidTasksByTaskidDumpChunks",
         "summary": "Query the number of chunks in a dump file",
         "description": "Minimum role: Standard User.\n\nBegin by querying the number of chunks using the `/chunks` endpoint.\n\nIt is possible for a dump file to be very large. To help manage the size of a dump file and prevent timeouts, download the dump file in chunks. Chunks are 10mb or less and numbered sequentially from 0.\n\n### Headers\n\n*   `Authorization:AnaplanAuthToken {anaplan_auth_token}`\n*   `Content-Type:application/json`",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
+        ],
         "responses": {
           "200": {
             "description": "List of chunks in the import failure dump file."
@@ -1751,6 +1903,12 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/IncludeAll"
+          },
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
           }
         ],
         "responses": {
@@ -1922,6 +2080,12 @@
               "type": "string"
             },
             "example": "-creationDate"
+          },
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
           }
         ],
         "responses": {
@@ -2075,6 +2239,14 @@
         "operationId": "getWorkspacesByWorkspaceidVisitors",
         "summary": "List workspace visitors",
         "description": "Minimum role: User Administrator.\n\nReturns all visitors for a workspace. Requires tenant admin privilege; workspace admin access alone is insufficient.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Visitors retrieved successfully."
@@ -2160,24 +2332,32 @@
       }
     },
     "parameters": {
-      "TaskId": {
-        "name": "taskId",
+      "ModelId": {
+        "name": "modelId",
         "in": "path",
-        "description": "Task identifier, scoped to the parent action/import/export/process that launched it: a taskId is valid only under the same parent, so an action's taskId will not resolve under a process, import, or export. Returned when a run is launched by `POST /workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks` (or the equivalent actions, exports, or processes tasks endpoint), and listed by the matching `GET .../tasks` \u2014 `tasks[].taskId`, except the import tasks response, which nests it under `task.taskId`.",
+        "description": "Model identifier (32-character uppercase hex string). From `GET /models` or `GET /workspaces/{workspaceId}/models`.",
         "required": true,
         "schema": {
           "type": "string"
         }
       },
-      "TenantDetails": {
-        "name": "tenantDetails",
-        "in": "query",
-        "description": "When `true`, the response includes additional workspace detail fields (`sizeAllowance` and `currentSize`). When `false` or omitted, only `id`, `name`, and `active` are returned.",
-        "required": false,
+      "DimensionId": {
+        "name": "dimensionId",
+        "in": "path",
+        "description": "Dimension identifier. From `GET /models/{modelId}/lineItems/{lineItemId}/dimensions`.",
+        "required": true,
         "schema": {
-          "type": "boolean"
-        },
-        "example": true
+          "type": "string"
+        }
+      },
+      "ExportId": {
+        "name": "exportId",
+        "in": "path",
+        "description": "Export definition identifier (12-digit numeric, prefix 116). From `GET /models/{modelId}/exports`.",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
       },
       "FileId": {
         "name": "fileId",
@@ -2188,55 +2368,10 @@
           "type": "string"
         }
       },
-      "ModelId": {
-        "name": "modelId",
+      "ChunkId": {
+        "name": "chunkId",
         "in": "path",
-        "description": "Model identifier (32-character uppercase hex string). From `GET /models` or `GET /workspaces/{workspaceId}/models`.",
-        "required": true,
-        "schema": {
-          "type": "string"
-        }
-      },
-      "ListId": {
-        "name": "listId",
-        "in": "path",
-        "description": "List identifier (12-digit numeric string, prefix 101). From `GET /models/{modelId}/lists`.",
-        "required": true,
-        "schema": {
-          "type": "string"
-        }
-      },
-      "UserId": {
-        "name": "userId",
-        "in": "path",
-        "description": "User identifier (32-character hex string). From `GET /users`, or `GET /users/me` for the caller's own id.",
-        "required": true,
-        "schema": {
-          "type": "string"
-        }
-      },
-      "ModuleId": {
-        "name": "moduleId",
-        "in": "path",
-        "description": "Module identifier (12-digit numeric string, prefix 102). From `GET /models/{modelId}/modules`.",
-        "required": true,
-        "schema": {
-          "type": "string"
-        }
-      },
-      "Search": {
-        "name": "s",
-        "in": "query",
-        "description": "Optional case-insensitive filter. Matches items whose name or ID contains this string. Supports wildcards `%` (0-n characters) and `_` (exactly 1 character). Omit to return all items. **Undocumented and may behave unpredictably; requires the Tenant Admin role and is ignored for non-admin users.**",
-        "required": false,
-        "schema": {
-          "type": "string"
-        }
-      },
-      "ProcessId": {
-        "name": "processId",
-        "in": "path",
-        "description": "Process identifier (12-digit numeric, prefix 118). From `GET /models/{modelId}/processes`.",
+        "description": "The chunk identifier. From the `id` values returned by the sibling `GET .../chunks` list endpoint for the file or dump. Chunk ids are zero-based; chunk `0` is always the first chunk of a file that has any content.",
         "required": true,
         "schema": {
           "type": "string"
@@ -2251,10 +2386,64 @@
           "type": "string"
         }
       },
+      "LineItemId": {
+        "name": "lineItemId",
+        "in": "path",
+        "description": "Line item identifier (12-digit numeric, prefix 206). From `GET /models/{modelId}/lineItems` or `GET /models/{modelId}/modules/{moduleId}/lineItems`.",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "ListId": {
+        "name": "listId",
+        "in": "path",
+        "description": "List identifier (12-digit numeric string, prefix 101). From `GET /models/{modelId}/lists`.",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "ModuleId": {
+        "name": "moduleId",
+        "in": "path",
+        "description": "Module identifier (12-digit numeric string, prefix 102). From `GET /models/{modelId}/modules`.",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "ProcessId": {
+        "name": "processId",
+        "in": "path",
+        "description": "Process identifier (12-digit numeric, prefix 118). From `GET /models/{modelId}/processes`.",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
       "VersionId": {
         "name": "versionId",
         "in": "path",
         "description": "Version identifier (12-digit numeric, prefix 107). From `GET /models/{modelId}/versions`.",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "ViewId": {
+        "name": "viewId",
+        "in": "path",
+        "description": "View identifier. From `GET /models/{modelId}/views` or `GET /models/{modelId}/modules/{moduleId}/views`. A line item ID from `GET /models/{modelId}/modules/{moduleId}/lineItems` also works when that line item has a subsidiary view, returning that view's data.",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "UserId": {
+        "name": "userId",
+        "in": "path",
+        "description": "User identifier (32-character hex string). From `GET /users`, or `GET /users/me` for the caller's own id.",
         "required": true,
         "schema": {
           "type": "string"
@@ -2278,28 +2467,10 @@
           "type": "string"
         }
       },
-      "ViewId": {
-        "name": "viewId",
+      "TaskId": {
+        "name": "taskId",
         "in": "path",
-        "description": "View identifier. From `GET /models/{modelId}/views` or `GET /models/{modelId}/modules/{moduleId}/views`. A line item ID from `GET /models/{modelId}/modules/{moduleId}/lineItems` also works when that line item has a subsidiary view, returning that view's data.",
-        "required": true,
-        "schema": {
-          "type": "string"
-        }
-      },
-      "LineItemId": {
-        "name": "lineItemId",
-        "in": "path",
-        "description": "Line item identifier (12-digit numeric, prefix 206). From `GET /models/{modelId}/lineItems` or `GET /models/{modelId}/modules/{moduleId}/lineItems`.",
-        "required": true,
-        "schema": {
-          "type": "string"
-        }
-      },
-      "DimensionId": {
-        "name": "dimensionId",
-        "in": "path",
-        "description": "Dimension identifier. From `GET /models/{modelId}/lineItems/{lineItemId}/dimensions`.",
+        "description": "Task identifier, scoped to the parent action/import/export/process that launched it: a taskId is valid only under the same parent, so an action's taskId will not resolve under a process, import, or export. Returned when a run is launched by `POST /workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks` (or the equivalent actions, exports, or processes tasks endpoint), and listed by the matching `GET .../tasks` \u2014 `tasks[].taskId`, except the import tasks response, which nests it under `task.taskId`.",
         "required": true,
         "schema": {
           "type": "string"
@@ -2314,23 +2485,56 @@
           "type": "string"
         }
       },
-      "ExportId": {
-        "name": "exportId",
+      "PageNo": {
+        "name": "pageNo",
         "in": "path",
-        "description": "Export definition identifier (12-digit numeric, prefix 116). From `GET /models/{modelId}/exports`.",
+        "description": "Zero-based page index of a read request result set.",
         "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "example": "0"
+      },
+      "Search": {
+        "name": "s",
+        "in": "query",
+        "description": "Optional case-insensitive filter. Matches items whose name or ID contains this string. Supports wildcards `%` (0-n characters) and `_` (exactly 1 character). Omit to return all items. **Undocumented and may behave unpredictably; requires the Tenant Admin role and is ignored for non-admin users.**",
+        "required": false,
         "schema": {
           "type": "string"
         }
       },
-      "ChunkId": {
-        "name": "chunkId",
-        "in": "path",
-        "description": "The chunk identifier. From the `id` values returned by the sibling `GET .../chunks` list endpoint for the file or dump. Chunk ids are zero-based; chunk `0` is always the first chunk of a file that has any content.",
-        "required": true,
+      "Offset": {
+        "name": "offset",
+        "in": "query",
+        "description": "Zero-based index of the first result to return. Use with `limit` to page through results. The response echoes the applied offset in `meta.paging.offset`, and when more results remain the server supplies a ready-to-use next-page URL in the `next` field of `meta.paging`.",
+        "required": false,
         "schema": {
-          "type": "string"
-        }
+          "type": "integer",
+          "minimum": 0
+        },
+        "example": 0
+      },
+      "Limit": {
+        "name": "limit",
+        "in": "query",
+        "description": "Maximum number of results to return per page. Use with `offset` to page through results. When omitted, the server returns up to a default page size of 5000. Compare `meta.paging.currentPageSize` against `meta.paging.totalSize` to detect whether further pages exist.",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "example": 100
+      },
+      "TenantDetails": {
+        "name": "tenantDetails",
+        "in": "query",
+        "description": "When `true`, the response includes additional workspace detail fields (`sizeAllowance` and `currentSize`). When `false` or omitted, only `id`, `name`, and `active` are returned.",
+        "required": false,
+        "schema": {
+          "type": "boolean"
+        },
+        "example": true
       },
       "IncludeAll": {
         "name": "includeAll",
@@ -2341,16 +2545,6 @@
           "type": "boolean"
         },
         "example": true
-      },
-      "PageNo": {
-        "name": "pageNo",
-        "in": "path",
-        "description": "Zero-based page index of a read request result set.",
-        "required": true,
-        "schema": {
-          "type": "string"
-        },
-        "example": "0"
       }
     },
     "securitySchemes": {
