@@ -12,7 +12,8 @@ This project has a **single-context** structure.
 │   ├── 0002-canonical-element-ordering.md
 │   ├── 0003-description-standards.md
 │   ├── 0004-id-source-path-descriptions.md
-│   └── 0005-shared-parameter-components.md
+│   ├── 0005-shared-parameter-components.md
+│   └── 0006-minimum-role-annotations.md
 └── [API folders]
     └── [API-specific READMEs]
 ```
@@ -40,6 +41,7 @@ This project has a **single-context** structure.
 - `0003-description-standards.md` — Description writing standards
 - `0004-id-source-path-descriptions.md` — Documenting ID sources in path parameter descriptions
 - `0005-shared-parameter-components.md` — Shared parameter components
+- `0006-minimum-role-annotations.md` — Machine-readable minimum-role annotations on operations
 
 ## Adding new context
 
