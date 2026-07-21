@@ -22,6 +22,7 @@ Optional:
 """
 
 import base64
+import json
 import os
 import pathlib
 import re
@@ -3308,3 +3309,250 @@ def _poll_read_request(client, url, h, timeout=60):
             break
         time.sleep(2)
     return vrr
+
+
+# ─── Authorization-404 on a NO ACCESS model (issue #225) ───────────────────────
+# The certificate principal holds the NO ACCESS role on ANAPLAN_NO_ACCESS_MODEL_ID.
+# Anaplan masks that as 404 on model-scoped operations rather than 403, so the
+# model's existence is not confirmed to a caller who cannot reach it.
+#
+# Expectations are read from the spec rather than restated here: every model-scoped
+# GET that declares components/responses/NotFoundOrNoAccess must actually return 404,
+# and every one that does not declare it must not. Spec and API cannot drift apart
+# without this failing.
+
+NO_ACCESS_MODEL_ID = os.getenv("ANAPLAN_NO_ACCESS_MODEL_ID", "")
+
+_INTEGRATION_SPEC_PATH = (
+    pathlib.Path(__file__).parent.parent / "integration" / "integration-openapi.json"
+)
+
+# Fabricated sub-resource IDs, shaped like real ones so that format validation does
+# not reject the request before the authorization check runs. A model-scoped 404
+# under NO ACCESS is expected regardless of whether the child exists.
+_DUMMY_IDS = {
+    "dimensionId": "109000000000",
+    "exportId":    "116000000000",
+    "importId":    "112000000000",
+    "processId":   "118000000000",
+    "actionId":    "117000000000",
+    "listId":      "101000000000",
+    "moduleId":    "102000000000",
+    "viewId":      "102000000000",
+    "lineItemId":  "206000000000",
+    "versionId":   "107000000000",
+    "fileId":      "113000000000",
+    "taskId":      "00000000000000000000000000000000",
+    "requestId":   "00000000000000000000000000000000",
+    "chunkId":     "0",
+    "pageNo":      "0",
+}
+
+_NO_ACCESS_REF = "#/components/responses/NotFoundOrNoAccess"
+
+
+def _model_scoped_gets():
+    """Return [(path, declares_authz_404)] for every model-scoped GET in the spec.
+
+    An operation declares the authorization-404 either by $ref to the shared
+    response, or — where it has its own not-found semantics to describe — with an
+    inline 404 whose description also names the NO ACCESS role.
+    """
+    with open(_INTEGRATION_SPEC_PATH, encoding="utf-8") as f:
+        spec = json.load(f)
+    out = []
+    for path, item in sorted(spec["paths"].items()):
+        if "{modelId}" not in path or "get" not in item:
+            continue
+        response = item["get"].get("responses", {}).get("404", {})
+        declares = response.get("$ref") == _NO_ACCESS_REF or "NO ACCESS" in response.get(
+            "description", ""
+        )
+        out.append((path, declares))
+    return out
+
+
+_MODEL_SCOPED_GETS = _model_scoped_gets()
+
+
+def _fill_path(path, model_id, workspace_id):
+    """Substitute real model/workspace IDs and fabricated sub-resource IDs into a template."""
+    filled = path.replace("{modelId}", model_id).replace("{workspaceId}", workspace_id)
+    for name, value in _DUMMY_IDS.items():
+        filled = filled.replace("{" + name + "}", value)
+    assert "{" not in filled, f"unsubstituted path parameter in {filled}"
+    return filled
+
+
+@pytest.fixture(scope="module")
+def cert_only_token(_ca_certs):
+    """AnaplanAuthToken from certificate auth only — no basic-auth fallback.
+
+    These tests assert the behaviour of one specific principal's model role, so
+    falling back to a different account would silently invalidate them.
+    """
+    if not _ca_certs:
+        pytest.skip("ANAPLAN_CA_CERT_PATH / ANAPLAN_CA_KEY_PATH not set")
+    with httpx.Client() as client:
+        token = _auth_with_cert(client, _ca_certs)
+        if not token:
+            pytest.skip("CACertificate authentication failed")
+        yield token
+        client.post(
+            f"{AUTH_URL}/token/logout",
+            headers={"Authorization": f"AnaplanAuthToken {token}"},
+        )
+
+
+@pytest.fixture(scope="module")
+def no_access_model(cert_only_token):
+    """Metadata for the NO ACCESS model, proving it exists and is readable.
+
+    Fails rather than skips when the model stops being a valid fixture (deleted,
+    or the cert user's role was raised) — a silent change there would make every
+    assertion below vacuously true.
+    """
+    if not NO_ACCESS_MODEL_ID:
+        pytest.skip("ANAPLAN_NO_ACCESS_MODEL_ID not set")
+    with httpx.Client() as client:
+        r = client.get(
+            f"{API_URL}/models/{NO_ACCESS_MODEL_ID}",
+            headers=_auth_headers(cert_only_token),
+        )
+        assert r.status_code == 200, (
+            f"GET /models/{NO_ACCESS_MODEL_ID} returned {r.status_code}; the NO ACCESS "
+            f"fixture model must still exist and be readable: {r.text[:200]}"
+        )
+        return r.json()["model"]
+
+
+@pytest.mark.live
+def test_no_access_model_metadata_is_readable(no_access_model):
+    """GET /models/{modelId} succeeds even where every sub-resource 404s.
+
+    This is what makes those 404s an authorization signal rather than a missing
+    model: the model demonstrably exists and is not in a locked lifecycle state.
+    """
+    assert no_access_model["id"] == NO_ACCESS_MODEL_ID
+    assert no_access_model.get("name"), "model metadata must carry a name"
+    assert no_access_model.get("activeState") == "UNLOCKED", (
+        f"NO ACCESS fixture model must be UNLOCKED to rule out lifecycle-state 404s; "
+        f"got {no_access_model.get('activeState')!r}"
+    )
+
+
+@pytest.mark.live
+def test_no_access_model_is_listed_by_workspace(cert_only_token, no_access_model):
+    """The model still appears in GET /workspaces/{workspaceId}/models.
+
+    Consumers therefore reach the 404 by following a listing the API itself handed
+    them, which is why the 404 reads as "deleted" and misleads.
+    """
+    workspace_id = no_access_model["currentWorkspaceId"]
+    with httpx.Client() as client:
+        r = client.get(
+            f"{API_URL}/workspaces/{workspace_id}/models",
+            headers=_auth_headers(cert_only_token),
+        )
+        assert r.status_code == 200, f"{r.status_code}: {r.text[:200]}"
+        ids = {m.get("id") for m in r.json().get("models", [])}
+        assert NO_ACCESS_MODEL_ID in ids, (
+            "NO ACCESS model must still be listed by the workspace model list"
+        )
+
+
+@pytest.mark.live
+@pytest.mark.parametrize("path", [p for p, declares in _MODEL_SCOPED_GETS if declares])
+def test_model_scoped_get_returns_404_under_no_access(
+    cert_only_token, no_access_model, path
+):
+    """Every model-scoped GET the spec marks NotFoundOrNoAccess must return 404."""
+    workspace_id = no_access_model["currentWorkspaceId"]
+    url = f"{API_URL}{_fill_path(path, NO_ACCESS_MODEL_ID, workspace_id)}"
+    with httpx.Client(timeout=120) as client:
+        r = client.get(url, headers=_auth_headers(cert_only_token))
+        assert r.status_code == 404, (
+            f"GET {path} declares {_NO_ACCESS_REF} but returned {r.status_code} "
+            f"under a NO ACCESS role: {r.text[:200]}"
+        )
+
+
+@pytest.mark.live
+@pytest.mark.parametrize("path", [p for p, declares in _MODEL_SCOPED_GETS if not declares])
+def test_model_scoped_get_without_404_does_not_return_404(
+    cert_only_token, no_access_model, path
+):
+    """Model-scoped GETs the spec exempts must genuinely not 404 under NO ACCESS.
+
+    Guards the other direction: if Anaplan starts masking these too, the spec is
+    understating the problem and this fails.
+    """
+    workspace_id = no_access_model["currentWorkspaceId"]
+    url = f"{API_URL}{_fill_path(path, NO_ACCESS_MODEL_ID, workspace_id)}"
+    with httpx.Client(timeout=120) as client:
+        r = client.get(url, headers=_auth_headers(cert_only_token))
+        assert r.status_code != 404, (
+            f"GET {path} returned 404 under a NO ACCESS role but the spec does not "
+            f"declare {_NO_ACCESS_REF} for it — the spec is now understating the masking"
+        )
+
+
+@pytest.mark.live
+@pytest.mark.parametrize("collection,parent_id_key", [
+    ("actions",   "actionId"),
+    ("exports",   "exportId"),
+    ("imports",   "importId"),
+    ("processes", "processId"),
+])
+def test_task_list_returns_empty_200_under_no_access(
+    cert_only_token, no_access_model, collection, parent_id_key
+):
+    """Task-list endpoints answer 200 with an empty list instead of 404.
+
+    They neither mask as 404 nor confirm the parent object exists — a caller
+    polling for tasks on an unreachable model sees "no tasks", not an error.
+    """
+    workspace_id = no_access_model["currentWorkspaceId"]
+    url = (
+        f"{API_URL}/workspaces/{workspace_id}/models/{NO_ACCESS_MODEL_ID}"
+        f"/{collection}/{_DUMMY_IDS[parent_id_key]}/tasks"
+    )
+    with httpx.Client(timeout=120) as client:
+        r = client.get(url, headers=_auth_headers(cert_only_token))
+        assert r.status_code == 200, (
+            f"GET .../{collection}/{{id}}/tasks expected 200 under NO ACCESS, "
+            f"got {r.status_code}: {r.text[:200]}"
+        )
+        body = r.json()
+        assert body.get("meta", {}).get("paging", {}).get("totalSize") == 0, (
+            f"expected an empty task list; got paging {body.get('meta', {}).get('paging')!r}"
+        )
+
+
+@pytest.mark.live
+def test_no_access_404_body_matches_error_response_schema(cert_only_token):
+    """The 404 body matches components/schemas/ErrorResponse: status, path, timestamp."""
+    if not NO_ACCESS_MODEL_ID:
+        pytest.skip("ANAPLAN_NO_ACCESS_MODEL_ID not set")
+    with httpx.Client() as client:
+        r = client.get(
+            f"{API_URL}/models/{NO_ACCESS_MODEL_ID}/modules",
+            headers=_auth_headers(cert_only_token),
+        )
+        assert r.status_code == 404
+        assert "application/json" in r.headers.get("content-type", ""), (
+            f"404 must be JSON; got {r.headers.get('content-type')!r}"
+        )
+        body = r.json()
+        assert body.get("status", {}).get("code") == 404
+        assert body.get("status", {}).get("message") == "Not Found"
+        assert body.get("path", "").endswith(f"/models/{NO_ACCESS_MODEL_ID}/modules"), (
+            f"ErrorResponse.path must echo the request path; got {body.get('path')!r}"
+        )
+        assert re.match(
+            r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$", body.get("timestamp", "")
+        ), f"ErrorResponse.timestamp must be RFC 3339 UTC; got {body.get('timestamp')!r}"
+        # No domain payload — that is what separates this from a 200 empty collection.
+        assert set(body) <= {"status", "path", "timestamp"}, (
+            f"unexpected fields in error envelope: {sorted(set(body))}"
+        )
