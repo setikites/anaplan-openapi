@@ -144,7 +144,7 @@
         }
       ],
       "get": {
-        "summary": "Retrieve compatible source model revisions",
+        "summary": "List source model ALM revisions compatible with this model",
         "description": "Minimum role: Workspace Administrator.\n\nReturns the list of revisions from the source model that are compatible with the target model, ordered by date descending. The caller must hold the Workspace Administrator role on both the source and target models.",
         "operationId": "getSyncableRevisions",
         "x-anaplan-min-role": "Workspace Administrator",
@@ -187,7 +187,7 @@
         }
       ],
       "get": {
-        "summary": "Retrieve latest revision",
+        "summary": "Retrieve the latest ALM revision in a model",
         "description": "Minimum role: Workspace Administrator.\n\nReturns the most recent revision for the model, if one exists.",
         "operationId": "getLatestRevision",
         "x-anaplan-min-role": "Workspace Administrator",
@@ -218,7 +218,7 @@
         }
       ],
       "get": {
-        "summary": "Retrieve revisions in a model",
+        "summary": "List ALM revisions in a model",
         "description": "Minimum role: Workspace Administrator.\n\nReturns all revisions for the model with optional date filtering and pagination.",
         "operationId": "getRevisions",
         "x-anaplan-min-role": "Workspace Administrator",
@@ -286,7 +286,7 @@
         }
       },
       "post": {
-        "summary": "Create a revision",
+        "summary": "Create an ALM revision",
         "description": "Minimum role: Workspace Administrator.\n\nCreates a new revision for the model. The model must be in standard mode and have structural changes since the last revision.",
         "operationId": "createRevision",
         "x-anaplan-min-role": "Workspace Administrator",
@@ -344,7 +344,7 @@
         }
       ],
       "get": {
-        "summary": "Retrieve the models for a specific revision",
+        "summary": "List models an ALM revision has been applied to",
         "description": "Minimum role: Workspace Administrator.\n\nReturns all models that have had this revision applied. Deleted models are included with `modelDeleted: true`; their `modelName` and `workspaceId` are omitted.\n\nThe first model in this list is the source model where revisions are created. Any model in this list can be a `sourceModelId` for discovering this revision (using `GET /models/{modelId}/alm/syncableRevisions`) and syncing it (using `POST /models/{modelId}/alm/syncTasks`).",
         "operationId": "getAppliedToModels",
         "x-anaplan-min-role": "Workspace Administrator",
@@ -375,7 +375,7 @@
         }
       ],
       "get": {
-        "summary": "Retrieve sync tasks for a model",
+        "summary": "List ALM sync tasks for a model",
         "description": "Minimum role: Workspace Administrator.\n\nReturns sync tasks that are in progress or completed within the last 48 hours. Up to ~20,000 results are retained per model before oldest tasks are removed.",
         "operationId": "getSyncTasks",
         "x-anaplan-min-role": "Workspace Administrator",
@@ -399,7 +399,7 @@
         }
       },
       "post": {
-        "summary": "Create a model sync task",
+        "summary": "Create an ALM model sync task",
         "description": "Minimum role: Workspace Administrator.\n\nInitiates a sync task to apply a source model revision to the target model.",
         "operationId": "createSyncTask",
         "x-anaplan-min-role": "Workspace Administrator",
@@ -457,7 +457,7 @@
         }
       ],
       "get": {
-        "summary": "Retrieve model sync task info",
+        "summary": "Retrieve ALM model sync task info",
         "description": "Minimum role: Workspace Administrator.\n\nReturns the current status and result of a sync task. Task states: `IN_PROGRESS`, `COMPLETE`. On failure, `result.successful` is false and `result.error` contains details.",
         "operationId": "getSyncTask",
         "x-anaplan-min-role": "Workspace Administrator",
@@ -488,7 +488,7 @@
         }
       ],
       "post": {
-        "summary": "Create a full comparison report generation task",
+        "summary": "Create a full ALM revision comparison report generation task",
         "description": "Minimum role: Workspace Administrator.\n\nStarts an asynchronous task to generate a full comparison report between a source revision and a specified target revision (sourceRevisionId, sourceModelId and targetRevisionId are all required). Poll the task info endpoint to check progress. The caller must hold the Workspace Administrator role on both the source and target models.",
         "operationId": "createComparisonReportTask",
         "x-anaplan-min-role": "Workspace Administrator",
@@ -535,7 +535,7 @@
         }
       ],
       "get": {
-        "summary": "Retrieve full comparison report task info",
+        "summary": "Retrieve full ALM revision comparison report task info",
         "description": "Minimum role: Workspace Administrator.\n\nReturns the status of a comparison report generation task. On success, `result.successful` is true and `result.reportFileUrl` contains the download URL. On failure, `result.error` contains title and messageText.",
         "operationId": "getComparisonReportTask",
         "x-anaplan-min-role": "Workspace Administrator",
@@ -572,7 +572,7 @@
         }
       ],
       "get": {
-        "summary": "Retrieve full comparison report content",
+        "summary": "Retrieve full ALM revision comparison report content",
         "description": "Minimum role: Workspace Administrator.\n\nDownloads the full comparison report as a tab-separated values (TSV) file. The report is available for 48 hours after generation and includes sections for: Lists Added, Modules Added, Roles Changed, Changes Within Lists, and Line Items Added.",
         "operationId": "getComparisonReport",
         "x-anaplan-min-role": "Workspace Administrator",
@@ -604,7 +604,7 @@
         }
       ],
       "post": {
-        "summary": "Create a summary report generation task",
+        "summary": "Create an ALM revision summary report generation task",
         "description": "Minimum role: Workspace Administrator.\n\nStarts an asynchronous task to generate a summary report between a source revision and a specified target revision (sourceRevisionId, sourceModelId and targetRevisionId are all required). Poll the task info endpoint to check progress.",
         "operationId": "createSummaryReportTask",
         "x-anaplan-min-role": "Workspace Administrator",
@@ -651,7 +651,7 @@
         }
       ],
       "get": {
-        "summary": "Retrieve summary report task info",
+        "summary": "Retrieve ALM revision summary report task info",
         "description": "Minimum role: Workspace Administrator.\n\nReturns the status of a summary report generation task. On success, `result.successful` is true and `result.reportFileUrl` contains the download URL.",
         "operationId": "getSummaryReportTask",
         "x-anaplan-min-role": "Workspace Administrator",
@@ -688,7 +688,7 @@
         }
       ],
       "get": {
-        "summary": "Retrieve summary report content",
+        "summary": "Retrieve ALM revision summary report content",
         "description": "Minimum role: Workspace Administrator.\n\nDownloads the summary report as JSON. The report is available for 48 hours after generation. Change types with zero differences are omitted. Properties within a change type are omitted if items were only created (not modified or deleted).",
         "operationId": "getSummaryReport",
         "x-anaplan-min-role": "Workspace Administrator",
