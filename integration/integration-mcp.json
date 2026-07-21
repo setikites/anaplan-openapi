@@ -162,6 +162,9 @@
         "responses": {
           "200": {
             "description": "Actions retrieved successfully"
+          },
+          "404": {
+            "description": ""
           }
         }
       }
@@ -179,6 +182,9 @@
         "responses": {
           "200": {
             "description": "The model's current period."
+          },
+          "404": {
+            "description": ""
           }
         }
       },
@@ -216,11 +222,14 @@
           "200": {
             "description": "The updated current period."
           },
-          "429": {
-            "description": "Rate limited \u2014 too many requests. Retry after a delay."
-          },
           "400": {
             "description": "Bad request. Occurs when: (1) the date is not in YYYY-MM-DD format \u2014 \"Invalid ISO date format '{date}'. Date should match format YYYY-MM-DD\"; (2) the date falls outside the model timescale \u2014 \"Specified date '{date}' is out of timescale range {start} - {end}\"; (3) date is supplied as both a query parameter and a request body field simultaneously."
+          },
+          "404": {
+            "description": ""
+          },
+          "429": {
+            "description": "Rate limited \u2014 too many requests. Retry after a delay."
           }
         }
       }
@@ -244,6 +253,9 @@
           },
           "400": {
             "description": "Bad request \u2014 check the request parameters and body."
+          },
+          "404": {
+            "description": ""
           },
           "429": {
             "description": "Rate limited \u2014 too many requests. Retry after a delay."
@@ -290,7 +302,7 @@
             "description": "Matching items from the dimension."
           },
           "404": {
-            "description": "Not found \u2014 the referenced resource does not exist."
+            "description": "Not found \u2014 the referenced resource does not exist.\n\nAlso returned when the caller holds a NO ACCESS role on the model \u2014 Anaplan masks that as `404` rather than `403` so the resource is not confirmed to exist."
           },
           "400": {
             "description": "Bad request \u2014 check the request parameters and body."
@@ -328,6 +340,9 @@
         "responses": {
           "200": {
             "description": "Exports retrieved successfully"
+          },
+          "404": {
+            "description": ""
           }
         }
       }
@@ -348,6 +363,9 @@
         "responses": {
           "200": {
             "description": "Metadata for the export definition."
+          },
+          "404": {
+            "description": ""
           }
         }
       }
@@ -382,6 +400,9 @@
         "responses": {
           "200": {
             "description": "Files in the model, each with the ID needed to upload."
+          },
+          "404": {
+            "description": ""
           }
         }
       }
@@ -410,6 +431,9 @@
         "responses": {
           "200": {
             "description": "Chunk IDs and names for the file."
+          },
+          "404": {
+            "description": ""
           }
         }
       }
@@ -444,6 +468,9 @@
         "responses": {
           "200": {
             "description": "Imports retrieved successfully"
+          },
+          "404": {
+            "description": ""
           }
         }
       }
@@ -464,6 +491,9 @@
         "responses": {
           "200": {
             "description": "Metadata for the import definition."
+          },
+          "404": {
+            "description": ""
           }
         }
       }
@@ -489,6 +519,9 @@
         "responses": {
           "200": {
             "description": "All line items in the model."
+          },
+          "404": {
+            "description": ""
           },
           "429": {
             "description": "Rate limited \u2014 too many requests. Retry after a delay."
@@ -520,6 +553,9 @@
         "responses": {
           "200": {
             "description": "Dimensions that define the line item"
+          },
+          "404": {
+            "description": ""
           }
         }
       }
@@ -543,6 +579,9 @@
         "responses": {
           "200": {
             "description": "Items of the dimension for the line item."
+          },
+          "404": {
+            "description": ""
           }
         }
       }
@@ -568,6 +607,9 @@
         "responses": {
           "200": {
             "description": "Lists in the model."
+          },
+          "404": {
+            "description": ""
           }
         }
       }
@@ -589,6 +631,9 @@
           "200": {
             "description": "Metadata for the list."
           },
+          "404": {
+            "description": ""
+          },
           "429": {
             "description": "Rate limited \u2014 too many requests. Retry after a delay."
           }
@@ -608,6 +653,9 @@
         "responses": {
           "200": {
             "description": "The model calendar."
+          },
+          "404": {
+            "description": ""
           }
         }
       }
@@ -643,6 +691,9 @@
         "responses": {
           "200": {
             "description": "The updated fiscal year with its start and end dates."
+          },
+          "404": {
+            "description": ""
           }
         }
       }
@@ -668,6 +719,9 @@
         "responses": {
           "200": {
             "description": "IDs and names of all modules in the model."
+          },
+          "404": {
+            "description": ""
           },
           "429": {
             "description": "Rate limited \u2014 too many requests. Retry after a delay."
@@ -788,6 +842,9 @@
         "responses": {
           "200": {
             "description": "Cell data written successfully"
+          },
+          "404": {
+            "description": ""
           }
         }
       }
@@ -819,6 +876,9 @@
         "responses": {
           "200": {
             "description": "Line items and metadata in the module."
+          },
+          "404": {
+            "description": ""
           }
         }
       }
@@ -856,6 +916,9 @@
           "200": {
             "description": "IDs and names of views in the module."
           },
+          "404": {
+            "description": ""
+          },
           "429": {
             "description": "Rate limited \u2014 too many requests. Retry after a delay."
           }
@@ -892,6 +955,9 @@
         "responses": {
           "200": {
             "description": "Processes retrieved successfully"
+          },
+          "404": {
+            "description": ""
           }
         }
       }
@@ -923,6 +989,9 @@
         "responses": {
           "200": {
             "description": "Metadata for the process."
+          },
+          "404": {
+            "description": ""
           }
         }
       }
@@ -948,6 +1017,9 @@
         "responses": {
           "200": {
             "description": "Version metadata for the model."
+          },
+          "404": {
+            "description": ""
           }
         }
       }
@@ -980,6 +1052,9 @@
         "responses": {
           "200": {
             "description": "The version switchover date as set."
+          },
+          "404": {
+            "description": ""
           }
         }
       }
@@ -1015,6 +1090,9 @@
           "200": {
             "description": "IDs and names of all views in the model."
           },
+          "404": {
+            "description": ""
+          },
           "429": {
             "description": "Rate limited \u2014 too many requests. Retry after a delay."
           }
@@ -1037,6 +1115,9 @@
         "responses": {
           "200": {
             "description": "Dimension metadata (columns, pages, rows) for the view."
+          },
+          "404": {
+            "description": ""
           },
           "429": {
             "description": "Rate limited \u2014 too many requests. Retry after a delay."
@@ -1108,6 +1189,9 @@
           "200": {
             "description": "View cell data. Returns text/csv by default; returns application/json when both Accept: application/json and format=v1 are set."
           },
+          "404": {
+            "description": ""
+          },
           "429": {
             "description": "Rate limited \u2014 too many requests. Retry after a delay."
           }
@@ -1133,6 +1217,9 @@
         "responses": {
           "200": {
             "description": "Selected items of the dimension as filtered by the view."
+          },
+          "404": {
+            "description": ""
           },
           "429": {
             "description": "Rate limited \u2014 too many requests. Retry after a delay."
@@ -1373,7 +1460,7 @@
       "get": {
         "operationId": "getWorkspacesByWorkspaceidModelsByModelidActionsByActionidTasks",
         "summary": "Get a list of action tasks",
-        "description": "Minimum role: Standard User.\n\n*   `Authorization:AnaplanAuthToken {anaplan_auth_token}`\n*   `Content-Type:application/json`\n\n### Parameters\n\n#",
+        "description": "Minimum role: Standard User.\n\n*   `Authorization:AnaplanAuthToken {anaplan_auth_token}`\n*   `Content-Type:application/json`\n\n### Parameters\n\n#\n\n**Note:** Returns `200` with an empty task list rather than `404` when the parent object does not exist, or when the caller holds a NO ACCESS role on the model.",
         "parameters": [
           {
             "name": "sort",
@@ -1399,6 +1486,9 @@
         "responses": {
           "200": {
             "description": "Task created successfully"
+          },
+          "404": {
+            "description": ""
           }
         }
       }
@@ -1425,6 +1515,9 @@
         "responses": {
           "200": {
             "description": "Status of the action task."
+          },
+          "404": {
+            "description": ""
           }
         }
       }
@@ -1453,6 +1546,9 @@
         "responses": {
           "200": {
             "description": "Dashboards retrieved successfully"
+          },
+          "404": {
+            "description": ""
           }
         }
       }
@@ -1472,7 +1568,7 @@
       "get": {
         "operationId": "getWorkspacesByWorkspaceidModelsByModelidExportsByExportidTasks",
         "summary": "Get a list of export tasks",
-        "description": "Minimum role: Standard User.",
+        "description": "Minimum role: Standard User.\n\n**Note:** Returns `200` with an empty task list rather than `404` when the parent object does not exist, or when the caller holds a NO ACCESS role on the model.",
         "parameters": [
           {
             "name": "sort",
@@ -1523,6 +1619,9 @@
         "responses": {
           "200": {
             "description": "The created export task."
+          },
+          "404": {
+            "description": ""
           }
         }
       }
@@ -1549,6 +1648,9 @@
         "responses": {
           "200": {
             "description": "Status of the export task."
+          },
+          "404": {
+            "description": ""
           }
         }
       }
@@ -1574,7 +1676,7 @@
             "description": "File metadata retrieved successfully."
           },
           "404": {
-            "description": "File not found or endpoint not available for this account role."
+            "description": "File not found or endpoint not available for this account role.\n\nAlso returned when the caller holds a NO ACCESS role on the model \u2014 Anaplan masks that as `404` rather than `403` so the resource is not confirmed to exist."
           }
         }
       },
@@ -1602,6 +1704,9 @@
         "responses": {
           "200": {
             "description": "The file metadata with the chunk count set."
+          },
+          "404": {
+            "description": ""
           }
         }
       },
@@ -1624,6 +1729,9 @@
         "responses": {
           "204": {
             "description": "File uploaded successfully. No response body."
+          },
+          "404": {
+            "description": ""
           }
         }
       },
@@ -1634,6 +1742,9 @@
         "responses": {
           "204": {
             "description": "File deleted successfully. No response body."
+          },
+          "404": {
+            "description": ""
           }
         }
       }
@@ -1660,6 +1771,9 @@
         "responses": {
           "200": {
             "description": "Chunk data downloaded successfully."
+          },
+          "404": {
+            "description": ""
           }
         }
       },
@@ -1680,11 +1794,14 @@
           }
         },
         "responses": {
+          "200": {
+            "description": "Chunk uploaded successfully (some regions may return 200)."
+          },
           "204": {
             "description": "Chunk uploaded successfully. No response body."
           },
-          "200": {
-            "description": "Chunk uploaded successfully (some regions may return 200)."
+          "404": {
+            "description": ""
           }
         }
       }
@@ -1708,6 +1825,9 @@
         "responses": {
           "200": {
             "description": "The completed file upload."
+          },
+          "404": {
+            "description": ""
           }
         }
       }
@@ -1727,7 +1847,7 @@
       "get": {
         "operationId": "getWorkspacesByWorkspaceidModelsByModelidImportsByImportidTasks",
         "summary": "Get a list of the import tasks",
-        "description": "Minimum role: Standard User.\n\n*   Request\n\n### Headers\n\n*   `Authorization:AnaplanAuthToken {anaplan_auth_token}`\n*   `Content-Type:application/json`\n\n### Parameters\n\n#",
+        "description": "Minimum role: Standard User.\n\n*   Request\n\n### Headers\n\n*   `Authorization:AnaplanAuthToken {anaplan_auth_token}`\n*   `Content-Type:application/json`\n\n### Parameters\n\n#\n\n**Note:** Returns `200` with an empty task list rather than `404` when the parent object does not exist, or when the caller holds a NO ACCESS role on the model.",
         "parameters": [
           {
             "name": "sort",
@@ -1753,6 +1873,9 @@
         "responses": {
           "200": {
             "description": "Task created successfully"
+          },
+          "404": {
+            "description": ""
           }
         }
       }
@@ -1779,6 +1902,9 @@
         "responses": {
           "200": {
             "description": "Status of the import task."
+          },
+          "404": {
+            "description": ""
           }
         }
       }
@@ -1810,7 +1936,7 @@
             "description": "No dump content available (import completed with no failures)."
           },
           "404": {
-            "description": "Dump file not found, not yet available, or has expired (48-hour TTL after last access)."
+            "description": "Dump file not found, not yet available, or has expired (48-hour TTL after last access).\n\nAlso returned when the caller holds a NO ACCESS role on the model \u2014 Anaplan masks that as `404` rather than `403` so the resource is not confirmed to exist."
           }
         }
       }
@@ -1847,7 +1973,7 @@
             "description": "List of chunks in the import failure dump file."
           },
           "404": {
-            "description": "Dump file not found or not yet available for this task."
+            "description": "Dump file not found or not yet available for this task.\n\nAlso returned when the caller holds a NO ACCESS role on the model \u2014 Anaplan masks that as `404` rather than `403` so the resource is not confirmed to exist."
           }
         }
       }
@@ -1879,7 +2005,7 @@
             "description": "Dump file chunk content. Plain text with CSV-formatted error rows; each row contains _Status_, data columns, _Line_, and _Error_1_ fields."
           },
           "404": {
-            "description": "Chunk not found or dump has expired."
+            "description": "Chunk not found or dump has expired.\n\nAlso returned when the caller holds a NO ACCESS role on the model \u2014 Anaplan masks that as `404` rather than `403` so the resource is not confirmed to exist."
           }
         }
       }
@@ -1912,11 +2038,14 @@
           }
         ],
         "responses": {
-          "429": {
-            "description": "Rate limited \u2014 too many requests. Retry after a delay."
-          },
           "200": {
             "description": "List items retrieved successfully"
+          },
+          "404": {
+            "description": ""
+          },
+          "429": {
+            "description": "Rate limited \u2014 too many requests. Retry after a delay."
           }
         }
       },
@@ -2017,6 +2146,9 @@
         "responses": {
           "200": {
             "description": "Operation completed; per-item failures reported inline"
+          },
+          "404": {
+            "description": ""
           }
         }
       },
@@ -2027,6 +2159,9 @@
         "responses": {
           "200": {
             "description": "List items updated; per-item failures reported inline"
+          },
+          "404": {
+            "description": ""
           }
         }
       }
@@ -2050,6 +2185,9 @@
         "responses": {
           "200": {
             "description": "Read request created successfully"
+          },
+          "404": {
+            "description": ""
           }
         }
       }
@@ -2069,7 +2207,7 @@
       "get": {
         "operationId": "getWorkspacesByWorkspaceidModelsByModelidProcessesByProcessidTasks",
         "summary": "Get the list of tasks for the process",
-        "description": "Minimum role: Standard User.\n\nThis lists the tasks in the process for the given processID. This returns a JSON array containing the list of tasks in the process definition.\n\n### Headers\n\n*   `Authorization:AnaplanAuthToken {anaplan_auth_token}`\n*   `Content-Type:application/json`\n\n### Parameters\n\n#",
+        "description": "Minimum role: Standard User.\n\nThis lists the tasks in the process for the given processID. This returns a JSON array containing the list of tasks in the process definition.\n\n### Headers\n\n*   `Authorization:AnaplanAuthToken {anaplan_auth_token}`\n*   `Content-Type:application/json`\n\n### Parameters\n\n#\n\n**Note:** Returns `200` with an empty task list rather than `404` when the parent object does not exist, or when the caller holds a NO ACCESS role on the model.",
         "parameters": [
           {
             "name": "sort",
@@ -2101,6 +2239,9 @@
         "responses": {
           "200": {
             "description": "Task created successfully"
+          },
+          "404": {
+            "description": ""
           }
         }
       }
@@ -2127,6 +2268,9 @@
         "responses": {
           "200": {
             "description": "Status of the process task."
+          },
+          "404": {
+            "description": ""
           }
         }
       }
@@ -2150,6 +2294,9 @@
         "responses": {
           "200": {
             "description": "The created read request, including the URL to poll for status."
+          },
+          "404": {
+            "description": ""
           }
         }
       }
@@ -2176,6 +2323,9 @@
         "responses": {
           "200": {
             "description": "Status of the read request, including available page count."
+          },
+          "404": {
+            "description": ""
           }
         }
       },
@@ -2186,6 +2336,9 @@
         "responses": {
           "200": {
             "description": "Read request cancelled or removed; pages cleared from file store."
+          },
+          "404": {
+            "description": ""
           }
         }
       }
@@ -2225,6 +2378,9 @@
         "responses": {
           "200": {
             "description": "One page of view data as CSV."
+          },
+          "404": {
+            "description": ""
           }
         }
       }

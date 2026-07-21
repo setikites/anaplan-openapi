@@ -891,6 +891,138 @@ def test_integration_response_meta_status_use_refs():
     assert not violations, "\n".join(violations)
 
 
+# ─── Integration authorization-404 (issue #225) ───────────────────────────
+# A caller holding a NO ACCESS role on a model receives 404 (not 403) from
+# model-scoped operations, even though the model still appears in GET /models.
+# Live-verified on GET /models/{modelId}/versions and .../modules.
+
+
+@_skip_integration
+def test_integration_has_error_response_component_schema():
+    """components/schemas/ErrorResponse must model the status/path/timestamp error envelope."""
+    spec = _load(_INTEGRATION_SPEC)
+    schemas = spec.get("components", {}).get("schemas", {})
+    assert "ErrorResponse" in schemas, "components/schemas/ErrorResponse is missing"
+    props = schemas["ErrorResponse"].get("properties", {})
+    assert props.get("status", {}).get("$ref") == "#/components/schemas/Status", (
+        "ErrorResponse.status must $ref #/components/schemas/Status"
+    )
+    assert props.get("path", {}).get("type") == "string", "ErrorResponse.path must be type string"
+    assert props.get("timestamp", {}).get("type") == "string", (
+        "ErrorResponse.timestamp must be type string"
+    )
+
+
+@_skip_integration
+def test_integration_has_not_found_or_no_access_response_component():
+    """components/responses/NotFoundOrNoAccess must explain that NO ACCESS masks as 404."""
+    spec = _load(_INTEGRATION_SPEC)
+    responses = spec.get("components", {}).get("responses", {})
+    assert "NotFoundOrNoAccess" in responses, (
+        "components/responses/NotFoundOrNoAccess is missing"
+    )
+    resp = responses["NotFoundOrNoAccess"]
+    desc = resp.get("description", "")
+    assert "NO ACCESS" in desc, (
+        "NotFoundOrNoAccess description must name the NO ACCESS model role"
+    )
+    schema = resp.get("content", {}).get("application/json", {}).get("schema", {})
+    assert schema.get("$ref") == "#/components/schemas/ErrorResponse", (
+        "NotFoundOrNoAccess must $ref #/components/schemas/ErrorResponse"
+    )
+
+
+@_skip_integration
+def test_integration_versions_declares_authz_404():
+    """GET /models/{modelId}/versions returns 404 under a NO ACCESS role (live-verified, issue #225)."""
+    spec = _load(_INTEGRATION_SPEC)
+    responses = spec["paths"]["/models/{modelId}/versions"]["get"]["responses"]
+    assert responses.get("404", {}).get("$ref") == (
+        "#/components/responses/NotFoundOrNoAccess"
+    ), "GET /models/{modelId}/versions must $ref the shared authorization-404 response"
+
+
+# Model-scoped GETs that live testing showed do NOT return the authorization-404
+# (issue #225). Every other operation on a path carrying {modelId} does.
+_AUTHZ_404_GET_EXCEPTIONS = frozenset({
+    # Model metadata stays readable — this is what proves the model exists and
+    # makes the sub-resource 404s an authorization signal rather than a deletion.
+    "/models/{modelId}",
+    # Task-list endpoints answer 200 with an empty list instead of 404, both for
+    # an unreachable model and for a parent object that does not exist.
+    "/workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks",
+    "/workspaces/{workspaceId}/models/{modelId}/exports/{exportId}/tasks",
+    "/workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks",
+    "/workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks",
+})
+
+
+def _authz_404_operations(spec: dict):
+    """Yield (path, method) for every model-scoped operation subject to NO ACCESS masking."""
+    for path_str, path_item in spec.get("paths", {}).items():
+        if "{modelId}" not in path_str:
+            continue
+        for method in _HTTP_METHODS:
+            if method not in path_item:
+                continue
+            if method == "get" and path_str in _AUTHZ_404_GET_EXCEPTIONS:
+                continue
+            yield path_str, method
+
+
+@_skip_integration
+def test_integration_model_scoped_operations_declare_authz_404():
+    """Every model sub-resource operation must document 404 as a NO ACCESS outcome.
+
+    Either by $ref to components/responses/NotFoundOrNoAccess, or — where the
+    endpoint has its own not-found semantics to describe — an inline 404 whose
+    description also names the NO ACCESS role.
+    """
+    spec = _load(_INTEGRATION_SPEC)
+    shared_ref = "#/components/responses/NotFoundOrNoAccess"
+    violations = []
+    for path_str, method in _authz_404_operations(spec):
+        response = spec["paths"][path_str][method].get("responses", {}).get("404")
+        if response is None:
+            violations.append(f"{method.upper()} {path_str}: no 404 documented")
+        elif response.get("$ref") != shared_ref and "NO ACCESS" not in response.get(
+            "description", ""
+        ):
+            violations.append(
+                f"{method.upper()} {path_str}: 404 neither $refs {shared_ref} "
+                f"nor names the NO ACCESS role"
+            )
+    assert not violations, (
+        "Model-scoped operations missing the authorization-404 (issue #225):\n"
+        + "\n".join(f"  {v}" for v in violations)
+    )
+
+
+@_skip_integration
+@pytest.mark.parametrize("path", sorted(_AUTHZ_404_GET_EXCEPTIONS))
+def test_integration_authz_404_exceptions_declare_no_404(path):
+    """The live-verified exceptions must not claim a 404 they do not return."""
+    spec = _load(_INTEGRATION_SPEC)
+    responses = spec["paths"][path]["get"].get("responses", {})
+    assert "404" not in responses, (
+        f"GET {path} returns 200 under a NO ACCESS role (live-verified) — "
+        f"it must not declare a 404"
+    )
+
+
+@_skip_integration
+def test_integration_import_dump_404_keeps_expiry_detail():
+    """The import-dump 404 has its own not-found semantics that the shared text must not erase."""
+    spec = _load(_INTEGRATION_SPEC)
+    response = spec["paths"][
+        "/workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/dump"
+    ]["get"]["responses"]["404"]
+    desc = response.get("description", "")
+    assert "48-hour" in desc, (
+        "import-dump 404 must keep its 48-hour TTL detail alongside the NO ACCESS note"
+    )
+
+
 # ─── Description cleanliness ──────────────────────────────────────────────
 
 

@@ -162,6 +162,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Action'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
   /models/{modelId}/currentPeriod:
     parameters:
@@ -195,6 +197,8 @@ paths:
                     $ref: '#/components/schemas/Status'
                   currentPeriod:
                     $ref: '#/components/schemas/CurrentPeriod'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Workspace Administrator
     put:
       summary: Set current period
@@ -264,13 +268,15 @@ paths:
                     $ref: '#/components/schemas/Status'
                   currentPeriod:
                     $ref: '#/components/schemas/CurrentPeriod'
-        '429':
-          description: Rate limited — too many requests. Retry after a delay.
         '400':
           description: 'Bad request. Occurs when: (1) the date is not in YYYY-MM-DD format — "Invalid ISO date format ''{date}''.
             Date should match format YYYY-MM-DD"; (2) the date falls outside the model timescale — "Specified date ''{date}''
             is out of timescale range {start} - {end}"; (3) date is supplied as both a query parameter and a request body
             field simultaneously.'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
+        '429':
+          description: Rate limited — too many requests. Retry after a delay.
       x-anaplan-min-role: Workspace Administrator
   /models/{modelId}/dimensions/{dimensionId}/items:
     parameters:
@@ -341,6 +347,8 @@ paths:
                       $ref: '#/components/schemas/Dimension'
         '400':
           description: Bad request — check the request parameters and body.
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
         '429':
           description: Rate limited — too many requests. Retry after a delay.
       x-anaplan-min-role: Standard User
@@ -420,7 +428,10 @@ paths:
                     items:
                       $ref: '#/components/schemas/Dimension'
         '404':
-          description: Not found — the referenced resource does not exist.
+          description: |-
+            Not found — the referenced resource does not exist.
+
+            Also returned when the caller holds a NO ACCESS role on the model — Anaplan masks that as `404` rather than `403` so the resource is not confirmed to exist.
         '400':
           description: Bad request — check the request parameters and body.
       x-anaplan-min-role: Standard User
@@ -479,6 +490,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Export'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
   /models/{modelId}/exports/{exportId}:
     parameters:
@@ -542,6 +555,8 @@ paths:
                     $ref: '#/components/schemas/Status'
                   exportMetadata:
                     $ref: '#/components/schemas/ExportMetadata'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
   /models/{modelId}/files:
     parameters:
@@ -640,6 +655,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/File'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
   /models/{modelId}/files/{fileId}/chunks:
     parameters:
@@ -691,6 +708,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Chunk'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
   /models/{modelId}/imports:
     parameters:
@@ -746,6 +765,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Import'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
   /models/{modelId}/imports/{importId}:
     parameters:
@@ -806,6 +827,8 @@ paths:
                     $ref: '#/components/schemas/Status'
                   importMetadata:
                     $ref: '#/components/schemas/ImportMetadata'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
   /models/{modelId}/lineItems:
     parameters:
@@ -881,6 +904,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/LineItem'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
         '429':
           description: Rate limited — too many requests. Retry after a delay.
       x-anaplan-min-role: Standard User
@@ -937,6 +962,8 @@ paths:
                   name: Products
                 - id: '101000000002'
                   name: Regions
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
   /models/{modelId}/lineItems/{lineItemId}/dimensions/{dimensionId}/items:
     parameters:
@@ -996,6 +1023,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Dimension'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
   /models/{modelId}/lists:
     parameters:
@@ -1051,6 +1080,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/List'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
   /models/{modelId}/lists/{listId}:
     parameters:
@@ -1118,6 +1149,8 @@ paths:
                     $ref: '#/components/schemas/Status'
                   metadata:
                     $ref: '#/components/schemas/ListMetadata'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
         '429':
           description: Rate limited — too many requests. Retry after a delay.
       x-anaplan-min-role: Standard User
@@ -1158,6 +1191,8 @@ paths:
                     $ref: '#/components/schemas/Status'
                   modelCalendar:
                     $ref: '#/components/schemas/ModelCalendar'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Workspace Administrator
   /models/{modelId}/modelCalendar/fiscalYear:
     parameters:
@@ -1207,6 +1242,8 @@ paths:
                     $ref: '#/components/schemas/Status'
                   modelCalendar:
                     $ref: '#/components/schemas/ModelCalendar'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Workspace Administrator
   /models/{modelId}/modules:
     parameters:
@@ -1263,6 +1300,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Module'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
         '429':
           description: Rate limited — too many requests. Retry after a delay.
       x-anaplan-min-role: Standard User
@@ -1357,6 +1396,8 @@ paths:
                 failures: []
               schema:
                 $ref: '#/components/schemas/WriteCellDataResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
   /models/{modelId}/modules/{moduleId}/lineItems:
     parameters:
@@ -1457,6 +1498,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/LineItem'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
   /models/{modelId}/modules/{moduleId}/views:
     parameters:
@@ -1520,6 +1563,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/View'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
         '429':
           description: Rate limited — too many requests. Retry after a delay.
       x-anaplan-min-role: Standard User
@@ -1575,6 +1620,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Process'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
   /models/{modelId}/processes/{processId}:
     parameters:
@@ -1657,6 +1704,8 @@ paths:
                     $ref: '#/components/schemas/Status'
                   processMetadata:
                     $ref: '#/components/schemas/Process'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
   /models/{modelId}/versions:
     parameters:
@@ -1726,6 +1775,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Version'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Workspace Administrator
   /models/{modelId}/versions/{versionId}/switchover:
     parameters:
@@ -1783,6 +1834,8 @@ paths:
                     $ref: '#/components/schemas/Status'
                   versionSwitchover:
                     $ref: '#/components/schemas/Switchover'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Workspace Administrator
   /models/{modelId}/views:
     parameters:
@@ -1879,6 +1932,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/View'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
         '429':
           description: Rate limited — too many requests. Retry after a delay.
       x-anaplan-min-role: Standard User
@@ -1957,6 +2012,8 @@ paths:
                 pages:
                 - id: '101000000001'
                   name: Versions
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
         '429':
           description: Rate limited — too many requests. Retry after a delay.
       x-anaplan-min-role: Standard User
@@ -2069,6 +2126,8 @@ paths:
                   - '64.6'
                   - '57.94'
                   - '108.36'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
         '429':
           description: Rate limited — too many requests. Retry after a delay.
       x-anaplan-min-role: Standard User
@@ -2123,6 +2182,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Dimension'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
         '429':
           description: Rate limited — too many requests. Retry after a delay.
       x-anaplan-min-role: Standard User
@@ -2497,6 +2558,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Action'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks:
     parameters:
@@ -2514,6 +2577,8 @@ paths:
         ### Parameters
 
         #
+
+        **Note:** Returns `200` with an empty task list rather than `404` when the parent object does not exist, or when the caller holds a NO ACCESS role on the model.
       tags:
       - Bulk Other
       parameters:
@@ -2575,6 +2640,8 @@ paths:
                 properties:
                   task:
                     $ref: '#/components/schemas/TaskWithUrl'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks/{taskId}:
     parameters:
@@ -2620,6 +2687,8 @@ paths:
                     $ref: '#/components/schemas/Status'
                   task:
                     $ref: '#/components/schemas/Task'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/currentPeriod:
     parameters:
@@ -2669,6 +2738,8 @@ paths:
                     $ref: '#/components/schemas/Status'
                   currentPeriod:
                     $ref: '#/components/schemas/CurrentPeriod'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
         '429':
           description: Rate limited — too many requests. Retry after a delay.
       x-anaplan-min-role: Workspace Administrator
@@ -2742,13 +2813,15 @@ paths:
                     $ref: '#/components/schemas/Status'
                   currentPeriod:
                     $ref: '#/components/schemas/CurrentPeriod'
-        '429':
-          description: Rate limited — too many requests. Retry after a delay.
         '400':
           description: 'Bad request. Occurs when: (1) the date is not in YYYY-MM-DD format — "Invalid ISO date format ''{date}''.
             Date should match format YYYY-MM-DD"; (2) the date falls outside the model timescale — "Specified date ''{date}''
             is out of timescale range {start} - {end}"; (3) date is supplied as both a query parameter and a request body
             field simultaneously.'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
+        '429':
+          description: Rate limited — too many requests. Retry after a delay.
       x-anaplan-min-role: Workspace Administrator
   /workspaces/{workspaceId}/models/{modelId}/dashboards:
     parameters:
@@ -2796,6 +2869,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Dashboard'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/dimensions/{dimensionId}/items:
     parameters:
@@ -2865,6 +2940,8 @@ paths:
                       $ref: '#/components/schemas/Dimension'
         '400':
           description: Bad request — check the request parameters and body.
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
         '429':
           description: Rate limited — too many requests. Retry after a delay.
       x-anaplan-min-role: Standard User
@@ -2942,7 +3019,10 @@ paths:
                     items:
                       $ref: '#/components/schemas/Dimension'
         '404':
-          description: Not found — the referenced resource does not exist.
+          description: |-
+            Not found — the referenced resource does not exist.
+
+            Also returned when the caller holds a NO ACCESS role on the model — Anaplan masks that as `404` rather than `403` so the resource is not confirmed to exist.
         '400':
           description: Bad request — check the request parameters and body.
       x-anaplan-min-role: Standard User
@@ -3012,6 +3092,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Export'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/exports/{exportId}:
     parameters:
@@ -3088,6 +3170,8 @@ paths:
                     $ref: '#/components/schemas/Status'
                   exportMetadata:
                     $ref: '#/components/schemas/ExportMetadata'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/exports/{exportId}/tasks:
     parameters:
@@ -3096,7 +3180,10 @@ paths:
     - $ref: '#/components/parameters/ExportId'
     get:
       summary: Get a list of export tasks
-      description: 'Minimum role: Standard User.'
+      description: |-
+        Minimum role: Standard User.
+
+        **Note:** Returns `200` with an empty task list rather than `404` when the parent object does not exist, or when the caller holds a NO ACCESS role on the model.
       parameters:
       - name: sort
         in: query
@@ -3182,6 +3269,8 @@ paths:
                     $ref: '#/components/schemas/Status'
                   task:
                     $ref: '#/components/schemas/Task'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/exports/{exportId}/tasks/{taskId}:
     parameters:
@@ -3255,6 +3344,8 @@ paths:
                     $ref: '#/components/schemas/Status'
                   task:
                     $ref: '#/components/schemas/Task'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/files:
     parameters:
@@ -3339,6 +3430,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/File'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/files/{fileId}:
     parameters:
@@ -3369,7 +3462,10 @@ paths:
                   file:
                     $ref: '#/components/schemas/File'
         '404':
-          description: File not found or endpoint not available for this account role.
+          description: |-
+            File not found or endpoint not available for this account role.
+
+            Also returned when the caller holds a NO ACCESS role on the model — Anaplan masks that as `404` rather than `403` so the resource is not confirmed to exist.
       x-anaplan-min-role: Standard User
     post:
       summary: Set the chunk count
@@ -3446,6 +3542,8 @@ paths:
                     $ref: '#/components/schemas/Status'
                   file:
                     $ref: '#/components/schemas/File'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
     put:
       summary: Upload file as a single chunk
@@ -3477,6 +3575,8 @@ paths:
       responses:
         '204':
           description: File uploaded successfully. No response body.
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
     delete:
       summary: Delete files
@@ -3501,6 +3601,8 @@ paths:
       responses:
         '204':
           description: File deleted successfully. No response body.
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks:
     parameters:
@@ -3558,6 +3660,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Chunk'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks/{chunkId}:
     parameters:
@@ -3578,6 +3682,8 @@ paths:
               schema:
                 type: string
                 format: binary
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
     put:
       summary: Upload a file in chunks
@@ -3601,10 +3707,12 @@ paths:
               type: string
               format: binary
       responses:
-        '204':
-          description: Chunk uploaded successfully. No response body.
         '200':
           description: Chunk uploaded successfully (some regions may return 200).
+        '204':
+          description: Chunk uploaded successfully. No response body.
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/files/{fileId}/complete:
     parameters:
@@ -3658,6 +3766,8 @@ paths:
                     $ref: '#/components/schemas/Status'
                   file:
                     $ref: '#/components/schemas/File'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/imports/:
     parameters:
@@ -3723,6 +3833,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Import'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/imports/{importId}:
     parameters:
@@ -3798,6 +3910,8 @@ paths:
                     $ref: '#/components/schemas/Status'
                   importMetadata:
                     $ref: '#/components/schemas/ImportMetadata'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks:
     parameters:
@@ -3819,6 +3933,8 @@ paths:
         ### Parameters
 
         #
+
+        **Note:** Returns `200` with an empty task list rather than `404` when the parent object does not exist, or when the caller holds a NO ACCESS role on the model.
       tags:
       - Model Metadata
       - Action Metadata
@@ -3889,6 +4005,8 @@ paths:
                 taskId: 5E6331685CC648A29B725923B8FAEA1C
               schema:
                 $ref: '#/components/schemas/TaskWithUrl'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}:
     parameters:
@@ -4002,6 +4120,8 @@ paths:
                     $ref: '#/components/schemas/Status'
                   task:
                     $ref: '#/components/schemas/Task'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/dump:
     parameters:
@@ -4049,7 +4169,10 @@ paths:
         '204':
           description: No dump content available (import completed with no failures).
         '404':
-          description: Dump file not found, not yet available, or has expired (48-hour TTL after last access).
+          description: |-
+            Dump file not found, not yet available, or has expired (48-hour TTL after last access).
+
+            Also returned when the caller holds a NO ACCESS role on the model — Anaplan masks that as `404` rather than `403` so the resource is not confirmed to exist.
       x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/dump/chunks:
     parameters:
@@ -4092,7 +4215,10 @@ paths:
                     items:
                       $ref: '#/components/schemas/Chunk'
         '404':
-          description: Dump file not found or not yet available for this task.
+          description: |-
+            Dump file not found or not yet available for this task.
+
+            Also returned when the caller holds a NO ACCESS role on the model — Anaplan masks that as `404` rather than `403` so the resource is not confirmed to exist.
       x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/dump/chunks/{chunkId}:
     parameters:
@@ -4123,7 +4249,10 @@ paths:
               schema:
                 type: string
         '404':
-          description: Chunk not found or dump has expired.
+          description: |-
+            Chunk not found or dump has expired.
+
+            Also returned when the caller holds a NO ACCESS role on the model — Anaplan masks that as `404` rather than `403` so the resource is not confirmed to exist.
       x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/lineItems:
     parameters:
@@ -4202,6 +4331,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/LineItem'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
         '429':
           description: Rate limited — too many requests. Retry after a delay.
       x-anaplan-min-role: Standard User
@@ -4261,6 +4392,8 @@ paths:
                   name: Products
                 - id: '101000000002'
                   name: Regions
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/lineItems/{lineItemId}/dimensions/{dimensionId}/items:
     parameters:
@@ -4323,6 +4456,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Dimension'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/lists:
     parameters:
@@ -4377,6 +4512,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/List'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/lists/{listId}:
     parameters:
@@ -4443,6 +4580,8 @@ paths:
                     $ref: '#/components/schemas/Status'
                   metadata:
                     $ref: '#/components/schemas/ListMetadata'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
         '429':
           description: Rate limited — too many requests. Retry after a delay.
       x-anaplan-min-role: Standard User
@@ -4492,8 +4631,6 @@ paths:
       - $ref: '#/components/parameters/Offset'
       - $ref: '#/components/parameters/Limit'
       responses:
-        '429':
-          description: Rate limited — too many requests. Retry after a delay.
         '200':
           description: List items retrieved successfully
           content:
@@ -4530,6 +4667,10 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/ListItem'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
+        '429':
+          description: Rate limited — too many requests. Retry after a delay.
       x-anaplan-min-role: Standard User
     post:
       summary: Add or delete list items
@@ -4691,6 +4832,8 @@ paths:
                   deleted:
                     description: Number of items successfully deleted. Present when action=delete.
                     type: integer
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
     put:
       summary: Update list items
@@ -4790,6 +4933,8 @@ paths:
                         failureMessageDetails:
                           type: string
                           description: Human-readable details about the failure.
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/lists/{listId}/readRequests:
     parameters:
@@ -4828,6 +4973,8 @@ paths:
                     $ref: '#/components/schemas/Status'
                   listReadRequest:
                     $ref: '#/components/schemas/ListReadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/modelCalendar:
     parameters:
@@ -4867,6 +5014,8 @@ paths:
                     $ref: '#/components/schemas/Status'
                   modelCalendar:
                     $ref: '#/components/schemas/ModelCalendar'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Workspace Administrator
   /workspaces/{workspaceId}/models/{modelId}/modules:
     parameters:
@@ -4926,6 +5075,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Module'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
         '429':
           description: Rate limited — too many requests. Retry after a delay.
       x-anaplan-min-role: Standard User
@@ -5031,6 +5182,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/LineItem'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/modules/{moduleId}/views:
     parameters:
@@ -5097,6 +5250,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/View'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
         '429':
           description: Rate limited — too many requests. Retry after a delay.
       x-anaplan-min-role: Standard User
@@ -5165,6 +5320,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Process'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/processes/{processId}:
     parameters:
@@ -5233,6 +5390,8 @@ paths:
                     $ref: '#/components/schemas/Status'
                   processMetadata:
                     $ref: '#/components/schemas/Process'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks:
     parameters:
@@ -5254,6 +5413,8 @@ paths:
         ### Parameters
 
         #
+
+        **Note:** Returns `200` with an empty task list rather than `404` when the parent object does not exist, or when the caller holds a NO ACCESS role on the model.
       tags:
       - Bulk Other
       parameters:
@@ -5316,6 +5477,8 @@ paths:
                 taskId: E1F648F527AF4297B09E06C278B99F4C
               schema:
                 $ref: '#/components/schemas/TaskWithUrl'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks/{taskId}:
     parameters:
@@ -5394,6 +5557,8 @@ paths:
                     $ref: '#/components/schemas/Status'
                   task:
                     $ref: '#/components/schemas/Task'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/versions:
     parameters:
@@ -5459,6 +5624,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Version'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Workspace Administrator
   /workspaces/{workspaceId}/models/{modelId}/views:
     parameters:
@@ -5554,6 +5721,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/View'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
         '429':
           description: Rate limited — too many requests. Retry after a delay.
       x-anaplan-min-role: Standard User
@@ -5635,6 +5804,8 @@ paths:
                 pages:
                 - id: '101000000001'
                   name: Versions
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
         '429':
           description: Rate limited — too many requests. Retry after a delay.
       x-anaplan-min-role: Standard User
@@ -5689,6 +5860,8 @@ paths:
                     $ref: '#/components/schemas/Status'
                   viewReadRequest:
                     $ref: '#/components/schemas/ViewReadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests/{requestId}:
     parameters:
@@ -5742,6 +5915,8 @@ paths:
                     $ref: '#/components/schemas/Status'
                   viewReadRequest:
                     $ref: '#/components/schemas/ViewReadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
     delete:
       summary: Delete Read Request
@@ -5783,6 +5958,8 @@ paths:
                   viewId: 102000001443
                   requestState: CANCELLED
                   url: https://api.anaplan.com/2/0/workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests/{requestId}
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests/{requestId}/pages/{pageNo}:
     parameters:
@@ -5820,6 +5997,8 @@ paths:
             text/csv:
               schema:
                 type: string
+        '404':
+          $ref: '#/components/responses/NotFoundOrNoAccess'
       x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/visitors:
     parameters:
@@ -6083,6 +6262,24 @@ components:
     BearerAuth:
       type: http
       scheme: bearer
+  responses:
+    NotFoundOrNoAccess:
+      description: |-
+        Not Found — the model does not exist, or the caller holds a NO ACCESS role on it.
+
+        Anaplan returns `404` rather than `403` for model-scoped operations so that the existence of a model is not confirmed to callers who cannot reach it. A model the caller cannot reach is still returned by `GET /models/{modelId}` with full metadata, and still appears in `GET /workspaces/{workspaceId}/models` — only its sub-resource operations return `404`. Whether it also appears in the tenant-wide `GET /models` listing varies.
+
+        Treat this status as "not reachable" rather than "does not exist": check the caller's model role before concluding the resource is gone.
+      content:
+        application/json:
+          example:
+            status:
+              code: 404
+              message: Not Found
+            path: /2/0/models/A66D439C712C41948C95C7543C700799/modules
+            timestamp: '2026-07-14T13:55:12.198115662Z'
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
   schemas:
     User:
       type: object
@@ -7136,3 +7333,20 @@ components:
           format: date
           type: string
       type: object
+    ErrorResponse:
+      type: object
+      description: Error envelope returned by the Integration API for 4xx responses that carry no domain payload.
+      required:
+      - status
+      properties:
+        status:
+          $ref: '#/components/schemas/Status'
+        path:
+          type: string
+          description: Request path that produced the error, including the API version prefix.
+          example: /2/0/models/A66D439C712C41948C95C7543C700799/modules
+        timestamp:
+          type: string
+          format: date-time
+          description: UTC time at which the error was generated.
+          example: '2026-07-14T13:55:12.198115662Z'

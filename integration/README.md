@@ -166,6 +166,35 @@ Expected skips:
 
 _Document differences between Apiary docs, Postman collection, and live API behavior here as they are discovered._
 
+### NO ACCESS model role is masked as `404` (issue #225)
+
+Live testing with a certificate principal holding the **NO ACCESS** role on model
+`EBP Request DEV` confirmed that Anaplan returns `404 Not Found` — never `403` — from
+model-scoped operations, so that the existence of an unreachable model is not confirmed
+to the caller. All 66 model-scoped `GET` operations in this spec were probed:
+
+- **61 returned `404`** with the `{ status, path, timestamp }` error envelope
+  (`components/schemas/ErrorResponse`). These now declare
+  `components/responses/NotFoundOrNoAccess`.
+- **`GET /models/{modelId}` returned `200`** with full metadata (name, `activeState`,
+  workspace). The model also remained listed by `GET /workspaces/{workspaceId}/models`,
+  though it was absent from the tenant-wide `GET /models` listing for this principal.
+  Whether it appears there varies — the issue reporter observed the opposite.
+- **The four task-list endpoints returned `200` with an empty list**
+  (`.../actions|exports|imports|processes/{id}/tasks`). They neither mask as `404` nor
+  confirm the parent object exists; a fabricated parent ID against a *reachable* model
+  behaves the same way. These deliberately do **not** declare a `404`.
+
+For 18 of the sub-resource paths the masking is directly provable: a fabricated child ID
+against a reachable model returns `200` (or `500` for `imports/{importId}`) while the same
+request against the NO ACCESS model returns `404`. For the remaining sub-resource paths
+both arms return `404`, so the 404 is consistent with the masking but not independently
+distinguishable from a genuinely missing child.
+
+Non-`GET` model-scoped operations are **not** live-verified — the live-test harness blocks
+writes to `api.anaplan.com` without `--allow-writes`. They declare the same `404` by
+inference from the read behaviour.
+
 ### `Admin` and `Visitor` schema email regex is over-escaped
 
 The `email` property on both `Admin` and `Visitor` uses the pattern inherited verbatim from `sources/integration/objectSchema.json`:
