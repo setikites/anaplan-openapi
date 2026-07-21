@@ -448,7 +448,9 @@ def test_cloudworks_integrationdetail_allof_property_has_description(field):
     """IntegrationDetail allOf inline properties must have descriptions (ADR 0003 §2).
 
     'version' and 'jobs' are not self-evident: version could mean API version
-    or schema version; jobs is absent on process integrations.
+    or schema version; jobs carries the integration's connection references and
+    is present on a process integration whose actions read from or write to the
+    connected cloud data store.
     """
     spec = json.loads(_CW_SPEC.read_text(encoding="utf-8"))
     allof = (

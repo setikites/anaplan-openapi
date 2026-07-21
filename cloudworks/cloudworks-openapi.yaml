@@ -28,11 +28,11 @@ security:
 paths:
   /integrations/connections:
     get:
-      summary: Get connections
+      summary: Get connections — a connection record does not report which integrations use it
       description: |-
         Minimum role: Restricted Integration User.
 
-        Retrieve all connections available to the authenticated user.
+        Retrieve all connections available to the authenticated user. Nothing in the returned record says whether a connection is referenced: determining that requires sweeping every integration with `getIntegrationById` and collecting `jobs[].sources[]`/`targets[].connectionId`.
       operationId: getConnections
       x-anaplan-min-role: Restricted Integration User
       tags:
@@ -396,11 +396,13 @@ paths:
           $ref: '#/components/responses/Conflict'
   /integrations:
     get:
-      summary: Get all integrations
+      summary: Get all integrations — the list view carries no `jobs`, so no connection references
       description: |-
         Minimum role: Restricted Integration User.
 
         Retrieve all integrations. Returns 25 integrations if `offset` and `limit` are not provided.
+
+        Items are `IntegrationSummary`: no `jobs`, therefore no `connectionId` anywhere in the response. Mapping connections to integrations costs one `getIntegrationById` call per integration; there is no bulk form.
       operationId: getIntegrations
       x-anaplan-min-role: Restricted Integration User
       tags:
@@ -557,8 +559,13 @@ paths:
     parameters:
     - $ref: '#/components/parameters/IntegrationId'
     get:
-      summary: Get integration by ID
-      description: 'Minimum role: Restricted Integration User.'
+      summary: Get integration by ID — the only op returning its connection references (`jobs[].sources[]`/`targets[].connectionId`)
+      description: |-
+        Minimum role: Restricted Integration User.
+
+        The only op that reveals which connections an integration uses: `integration.jobs[].sources[]` and `targets[]` carry `connectionId`. `getIntegrations` does not return `jobs`, so mapping connections to integrations costs one call per integration.
+
+        Imports bind the connection in `sources`, exports in `targets` — read both. `integrationType: "Process"` does not mean no connection: a process integration whose actions read from or write to the connected cloud data store carries `jobs` with `sources`/`targets` pointing at a connection, so a sweep must cover every integration type.
       operationId: getIntegrationById
       x-anaplan-min-role: Restricted Integration User
       tags:
@@ -1753,7 +1760,9 @@ components:
             description: Integration schema version; currently "2.0".
             type: string
           jobs:
-            description: Import/export job definitions; empty for process integrations.
+            description: 'Import/export job definitions, each carrying the `connectionId` of the connection it binds. Present
+              on a process integration whose actions read from or write to the connected cloud data store, so `integrationType:
+              "Process"` does not imply the absence of a connection.'
             type: array
             items:
               $ref: '#/components/schemas/Job'

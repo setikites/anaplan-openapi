@@ -27,8 +27,8 @@
     "/integrations/connections": {
       "get": {
         "operationId": "getConnections",
-        "summary": "Get connections",
-        "description": "Minimum role: Restricted Integration User.\n\nRetrieve all connections available to the authenticated user.",
+        "summary": "Get connections \u2014 a connection record does not report which integrations use it",
+        "description": "Minimum role: Restricted Integration User.\n\nRetrieve all connections available to the authenticated user. Nothing in the returned record says whether a connection is referenced: determining that requires sweeping every integration with `getIntegrationById` and collecting `jobs[].sources[]`/`targets[].connectionId`.",
         "responses": {
           "200": {
             "description": "List of connections."
@@ -409,8 +409,8 @@
     "/integrations": {
       "get": {
         "operationId": "getIntegrations",
-        "summary": "Get all integrations",
-        "description": "Minimum role: Restricted Integration User.\n\nRetrieve all integrations. Returns 25 integrations if `offset` and `limit` are not provided.",
+        "summary": "Get all integrations \u2014 the list view carries no `jobs`, so no connection references",
+        "description": "Minimum role: Restricted Integration User.\n\nRetrieve all integrations. Returns 25 integrations if `offset` and `limit` are not provided.\n\nItems are `IntegrationSummary`: no `jobs`, therefore no `connectionId` anywhere in the response. Mapping connections to integrations costs one `getIntegrationById` call per integration; there is no bulk form.",
         "parameters": [
           {
             "name": "offset",
@@ -548,8 +548,8 @@
       ],
       "get": {
         "operationId": "getIntegrationById",
-        "summary": "Get integration by ID",
-        "description": "Minimum role: Restricted Integration User.",
+        "summary": "Get integration by ID \u2014 the only op returning its connection references (`jobs[].sources[]`/`targets[].connectionId`)",
+        "description": "Minimum role: Restricted Integration User.\n\nThe only op that reveals which connections an integration uses: `integration.jobs[].sources[]` and `targets[]` carry `connectionId`. `getIntegrations` does not return `jobs`, so mapping connections to integrations costs one call per integration.\n\nImports bind the connection in `sources`, exports in `targets` \u2014 read both. `integrationType: \"Process\"` does not mean no connection: a process integration whose actions read from or write to the connected cloud data store carries `jobs` with `sources`/`targets` pointing at a connection, so a sweep must cover every integration type.",
         "responses": {
           "200": {
             "description": "Integration details."
