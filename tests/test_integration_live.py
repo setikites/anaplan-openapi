@@ -1017,7 +1017,10 @@ def test_list_line_item_dimension_items(integration_token, line_item_id, dimensi
     body = response.json()
     assert body.get("status", {}).get("code") == 200
     items = body.get("items")
-    assert isinstance(items, list), f"Expected 'items' list; keys: {list(body.keys())}"
+    # When the dimension is empty, the API omits the 'items' key entirely; accept None or list.
+    assert items is None or isinstance(items, list), (
+        f"Expected 'items' to be a list or absent; got {type(items)}"
+    )
     if items:
         assert items[0].get("id"), "Dimension item must have an id"
         assert "name" in items[0], "Dimension item must have a name"
@@ -1056,7 +1059,10 @@ def test_list_workspace_dimension_items(integration_token, dimension_id):
     body = response.json()
     assert body.get("status", {}).get("code") == 200
     items = body.get("items")
-    assert isinstance(items, list), f"Expected 'items' list; keys: {list(body.keys())}"
+    # When the dimension is empty, the API omits the 'items' key entirely; accept None or list.
+    assert items is None or isinstance(items, list), (
+        f"Expected 'items' to be a list or absent; got {type(items)}"
+    )
     if items:
         assert items[0].get("id"), "Dimension item must have an id"
         assert "name" in items[0], "Dimension item must have a name"

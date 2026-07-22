@@ -300,6 +300,7 @@ paths:
         *   This call only supports the retrieval of dimensions and items from a dimension that contains a maximum of 1,000,000 items.
             The call returns a `400` response for any more than that number of items.
         *   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response.
+        *   When the dimension has no items, the response omits the `items` key entirely rather than returning an empty array.
       tags:
       - Model Metadata
       - List Metadata
@@ -988,6 +989,7 @@ paths:
         *   Providing a non-existent Line Item ID or Dimension ID returns a 404 Not Found HTTP status.
         *   If the request provides an invalid line item ID or dimension ID this call returns a `400 Bad Request` HTTP status.
         *   In the future, use of this call may be rate limited.
+        *   When the dimension has no items, the response omits the `items` key entirely rather than returning an empty array.
       tags:
       - Model Metadata
       - Line Item Metadata
@@ -2152,6 +2154,8 @@ paths:
         *   This call only supports the retrieval of dimension items within a view that contains a maximum of 1,000,000 cells. If the specified view contains more than 1,000,000 dimension items, then the call returns a `400 Bad Request` HTTP status, instead of a subset of the dimension items. Use the [quick sum bar](https://help.anaplan.com/anapedia/Content/New_User_Experience/Use/Worksheets/Grid/Quick-sum-bar.htm) in Anaplan to identify the number of dimension items in a view
         *   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response
         *   The `viewId` in this request can also be replaced by any valid `lineItemId`. If the Line Item has a changed dimensionality (has a Subsidiary View), the response returns the applicable dimension items for the given dimension. Otherwise, the response returns all default applicable dimension items for the given dimension
+
+        **Note**: When the dimension has no items, the response omits the `items` key entirely rather than returning an empty array.
       tags:
       - Model Metadata
       - List Metadata
@@ -2893,6 +2897,7 @@ paths:
         *   This call only supports the retrieval of dimensions and items from a dimension that contains a maximum of 1,000,000 items.
             The call returns a `400` response for any more than that number of items.
         *   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response.
+        *   When the dimension has no items, the response omits the `items` key entirely rather than returning an empty array.
       tags:
       - Model Metadata
       - List Metadata
@@ -4419,6 +4424,7 @@ paths:
         *   Providing a non-existent Line Item ID or Dimension ID returns a 404 Not Found HTTP status.
         *   If the request provides an invalid line item ID or dimension ID this call returns a `400 Bad Request` HTTP status.
         *   In the future, use of this call may be rate limited.
+        *   When the dimension has no items, the response omits the `items` key entirely rather than returning an empty array.
       tags:
       - Model Metadata
       - Line Item Metadata
