@@ -89,7 +89,7 @@ paths:
     parameters:
     - $ref: '#/components/parameters/ModelId'
     get:
-      summary: Retrieve compatible source model revisions
+      summary: List source model ALM revisions compatible with this model
       description: |-
         Minimum role: Workspace Administrator.
 
@@ -123,7 +123,7 @@ paths:
     parameters:
     - $ref: '#/components/parameters/ModelId'
     get:
-      summary: Retrieve latest revision
+      summary: Retrieve the latest ALM revision in a model
       description: |-
         Minimum role: Workspace Administrator.
 
@@ -145,7 +145,7 @@ paths:
     parameters:
     - $ref: '#/components/parameters/ModelId'
     get:
-      summary: Retrieve revisions in a model
+      summary: List ALM revisions in a model
       description: |-
         Minimum role: Workspace Administrator.
 
@@ -192,7 +192,7 @@ paths:
         '404':
           description: Model not found or caller has no access.
     post:
-      summary: Create a revision
+      summary: Create an ALM revision
       description: |-
         Minimum role: Workspace Administrator.
 
@@ -232,7 +232,7 @@ paths:
         pattern: ^[0-9A-F]{32}$
       example: B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4E5
     get:
-      summary: Retrieve the models for a specific revision
+      summary: List models an ALM revision has been applied to
       description: |-
         Minimum role: Workspace Administrator.
 
@@ -256,7 +256,7 @@ paths:
     parameters:
     - $ref: '#/components/parameters/ModelId'
     get:
-      summary: Retrieve sync tasks for a model
+      summary: List ALM sync tasks for a model
       description: |-
         Minimum role: Workspace Administrator.
 
@@ -275,7 +275,7 @@ paths:
         '404':
           description: Model not found or caller has no access.
     post:
-      summary: Create a model sync task
+      summary: Create an ALM model sync task
       description: |-
         Minimum role: Workspace Administrator.
 
@@ -315,7 +315,7 @@ paths:
         pattern: ^[0-9A-F]{32}$
       example: 0A1B2C3D4E5F0A1B2C3D4E5F0A1B2C3D
     get:
-      summary: Retrieve model sync task info
+      summary: Retrieve ALM model sync task info
       description: |-
         Minimum role: Workspace Administrator.
 
@@ -337,7 +337,7 @@ paths:
     parameters:
     - $ref: '#/components/parameters/ModelId'
     post:
-      summary: Create a full comparison report generation task
+      summary: Create a full ALM revision comparison report generation task
       description: |-
         Minimum role: Workspace Administrator.
 
@@ -368,7 +368,7 @@ paths:
     - $ref: '#/components/parameters/ModelId'
     - $ref: '#/components/parameters/TaskId'
     get:
-      summary: Retrieve full comparison report task info
+      summary: Retrieve full ALM revision comparison report task info
       description: |-
         Minimum role: Workspace Administrator.
 
@@ -392,7 +392,7 @@ paths:
     - $ref: '#/components/parameters/TargetRevisionId'
     - $ref: '#/components/parameters/SourceRevisionId'
     get:
-      summary: Retrieve full comparison report content
+      summary: Retrieve full ALM revision comparison report content
       description: |-
         Minimum role: Workspace Administrator.
 
@@ -415,7 +415,7 @@ paths:
     parameters:
     - $ref: '#/components/parameters/ModelId'
     post:
-      summary: Create a summary report generation task
+      summary: Create an ALM revision summary report generation task
       description: |-
         Minimum role: Workspace Administrator.
 
@@ -446,7 +446,7 @@ paths:
     - $ref: '#/components/parameters/ModelId'
     - $ref: '#/components/parameters/TaskId'
     get:
-      summary: Retrieve summary report task info
+      summary: Retrieve ALM revision summary report task info
       description: |-
         Minimum role: Workspace Administrator.
 
@@ -470,7 +470,7 @@ paths:
     - $ref: '#/components/parameters/TargetRevisionId'
     - $ref: '#/components/parameters/SourceRevisionId'
     get:
-      summary: Retrieve summary report content
+      summary: Retrieve ALM revision summary report content
       description: |-
         Minimum role: Workspace Administrator.
 
