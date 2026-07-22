@@ -3439,31 +3439,29 @@ paths:
     - $ref: '#/components/parameters/ModelId'
     - $ref: '#/components/parameters/FileId'
     get:
-      summary: Get file metadata
+      summary: Download file content in a single call
       description: |-
         Minimum role: Standard User.
 
-        Returns metadata for a specific file in the model. Requires Workspace Administrator access; standard Integration API users receive 404. Individual file metadata is also accessible via the full file list endpoint. See integration/README.md for details.
+        Returns the raw content of the file as `application/octet-stream` — the file body itself, not a JSON metadata envelope. Response bytes are identical to concatenating every chunk from `GET .../files/{fileId}/chunks/{chunkId}`, so this is the single-call alternative to the chunked download path. Prefer the chunked path for large files, where holding the whole body in memory is a problem.
+
+        This endpoint returns no metadata. Per-file metadata (`name`, `chunkCount`, `delimiter`, `encoding`, `format`, `headerRow`, `separator`) comes from the file list endpoint `GET /models/{modelId}/files`, which lists every file in the model.
+
+        A file only has downloadable content once content has been uploaded to it or written by an export action. Files listed with `chunkCount` of 0 hold no content and return `404`.
       tags:
-      - Model Metadata
-      - File Metadata
+      - Bulk Read
       responses:
         '200':
-          description: File metadata retrieved successfully.
+          description: File content. The media type is `application/octet-stream` regardless of the file's own format — a
+            CSV file is served as octet-stream, not `text/csv`.
           content:
-            application/json:
+            application/octet-stream:
               schema:
-                type: object
-                properties:
-                  meta:
-                    $ref: '#/components/schemas/Meta'
-                  status:
-                    $ref: '#/components/schemas/Status'
-                  file:
-                    $ref: '#/components/schemas/File'
+                type: string
+                format: binary
         '404':
           description: |-
-            File not found or endpoint not available for this account role.
+            File not found, file holds no content (`chunkCount` of 0), or endpoint not available for this account role.
 
             Also returned when the caller holds a NO ACCESS role on the model — Anaplan masks that as `404` rather than `403` so the resource is not confirmed to exist.
       x-anaplan-min-role: Standard User

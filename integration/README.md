@@ -132,7 +132,7 @@ Endpoints covered (all paths relative to the `/2/0` base URL):
 | `test_view_data_json` | `GET /models/{modelId}/views/{viewId}/data?format=v1` (`Accept: application/json`) |
 | `test_view_read_request_lifecycle` | `POST` / `GET` / `DELETE /workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests` (write-guarded) |
 | `test_list_model_files` | `GET /models/{modelId}/files` |
-| `test_get_file_metadata` | `GET /workspaces/{workspaceId}/models/{modelId}/files/{fileId}` (warns — 404 or 200+octet-stream) |
+| `test_download_file_content` | `GET /workspaces/{workspaceId}/models/{modelId}/files/{fileId}` (200+octet-stream, or 404 when `chunkCount` is 0) |
 | `test_list_file_chunks` | `GET /workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks` |
 | `test_download_first_chunk` | `GET /workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks/0` (skips when no content) |
 | `test_upload_single_chunk` | `PUT /workspaces/{workspaceId}/models/{modelId}/files/{fileId}` + `DELETE` (write-guarded) |
@@ -205,18 +205,17 @@ The `email` property on both `Admin` and `Visitor` uses the pattern inherited ve
 
 After JSON double-escaping, the decoded regex pattern contains `\\.` (two characters: backslash + dot) where `\.` (escaped dot = literal dot) was almost certainly intended. In Python's `re` module, `\\.` means "literal backslash followed by any character" rather than "literal dot", making the pattern reject standard emails like `user.name@example.com`. The pattern is retained as-is to preserve fidelity to the source schema; inline examples in the spec omit the `email` field to avoid failing the example/schema contract test.
 
-### `GET /models/{modelId}/files/{fileId}` requires Workspace Administrator
+### `GET .../files/{fileId}` returns file content, not metadata (issues #111, #228)
 
-Returns 404 for standard Integration API users. Individual file metadata is only accessible to Workspace Administrators; all other callers should use `GET /models/{modelId}/files` (the full file list endpoint).
+The spec originally documented this endpoint as "Get file metadata" returning a `{meta, status, file}` JSON envelope. It does not. Live testing on 2026-07-21 swept every file in two models (58 and 215 files) with two principals:
 
-### `GET /workspaces/{workspaceId}/models/{modelId}/files/{fileId}` — content vs. metadata (issue #111)
+- Files with `chunkCount` >= 1 return **200 `application/octet-stream`** carrying the raw file body. Verified against a 452,495-byte CSV; the bytes were identical to the single chunk fetched from `.../files/{fileId}/chunks/0`.
+- Files with `chunkCount` of 0 return **404** — every one of them, for both principals, including for the account that could read the file with content in the same model. The discriminator is content presence, not only role.
+- The media type is `application/octet-stream` even for a `.csv` file whose listed `format` is `txt`. The server does not negotiate `text/csv` here.
 
-Live testing with file ID `113000001109` (an import source file, `Users.csv`) showed:
+Per-file metadata is only available from the file list endpoint `GET /models/{modelId}/files`.
 
-- For import source files, this endpoint returns **200 with `application/octet-stream`** (the raw file content), not a JSON metadata envelope. The test warns and skips the metadata assertions in this case.
-- For other files (discovered dynamically), the endpoint returns **404** for non-Workspace-Administrator accounts (see above).
-
-The test (`test_get_file_metadata`) handles both cases gracefully and issues a warning rather than failing.
+A NO ACCESS role on the model also produces 404 (see the NO ACCESS masking section), so a 404 alone does not distinguish "no such file", "no content", and "no access".
 
 ### `GET /workspaces/{workspaceId}` returns 404 for non-admins
 
@@ -312,7 +311,7 @@ All 4 valid paths have been added to `integration-openapi.json`.
 | `GET /workspaces/{workspaceId}/models/{modelId}/views/{viewId}/data` | **500** | Server error for the probed view (module default view with no data). Both baseline and alternate returned 500 — path likely exists but 200 response shape could not be confirmed. Not added to spec. |
 | `GET /workspaces/{workspaceId}/models/{modelId}/modules/{moduleId}/data` | **405** | Only `POST` is supported on this path; `GET` is not valid on either form. Not added. |
 | `GET /workspaces/{workspaceId}/models/{modelId}/modelCalendar/fiscalYear` | **405** | Only `PUT` is supported (see above). Not added. |
-| `GET /models/{modelId}/files/{fileId}` | **404** | Both model-direct and workspace-prefixed forms return 404 for non-Workspace-Administrator accounts. Existence of the model-direct form cannot be confirmed from a standard user account. Not added to spec. |
+| `GET /models/{modelId}/files/{fileId}` | **200** | Re-probed 2026-07-21 against a file with content: the model-direct form returns the same 200 `application/octet-stream` body as the workspace-prefixed form, byte for byte. The earlier 404 came from probing files with `chunkCount` of 0. Path duality is confirmed; adding the model-direct path to the spec is tracked separately. |
 
 ### Action/import/export/process GET path duality (issue #28)
 

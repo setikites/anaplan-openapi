@@ -1769,23 +1769,41 @@ def test_list_model_files(integration_token):
 
 
 @pytest.mark.live
-def test_get_file_metadata(integration_token, file_id):
-    """GET /workspaces/{workspaceId}/models/{modelId}/files/{fileId} returns file metadata.
+def test_download_file_content(integration_token, file_id):
+    """GET /workspaces/{workspaceId}/models/{modelId}/files/{fileId} returns file content.
 
-    NOTE: Live testing shows this endpoint returns 404 even for files visible in
-    GET /models/{modelId}/files. Individual file metadata is only available via
-    the full list endpoint. See integration/README.md discrepancies.
+    The endpoint serves the raw file body as application/octet-stream, not a JSON
+    metadata envelope (issue #228). A file with chunkCount 0 holds no content and
+    returns 404, so the expected status is read from the file list first.
     """
+    h = _auth_headers(integration_token)
     with httpx.Client() as client:
+        files_r = client.get(f"{API_URL}/models/{MODEL_ID}/files", headers=h)
+        if files_r.status_code != 200:
+            pytest.skip(f"Could not list files: {files_r.status_code}")
+        file_meta = next(
+            (f for f in files_r.json().get("files", []) if str(f["id"]) == str(file_id)),
+            None,
+        )
+        if file_meta is None:
+            pytest.skip(f"File {file_id} not in model file list")
+
         response = client.get(
             f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/files/{file_id}",
-            headers=_auth_headers(integration_token),
+            headers=h,
         )
+
+    if not file_meta.get("chunkCount"):
+        assert response.status_code == 404, (
+            f"File with chunkCount 0 should return 404; got {response.status_code}"
+        )
+        return
 
     if response.status_code == 404:
         warnings.warn(
-            f"GET /workspaces/.../files/{file_id} returned 404 — "
-            "individual file metadata endpoint not available; use GET /models/{modelId}/files instead. "
+            f"GET /workspaces/.../files/{file_id} returned 404 despite "
+            f"chunkCount {file_meta.get('chunkCount')} — content may have been removed "
+            "by a concurrent write test, or the account lacks Workspace Administrator role. "
             "See integration/README.md discrepancies.",
             UserWarning,
             stacklevel=2,
@@ -1794,21 +1812,8 @@ def test_get_file_metadata(integration_token, file_id):
 
     assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
     ct = response.headers.get("content-type", "")
-    if "application/json" not in ct:
-        warnings.warn(
-            f"GET /workspaces/.../files/{file_id} returned 200 with non-JSON content-type "
-            f"({ct!r}) — endpoint returned file content rather than metadata for this file. "
-            "See integration/README.md discrepancies.",
-            UserWarning,
-            stacklevel=2,
-        )
-        return
-    body = response.json()
-    assert body.get("status", {}).get("code") == 200
-    file_obj = body.get("file")
-    assert file_obj is not None, f"Expected 'file' key; keys: {list(body.keys())}"
-    assert file_obj.get("id") == file_id, "Returned file ID must match requested ID"
-    assert "name" in file_obj, "File metadata must have a name"
+    assert "application/octet-stream" in ct, f"Expected octet-stream content; got {ct!r}"
+    assert response.content, "File with content must return a non-empty body"
 
 
 @pytest.mark.live

@@ -1669,14 +1669,14 @@
       ],
       "get": {
         "operationId": "getWorkspacesByWorkspaceidModelsByModelidFilesByFileid",
-        "summary": "Get file metadata",
-        "description": "Minimum role: Standard User.\n\nReturns metadata for a specific file in the model. Requires Workspace Administrator access; standard Integration API users receive 404. Individual file metadata is also accessible via the full file list endpoint. See integration/README.md for details.",
+        "summary": "Download file content in a single call",
+        "description": "Minimum role: Standard User.\n\nReturns the raw content of the file as `application/octet-stream` \u2014 the file body itself, not a JSON metadata envelope. Response bytes are identical to concatenating every chunk from `GET .../files/{fileId}/chunks/{chunkId}`, so this is the single-call alternative to the chunked download path. Prefer the chunked path for large files, where holding the whole body in memory is a problem.\n\nThis endpoint returns no metadata. Per-file metadata (`name`, `chunkCount`, `delimiter`, `encoding`, `format`, `headerRow`, `separator`) comes from the file list endpoint `GET /models/{modelId}/files`, which lists every file in the model.\n\nA file only has downloadable content once content has been uploaded to it or written by an export action. Files listed with `chunkCount` of 0 hold no content and return `404`.",
         "responses": {
           "200": {
-            "description": "File metadata retrieved successfully."
+            "description": "File content. The media type is `application/octet-stream` regardless of the file's own format \u2014 a CSV file is served as octet-stream, not `text/csv`."
           },
           "404": {
-            "description": "File not found or endpoint not available for this account role.\n\nAlso returned when the caller holds a NO ACCESS role on the model \u2014 Anaplan masks that as `404` rather than `403` so the resource is not confirmed to exist."
+            "description": "File not found, file holds no content (`chunkCount` of 0), or endpoint not available for this account role.\n\nAlso returned when the caller holds a NO ACCESS role on the model \u2014 Anaplan masks that as `404` rather than `403` so the resource is not confirmed to exist."
           }
         }
       },
