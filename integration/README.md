@@ -358,6 +358,32 @@ Two paths absent from the original spec were probed via live testing:
 - `GET /workspaces/{workspaceId}/models`: response key is `models` (array), identical shape to `GET /models` ✓
 - `GET /workspaces/{workspaceId}`: not confirmed (returns 404 — see above)
 
+### Empty collections omit their key (issue #234)
+
+Several list endpoints drop the collection key entirely on a `200` rather than returning an empty
+array. Consumers must treat the key as optional.
+
+| Endpoint | Key | Omitted when |
+|----------|-----|--------------|
+| `GET .../dimensions/{dimensionId}/items` (all five path forms) | `items` | The dimension has no items |
+| `GET .../files/{fileId}/chunks` | `chunks` | `chunkCount` is `0` |
+| `POST/PUT .../lists/{listId}/items` | `failures` | No per-item errors (see [List item write response schemas](#list-item-write-response-schemas-issue-109)) |
+| `POST /workspaces/{workspaceId}/bulkDeleteModels` | `bulkDeleteModelsFailures` | All models deleted |
+
+Confirmed live 2026-07-21 against dimension `101000000055` (list "UAM Bulk Upload Users", empty).
+Both the model-scoped and line-item-scoped forms returned, byte for byte:
+
+```json
+{
+  "meta" : { "schema" : "https://api.anaplan.com/2/0/objects/dimension" },
+  "status" : { "code" : 200, "message" : "Success" }
+}
+```
+
+No `items` key and no `meta.paging`. None of the affected spec schemas mark the collection as
+`required`, so the specs already permit this shape; the operation descriptions now state it
+explicitly.
+
 ### View data response formats (issue #110)
 
 **`GET /models/{modelId}/views/{viewId}/data`** supports two response formats:
