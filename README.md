@@ -3,8 +3,8 @@
 Community-maintained OpenAPI 3.0 specifications for the 10 publicly documented
 Anaplan REST APIs.
 
-Anaplan's official API documentation is spread across an outdated
-Apiary site and a new Postman collection, without detailed
+The [official Anaplan API documentation](https://help.anaplan.com/anaplan-api-844c6d40-a21c-423d-8435-ebaaa0372b76)
+is the authoritative source, but it lacks detailed
 machine-readable OpenAPI specs. This project fills that gap: accurate,
 testable OpenAPI 3.0 specs you can feed directly to code generators,
 MCP server tooling, and your own documentation.
