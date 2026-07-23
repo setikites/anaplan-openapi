@@ -2024,7 +2024,7 @@ paths:
     - $ref: '#/components/parameters/ModelId'
     - $ref: '#/components/parameters/ViewId'
     get:
-      summary: Retrieve cell data for a view
+      summary: Retrieve cell data for a view (large responses — see description)
       description: |-
         Minimum role: Standard User.
 
@@ -2064,6 +2064,8 @@ paths:
             *   A `cells` key with a value, which is a list of all the cell values in the current row.
 
         To get the full coordinates for each cell, use the position of the cell value in the `cells` list, and find the column coordinates at the same position in the `columnCoordinates` list. Then, to uniquely specify the cell, combine the column coordinates with the `rowCoordinates` for the current row and any selected pages.
+
+        **HIGH VOLUME** — a full grid export is returned in one non-paginated response (observed ~210 KB) and there is no `limit`/`offset` paging (the call is instead capped at 1,000,000 cells, returning `400` above that). Narrow the request with page selectors and request only the view/pages you need.
       tags:
       - Transactional Read
       parameters:
@@ -2139,7 +2141,7 @@ paths:
     - $ref: '#/components/parameters/ViewId'
     - $ref: '#/components/parameters/DimensionId'
     get:
-      summary: Retrieve selected items in a dimension
+      summary: Retrieve selected items in a dimension (large responses — see description)
       description: |-
         Minimum role: Standard User.
 
@@ -2156,6 +2158,8 @@ paths:
         *   The `viewId` in this request can also be replaced by any valid `lineItemId`. If the Line Item has a changed dimensionality (has a Subsidiary View), the response returns the applicable dimension items for the given dimension. Otherwise, the response returns all default applicable dimension items for the given dimension
 
         **Note**: When the dimension has no items, the response omits the `items` key entirely rather than returning an empty array.
+
+        **HIGH VOLUME** — all selected items are returned in one non-paginated response (observed ~149 KB); there is no `limit`/`offset` paging (the call is instead capped at 1,000,000 cells, returning `400` above that). Scope to the specific dimension and view you need rather than requesting broad dimensions.
       tags:
       - Model Metadata
       - List Metadata
@@ -3444,11 +3448,13 @@ paths:
     - $ref: '#/components/parameters/ModelId'
     - $ref: '#/components/parameters/FileId'
     get:
-      summary: Download file content in a single call
+      summary: Download file content in a single call (large responses — see description)
       description: |-
         Minimum role: Standard User.
 
-        Returns the raw content of the file as `application/octet-stream` — the file body itself, not a JSON metadata envelope. Response bytes are identical to concatenating every chunk from `GET .../files/{fileId}/chunks/{chunkId}`, so this is the single-call alternative to the chunked download path. Prefer the chunked path for large files, where holding the whole body in memory is a problem.
+        Returns the raw content of the file as `application/octet-stream` — the file body itself, not a JSON metadata envelope. Response bytes are identical to concatenating every chunk from `GET .../files/{fileId}/chunks/{chunkId}`, so this is the single-call alternative to the chunked download path.
+
+        **HIGH VOLUME** — this returns the complete file in one response (observed ~462 KB, and files can be far larger). For anything but tiny files use the chunked download path instead: `GET /workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks` to enumerate chunks, then `GET /workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks/{chunkId}` to fetch each — never hold the whole body in one response.
 
         This endpoint returns no metadata. Per-file metadata (`name`, `chunkCount`, `delimiter`, `encoding`, `format`, `headerRow`, `separator`) comes from the file list endpoint `GET /models/{modelId}/files`, which lists every file in the model.
 
@@ -4595,7 +4601,7 @@ paths:
     - $ref: '#/components/parameters/ModelId'
     - $ref: '#/components/parameters/ListId'
     get:
-      summary: Retrieve list data
+      summary: Retrieve list data (large responses — see description)
       description: |-
         Minimum role: Standard User.
 
@@ -4628,6 +4634,8 @@ paths:
         | `read` | If [Selective Access](https://help.anaplan.com/anapedia/Content/Modeling/Users/Selective_Access.html) is enabled for the list, you can add individual users to provide `read` access. Users with `read` access can view the data associated with the list items but not edit it. |
         | `subsets` | If the value of the subset column is true, the associated item belongs to that subset.  You can view subsets under **Subsets** tab in Anaplan. |
         | `properties` | The value of each custom list property. |
+
+        **HIGH VOLUME** — a list's items can be very large (observed ~9.7 MB for a single list). With no `limit`, a client that auto-follows `meta.paging` merges every page into one response and overflows its token budget. Always pass an explicit `limit` and page with `offset`, and scope to a single list rather than enumerating everything.
       tags:
       - Transactional Read
       parameters:

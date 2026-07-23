@@ -218,8 +218,8 @@
         }
       ],
       "get": {
-        "summary": "List ALM revisions in a model",
-        "description": "Minimum role: Workspace Administrator.\n\nReturns all revisions for the model with optional date filtering and pagination.",
+        "summary": "List ALM revisions in a model (large responses — see description)",
+        "description": "Minimum role: Workspace Administrator.\n\nReturns all revisions for the model with optional date filtering and pagination.\n\n**HIGH VOLUME** — a model's revision history can be large (observed ~815 KB). With no `limit`, a client that auto-follows `meta.paging` merges every page into one response and overflows its token budget. Always pass an explicit `limit` and page with `offset`, and narrow with `appliedAfter`/`appliedBefore` rather than pulling the whole history at once.",
         "operationId": "getRevisions",
         "x-anaplan-min-role": "Workspace Administrator",
         "parameters": [
@@ -572,8 +572,8 @@
         }
       ],
       "get": {
-        "summary": "Retrieve full ALM revision comparison report content",
-        "description": "Minimum role: Workspace Administrator.\n\nDownloads the full comparison report as a tab-separated values (TSV) file. The report is available for 48 hours after generation and includes sections for: Lists Added, Modules Added, Roles Changed, Changes Within Lists, and Line Items Added.",
+        "summary": "Retrieve full ALM revision comparison report content (large responses — see description)",
+        "description": "Minimum role: Workspace Administrator.\n\nDownloads the full comparison report as a tab-separated values (TSV) file. The report is available for 48 hours after generation and includes sections for: Lists Added, Modules Added, Roles Changed, Changes Within Lists, and Line Items Added.\n\n**HIGH VOLUME** — the full report is returned whole in one non-paginated response (observed ~147 KB) and can be larger; there is no paging. Fetch it only when you need the complete diff.",
         "operationId": "getComparisonReport",
         "x-anaplan-min-role": "Workspace Administrator",
         "responses": {
