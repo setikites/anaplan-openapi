@@ -14,8 +14,8 @@
   "paths": {
     "/events": {
       "get": {
-        "summary": "Retrieve audit events",
-        "description": "Minimum role: Tenant Auditor.\n\nRetrieves audit events for the tenant associated with the authenticated user. Use `type` to filter by event category. Use `dateFrom`/`dateTo` for a specific date range, or `intervalInHours` for a rolling window; the queried range cannot exceed 30 days. If no date filter is supplied, the previous 30 days are returned. Use `limit` and `offset` for pagination (the documented limit cap of 10000 is not enforced server-side — see the `limit` parameter).\n\nSet `Accept: text/plain` to receive results in Common Event Format (CEF). Default is `application/json`.",
+        "summary": "Retrieve audit events (large responses — see description)",
+        "description": "Minimum role: Tenant Auditor.\n\nRetrieves audit events for the tenant associated with the authenticated user. Use `type` to filter by event category. Use `dateFrom`/`dateTo` for a specific date range, or `intervalInHours` for a rolling window; the queried range cannot exceed 30 days. If no date filter is supplied, the previous 30 days are returned. Use `limit` and `offset` for pagination (the documented limit cap of 10000 is not enforced server-side — see the `limit` parameter).\n\n**HIGH VOLUME** — audit events are unbounded: a single busy hour can exceed 1,500 events (~825 KB), and with no date filter the default window is the previous 30 days. With no `limit`, a client that auto-follows `meta.paging` merges every page into one response and overflows its token budget. Always pass an explicit `limit` (start small, ~50–100) and narrow the query with `type` plus a tight time range (`intervalInHours`/`interval` or explicit dates). To sweep the full set, hand-page with `limit`+`offset` or filter server-side — never pull a whole window in one call. CEF output (`Accept: text/plain`) ignores `limit`/`offset` and always returns the entire window.\n\nSet `Accept: text/plain` to receive results in Common Event Format (CEF). Default is `application/json`.",
         "operationId": "getAuditEvents",
         "x-anaplan-min-role": "Tenant Auditor",
         "tags": [
@@ -130,8 +130,8 @@
     },
     "/events/search": {
       "post": {
-        "summary": "Search audit events",
-        "description": "Minimum role: Tenant Auditor.\n\nRetrieves audit events for the tenant associated with the authenticated user using a JSON request body to specify the time range. Use `from`/`to` for a specific date range, or `interval` for a rolling window in hours. Use `type` query parameter to filter by event category.\n\nSet `Accept: text/plain` to receive results in Common Event Format (CEF). Default is `application/json`.",
+        "summary": "Search audit events (large responses — see description)",
+        "description": "Minimum role: Tenant Auditor.\n\nRetrieves audit events for the tenant associated with the authenticated user using a JSON request body to specify the time range. Use `from`/`to` for a specific date range, or `interval` for a rolling window in hours. Use `type` query parameter to filter by event category.\n\n**HIGH VOLUME** — audit events are unbounded: a single busy hour can exceed 1,500 events (~825 KB), and with no date filter the default window is the previous 30 days. With no `limit`, a client that auto-follows `meta.paging` merges every page into one response and overflows its token budget. Always pass an explicit `limit` (start small, ~50–100) and narrow the query with `type` plus a tight time range (`intervalInHours`/`interval` or explicit dates). To sweep the full set, hand-page with `limit`+`offset` or filter server-side — never pull a whole window in one call. CEF output (`Accept: text/plain`) ignores `limit`/`offset` and always returns the entire window.\n\nSet `Accept: text/plain` to receive results in Common Event Format (CEF). Default is `application/json`.",
         "operationId": "searchAuditEvents",
         "x-anaplan-min-role": "Tenant Auditor",
         "tags": [
