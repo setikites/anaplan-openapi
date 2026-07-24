@@ -544,13 +544,14 @@
           {
             "name": "myIntegrations",
             "in": "query",
-            "description": "Set to `1` to return only the current user's integrations.",
+            "description": "Scope of the returned list. Set to `1` to return only the current user's integrations. Omitted or set to `0` (the default), the response spans integrations owned by every user the caller can see — use this scoping when answering tenant-wide questions, such as which connections no integration references.",
             "schema": {
               "type": "integer",
               "enum": [
                 0,
                 1
-              ]
+              ],
+              "default": 0
             }
           },
           {

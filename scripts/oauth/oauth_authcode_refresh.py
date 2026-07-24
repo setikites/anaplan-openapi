@@ -50,11 +50,18 @@ r = httpx.post(
 )
 
 body = r.json()
-print(f"Status: {r.status_code}")
-print(json.dumps({k: v for k, v in body.items() if k != "access_token"}, indent=2))
 
 if r.status_code == 200:
     token_blob = {**saved, **body}
     store_token(service, json.dumps(token_blob))
-    print()
-    print(f"Refreshed token stored in OS keyring under service '{service}'.")
+    print(f"Refresh succeeded. Token stored in OS keyring under service '{service}'.")
+    if "expires_in" in body:
+        print(f"Access token expires in {body['expires_in']}s.")
+else:
+    # Allowlist, not denylist: the error body carries no secrets, but the success
+    # body carries access_token/refresh_token/id_token — never echo it.
+    detail = " ".join(
+        str(body[k]) for k in ("error", "error_description") if k in body
+    )
+    print(f"Refresh failed: HTTP {r.status_code}{' — ' + detail if detail else ''}")
+    raise SystemExit(1)

@@ -21,7 +21,7 @@
           {
             "name": "type",
             "in": "query",
-            "description": "Type of events to return. Each value filters to events whose `eventTypeId` carries a matching prefix. Accepted values: `all` (every event), `user_activity` (`USR-*`), `access_control` (`AUTHZ-*`), `int` (integrations, `INT-*`), `conn_mgmt` (connection / SAML management, `CONN-*`), `comment` (`COMMENT-*`), `byok` (Bring Your Own Key encryption), `plan_iq` (PlanIQ), and `forecaster`. A `workflow` category exists for the Workflow product but is omitted from the enum (product not enabled on the test tenant). The enum is not enforced server-side \u2014 an unrecognised value is treated as `all` rather than rejected.",
+            "description": "Type of events to return. Each value filters to events whose `eventTypeId` carries a matching prefix. Accepted values: `all` (every event), `user_activity` (`USR-*`), `access_control` (`AUTHZ-*`), `int` (integrations, `INT-*`), `conn_mgmt` (connection / SAML management, `CONN-*`), `comment` (`COMMENT-*`), `byok` (Bring Your Own Key encryption), `plan_iq` (PlanIQ), and `forecaster`. A `workflow` category exists for the Workflow product but is omitted from the enum (product not enabled on the test tenant). Omitting the parameter is equivalent to `all` (the default). The enum is not enforced server-side \u2014 an unrecognised value is treated as `all` rather than rejected.",
             "schema": {
               "type": "string",
               "enum": [
@@ -34,7 +34,8 @@
                 "byok",
                 "plan_iq",
                 "forecaster"
-              ]
+              ],
+              "default": "all"
             }
           },
           {
@@ -106,7 +107,7 @@
           {
             "name": "type",
             "in": "query",
-            "description": "Type of events to return. Same vocabulary as the `type` filter on `GET /events` (each value matches an `eventTypeId` prefix): `all`, `user_activity`, `access_control`, `int`, `conn_mgmt`, `comment`, `byok`, `plan_iq`, `forecaster`. The enum is not enforced server-side.",
+            "description": "Type of events to return. Same vocabulary as the `type` filter on `GET /events` (each value matches an `eventTypeId` prefix): `all`, `user_activity`, `access_control`, `int`, `conn_mgmt`, `comment`, `byok`, `plan_iq`, `forecaster`. Omitting the parameter is equivalent to `all` (the default). The enum is not enforced server-side.",
             "schema": {
               "type": "string",
               "enum": [
@@ -119,7 +120,8 @@
                 "byok",
                 "plan_iq",
                 "forecaster"
-              ]
+              ],
+              "default": "all"
             }
           }
         ],
