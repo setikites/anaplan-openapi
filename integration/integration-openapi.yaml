@@ -6235,9 +6235,10 @@ components:
     Search:
       name: s
       in: query
-      description: Optional case-insensitive filter. Matches items whose name or ID contains this string. Supports wildcards
-        `%` (0-n characters) and `_` (exactly 1 character). Omit to return all items. **Undocumented and may behave unpredictably;
-        requires the Tenant Admin role and is ignored for non-admin users.**
+      description: Optional case-insensitive substring filter (matches anywhere in the field). Supports wildcards `%` (0-n
+        characters) and `_` (exactly 1 character). Omit to return all items. **Undocumented, and behavior is endpoint-specific.**
+        `GET /workspaces` and `GET /users` are verified with the Workspace Administrator role. `GET /models` requires the
+        Tenant Admin role; otherwise it returns the full model list unfiltered.
       required: false
       schema:
         type: string
