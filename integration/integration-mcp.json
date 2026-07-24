@@ -67,8 +67,8 @@
     "/models": {
       "get": {
         "operationId": "getModels",
-        "summary": "List user models",
-        "description": "Minimum role: Standard User.\n\nRetrieves information about all models in the user's default tenant.",
+        "summary": "List user models (large responses \u2014 see description)",
+        "description": "Minimum role: Standard User.\n\nRetrieves information about all models in the user's default tenant.\n\n**HIGH VOLUME** \u2014 this returns every model in the user's default tenant in one merged response; with no `limit` a client that auto-follows `meta.paging` combines every page and can overflow its token budget. Reduce volume by passing an explicit `limit` and paging with `offset`, by scoping server-side (the `s=` search filter, or the workspace-scoped `GET /workspaces/{workspaceId}/models` list) instead of full enumeration, and/or by using `search` to locate the specific op/params rather than pulling the whole collection.",
         "parameters": [
           {
             "name": "modelDetails",
@@ -1230,8 +1230,8 @@
     "/users": {
       "get": {
         "operationId": "getUsers",
-        "summary": "List users",
-        "description": "Minimum role: Standard User.\n\nRetrieves all users within the tenant.",
+        "summary": "List users (large responses \u2014 see description)",
+        "description": "Minimum role: Standard User.\n\nRetrieves all users within the tenant.\n\n**HIGH VOLUME** \u2014 this returns every user in the tenant in one merged response; with no `limit` a client that auto-follows `meta.paging` combines every page and can overflow its token budget. Reduce volume by passing an explicit `limit` and paging with `offset`, by scoping server-side with the `s=` search filter instead of full enumeration, and/or by using `search` to locate the specific op/params rather than pulling the whole collection.",
         "parameters": [
           {
             "$ref": "#/components/parameters/Search"
@@ -1291,8 +1291,8 @@
     "/workspaces": {
       "get": {
         "operationId": "getWorkspaces",
-        "summary": "List user workspaces",
-        "description": "Minimum role: Standard User.\n\nRetrieves all workspaces a user has access to within the user's default tenant",
+        "summary": "List user workspaces (large responses \u2014 see description)",
+        "description": "Minimum role: Standard User.\n\nRetrieves all workspaces a user has access to within the user's default tenant\n\n**HIGH VOLUME** \u2014 this returns every workspace the user can access in one merged response; with no `limit` a client that auto-follows `meta.paging` combines every page and can overflow its token budget (a `getWorkspaces` \u2192 per-workspace admins pipe produced a 335 KB result that exceeded the token cap). Reduce volume by passing an explicit `limit` and paging with `offset`, by scoping server-side with the `s=` search filter instead of full enumeration, and/or by using `search` to locate the specific op/params rather than pulling the whole collection.",
         "parameters": [
           {
             "$ref": "#/components/parameters/TenantDetails"
