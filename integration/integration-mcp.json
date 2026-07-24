@@ -68,7 +68,7 @@
       "get": {
         "operationId": "getModels",
         "summary": "List user models (large responses \u2014 see description)",
-        "description": "Minimum role: Standard User.\n\nRetrieves information about all models in the user's default tenant.\n\n**HIGH VOLUME** \u2014 this returns every model in the user's default tenant in one merged response; with no `limit` a client that auto-follows `meta.paging` combines every page and can overflow its token budget. Reduce volume by passing an explicit `limit` and paging with `offset`, by scoping server-side (the `s=` search filter, or the workspace-scoped `GET /workspaces/{workspaceId}/models` list) instead of full enumeration, and/or by using `search` to locate the specific op/params rather than pulling the whole collection.",
+        "description": "Minimum role: Standard User.\n\nRetrieves information about all models in the user's default tenant.\n\nModels with `activeState` of `ARCHIVED` are typically inactive and not actionable; filter them out of results (keep only `activeState` != `ARCHIVED`) unless you specifically need archived models.\n\n**HIGH VOLUME** \u2014 this returns every model in the user's default tenant in one merged response; with no `limit` a client that auto-follows `meta.paging` combines every page and can overflow its token budget. Reduce volume by passing an explicit `limit` and paging with `offset`, by scoping server-side (the `s=` search filter, or the workspace-scoped `GET /workspaces/{workspaceId}/models` list) instead of full enumeration, and/or by using `search` to locate the specific op/params rather than pulling the whole collection.",
         "parameters": [
           {
             "name": "modelDetails",
@@ -1231,7 +1231,7 @@
       "get": {
         "operationId": "getUsers",
         "summary": "List users (large responses \u2014 see description)",
-        "description": "Minimum role: Standard User.\n\nRetrieves all users within the tenant.\n\n**HIGH VOLUME** \u2014 this returns every user in the tenant in one merged response; with no `limit` a client that auto-follows `meta.paging` combines every page and can overflow its token budget. Reduce volume by passing an explicit `limit` and paging with `offset`, by scoping server-side with the `s=` search filter instead of full enumeration, and/or by using `search` to locate the specific op/params rather than pulling the whole collection.",
+        "description": "Minimum role: Standard User.\n\nRetrieves all users within the tenant.\n\nDeactivated users (`active` is `false`) are typically not relevant to callers listing people; filter to `active=true` unless you specifically need inactive users.\n\n**HIGH VOLUME** \u2014 this returns every user in the tenant in one merged response; with no `limit` a client that auto-follows `meta.paging` combines every page and can overflow its token budget. Reduce volume by passing an explicit `limit` and paging with `offset`, by scoping server-side with the `s=` search filter instead of full enumeration, and/or by using `search` to locate the specific op/params rather than pulling the whole collection.",
         "parameters": [
           {
             "$ref": "#/components/parameters/Search"
@@ -1357,7 +1357,7 @@
       "get": {
         "operationId": "getWorkspacesByWorkspaceidAdmins",
         "summary": "List workspace administrators",
-        "description": "Minimum role: User Administrator.\n\nReturns all administrators for a workspace. Requires tenant admin privilege; workspace admin access alone is insufficient.",
+        "description": "Minimum role: User Administrator.\n\nReturns all administrators for a workspace. Requires tenant admin privilege; workspace admin access alone is insufficient.\n\nDeactivated administrators (`active` is `false`) are typically not relevant to callers listing people; filter to `active=true` unless you specifically need inactive administrators.",
         "parameters": [
           {
             "$ref": "#/components/parameters/Offset"
@@ -1429,7 +1429,7 @@
       "get": {
         "operationId": "getWorkspacesByWorkspaceidModels",
         "summary": "List workspace models",
-        "description": "Minimum role: Standard User.\n\nReturns models accessible to the calling user within the specified workspace. The response shape is identical to `GET /2/0/models` but filtered to models within the given workspace.",
+        "description": "Minimum role: Standard User.\n\nReturns models accessible to the calling user within the specified workspace. The response shape is identical to `GET /2/0/models` but filtered to models within the given workspace.\n\nModels with `activeState` of `ARCHIVED` are typically inactive and not actionable; filter them out of results (keep only `activeState` != `ARCHIVED`) unless you specifically need archived models.",
         "parameters": [
           {
             "$ref": "#/components/parameters/Offset"
@@ -2394,7 +2394,7 @@
       "get": {
         "operationId": "getWorkspacesByWorkspaceidVisitors",
         "summary": "List workspace visitors",
-        "description": "Minimum role: User Administrator.\n\nReturns all visitors for a workspace. Requires tenant admin privilege; workspace admin access alone is insufficient.",
+        "description": "Minimum role: User Administrator.\n\nReturns all visitors for a workspace. Requires tenant admin privilege; workspace admin access alone is insufficient.\n\nDeactivated visitors (`active` is `false`) are typically not relevant to callers listing people; filter to `active=true` unless you specifically need inactive visitors.",
         "parameters": [
           {
             "$ref": "#/components/parameters/Offset"
