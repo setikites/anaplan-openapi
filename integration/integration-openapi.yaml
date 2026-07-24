@@ -36,11 +36,13 @@ security:
 paths:
   /models:
     get:
-      summary: List user models
+      summary: List user models (large responses — see description)
       description: |-
         Minimum role: Standard User.
 
         Retrieves information about all models in the user's default tenant.
+
+        **HIGH VOLUME** — this returns every model in the user's default tenant in one merged response; with no `limit` a client that auto-follows `meta.paging` combines every page and can overflow its token budget. Reduce volume by passing an explicit `limit` and paging with `offset`, by scoping server-side (the `s=` search filter, or the workspace-scoped `GET /workspaces/{workspaceId}/models` list) instead of full enumeration, and/or by using `search` to locate the specific op/params rather than pulling the whole collection.
       tags:
       - General Workspace & Model Metadata
       parameters:
@@ -2197,11 +2199,13 @@ paths:
       x-anaplan-min-role: Standard User
   /users:
     get:
-      summary: List users
+      summary: List users (large responses — see description)
       description: |-
         Minimum role: Standard User.
 
         Retrieves all users within the tenant.
+
+        **HIGH VOLUME** — this returns every user in the tenant in one merged response; with no `limit` a client that auto-follows `meta.paging` combines every page and can overflow its token budget. Reduce volume by passing an explicit `limit` and paging with `offset`, by scoping server-side with the `s=` search filter instead of full enumeration, and/or by using `search` to locate the specific op/params rather than pulling the whole collection.
       tags:
       - User Data
       parameters:
@@ -2290,11 +2294,13 @@ paths:
       x-anaplan-min-role: Standard User
   /workspaces:
     get:
-      summary: List user workspaces
+      summary: List user workspaces (large responses — see description)
       description: |-
         Minimum role: Standard User.
 
         Retrieves all workspaces a user has access to within the user's default tenant
+
+        **HIGH VOLUME** — this returns every workspace the user can access in one merged response; with no `limit` a client that auto-follows `meta.paging` combines every page and can overflow its token budget (a `getWorkspaces` → per-workspace admins pipe produced a 335 KB result that exceeded the token cap). Reduce volume by passing an explicit `limit` and paging with `offset`, by scoping server-side with the `s=` search filter instead of full enumeration, and/or by using `search` to locate the specific op/params rather than pulling the whole collection.
       tags:
       - General Workspace & Model Metadata
       parameters:
