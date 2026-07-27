@@ -256,7 +256,8 @@
           "additionalAttributes": {
             "type": "object",
             "additionalProperties": true,
-            "description": "Event-type-specific attributes as a free-form map. Keys vary by event type.",
+            "nullable": true,
+            "description": "Event-type-specific attributes as a free-form map. Keys vary by event type. The API may return an explicit `null` for this field (observed on some `USR-8` login events), so treat it as optional rather than always-present.",
             "example": {
               "clientName": "MyApp"
             }
