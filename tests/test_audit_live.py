@@ -42,6 +42,7 @@ import warnings
 import httpx
 import jsonschema
 import pytest
+from openapi_schema_validator import OAS30Validator
 
 from oauth.token_keyring import load_token
 
@@ -500,13 +501,18 @@ def test_audit_event_records_validate_against_schema(audit_events):
 
     Catches type drift between the spec and the real API — e.g. a field the spec
     types as a string that the API returns as an integer.
+
+    Validated with OAS30Validator, not jsonschema.validate: the spec is OpenAPI
+    3.0, where nullability is `nullable: true` (e.g. AuditEvent.additionalAttributes,
+    issue #249). Plain JSON Schema ignores that keyword and would reject the nulls
+    the API actually returns.
     """
     records = audit_events["response"]
     assert records, "expected >=1 audit event record to validate"
 
     for index, record in enumerate(records):
         try:
-            jsonschema.validate(record, _AUDIT_EVENT_SCHEMA)
+            OAS30Validator(_AUDIT_EVENT_SCHEMA).validate(record)
         except jsonschema.ValidationError as exc:
             pytest.fail(
                 f"event record {index} (id={record.get('id')}) violates the "

@@ -54,6 +54,10 @@ plus `meta.paging` (`AuditPaging`). Field reconciliations:
 - **`additionalAttributes` was undocumented** — real events carry an
   `additionalAttributes` object (a free-form, event-type-specific map; e.g.
   `{"clientName": "..."}` on token events). Added to the `AuditEvent` schema.
+- **`additionalAttributes` can be an explicit `null`** (issue #249) — the key is
+  present but null on a small fraction of records (roughly 1 in 1000; observed on
+  `USR-8` login events). Marked `nullable: true`. It is the only `AuditEvent`
+  property observed null across ~2400 sampled events spanning every event type.
 - **`checksum` is not a SHA-256 hash** — the spec described it as a "SHA-256
   checksum", but the live value is a short numeric string (e.g. `"1118902891"`).
   The type (string) is correct; the description has been corrected.
