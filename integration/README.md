@@ -136,7 +136,7 @@ Endpoints covered (all paths relative to the `/2/0` base URL):
 | `test_list_file_chunks` | `GET /workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks` |
 | `test_download_first_chunk` | `GET /workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks/0` (skips when no content) |
 | `test_upload_single_chunk` | `PUT /workspaces/{workspaceId}/models/{modelId}/files/{fileId}` + `DELETE` (write-guarded) |
-| `test_upload_and_complete_cycle` | `POST` (set chunk count) + `PUT /chunks/0` + `POST /complete` (write-guarded) |
+| `test_upload_and_complete_cycle` | `POST` (set chunk count) + `PUT /chunks/0` (asserts **204**, empty body — issue #253) + `POST /complete` (write-guarded) |
 | `test_run_process_and_poll_task` | `POST /workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks` + `GET .../tasks/{taskId}` (write-guarded) |
 | `test_run_action_and_poll_task` | `POST /workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks` + `GET .../tasks/{taskId}` (write-guarded) |
 | `test_export_import_cycle` | Full export → download → stage → import cycle (write-guarded; see details below) |
@@ -469,6 +469,12 @@ Live probe results for `INTEGRATION_FILE` (`113000001109`, Users.csv):
 | `/workspaces/{wid}/models/{mid}/files/{fileId}` | `PUT` | **204 No Content** |
 | `/workspaces/{wid}/models/{mid}/files/{fileId}` | `DELETE` | **204 No Content** |
 | `/workspaces/{wid}/models/{mid}/files/{fileId}/chunks/0` | `GET` | **200 `application/octet-stream`** |
+| `/workspaces/{wid}/models/{mid}/files/{fileId}/chunks/{chunkId}` | `PUT` | **204 No Content** — empty body, no `Content-Type` (issue #253) |
+
+Chunk upload was previously documented as both an empty `200` and a `204`. A live
+probe on 2026-07-28 returned `204` with a zero-byte body, so the `200` has been
+removed from the spec and `test_upload_and_complete_cycle` now asserts the exact
+status code rather than accepting either.
 
 `INTEGRATION_FILE` is an import source file. After `DELETE` teardown in write tests, the file has no content. The `chunkCount` field in the model-level file list (`GET /models/{modelId}/files`) may still show a non-zero value after DELETE (stale metadata), while `GET /chunks/0` returns 404. `test_download_first_chunk` handles this with a skip.
 

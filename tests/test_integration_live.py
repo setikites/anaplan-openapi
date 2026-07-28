@@ -1995,8 +1995,19 @@ def test_upload_and_complete_cycle(integration_token, file_id):
             headers={**h, "Content-Type": "application/octet-stream"},
             content=chunk_data,
         )
-        assert upload_r.status_code in (200, 204), (
-            f"PUT chunk {chunk_id} failed: {upload_r.status_code}: {upload_r.text[:200]}"
+        # Issue #253: the spec declared both an empty 200 and a 204 for this
+        # operation. Pin the status code so the answer stays recorded.
+        print(
+            f"\nPUT .../chunks/{chunk_id} status: {upload_r.status_code}, "
+            f"body bytes: {len(upload_r.content)}, "
+            f"content-type: {upload_r.headers.get('content-type')!r}"
+        )
+        assert upload_r.status_code == 204, (
+            f"PUT chunk {chunk_id}: expected 204 No Content, got "
+            f"{upload_r.status_code}: {upload_r.text[:200]}"
+        )
+        assert not upload_r.content, (
+            f"PUT chunk {chunk_id}: expected empty body, got {upload_r.text[:200]}"
         )
 
         # Verify the chunk is staged

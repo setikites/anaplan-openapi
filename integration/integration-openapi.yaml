@@ -3730,8 +3730,6 @@ paths:
               type: string
               format: binary
       responses:
-        '200':
-          description: Chunk uploaded successfully (some regions may return 200).
         '204':
           description: Chunk uploaded successfully. No response body.
         '404':

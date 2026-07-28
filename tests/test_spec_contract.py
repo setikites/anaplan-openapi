@@ -347,6 +347,11 @@ _NO_JSON_SCHEMA_INTENTIONAL: dict[tuple[str, str, str], str] = {
         "204 No Content",
     ("integration", "DELETE", "/workspaces/{workspaceId}/models/{modelId}/files/{fileId}"):
         "204 No Content",
+    # Confirmed live (issue #253): returns 204 with an empty body and no
+    # Content-Type. The empty 200 the spec also declared has been removed.
+    ("integration", "PUT",
+     "/workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks/{chunkId}"):
+        "204 No Content",
 
     # Non-JSON media type — the response is raw file content, and the
     # operation already declares `content` with the correct media type.
@@ -406,11 +411,6 @@ _NO_JSON_SCHEMA_KNOWN_GAPS: set[tuple[str, str, str]] = {
     ("financial-consolidation", "POST", "/process/start/{path}/{name_of_workflow}"),
     ("financial-consolidation", "POST", "/process/stop/{path}/{name_of_workflow}"),
     ("financial-consolidation", "DELETE", "/users/{username}"),
-
-    # integration — declares both an empty 200 and a 204; the 200 either needs
-    # a schema or should be dropped in favour of the 204.
-    ("integration", "PUT",
-     "/workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks/{chunkId}"),
 }
 
 
