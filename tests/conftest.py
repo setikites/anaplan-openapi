@@ -64,16 +64,29 @@ def ca_certs():
     }
 
 
-@pytest.fixture
-def cert_token(ca_certs):
-    """AnaplanAuthToken obtained via CACertificate auth (the cert-auth user).
+def ca_certs_from_env() -> dict | None:
+    """Return cert/key paths from the environment, or None when not configured.
 
-    Skips when cert env vars are unset. Logs out on teardown. Used where a test
-    needs the specific cert-auth principal rather than the basic-auth account.
+    The plain-function form of the `ca_certs` fixture, for fixtures that need
+    certificate paths at a scope other than function scope.
     """
-    if not ca_certs:
-        pytest.skip("ANAPLAN_CA_CERT_PATH / ANAPLAN_CA_KEY_PATH not set")
+    cert_path = os.getenv("ANAPLAN_CA_CERT_PATH")
+    key_path = os.getenv("ANAPLAN_CA_KEY_PATH")
+    if not cert_path or not key_path:
+        return None
+    cert_file = Path(cert_path)
+    key_file = Path(key_path)
+    if not cert_file.exists() or not key_file.exists():
+        return None
+    return {
+        "cert_path": str(cert_file),
+        "key_path": str(key_file),
+        "key_password": os.getenv("ANAPLAN_CA_KEY_PASSWORD"),
+    }
 
+
+def cert_auth_token(client: httpx.Client, ca_certs: dict) -> str | None:
+    """Authenticate via CACertificate auth. Returns an AnaplanAuthToken or None."""
     from cryptography.hazmat.backends import default_backend
     from cryptography.hazmat.primitives import hashes, serialization
     from cryptography.hazmat.primitives.asymmetric import padding
@@ -91,18 +104,33 @@ def cert_token(ca_certs):
         key.sign(random_data, padding.PKCS1v15(), hashes.SHA512())
     ).decode()
 
+    resp = client.post(
+        f"{AUTH_URL}/token/authenticate",
+        headers={"Authorization": f"CACertificate {cert_b64}"},
+        json={
+            "encodedData": base64.b64encode(random_data).decode(),
+            "encodedSignedData": signature,
+        },
+    )
+    if resp.status_code != 201:
+        return None
+    return resp.json().get("tokenInfo", {}).get("tokenValue")
+
+
+@pytest.fixture
+def cert_token(ca_certs):
+    """AnaplanAuthToken obtained via CACertificate auth (the cert-auth user).
+
+    Skips when cert env vars are unset. Logs out on teardown. Used where a test
+    needs the specific cert-auth principal rather than the basic-auth account.
+    """
+    if not ca_certs:
+        pytest.skip("ANAPLAN_CA_CERT_PATH / ANAPLAN_CA_KEY_PATH not set")
+
     with httpx.Client() as client:
-        resp = client.post(
-            f"{AUTH_URL}/token/authenticate",
-            headers={"Authorization": f"CACertificate {cert_b64}"},
-            json={
-                "encodedData": base64.b64encode(random_data).decode(),
-                "encodedSignedData": signature,
-            },
-        )
-        if resp.status_code != 201:
-            pytest.skip(f"CACertificate auth failed ({resp.status_code})")
-        token = resp.json().get("tokenInfo", {}).get("tokenValue")
+        token = cert_auth_token(client, ca_certs)
+        if not token:
+            pytest.skip("CACertificate auth failed")
 
         yield token
 

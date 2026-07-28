@@ -98,6 +98,23 @@ Live tests run against real tenant data (June 2026). All previously-open questio
 | GET /integrations/anaplanModels/{modelId}: returns HTML 404 from nginx — likely deprecated | ⚠️ |
 | GET /integrations/runerror/{runId}: returns `"runs": {}` (empty object, not array) when no errors | ⚠️ |
 
+### Connection lifecycle response shapes (issue #254)
+
+Live-tested July 2026 by `test_cloudworks_connection_lifecycle_response_shapes`, which runs only against `CLOUDWORKS_DISPOSABLE_CONNECTION_ID` and deletes that connection.
+
+| Operation | Confirmed | Observed |
+|---|---|---|
+| `DELETE /integrations/connections/{connectionId}` | ✅ | `200` with `{"status": {"code": 200, "message": "Success"}}` — matches `SuccessStatus` |
+| `PUT /integrations/connections/{connectionId}` | ⚠️ unconfirmed | `400 "Invalid request body"` for a body carrying only `name` |
+| `PATCH /integrations/connections/{connectionId}` | ⚠️ unconfirmed | `400 "Invalid request body"` for a body carrying only `name`, with or without a `type` key |
+
+Findings:
+
+- **The 13 mutating operations that appear to declare an empty `200` are not gaps.** They reference `#/components/responses/SuccessStatus`, which carries a JSON schema. A contract check that reads response objects without resolving `$ref` reports every one of them as schema-less; the check in `tests/test_spec_contract.py` resolves them.
+- **`POST /integrations/connections` validates third-party credentials server-side.** A well-formed AzureBlob body with a fake storage account and SAS token is rejected with `400 "Credentials are invalid"`. Tests cannot create a disposable connection to work against, which is why the lifecycle test requires one to be supplied.
+- **`PUT` and `PATCH` want the complete connection body, not a partial one.** A name-only update fails for both. Since `GET` never returns a connection's secret, neither can be exercised against a connection whose credentials the caller does not already hold — so their success envelopes remain unconfirmed and are documented from `SuccessStatus`.
+- **`DELETE` returned `200`, not `409`**, for a connection not referenced by any integration.
+
 ### Azure Blob Storage: `auth_method` is now required (undocumented)
 
 A recent CloudWorks update added support for connecting to Azure Blob Storage via OAuth 2.0. As a side effect, the `body` object for `AzureBlob` connections now **requires** an `auth_method` field that is absent from the Apiary docs.

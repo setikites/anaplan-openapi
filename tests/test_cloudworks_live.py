@@ -30,6 +30,8 @@ import warnings
 import httpx
 import pytest
 
+from tests.conftest import ca_certs_from_env, cert_auth_token
+
 _URL_PRIMARY = "https://api.cloudworks.anaplan.com/2/0"
 _URL_ALT = "https://api.anaplan.com/cloudworks/2/0"
 
@@ -53,15 +55,30 @@ def _get_anaplan_token(username: str, password: str) -> str | None:
 
 @pytest.fixture(scope="module")
 def cw_token():
-    """AnaplanAuthToken for CloudWorks calls (module-scoped). Logs out on teardown."""
-    username = os.getenv("ANAPLAN_USERNAME")
-    password = os.getenv("ANAPLAN_PASSWORD")
-    if not username or not password:
-        pytest.skip("ANAPLAN_USERNAME and ANAPLAN_PASSWORD not set")
+    """AnaplanAuthToken for CloudWorks calls (module-scoped). Logs out on teardown.
 
-    token = _get_anaplan_token(username, password)
+    Prefers certificate auth and falls back to basic auth, matching the
+    Integration and Administration live suites. Certificate auth is what most
+    tenants configure, and requiring basic auth here skipped every CloudWorks
+    live test on a cert-only setup.
+    """
+    token = None
+    ca_certs = ca_certs_from_env()
+    if ca_certs:
+        with httpx.Client() as client:
+            token = cert_auth_token(client, ca_certs)
+
     if not token:
-        pytest.skip("Failed to obtain AnaplanAuthToken from basic auth")
+        username = os.getenv("ANAPLAN_USERNAME")
+        password = os.getenv("ANAPLAN_PASSWORD")
+        if username and password:
+            token = _get_anaplan_token(username, password)
+
+    if not token:
+        pytest.skip(
+            "No CloudWorks credentials: set ANAPLAN_CA_CERT_PATH / "
+            "ANAPLAN_CA_KEY_PATH, or ANAPLAN_USERNAME / ANAPLAN_PASSWORD"
+        )
 
     yield token
 
@@ -339,6 +356,145 @@ def test_cloudworks_get_connections_response_shape(cw_token, cw_base_url):
         )
 
 
+# ── Connection lifecycle: create → edit → patch → delete (issue #254) ────────
+
+# A connection this test is permitted to modify and then destroy. It cannot
+# create its own: POST /integrations/connections validates the third-party
+# credentials server-side and rejects a fake SAS token with
+# 400 "Credentials are invalid" (confirmed live, issue #254). Set this only to a
+# connection you are certain is unused — the test deletes it and cannot
+# recreate it, because GET never returns a connection's secret.
+DISPOSABLE_CONNECTION_ID = os.getenv("CLOUDWORKS_DISPOSABLE_CONNECTION_ID", "")
+
+_TEST_CONNECTION_NAME = "openapi-live-test-delete-me"
+
+
+@pytest.mark.live
+@pytest.mark.write
+def test_cloudworks_connection_lifecycle_response_shapes(cw_token, cw_base_url):
+    """PUT / PATCH / DELETE on a connection return the SuccessStatus envelope.
+
+    The spec declares #/components/responses/SuccessStatus — a JSON body of
+    {"status": {"code", "message"}} — for all three. This confirms that against
+    a live tenant (issue #254).
+
+    All three operations mutate or destroy the connection they act on, so the
+    test refuses to touch an arbitrary tenant connection: it runs only against
+    CLOUDWORKS_DISPOSABLE_CONNECTION_ID and skips when that is unset.
+
+    Only DELETE is confirmable without credentials. PUT and PATCH reject a
+    name-only body with 400 "Invalid request body": both want the complete
+    connection body including the secret, and GET does not return it. Their
+    outcome is reported as unconfirmed rather than failing the run.
+    """
+    if not DISPOSABLE_CONNECTION_ID:
+        pytest.skip(
+            "CLOUDWORKS_DISPOSABLE_CONNECTION_ID not set. This test deletes the "
+            "connection it runs against, so it never picks one on its own."
+        )
+
+    h = {
+        "Authorization": f"AnaplanAuthToken {cw_token}",
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+    }
+    conn_url = f"{cw_base_url}/integrations/connections/{DISPOSABLE_CONNECTION_ID}"
+
+    with httpx.Client(timeout=60) as client:
+        # Read the current shape first — confirms the id exists and supplies the
+        # non-secret fields the PUT body needs.
+        list_r = client.get(f"{cw_base_url}/integrations/connections", headers=h)
+        assert list_r.status_code == 200, (
+            f"GET connections failed: {list_r.status_code}: {list_r.text[:200]}"
+        )
+        existing = next(
+            (
+                c
+                for c in list_r.json().get("connections", [])
+                if c.get("connectionId") == DISPOSABLE_CONNECTION_ID
+            ),
+            None,
+        )
+        if existing is None:
+            pytest.skip(
+                f"Connection {DISPOSABLE_CONNECTION_ID} is not visible to this "
+                "account — nothing to exercise."
+            )
+        print(f"\nTarget connection: {existing.get('body', {}).get('name')!r}")
+
+        # Each call is recorded before anything is asserted. The connection is
+        # consumed by the DELETE and cannot be recreated, so one run has to
+        # yield all three answers — a failed assertion partway through would
+        # throw away the results still to come.
+        results: dict[str, httpx.Response] = {}
+        try:
+            # PUT — the documented body carries `type` and a `body` holding the
+            # editable fields. Secrets are not resent; note that GET reports
+            # `authMethod` in camelCase while requests take `auth_method`, so a
+            # GET body cannot be echoed back verbatim.
+            results["PUT"] = client.put(
+                conn_url,
+                json={
+                    "type": existing.get("connectionType", "AzureBlob"),
+                    "body": {"name": _TEST_CONNECTION_NAME},
+                },
+                headers=h,
+            )
+
+            # PATCH — partial update. The body has no `type` key; sending one
+            # is rejected with 400 "Invalid request body".
+            results["PATCH"] = client.patch(
+                conn_url,
+                json={"body": {"name": f"{_TEST_CONNECTION_NAME}-patched"}},
+                headers=h,
+            )
+        finally:
+            results["DELETE"] = client.delete(conn_url, headers=h)
+
+        for label, response in results.items():
+            print(f"\n{label} .../connections/{{connectionId}}: {response.status_code}")
+            print(f"Body: {response.text[:300]}")
+
+        # DELETE needs no request body, so its success shape is confirmable here.
+        _assert_success_status_envelope(results["DELETE"], "DELETE")
+
+        # PUT and PATCH both reject a name-only body with 400 "Invalid request
+        # body" — they want the complete connection body, credentials included,
+        # and GET never returns the secret. When a caller supplies one (a
+        # connection whose credentials are known), the envelope is asserted;
+        # otherwise the outcome is reported and left unconfirmed.
+        for label in ("PUT", "PATCH"):
+            response = results[label]
+            if response.status_code == 200:
+                _assert_success_status_envelope(response, label)
+            else:
+                warnings.warn(
+                    f"{label} .../connections/{{connectionId}} returned "
+                    f"{response.status_code}: {response.text[:200]}. Success "
+                    "envelope unconfirmed — this operation needs the complete "
+                    "connection body including credentials.",
+                    UserWarning,
+                    stacklevel=2,
+                )
+
+
+def _assert_success_status_envelope(response: httpx.Response, label: str) -> None:
+    """Assert a response carries the SuccessStatus envelope the spec declares."""
+    assert response.status_code == 200, (
+        f"{label} expected 200, got {response.status_code}: {response.text[:200]}"
+    )
+    body = response.json()
+    assert "status" in body, (
+        f"{label} response must have a top-level 'status' key; got {list(body.keys())}"
+    )
+    assert body["status"].get("code") == 200, (
+        f"{label} status.code must be 200; got {body['status']!r}"
+    )
+    assert isinstance(body["status"].get("message"), str), (
+        f"{label} status.message must be a string; got {body['status']!r}"
+    )
+
+
 # ── Azure Blob auth_method probe ──────────────────────────────────────────────
 
 @pytest.mark.live
@@ -348,7 +504,11 @@ def test_cloudworks_azure_blob_auth_method_required_probe(cw_token, cw_base_url)
     Sends a POST /integrations/connections with a well-formed AzureBlob body
     that intentionally omits auth_method (the pre-update shape). The expected
     response is:
-      - 400  → auth_method is required; our spec addition is correct.
+      - 400  → depends on the message. CloudWorks validates the third-party
+               credentials on create, so a fake SAS token draws
+               400 "Credentials are invalid" whether or not auth_method is
+               present — that outcome says nothing about the field. Only a
+               field-validation message confirms auth_method is required.
       - 200  → auth_method is NOT required; the spec should remove it from
                required[] (and a connection was created — check the warnings).
       - 403  → insufficient permission to create connections; inconclusive.
@@ -383,12 +543,24 @@ def test_cloudworks_azure_blob_auth_method_required_probe(cw_token, cw_base_url)
     print(f"Body: {response.text[:300]}")
 
     if status == 400:
-        warnings.warn(
-            "POST without auth_method returned 400 — auth_method is confirmed "
-            "required on AzureBlob connections; spec required[] is correct.",
-            UserWarning,
-            stacklevel=2,
-        )
+        message = response.json().get("status", {}).get("message", "")
+        if "credential" in message.lower():
+            warnings.warn(
+                f"POST without auth_method returned 400 {message!r} — the fake "
+                "SAS token was rejected before any field validation, so this "
+                "run says nothing about whether auth_method is required. "
+                "Confirming it needs a body whose credentials are valid.",
+                UserWarning,
+                stacklevel=2,
+            )
+        else:
+            warnings.warn(
+                f"POST without auth_method returned 400 {message!r} — reads as "
+                "field validation, supporting auth_method being required on "
+                "AzureBlob connections; spec required[] is correct.",
+                UserWarning,
+                stacklevel=2,
+            )
     elif status == 200:
         connection_id = response.json().get("connectionId", "<unknown>")
         warnings.warn(
