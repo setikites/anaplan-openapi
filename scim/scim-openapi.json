@@ -671,7 +671,8 @@
       },
       "BearerAuth": {
         "type": "http",
-        "scheme": "bearer"
+        "scheme": "bearer",
+        "description": "Bearer credential. Accepts an AnaplanAuthToken value or an Anaplan API key. Format: `Bearer {token-or-api-key}`. Not a distinct OAuth 2.0 flow."
       },
       "BasicAuth": {
         "type": "http",
