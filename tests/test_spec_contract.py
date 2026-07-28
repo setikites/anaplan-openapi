@@ -5,6 +5,8 @@ from CONTEXT.md. These tests run without network access.
 Invariants checked:
   Universal        — version, info, servers[], paths, responses, refs, security
   Cross-spec       — no path appears in more than one spec file
+  Response schemas — every operation without a 2xx JSON schema is classified
+                     as intentional (204 / non-JSON / redirect) or a known gap
   Server URLs      — each API family must use its correct host pattern
   Security schemes — each API must declare the scheme(s) it accepts
   Required paths   — each API must document its core (method, path) pairs
@@ -322,6 +324,155 @@ def test_no_path_appears_in_more_than_one_spec():
         "The following paths appear in more than one spec:\n"
         + "\n".join(f"  {d}" for d in duplicates)
     )
+
+
+# ─── Response schema coverage (issue #252) ────────────────────────────────
+
+# Operations that declare no 2xx response with a JSON schema, split into the
+# ones that are correct that way and the ones that are documentation gaps.
+# Keys are (api directory, uppercase method, path).
+#
+# Intentional — the reason is recorded as the dict value so it travels with
+# the classification rather than living in a separate document.
+_NO_JSON_SCHEMA_INTENTIONAL: dict[tuple[str, str, str], str] = {
+    # 204 No Content — success is signalled by the status code; a body would
+    # violate RFC 7231 §6.3.5.
+    ("alm", "POST", "/models/{modelId}/onlineStatus"): "204 No Content",
+    ("alm", "PUT", "/models/{modelId}/onlineStatus"): "204 No Content",
+    ("authentication", "POST", "/token/logout"): "204 No Content",
+    ("exception", "PATCH", "/permissions/exception-users/users/{userGuid}"):
+        "204 No Content",
+    ("scim", "DELETE", "/Users/{id}"): "204 No Content",
+    ("integration", "PUT", "/workspaces/{workspaceId}/models/{modelId}/files/{fileId}"):
+        "204 No Content",
+    ("integration", "DELETE", "/workspaces/{workspaceId}/models/{modelId}/files/{fileId}"):
+        "204 No Content",
+
+    # Non-JSON media type — the response is raw file content, and the
+    # operation already declares `content` with the correct media type.
+    ("administration", "GET", "/users/export"):
+        "non-JSON media type: text/csv",
+    ("alm", "GET",
+     "/models/{modelId}/alm/comparisonReports/{targetRevisionId}/{sourceRevisionId}"):
+        "non-JSON media type: application/octet-stream",
+    ("integration", "GET", "/workspaces/{workspaceId}/models/{modelId}/files/{fileId}"):
+        "non-JSON media type: application/octet-stream",
+    ("integration", "GET",
+     "/workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks/{chunkId}"):
+        "non-JSON media type: application/octet-stream",
+    ("integration", "GET",
+     "/workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/dump"):
+        "non-JSON media type: text/plain",
+    ("integration", "GET",
+     "/workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}"
+     "/dump/chunks/{chunkId}"):
+        "non-JSON media type: text/plain",
+    ("integration", "GET",
+     "/workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests/{requestId}"
+     "/pages/{pageNo}"):
+        "non-JSON media type: text/csv",
+
+    # Browser redirect — the authorization endpoint answers with a 302 to the
+    # client's redirect_uri, so there is no 2xx response by design.
+    ("oauth", "GET", "/auth/authorize"): "browser redirect, no 2xx by design",
+}
+
+# Known gaps — a 2xx is declared with no `content` at all, or with `content`
+# that carries no `schema`. Each of these needs a response schema derived from
+# live testing; remove the entry once one is added.
+_NO_JSON_SCHEMA_KNOWN_GAPS: set[tuple[str, str, str]] = {
+    # cloudworks — 13 operations declare an empty 200; cancelIntegration
+    # declares application/json with no schema.
+    ("cloudworks", "PATCH", "/integrations/connections/{connectionId}"),
+    ("cloudworks", "PUT", "/integrations/connections/{connectionId}"),
+    ("cloudworks", "DELETE", "/integrations/connections/{connectionId}"),
+    ("cloudworks", "PUT", "/integrations/{integrationId}"),
+    ("cloudworks", "DELETE", "/integrations/{integrationId}"),
+    ("cloudworks", "POST", "/integrations/{integrationId}/cancel"),
+    ("cloudworks", "POST", "/integrations/{integrationId}/schedule"),
+    ("cloudworks", "PUT", "/integrations/{integrationId}/schedule"),
+    ("cloudworks", "DELETE", "/integrations/{integrationId}/schedule"),
+    ("cloudworks", "POST", "/integrations/{integrationId}/schedule/status/{status}"),
+    ("cloudworks", "PUT", "/integrations/notification/{notificationId}"),
+    ("cloudworks", "DELETE", "/integrations/notification/{notificationId}"),
+    ("cloudworks", "PUT", "/integrationflows/{integrationFlowId}"),
+    ("cloudworks", "DELETE", "/integrationflows/{integrationFlowId}"),
+
+    # financial-consolidation
+    ("financial-consolidation", "POST", "/odata/{tableName}"),
+    ("financial-consolidation", "PUT", "/odata/{tableName}"),
+    ("financial-consolidation", "DELETE", "/odata/{tableName}"),
+    ("financial-consolidation", "POST", "/odata/batch/{tableName}"),
+    ("financial-consolidation", "POST", "/process/start/{path}/{name_of_workflow}"),
+    ("financial-consolidation", "POST", "/process/stop/{path}/{name_of_workflow}"),
+    ("financial-consolidation", "DELETE", "/users/{username}"),
+
+    # integration — declares both an empty 200 and a 204; the 200 either needs
+    # a schema or should be dropped in favour of the 204.
+    ("integration", "PUT",
+     "/workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks/{chunkId}"),
+}
+
+
+def _operations_without_2xx_json_schema() -> set[tuple[str, str, str]]:
+    """Return (api, METHOD, path) for operations with no 2xx JSON response schema."""
+    found: set[tuple[str, str, str]] = set()
+    for spec_path in SPEC_FILES:
+        spec = _load(spec_path)
+        api = spec_path.parent.name
+        for path_str, method, operation in _all_operations(spec):
+            has_schema = any(
+                "json" in media_type and media.get("schema")
+                for code, response in operation.get("responses", {}).items()
+                if code.startswith("2")
+                for media_type, media in (response.get("content") or {}).items()
+            )
+            if not has_schema:
+                found.add((api, method.upper(), path_str))
+    return found
+
+
+def test_no_2xx_json_schema_operations_are_classified():
+    """Every operation without a 2xx JSON response schema must be classified.
+
+    Either it is intentional (204 / non-JSON media type / redirect, with the
+    reason recorded in _NO_JSON_SCHEMA_INTENTIONAL) or it is a known gap listed
+    in _NO_JSON_SCHEMA_KNOWN_GAPS. A newly added operation that is neither
+    fails here, so response-schema coverage cannot silently regress.
+    """
+    classified = set(_NO_JSON_SCHEMA_INTENTIONAL) | _NO_JSON_SCHEMA_KNOWN_GAPS
+    unclassified = _operations_without_2xx_json_schema() - classified
+
+    assert not unclassified, (
+        "These operations declare no 2xx JSON response schema and are not "
+        "classified. Add a response schema, or classify them in "
+        "_NO_JSON_SCHEMA_INTENTIONAL (with a reason) or "
+        "_NO_JSON_SCHEMA_KNOWN_GAPS:\n"
+        + "\n".join(f"  {api}: {method} {path}" for api, method, path in sorted(unclassified))
+    )
+
+
+def test_no_2xx_json_schema_classifications_are_current():
+    """No stale entries: every classified operation must still lack a schema.
+
+    Keeps the lists honest — once a known gap is filled or an operation is
+    removed, its entry has to go too.
+    """
+    actual = _operations_without_2xx_json_schema()
+    stale = (set(_NO_JSON_SCHEMA_INTENTIONAL) | _NO_JSON_SCHEMA_KNOWN_GAPS) - actual
+
+    assert not stale, (
+        "These operations are classified as having no 2xx JSON response schema "
+        "but now have one (or no longer exist). Remove them from "
+        "_NO_JSON_SCHEMA_INTENTIONAL / _NO_JSON_SCHEMA_KNOWN_GAPS:\n"
+        + "\n".join(f"  {api}: {method} {path}" for api, method, path in sorted(stale))
+    )
+
+
+def test_no_2xx_json_schema_lists_do_not_overlap():
+    """An operation is either intentional or a gap, never both."""
+    overlap = set(_NO_JSON_SCHEMA_INTENTIONAL) & _NO_JSON_SCHEMA_KNOWN_GAPS
+    assert not overlap, f"classified as both intentional and a known gap: {sorted(overlap)}"
 
 
 # ─── Server URL pattern invariants ────────────────────────────────────────
