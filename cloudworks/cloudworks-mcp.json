@@ -336,6 +336,30 @@
             "application/json": {
               "schema": {
                 "type": "object",
+                "required": [
+                  "type",
+                  "body"
+                ],
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "AmazonS3",
+                      "GoogleBigQuery",
+                      "AzureBlob"
+                    ],
+                    "description": "Connection type. Must match the existing connection."
+                  },
+                  "body": {
+                    "type": "object",
+                    "description": "The complete connection body, in the same shape the create request uses for this connection type \u2014 including credentials.",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
                 "description": "Updated connection details. Shape mirrors the create request body for the relevant connection type."
               }
             }
@@ -366,6 +390,20 @@
             "application/json": {
               "schema": {
                 "type": "object",
+                "required": [
+                  "body"
+                ],
+                "properties": {
+                  "body": {
+                    "type": "object",
+                    "description": "Fields to update, in the same shape the create request uses for this connection type.",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
                 "description": "Fields to update. Only supplied fields are modified."
               }
             }

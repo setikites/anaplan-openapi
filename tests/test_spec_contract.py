@@ -386,22 +386,11 @@ _NO_JSON_SCHEMA_INTENTIONAL: dict[tuple[str, str, str], str] = {
 # that carries no `schema`. Each of these needs a response schema derived from
 # live testing; remove the entry once one is added.
 _NO_JSON_SCHEMA_KNOWN_GAPS: set[tuple[str, str, str]] = {
-    # cloudworks — 13 operations declare an empty 200; cancelIntegration
-    # declares application/json with no schema.
-    ("cloudworks", "PATCH", "/integrations/connections/{connectionId}"),
-    ("cloudworks", "PUT", "/integrations/connections/{connectionId}"),
-    ("cloudworks", "DELETE", "/integrations/connections/{connectionId}"),
-    ("cloudworks", "PUT", "/integrations/{integrationId}"),
-    ("cloudworks", "DELETE", "/integrations/{integrationId}"),
+    # cloudworks — cancelIntegration declares application/json with no schema.
+    # The other 13 mutating operations were listed here until the check learned
+    # to resolve $ref responses (issue #254): they reference
+    # #/components/responses/SuccessStatus, which does carry a JSON schema.
     ("cloudworks", "POST", "/integrations/{integrationId}/cancel"),
-    ("cloudworks", "POST", "/integrations/{integrationId}/schedule"),
-    ("cloudworks", "PUT", "/integrations/{integrationId}/schedule"),
-    ("cloudworks", "DELETE", "/integrations/{integrationId}/schedule"),
-    ("cloudworks", "POST", "/integrations/{integrationId}/schedule/status/{status}"),
-    ("cloudworks", "PUT", "/integrations/notification/{notificationId}"),
-    ("cloudworks", "DELETE", "/integrations/notification/{notificationId}"),
-    ("cloudworks", "PUT", "/integrationflows/{integrationFlowId}"),
-    ("cloudworks", "DELETE", "/integrationflows/{integrationFlowId}"),
 
     # financial-consolidation
     ("financial-consolidation", "POST", "/odata/{tableName}"),
@@ -412,6 +401,22 @@ _NO_JSON_SCHEMA_KNOWN_GAPS: set[tuple[str, str, str]] = {
     ("financial-consolidation", "POST", "/process/stop/{path}/{name_of_workflow}"),
     ("financial-consolidation", "DELETE", "/users/{username}"),
 }
+
+
+def _resolve_response(spec: dict, response: dict) -> dict:
+    """Resolve a response object that is a $ref into #/components/responses.
+
+    A response declared as {"$ref": "#/components/responses/SuccessStatus"} has no
+    `content` key of its own. Reading it unresolved reports every such operation
+    as schema-less, which is how 13 CloudWorks operations were first misread as
+    documentation gaps.
+    """
+    ref = response.get("$ref")
+    if not ref or not ref.startswith("#/components/responses/"):
+        return response
+    return spec.get("components", {}).get("responses", {}).get(
+        ref.rsplit("/", 1)[1], {}
+    )
 
 
 def _operations_without_2xx_json_schema() -> set[tuple[str, str, str]]:
@@ -425,7 +430,9 @@ def _operations_without_2xx_json_schema() -> set[tuple[str, str, str]]:
                 "json" in media_type and media.get("schema")
                 for code, response in operation.get("responses", {}).items()
                 if code.startswith("2")
-                for media_type, media in (response.get("content") or {}).items()
+                for media_type, media in (
+                    _resolve_response(spec, response).get("content") or {}
+                ).items()
             )
             if not has_schema:
                 found.add((api, method.upper(), path_str))

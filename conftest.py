@@ -5,7 +5,11 @@ _WRITE_METHODS = frozenset({"PUT", "POST", "PATCH", "DELETE"})
 
 
 def _is_data_plane_host(url: str) -> bool:
-    """Return True if the URL targets an Anaplan data-plane host (api.anaplan.com).
+    """Return True if the URL targets an Anaplan data-plane host.
+
+    Covers api.anaplan.com and the dedicated CloudWorks host
+    api.cloudworks.anaplan.com — CloudWorks mutations create and destroy real
+    tenant resources, so they need the same gate as the rest of the data plane.
 
     Auth (auth.anaplan.com) and OAuth (app.anaplan.com) hosts are excluded —
     those POST/PUT calls are authentication infrastructure, not data mutations.
@@ -14,7 +18,11 @@ def _is_data_plane_host(url: str) -> bool:
         host = httpx.URL(url).host
     except Exception:
         return False
-    return host == "api.anaplan.com" or host.endswith(".api.anaplan.com")
+    return (
+        host == "api.anaplan.com"
+        or host.endswith(".api.anaplan.com")
+        or host == "api.cloudworks.anaplan.com"
+    )
 
 
 def pytest_configure(config):
