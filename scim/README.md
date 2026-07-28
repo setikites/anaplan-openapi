@@ -53,12 +53,14 @@ All three schemes below were confirmed accepted via live testing against `GET /U
 | Scheme | Format | Notes |
 |--------|--------|-------|
 | Anaplan Auth Token | `Authorization: AnaplanAuthToken <token>` | Token from the Authentication API |
-| Bearer | `Authorization: Bearer <token>` | Accepts the same AnaplanAuthToken value — not a distinct OAuth 2.0 flow |
+| Bearer | `Authorization: Bearer <token>` | Accepts an AnaplanAuthToken value or an Anaplan API key — not a distinct OAuth 2.0 flow |
 | HTTP Basic | `Authorization: Basic <base64(user:pass)>` | Standard HTTP Basic Auth |
 
 The `ServiceProviderConfig` endpoint documents only Basic and AnaplanAuthToken. The Apiary docs also list Bearer. Live testing confirms all three work.
 
-Calls require an active, non-SSO Anaplan user with the `USER_ADMIN` role.
+An Anaplan API key is accepted as the Bearer credential — `Authorization: Bearer <api-key>` — in addition to an AnaplanAuthToken value. Note this is the opposite convention from the Exception Users API, which requires its own `AnaplanApiKey` prefix (`Authorization: AnaplanApiKey <api-key>`) and rejects `Bearer`. SCIM has no `AnaplanApiKey` scheme; send the key under `Bearer`. Not yet covered by a live test in `tests/test_scim_live.py`.
+
+Calls require either an Anaplan API Key or a user with the `USER_ADMIN` role.
 
 ## Endpoints
 
