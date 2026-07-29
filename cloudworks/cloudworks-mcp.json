@@ -772,12 +772,15 @@
         "description": "Minimum role: Restricted Integration User.",
         "responses": {
           "200": {
-            "description": "Integration cancelled."
+            "description": ""
           },
           "403": {
             "description": ""
           },
           "404": {
+            "description": ""
+          },
+          "409": {
             "description": ""
           }
         }

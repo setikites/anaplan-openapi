@@ -115,6 +115,33 @@ Findings:
 - **`PUT` and `PATCH` want the complete connection body, not a partial one.** A name-only update fails for both. Since `GET` never returns a connection's secret, neither can be exercised against a connection whose credentials the caller does not already hold — so their success envelopes remain unconfirmed and are documented from `SuccessStatus`.
 - **`DELETE` returned `200`, not `409`**, for a connection not referenced by any integration.
 
+### Integration, flow, schedule, and notification mutation response shapes (issue #255)
+
+Live-tested July 2026 by `test_cloudworks_mutation_lifecycle_response_shapes`, which builds its own disposable integrations, schedule, notification, and flow in the `Crash Test Dummy` model, exercises all eleven operations, and destroys them again.
+
+| Operation | Confirmed | Observed |
+|---|---|---|
+| `PUT /integrations/{integrationId}` | ✅ | `200` with `{"status": {"code": 200, "message": "Success"}}` — matches `SuccessStatus` |
+| `DELETE /integrations/{integrationId}` | ✅ | as above |
+| `PUT /integrationflows/{integrationFlowId}` | ✅ | as above |
+| `DELETE /integrationflows/{integrationFlowId}` | ✅ | as above |
+| `POST /integrations/{integrationId}/schedule` | ✅ | as above |
+| `PUT /integrations/{integrationId}/schedule` | ✅ | as above |
+| `DELETE /integrations/{integrationId}/schedule` | ✅ | as above |
+| `POST /integrations/{integrationId}/schedule/status/{status}` | ✅ | as above |
+| `PUT /integrations/notification/{notificationId}` | ✅ | as above |
+| `DELETE /integrations/notification/{notificationId}` | ✅ | as above |
+| `POST /integrations/{integrationId}/cancel` | ⚠️ unconfirmed | `409 "Integration {id} is not in running state"` against an idle integration; `404 "Resource not found"` while a run is queued; `409` again once `latestRun.message` reads `Running` |
+
+Findings:
+
+- **All ten confirmed operations return the `SuccessStatus` envelope**, so the schema the spec already declared for them is correct.
+- **`POST /integrations` returns the new ID wrapped in an `integration` object** — `{"status": {...}, "integration": {"integrationId": "..."}}`, mirroring the `integrationFlow` wrapper on flow creation. The spec previously declared a top-level `integrationId`, which no live response carries.
+- **Creating an integration also creates its notification configuration.** The new integration's record already carries a `notificationId`, and a `POST /integrations/notification` for that same integration is rejected with `400 "Duplicate resource name not allowed"`. `editNotification` and `deleteNotification` are therefore exercised against the auto-created configuration.
+- **`updateSchedule` requires `integrationId` in the request body as well as the path.** Sending only `schedule` draws `400 "Invalid value for integration_id"`, even though the path already names the integration.
+- **`cancelIntegration`'s success body could not be observed.** For a process integration the success path appears unreachable: the API answers `404` while the run is queued and `409 "is not in running state"` once `latestRun` reports `Running`. Its `200` is documented as `SuccessStatus` — every other CloudWorks 2/0 mutation returns that envelope, and cancel's own error responses use the same `{"status": {...}, "path", "timestamp"}` shape. The Apiary blueprint instead showed `{"success": true, "message": {"integration_id": ..., "state": "cancelled"}}`; no live response has corroborated that shape, and it is not carried into the spec.
+- **A run in flight blocks `DELETE /integrations/{integrationId}`** with `409 "Integration is already running"`, and a process run in this model takes about six minutes. The lifecycle test therefore never starts a run — doing so leaks its disposable integrations for the duration.
+
 ### Azure Blob Storage: `auth_method` is now required (undocumented)
 
 A recent CloudWorks update added support for connecting to Azure Blob Storage via OAuth 2.0. As a side effect, the `body` object for `AzureBlob` connections now **requires** an `auth_method` field that is absent from the Apiary docs.

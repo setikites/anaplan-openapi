@@ -575,8 +575,11 @@ paths:
                 properties:
                   status:
                     $ref: '#/components/schemas/Status'
-                  integrationId:
-                    type: string
+                  integration:
+                    type: object
+                    properties:
+                      integrationId:
+                        type: string
         '400':
           $ref: '#/components/responses/BadRequest'
         '403':
@@ -782,18 +785,13 @@ paths:
       - Integrations
       responses:
         '200':
-          description: Integration cancelled.
-          content:
-            application/json:
-              example:
-                success: true
-                message:
-                  integration_id: e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b3
-                  state: cancelled
+          $ref: '#/components/responses/SuccessStatus'
         '403':
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
   /integrations/{integrationId}/schedule:
     parameters:
     - $ref: '#/components/parameters/IntegrationId'
@@ -2130,8 +2128,8 @@ components:
           schema:
             $ref: '#/components/schemas/ErrorStatus'
     Conflict:
-      description: 'Conflict. Common causes: integration already running (409); tenant integration count exceeded (409); resource
-        is being referenced (409).'
+      description: 'Conflict. Common causes: integration already running (409); integration not in a running state, so there
+        is nothing to cancel (409); tenant integration count exceeded (409); resource is being referenced (409).'
       content:
         application/json:
           schema:
