@@ -386,11 +386,9 @@ _NO_JSON_SCHEMA_INTENTIONAL: dict[tuple[str, str, str], str] = {
 # that carries no `schema`. Each of these needs a response schema derived from
 # live testing; remove the entry once one is added.
 _NO_JSON_SCHEMA_KNOWN_GAPS: set[tuple[str, str, str]] = {
-    # cloudworks — cancelIntegration declares application/json with no schema.
-    # The other 13 mutating operations were listed here until the check learned
-    # to resolve $ref responses (issue #254): they reference
-    # #/components/responses/SuccessStatus, which does carry a JSON schema.
-    ("cloudworks", "POST", "/integrations/{integrationId}/cancel"),
+    # cloudworks has no remaining gaps. Thirteen mutating operations were listed
+    # here until the check learned to resolve $ref responses (issue #254), and
+    # cancelIntegration until issue #255 gave it a schema.
 
     # financial-consolidation
     ("financial-consolidation", "POST", "/odata/{tableName}"),

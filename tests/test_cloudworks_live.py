@@ -23,8 +23,10 @@ Optional variables:
 """
 
 import base64
+import datetime
 import os
 import pathlib
+import uuid
 import warnings
 
 import httpx
@@ -34,6 +36,11 @@ from tests.conftest import ca_certs_from_env, cert_auth_token
 
 _URL_PRIMARY = "https://api.cloudworks.anaplan.com/2/0"
 _URL_ALT = "https://api.anaplan.com/cloudworks/2/0"
+
+# CloudWorks identifies its target model by workspaceId / modelId, and the
+# notification recipient by userGuid, none of which CloudWorks itself can list.
+# All three come from the Integration API.
+_INTEGRATION_API = os.getenv("ANAPLAN_API_BASE_URL", "https://api.anaplan.com").rstrip("/") + "/2/0"
 
 CLOUDWORKS_BASE_URL_OVERRIDE = os.getenv("ANAPLAN_CLOUDWORKS_BASE_URL")
 AUTH_URL = "https://auth.anaplan.com"
@@ -905,3 +912,340 @@ def test_cloudworks_get_notification_shape(cw_token, cw_base_url, cw_first_integ
             f"type={entry.get('type')!r}, users[0]={entry.get('users', [{}])[0] if entry.get('users') else 'none'}",
             UserWarning, stacklevel=2,
         )
+
+
+# ── Mutation lifecycle: integration, flow, schedule, notification (issue #255) ─
+
+# The disposable resources are built in a model kept for being written to.
+# Both are resolved by name so the test skips on a tenant that lacks them,
+# rather than mutating whatever model a hardcoded ID happens to name.
+_TARGET_WORKSPACE_NAME = "EBP Administration TEST"
+_TARGET_MODEL_NAME = "Crash Test Dummy"
+
+# A CloudWorks integration has to wrap a runnable Anaplan action. This is the
+# process in the target model that exists for that purpose.
+_TARGET_PROCESS_ID = os.getenv("CLOUDWORKS_TEST_PROCESS_ID", "118000000001")
+
+# The eleven mutation operations this test exists to observe (issue #255).
+_LIFECYCLE_OPERATIONS = (
+    "PUT /integrations/{integrationId}",
+    "DELETE /integrations/{integrationId}",
+    "DELETE /integrations/{integrationId} (second)",
+    "POST /integrations/{integrationId}/cancel",
+    "PUT /integrationflows/{integrationFlowId}",
+    "DELETE /integrationflows/{integrationFlowId}",
+    "POST /integrations/{integrationId}/schedule",
+    "PUT /integrations/{integrationId}/schedule",
+    "DELETE /integrations/{integrationId}/schedule",
+    "POST /integrations/{integrationId}/schedule/status/{status}",
+    "PUT /integrations/notification/{notificationId}",
+    "DELETE /integrations/notification/{notificationId}",
+)
+
+
+@pytest.fixture(scope="module")
+def cw_target(cw_token):
+    """Resolve the target workspace, model, and caller userGuid via the Integration API.
+
+    CloudWorks addresses its target model by workspaceId / modelId and its
+    notification recipients by userGuid, and can list none of the three itself.
+    Skips when the tenant does not have the named workspace and model.
+    """
+    h = {"Authorization": f"AnaplanAuthToken {cw_token}", "Accept": "application/json"}
+    with httpx.Client(timeout=60) as client:
+        ws_response = client.get(f"{_INTEGRATION_API}/workspaces", headers=h)
+        if ws_response.status_code != 200:
+            pytest.skip(
+                f"GET /workspaces returned {ws_response.status_code}; "
+                "cannot resolve the target workspace"
+            )
+        # Names are matched case-insensitively — the tenant's capitalisation of
+        # these two is not stable enough to skip a whole run over.
+        workspace = next(
+            (
+                w
+                for w in ws_response.json().get("workspaces", [])
+                if (w.get("name") or "").casefold() == _TARGET_WORKSPACE_NAME.casefold()
+            ),
+            None,
+        )
+        if workspace is None:
+            pytest.skip(f"Workspace {_TARGET_WORKSPACE_NAME!r} is not present in this tenant")
+
+        models_response = client.get(
+            f"{_INTEGRATION_API}/workspaces/{workspace['id']}/models", headers=h
+        )
+        if models_response.status_code != 200:
+            pytest.skip(
+                f"GET /workspaces/{workspace['id']}/models returned "
+                f"{models_response.status_code}; cannot resolve the target model"
+            )
+        model = next(
+            (
+                m
+                for m in models_response.json().get("models", [])
+                if (m.get("name") or "").casefold() == _TARGET_MODEL_NAME.casefold()
+            ),
+            None,
+        )
+        if model is None:
+            pytest.skip(
+                f"Model {_TARGET_MODEL_NAME!r} is not present in workspace "
+                f"{_TARGET_WORKSPACE_NAME!r}"
+            )
+
+        me_response = client.get(f"{_INTEGRATION_API}/users/me", headers=h)
+        user_guid = (
+            me_response.json().get("user", {}).get("id")
+            if me_response.status_code == 200
+            else None
+        )
+        if not user_guid:
+            pytest.skip(
+                "GET /users/me did not yield a userGuid; the notification "
+                "recipient cannot be resolved"
+            )
+
+    return {
+        "workspaceId": workspace["id"],
+        "modelId": model["id"],
+        "userGuid": user_guid,
+    }
+
+
+@pytest.mark.live
+@pytest.mark.write
+def test_cloudworks_mutation_lifecycle_response_shapes(cw_token, cw_base_url, cw_target):
+    """The eleven mutating integration/flow/schedule/notification operations
+    return the SuccessStatus envelope (issue #255).
+
+    The spec declares #/components/responses/SuccessStatus for all of them, and
+    none had ever been called live. Every one acts on a resource that has to
+    exist first, so a single run creates its own disposable integrations,
+    schedule, notification, and flow, exercises all eleven, and destroys them
+    again.
+
+    Ten are asserted. cancelIntegration is recorded but not asserted: its
+    success path is unreachable for a process integration, so only the
+    condition it was observed under is reported.
+
+    Two integrations are created because a flow needs at least two steps and
+    each step references an integration.
+
+    Responses are recorded as they arrive and asserted only after teardown has
+    run: an assertion failing partway through would otherwise leak tenant
+    resources and throw away the results still to come.
+    """
+    h = {
+        "Authorization": f"AnaplanAuthToken {cw_token}",
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+    }
+    suffix = uuid.uuid4().hex[:8]
+    today = datetime.date.today()
+    integration_body = {
+        "version": "2.0",
+        "workspaceId": cw_target["workspaceId"],
+        "modelId": cw_target["modelId"],
+        "processId": _TARGET_PROCESS_ID,
+    }
+
+    observed: dict[str, httpx.Response] = {}
+    setup: dict[str, httpx.Response] = {}
+    integration_ids: list[str] = []
+    flow_id: str | None = None
+    notification_id: str | None = None
+    schedule_created = False
+    cancel_condition = "not reached"
+
+    with httpx.Client(timeout=120) as client:
+        try:
+            # ── Integrations ─────────────────────────────────────────────────
+            for label in ("a", "b"):
+                created = client.post(
+                    f"{cw_base_url}/integrations",
+                    json={"name": f"openapi-live-{suffix}-{label}", **integration_body},
+                    headers=h,
+                )
+                setup[f"POST /integrations ({label})"] = created
+                if created.status_code != 200:
+                    pytest.skip(
+                        f"POST /integrations returned {created.status_code}: "
+                        f"{created.text[:300]} — the disposable resources this "
+                        "test needs cannot be created"
+                    )
+                # The new id arrives wrapped in `integration`, mirroring the
+                # `integrationFlow` wrapper on flow creation.
+                integration_ids.append(created.json()["integration"]["integrationId"])
+
+            primary, secondary = integration_ids
+
+            observed["PUT /integrations/{integrationId}"] = client.put(
+                f"{cw_base_url}/integrations/{primary}",
+                json={"name": f"openapi-live-{suffix}-a-edited", **integration_body},
+                headers=h,
+            )
+
+            # ── Schedule ─────────────────────────────────────────────────────
+            schedule = {
+                "name": f"openapi-live-{suffix}-schedule",
+                "type": "daily",
+                "time": "23:45",
+                "startDate": today.isoformat(),
+                "endDate": (today + datetime.timedelta(days=1)).isoformat(),
+                "timezone": "America/New_York",
+            }
+            create_schedule = client.post(
+                f"{cw_base_url}/integrations/{primary}/schedule",
+                json={"integrationId": primary, "schedule": schedule},
+                headers=h,
+            )
+            observed["POST /integrations/{integrationId}/schedule"] = create_schedule
+            schedule_created = create_schedule.status_code == 200
+
+            # `integrationId` is required in the update body as well as the
+            # path — omitting it draws 400 "Invalid value for integration_id".
+            observed["PUT /integrations/{integrationId}/schedule"] = client.put(
+                f"{cw_base_url}/integrations/{primary}/schedule",
+                json={"integrationId": primary, "schedule": {**schedule, "time": "23:50"}},
+                headers=h,
+            )
+            observed["POST /integrations/{integrationId}/schedule/status/{status}"] = client.post(
+                f"{cw_base_url}/integrations/{primary}/schedule/status/disabled", headers=h
+            )
+
+            # ── Notification ─────────────────────────────────────────────────
+            # Creating an integration also creates its notification config, so
+            # the id is read off the integration rather than POSTed: a second
+            # POST /integrations/notification for the same integration is
+            # rejected with 400 "Duplicate resource name not allowed".
+            detail = client.get(f"{cw_base_url}/integrations/{primary}", headers=h)
+            setup["GET /integrations/{integrationId}"] = detail
+            notification_id = detail.json().get("integration", {}).get("notificationId")
+
+            # The recipient is the caller's own userGuid, so confirming the
+            # operation never notifies anyone else.
+            notification_body = {
+                "integrationIds": [primary],
+                "channels": ["email", "in_app"],
+                "notifications": {
+                    "config": [{"type": "full_failure", "users": [cw_target["userGuid"]]}]
+                },
+            }
+            if notification_id:
+                observed["PUT /integrations/notification/{notificationId}"] = client.put(
+                    f"{cw_base_url}/integrations/notification/{notification_id}",
+                    json=notification_body,
+                    headers=h,
+                )
+
+            # ── Flow ─────────────────────────────────────────────────────────
+            step = {
+                "type": "Integration",
+                "isSkipped": False,
+                "exceptionBehavior": [{"type": "failure", "strategy": "stop"}],
+            }
+            flow_body = {
+                "name": f"openapi-live-{suffix}-flow",
+                "version": "2.0",
+                "type": "IntegrationFlow",
+                "steps": [
+                    {**step, "referrer": primary},
+                    {**step, "referrer": secondary},
+                ],
+            }
+            create_flow = client.post(
+                f"{cw_base_url}/integrationflows", json=flow_body, headers=h
+            )
+            setup["POST /integrationflows"] = create_flow
+            if create_flow.status_code == 200:
+                flow_id = create_flow.json().get("integrationFlow", {}).get("integrationFlowId")
+                observed["PUT /integrationflows/{integrationFlowId}"] = client.put(
+                    f"{cw_base_url}/integrationflows/{flow_id}",
+                    json={**flow_body, "name": f"openapi-live-{suffix}-flow-edited"},
+                    headers=h,
+                )
+
+            # ── Cancel ───────────────────────────────────────────────────────
+            # cancelIntegration is meant for a run in flight. A run is started
+            # and cancelled immediately; if it cannot be started, the idle
+            # integration is cancelled anyway so the operation is not left
+            # undocumented. Which of the two happened is recorded.
+            # cancelIntegration is documented for a run in flight, and its 2xx
+            # body cannot be captured from a process integration. Live probing
+            # found the success path unreachable: the API answers 404 while the
+            # run is queued and 409 "is not in running state" once latestRun
+            # reports Running.
+            #
+            # No run is started here. A process run in this model takes about
+            # six minutes, and DELETE refuses an integration with a run in
+            # flight ("Integration is already running"), so starting one leaks
+            # both disposable integrations for as long as the run lasts. The
+            # response to a cancel against an idle integration is recorded
+            # instead, which is what issue #255 asks for when the in-flight
+            # condition cannot be reached.
+            observed["POST /integrations/{integrationId}/cancel"] = client.post(
+                f"{cw_base_url}/integrations/{primary}/cancel", headers=h
+            )
+            cancel_condition = "no run in flight — cancel against an idle integration"
+        finally:
+            # Reverse creation order. Each delete is both teardown and one of
+            # the operations under test, so a failure is recorded and the rest
+            # still run — a leaked flow would otherwise block its integrations.
+            teardown = [
+                ("DELETE /integrationflows/{integrationFlowId}",
+                 f"{cw_base_url}/integrationflows/{flow_id}" if flow_id else None),
+                ("DELETE /integrations/notification/{notificationId}",
+                 f"{cw_base_url}/integrations/notification/{notification_id}"
+                 if notification_id else None),
+                ("DELETE /integrations/{integrationId}/schedule",
+                 f"{cw_base_url}/integrations/{integration_ids[0]}/schedule"
+                 if schedule_created else None),
+            ]
+            teardown += [
+                (
+                    "DELETE /integrations/{integrationId}"
+                    + ("" if i == 0 else " (second)"),
+                    f"{cw_base_url}/integrations/{integration_id}",
+                )
+                for i, integration_id in enumerate(reversed(integration_ids))
+            ]
+
+            for label, url in teardown:
+                if url is None:
+                    continue
+                try:
+                    observed[label] = client.delete(url, headers=h)
+                except httpx.HTTPError as exc:
+                    warnings.warn(
+                        f"{label} raised {exc!r}; a disposable resource may be "
+                        f"left behind at {url}",
+                        UserWarning,
+                        stacklevel=2,
+                    )
+
+    for label, response in {**setup, **observed}.items():
+        print(f"\n{label}: {response.status_code}")
+        print(f"Body: {response.text[:300]}")
+
+    missing = [op for op in _LIFECYCLE_OPERATIONS if op not in observed]
+    assert not missing, (
+        "These operations were never reached, so their response shape is "
+        f"unconfirmed: {missing}. Setup responses: "
+        + ", ".join(f"{k} -> {v.status_code}: {v.text[:120]}" for k, v in setup.items())
+    )
+
+    # cancelIntegration is the one operation whose success body no live call has
+    # produced. Its spec 200 is inferred from the envelope every other CloudWorks
+    # mutation returns, so what is reported here is the condition observed, not a
+    # confirmation. See cloudworks/README.md.
+    cancel = observed.pop("POST /integrations/{integrationId}/cancel")
+    warnings.warn(
+        f"cancelIntegration observed with {cancel_condition}: "
+        f"{cancel.status_code} {cancel.text[:300]}",
+        UserWarning,
+        stacklevel=2,
+    )
+
+    for label, response in observed.items():
+        _assert_success_status_envelope(response, label)
