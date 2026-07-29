@@ -169,3 +169,63 @@ direct tools (A) for the high-risk operations you want permissioned individually
 A practical path: **B now** for the immediate catalog fix, add **D's primitives** as
 chained-workflow token cost shows up, and reserve **C** for the procedural tasks the
 primitives deliberately refuse to handle.
+
+## The generated artifacts
+
+Two transforms read the canonical `<api>-openapi.json` and write a committed artifact.
+They are siblings. Each one serves a different surface, so their output stays independent.
+
+| Artifact | Script | Surface |
+|---|---|---|
+| `<api>-mcp.json` | `scripts/make_mcp.py` | One MCP tool per operation (options A, B, D) |
+| `<api>-ptc.json` | `scripts/make_ptc.py` | Programmatic tool calling (option C) |
+
+Both synthesize a missing `operationId`, drop the workspace-scoped path where a
+model-direct twin exists, and strip `example`, `pattern` and `format` from opaque ID
+parameters. Both keep the prose verbatim.
+
+### `<api>-ptc.json`
+
+Under programmatic tool calling a consumer gives the agent two tools, `catalog` and
+`anaplan_op`, and the agent writes Python that calls them. The response returns to the
+running script, not to the model. The agent writes the code that reads the response body
+before any response exists, so every field name in that code is a guess unless the response
+shape is known. A read operation can be probed once to learn its shape. A write operation
+cannot, because a probe performs the write. So this artifact keeps the 2xx response schema
+that `<api>-mcp.json` strips, and drops the `security` block that `<api>-mcp.json` keeps.
+
+Each file holds two payloads, and they are the exact payloads the two tools return. No
+document assembly runs at request time.
+
+- `catalog` — an array. One compact entry per operation, with `op_id`, method, path,
+  parameters, `summary`, and the request-body field names. The consumer always loads it.
+- `detail` — a map keyed by `op_id`, with `description` and the resolved parameter,
+  request-body and 2xx response schemas. The consumer fetches it on demand.
+
+Seven APIs are covered: `administration`, `alm`, `audit`, `cloudworks`, `exception`,
+`integration` and `scim`. Together they hold 134 operations.
+
+Three APIs get no `-ptc.json` file at all. `authentication` and `oauth` are excluded
+because token minting is host-side and stays outside the surface an agent can touch.
+`financial-consolidation` is excluded because its paging is not implemented downstream.
+The exclusion is a build-time decision, so a configuration mistake downstream cannot reach
+an excluded operation.
+
+Two properties of the source documents shape the output.
+
+1. 14 of the 134 operations document no 2xx JSON response schema. Their `detail` entry
+   carries `"response": null` and a `response_note`, never an empty object. An agent that
+   can tell "undocumented" from "returns no fields" knows to probe.
+2. The response `$ref` graph is recursive. The resolver carries a per-branch cycle guard
+   and a depth cap. Where it truncates, it writes an `x-ptc-truncated` node into the schema
+   and sets `response_truncated` on the `detail` entry. A shape that reads as complete but
+   is not costs more than a marked truncation. The mark lands in a diff a reviewer sees.
+
+Regenerate one file:
+
+```sh
+uv run python scripts/make_ptc.py <api>/<api>-openapi.json
+```
+
+`scripts/check_generated.py` verifies every artifact against its source. It also fails if a
+`-ptc.json` file exists for one of the three excluded APIs.

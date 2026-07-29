@@ -1,0 +1,2119 @@
+{
+  "catalog": [
+    {
+      "op_id": "postModelOnlineStatus",
+      "method": "POST",
+      "path": "/models/{modelId}/onlineStatus",
+      "summary": "Change a model's online status",
+      "parameters": [
+        {
+          "name": "modelId",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        }
+      ],
+      "body_fields": [
+        "status"
+      ]
+    },
+    {
+      "op_id": "putModelOnlineStatus",
+      "method": "PUT",
+      "path": "/models/{modelId}/onlineStatus",
+      "summary": "Change a model's online status (PUT)",
+      "parameters": [
+        {
+          "name": "modelId",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        }
+      ],
+      "body_fields": [
+        "status"
+      ]
+    },
+    {
+      "op_id": "getSyncableRevisions",
+      "method": "GET",
+      "path": "/models/{modelId}/alm/syncableRevisions",
+      "summary": "List source model ALM revisions compatible with this model",
+      "parameters": [
+        {
+          "name": "modelId",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "name": "sourceModelId",
+          "in": "query",
+          "required": true,
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "op_id": "getLatestRevision",
+      "method": "GET",
+      "path": "/models/{modelId}/alm/latestRevision",
+      "summary": "Retrieve the latest ALM revision in a model",
+      "parameters": [
+        {
+          "name": "modelId",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "op_id": "getRevisions",
+      "method": "GET",
+      "path": "/models/{modelId}/alm/revisions",
+      "summary": "List ALM revisions in a model (large responses \u2014 see description)",
+      "parameters": [
+        {
+          "name": "modelId",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "name": "appliedAfter",
+          "in": "query",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "name": "appliedBefore",
+          "in": "query",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "name": "offset",
+          "in": "query",
+          "required": false,
+          "type": "integer"
+        }
+      ]
+    },
+    {
+      "op_id": "createRevision",
+      "method": "POST",
+      "path": "/models/{modelId}/alm/revisions",
+      "summary": "Create an ALM revision",
+      "parameters": [
+        {
+          "name": "modelId",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        }
+      ],
+      "body_fields": [
+        "name",
+        "description"
+      ]
+    },
+    {
+      "op_id": "getAppliedToModels",
+      "method": "GET",
+      "path": "/models/{modelId}/alm/revisions/{revisionId}/appliedToModels",
+      "summary": "List models an ALM revision has been applied to",
+      "parameters": [
+        {
+          "name": "modelId",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "name": "revisionId",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "op_id": "getSyncTasks",
+      "method": "GET",
+      "path": "/models/{modelId}/alm/syncTasks",
+      "summary": "List ALM sync tasks for a model",
+      "parameters": [
+        {
+          "name": "modelId",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "op_id": "createSyncTask",
+      "method": "POST",
+      "path": "/models/{modelId}/alm/syncTasks",
+      "summary": "Create an ALM model sync task",
+      "parameters": [
+        {
+          "name": "modelId",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        }
+      ],
+      "body_fields": [
+        "sourceRevisionId",
+        "sourceModelId",
+        "targetRevisionId"
+      ]
+    },
+    {
+      "op_id": "getSyncTask",
+      "method": "GET",
+      "path": "/models/{modelId}/alm/syncTasks/{syncTaskId}",
+      "summary": "Retrieve ALM model sync task info",
+      "parameters": [
+        {
+          "name": "modelId",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "name": "syncTaskId",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "op_id": "createComparisonReportTask",
+      "method": "POST",
+      "path": "/models/{modelId}/alm/comparisonReportTasks",
+      "summary": "Create a full ALM revision comparison report generation task",
+      "parameters": [
+        {
+          "name": "modelId",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        }
+      ],
+      "body_fields": [
+        "sourceRevisionId",
+        "sourceModelId",
+        "targetRevisionId"
+      ]
+    },
+    {
+      "op_id": "getComparisonReportTask",
+      "method": "GET",
+      "path": "/models/{modelId}/alm/comparisonReportTasks/{taskId}",
+      "summary": "Retrieve full ALM revision comparison report task info",
+      "parameters": [
+        {
+          "name": "modelId",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "name": "taskId",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "op_id": "getComparisonReport",
+      "method": "GET",
+      "path": "/models/{modelId}/alm/comparisonReports/{targetRevisionId}/{sourceRevisionId}",
+      "summary": "Retrieve full ALM revision comparison report content (large responses \u2014 see description)",
+      "parameters": [
+        {
+          "name": "modelId",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "name": "targetRevisionId",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "name": "sourceRevisionId",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "op_id": "createSummaryReportTask",
+      "method": "POST",
+      "path": "/models/{modelId}/alm/summaryReportTasks",
+      "summary": "Create an ALM revision summary report generation task",
+      "parameters": [
+        {
+          "name": "modelId",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        }
+      ],
+      "body_fields": [
+        "sourceRevisionId",
+        "sourceModelId",
+        "targetRevisionId"
+      ]
+    },
+    {
+      "op_id": "getSummaryReportTask",
+      "method": "GET",
+      "path": "/models/{modelId}/alm/summaryReportTasks/{taskId}",
+      "summary": "Retrieve ALM revision summary report task info",
+      "parameters": [
+        {
+          "name": "modelId",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "name": "taskId",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "op_id": "getSummaryReport",
+      "method": "GET",
+      "path": "/models/{modelId}/alm/summaryReports/{targetRevisionId}/{sourceRevisionId}",
+      "summary": "Retrieve ALM revision summary report content",
+      "parameters": [
+        {
+          "name": "modelId",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "name": "targetRevisionId",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "name": "sourceRevisionId",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        }
+      ]
+    }
+  ],
+  "detail": {
+    "postModelOnlineStatus": {
+      "description": "Minimum role: Workspace Administrator.\n\nSet a model online or offline. Returns 400 if the status value is invalid or the model is locked, 422 if the model is archived.",
+      "parameters": [
+        {
+          "name": "modelId",
+          "in": "path",
+          "description": "Model identifier (32-character uppercase hex string). From `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2).",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "request_body": {
+        "media_type": "application/json",
+        "required": true,
+        "schema": {
+          "type": "object",
+          "required": [
+            "status"
+          ],
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "online",
+                "offline"
+              ]
+            }
+          }
+        }
+      },
+      "response": null,
+      "response_note": "no documented 2xx JSON response schema \u2014 probe a read operation to learn it"
+    },
+    "putModelOnlineStatus": {
+      "description": "Minimum role: Workspace Administrator.\n\nSet a model online or offline. Identical semantics to POST.",
+      "parameters": [
+        {
+          "name": "modelId",
+          "in": "path",
+          "description": "Model identifier (32-character uppercase hex string). From `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2).",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "request_body": {
+        "media_type": "application/json",
+        "required": true,
+        "schema": {
+          "type": "object",
+          "required": [
+            "status"
+          ],
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "online",
+                "offline"
+              ]
+            }
+          }
+        }
+      },
+      "response": null,
+      "response_note": "no documented 2xx JSON response schema \u2014 probe a read operation to learn it"
+    },
+    "getSyncableRevisions": {
+      "description": "Minimum role: Workspace Administrator.\n\nReturns the list of revisions from the source model that are compatible with the target model, ordered by date descending. The caller must hold the Workspace Administrator role on both the source and target models.",
+      "parameters": [
+        {
+          "name": "modelId",
+          "in": "path",
+          "description": "Model identifier (32-character uppercase hex string). From `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2).",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sourceModelId",
+          "in": "query",
+          "description": "Model identifier (32-character uppercase hex string) of the source model whose revisions to evaluate. For a model already participating in ALM, a good choice is the **first** model in the `appliedToModels` list of its latest revision \u2014 the source model where its revisions are created. Find it with `GET /models/{modelId}/alm/latestRevision` (for the revision id), then `GET /models/{modelId}/alm/revisions/{revisionId}/appliedToModels` (`appliedToModels[].modelId`). Ultimately an Anaplan model ID from `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2).",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "request_body": null,
+      "response": {
+        "status": "200",
+        "media_type": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "meta": {
+              "type": "object",
+              "description": "Response envelope metadata. Contains the schema URL that identifies the response type and optional paging information for list responses.",
+              "required": [
+                "schema"
+              ],
+              "properties": {
+                "schema": {
+                  "type": "string",
+                  "description": "URL identifying the response schema."
+                },
+                "paging": {
+                  "type": "object",
+                  "required": [
+                    "currentPageSize",
+                    "offset",
+                    "totalSize"
+                  ],
+                  "properties": {
+                    "currentPageSize": {
+                      "type": "integer"
+                    },
+                    "offset": {
+                      "type": "integer"
+                    },
+                    "totalSize": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            },
+            "status": {
+              "type": "object",
+              "description": "Anaplan API response status. The code mirrors the HTTP status code; the message is a human-readable outcome string.",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "description": "Numeric response code, mirrors the HTTP status code.",
+                  "example": 200
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Human-readable outcome string.",
+                  "example": "Success"
+                }
+              }
+            },
+            "revisions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[0-9A-F]{32}$"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "createdOn": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "createdBy": {
+                    "type": "string"
+                  },
+                  "creationMethod": {
+                    "type": "string",
+                    "description": "How the revision was created.",
+                    "example": "user"
+                  },
+                  "appliedOn": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "appliedBy": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "getLatestRevision": {
+      "description": "Minimum role: Workspace Administrator.\n\nReturns the most recent revision for the model, if one exists.",
+      "parameters": [
+        {
+          "name": "modelId",
+          "in": "path",
+          "description": "Model identifier (32-character uppercase hex string). From `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2).",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "request_body": null,
+      "response": {
+        "status": "200",
+        "media_type": "application/json",
+        "schema": {
+          "type": "object",
+          "description": "Response for the latestRevision endpoint. When no revision exists, the response contains only meta and status \u2014 the 'revisions' key is omitted. When a revision exists, 'revisions' contains exactly one item.",
+          "properties": {
+            "meta": {
+              "type": "object",
+              "description": "Response envelope metadata. Contains the schema URL that identifies the response type and optional paging information for list responses.",
+              "required": [
+                "schema"
+              ],
+              "properties": {
+                "schema": {
+                  "type": "string",
+                  "description": "URL identifying the response schema."
+                },
+                "paging": {
+                  "type": "object",
+                  "required": [
+                    "currentPageSize",
+                    "offset",
+                    "totalSize"
+                  ],
+                  "properties": {
+                    "currentPageSize": {
+                      "type": "integer"
+                    },
+                    "offset": {
+                      "type": "integer"
+                    },
+                    "totalSize": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            },
+            "status": {
+              "type": "object",
+              "description": "Anaplan API response status. The code mirrors the HTTP status code; the message is a human-readable outcome string.",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "description": "Numeric response code, mirrors the HTTP status code.",
+                  "example": 200
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Human-readable outcome string.",
+                  "example": "Success"
+                }
+              }
+            },
+            "revisions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[0-9A-F]{32}$"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "createdOn": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "createdBy": {
+                    "type": "string"
+                  },
+                  "creationMethod": {
+                    "type": "string",
+                    "description": "How the revision was created.",
+                    "example": "user"
+                  },
+                  "appliedOn": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "appliedBy": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "getRevisions": {
+      "description": "Minimum role: Workspace Administrator.\n\nReturns all revisions for the model with optional date filtering and pagination.\n\n**HIGH VOLUME** \u2014 a model's revision history can be large (observed ~815 KB). With no `limit`, a client that auto-follows `meta.paging` merges every page into one response and overflows its token budget. Always pass an explicit `limit` and page with `offset`, and narrow with `appliedAfter`/`appliedBefore` rather than pulling the whole history at once.",
+      "parameters": [
+        {
+          "name": "modelId",
+          "in": "path",
+          "description": "Model identifier (32-character uppercase hex string). From `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2).",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "appliedAfter",
+          "in": "query",
+          "description": "Filter to revisions applied on or after this date (YYYY-MM-DD).",
+          "schema": {
+            "type": "string",
+            "format": "date"
+          }
+        },
+        {
+          "name": "appliedBefore",
+          "in": "query",
+          "description": "Filter to revisions applied on or before this date (YYYY-MM-DD).",
+          "schema": {
+            "type": "string",
+            "format": "date"
+          }
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "description": "Property name to sort by. Prefix with `-` for descending order.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "description": "Maximum number of results to return.",
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "name": "offset",
+          "in": "query",
+          "description": "Zero-based starting position for results.",
+          "schema": {
+            "type": "integer"
+          }
+        }
+      ],
+      "request_body": null,
+      "response": {
+        "status": "200",
+        "media_type": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "meta": {
+              "type": "object",
+              "description": "Response envelope metadata. Contains the schema URL that identifies the response type and optional paging information for list responses.",
+              "required": [
+                "schema"
+              ],
+              "properties": {
+                "schema": {
+                  "type": "string",
+                  "description": "URL identifying the response schema."
+                },
+                "paging": {
+                  "type": "object",
+                  "required": [
+                    "currentPageSize",
+                    "offset",
+                    "totalSize"
+                  ],
+                  "properties": {
+                    "currentPageSize": {
+                      "type": "integer"
+                    },
+                    "offset": {
+                      "type": "integer"
+                    },
+                    "totalSize": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            },
+            "status": {
+              "type": "object",
+              "description": "Anaplan API response status. The code mirrors the HTTP status code; the message is a human-readable outcome string.",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "description": "Numeric response code, mirrors the HTTP status code.",
+                  "example": 200
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Human-readable outcome string.",
+                  "example": "Success"
+                }
+              }
+            },
+            "revisions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[0-9A-F]{32}$"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "createdOn": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "createdBy": {
+                    "type": "string"
+                  },
+                  "creationMethod": {
+                    "type": "string",
+                    "description": "How the revision was created.",
+                    "example": "user"
+                  },
+                  "appliedOn": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "appliedBy": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "createRevision": {
+      "description": "Minimum role: Workspace Administrator.\n\nCreates a new revision for the model. The model must be in standard mode and have structural changes since the last revision.",
+      "parameters": [
+        {
+          "name": "modelId",
+          "in": "path",
+          "description": "Model identifier (32-character uppercase hex string). From `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2).",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "request_body": {
+        "media_type": "application/json",
+        "required": true,
+        "schema": {
+          "type": "object",
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "maxLength": 60,
+              "description": "Revision name. Maximum 60 characters."
+            },
+            "description": {
+              "type": "string",
+              "maxLength": 250,
+              "description": "Optional revision description. Maximum 250 characters."
+            }
+          }
+        }
+      },
+      "response": {
+        "status": "201",
+        "media_type": "application/json",
+        "schema": {
+          "type": "object",
+          "description": "Response for the latestRevision endpoint. When no revision exists, the response contains only meta and status \u2014 the 'revisions' key is omitted. When a revision exists, 'revisions' contains exactly one item.",
+          "properties": {
+            "meta": {
+              "type": "object",
+              "description": "Response envelope metadata. Contains the schema URL that identifies the response type and optional paging information for list responses.",
+              "required": [
+                "schema"
+              ],
+              "properties": {
+                "schema": {
+                  "type": "string",
+                  "description": "URL identifying the response schema."
+                },
+                "paging": {
+                  "type": "object",
+                  "required": [
+                    "currentPageSize",
+                    "offset",
+                    "totalSize"
+                  ],
+                  "properties": {
+                    "currentPageSize": {
+                      "type": "integer"
+                    },
+                    "offset": {
+                      "type": "integer"
+                    },
+                    "totalSize": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            },
+            "status": {
+              "type": "object",
+              "description": "Anaplan API response status. The code mirrors the HTTP status code; the message is a human-readable outcome string.",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "description": "Numeric response code, mirrors the HTTP status code.",
+                  "example": 200
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Human-readable outcome string.",
+                  "example": "Success"
+                }
+              }
+            },
+            "revisions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[0-9A-F]{32}$"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "createdOn": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "createdBy": {
+                    "type": "string"
+                  },
+                  "creationMethod": {
+                    "type": "string",
+                    "description": "How the revision was created.",
+                    "example": "user"
+                  },
+                  "appliedOn": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "appliedBy": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "getAppliedToModels": {
+      "description": "Minimum role: Workspace Administrator.\n\nReturns all models that have had this revision applied. Deleted models are included with `modelDeleted: true`; their `modelName` and `workspaceId` are omitted.\n\nThe first model in this list is the source model where revisions are created. Any model in this list can be a `sourceModelId` for discovering this revision (using `GET /models/{modelId}/alm/syncableRevisions`) and syncing it (using `POST /models/{modelId}/alm/syncTasks`).",
+      "parameters": [
+        {
+          "name": "modelId",
+          "in": "path",
+          "description": "Model identifier (32-character uppercase hex string). From `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2).",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "revisionId",
+          "in": "path",
+          "description": "Revision identifier (32-character uppercase hex string). From `GET /models/{modelId}/alm/revisions`.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "request_body": null,
+      "response": {
+        "status": "200",
+        "media_type": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "meta": {
+              "type": "object",
+              "description": "Response envelope metadata. Contains the schema URL that identifies the response type and optional paging information for list responses.",
+              "required": [
+                "schema"
+              ],
+              "properties": {
+                "schema": {
+                  "type": "string",
+                  "description": "URL identifying the response schema."
+                },
+                "paging": {
+                  "type": "object",
+                  "required": [
+                    "currentPageSize",
+                    "offset",
+                    "totalSize"
+                  ],
+                  "properties": {
+                    "currentPageSize": {
+                      "type": "integer"
+                    },
+                    "offset": {
+                      "type": "integer"
+                    },
+                    "totalSize": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            },
+            "status": {
+              "type": "object",
+              "description": "Anaplan API response status. The code mirrors the HTTP status code; the message is a human-readable outcome string.",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "description": "Numeric response code, mirrors the HTTP status code.",
+                  "example": 200
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Human-readable outcome string.",
+                  "example": "Success"
+                }
+              }
+            },
+            "appliedToModels": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "modelId": {
+                    "type": "string",
+                    "pattern": "^[0-9A-F]{32}$",
+                    "description": "Model identifier (32-character uppercase hex string). Omitted when modelDeleted is true."
+                  },
+                  "modelName": {
+                    "type": "string",
+                    "description": "Omitted when modelDeleted is true."
+                  },
+                  "workspaceId": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{32}$",
+                    "description": "Workspace identifier (32-character lowercase hex string). Omitted when modelDeleted is true."
+                  },
+                  "appliedBy": {
+                    "type": "string"
+                  },
+                  "appliedOn": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "appliedMethod": {
+                    "type": "string"
+                  },
+                  "modelDeleted": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "getSyncTasks": {
+      "description": "Minimum role: Workspace Administrator.\n\nReturns sync tasks that are in progress or completed within the last 48 hours. Up to ~20,000 results are retained per model before oldest tasks are removed.",
+      "parameters": [
+        {
+          "name": "modelId",
+          "in": "path",
+          "description": "Model identifier (32-character uppercase hex string). From `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2).",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "request_body": null,
+      "response": {
+        "status": "200",
+        "media_type": "application/json",
+        "schema": {
+          "type": "object",
+          "description": "When no sync tasks exist in the last 48 hours, the response contains only meta and status \u2014 the 'tasks' key is omitted entirely rather than returning an empty array.",
+          "properties": {
+            "meta": {
+              "type": "object",
+              "description": "Response envelope metadata. Contains the schema URL that identifies the response type and optional paging information for list responses.",
+              "required": [
+                "schema"
+              ],
+              "properties": {
+                "schema": {
+                  "type": "string",
+                  "description": "URL identifying the response schema."
+                },
+                "paging": {
+                  "type": "object",
+                  "required": [
+                    "currentPageSize",
+                    "offset",
+                    "totalSize"
+                  ],
+                  "properties": {
+                    "currentPageSize": {
+                      "type": "integer"
+                    },
+                    "offset": {
+                      "type": "integer"
+                    },
+                    "totalSize": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            },
+            "status": {
+              "type": "object",
+              "description": "Anaplan API response status. The code mirrors the HTTP status code; the message is a human-readable outcome string.",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "description": "Numeric response code, mirrors the HTTP status code.",
+                  "example": 200
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Human-readable outcome string.",
+                  "example": "Success"
+                }
+              }
+            },
+            "tasks": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "taskId": {
+                    "type": "string",
+                    "pattern": "^[0-9A-F]{32}$"
+                  },
+                  "taskUrl": {
+                    "type": "string",
+                    "description": "URL to poll for this task's current status."
+                  },
+                  "taskState": {
+                    "type": "string",
+                    "enum": [
+                      "IN_PROGRESS",
+                      "COMPLETE"
+                    ]
+                  },
+                  "creationTime": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "result": {
+                    "type": "object",
+                    "description": "Outcome of an async task. Check `successful` first; if false, `error` contains details. On successful report tasks, `reportFileUrl` is populated with a download URL.",
+                    "properties": {
+                      "successful": {
+                        "type": "boolean"
+                      },
+                      "reportFileUrl": {
+                        "type": "string",
+                        "description": "URL to download the report file (present on successful report tasks)."
+                      },
+                      "error": {
+                        "type": "object",
+                        "description": "Error details for a failed async task.",
+                        "properties": {
+                          "title": {
+                            "type": "string",
+                            "description": "Short error title summarising the failure."
+                          },
+                          "messageText": {
+                            "type": "string",
+                            "description": "Detailed error message body."
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "createSyncTask": {
+      "description": "Minimum role: Workspace Administrator.\n\nInitiates a sync task to apply a source model revision to the target model.",
+      "parameters": [
+        {
+          "name": "modelId",
+          "in": "path",
+          "description": "Model identifier (32-character uppercase hex string). From `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2).",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "request_body": {
+        "media_type": "application/json",
+        "required": true,
+        "schema": {
+          "type": "object",
+          "required": [
+            "sourceRevisionId",
+            "sourceModelId",
+            "targetRevisionId"
+          ],
+          "properties": {
+            "sourceRevisionId": {
+              "type": "string",
+              "pattern": "^[0-9A-F]{32}$",
+              "description": "Source revision identifier (32-character uppercase hex string). From `GET /models/{targetModelId}/alm/syncableRevisions?sourceModelId={sourceModelId}` (`revisions[].id`) \u2014 the source model's revisions that can be synced into the target model, where `{targetModelId}` is the request-path model and `{sourceModelId}` is this body's `sourceModelId`."
+            },
+            "sourceModelId": {
+              "type": "string",
+              "pattern": "^[0-9A-F]{32}$",
+              "description": "Source model identifier (32-character uppercase hex string) of the model supplying the source revision. See the `sourceModelId` query parameter on `GET /models/{modelId}/alm/syncableRevisions` for the full process of identifying it (via the `appliedToModels` list of the target model's latest revision). Ultimately an Anaplan model ID from `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2)."
+            },
+            "targetRevisionId": {
+              "type": "string",
+              "pattern": "^[0-9A-F]{32}$",
+              "description": "Target revision identifier (32-character uppercase hex string). From `GET /models/{targetModelId}/alm/latestRevision` (`revisions[0].id`) \u2014 the target model's latest revision, where `{targetModelId}` is the request-path model. Required."
+            }
+          }
+        }
+      },
+      "response": {
+        "status": "201",
+        "media_type": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "meta": {
+              "type": "object",
+              "description": "Response envelope metadata. Contains the schema URL that identifies the response type and optional paging information for list responses.",
+              "required": [
+                "schema"
+              ],
+              "properties": {
+                "schema": {
+                  "type": "string",
+                  "description": "URL identifying the response schema."
+                },
+                "paging": {
+                  "type": "object",
+                  "required": [
+                    "currentPageSize",
+                    "offset",
+                    "totalSize"
+                  ],
+                  "properties": {
+                    "currentPageSize": {
+                      "type": "integer"
+                    },
+                    "offset": {
+                      "type": "integer"
+                    },
+                    "totalSize": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            },
+            "status": {
+              "type": "object",
+              "description": "Anaplan API response status. The code mirrors the HTTP status code; the message is a human-readable outcome string.",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "description": "Numeric response code, mirrors the HTTP status code.",
+                  "example": 200
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Human-readable outcome string.",
+                  "example": "Success"
+                }
+              }
+            },
+            "task": {
+              "type": "object",
+              "properties": {
+                "taskId": {
+                  "type": "string",
+                  "pattern": "^[0-9A-F]{32}$"
+                },
+                "taskUrl": {
+                  "type": "string",
+                  "description": "URL to poll for this task's current status."
+                },
+                "taskState": {
+                  "type": "string",
+                  "enum": [
+                    "IN_PROGRESS",
+                    "COMPLETE"
+                  ]
+                },
+                "creationTime": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "result": {
+                  "type": "object",
+                  "description": "Outcome of an async task. Check `successful` first; if false, `error` contains details. On successful report tasks, `reportFileUrl` is populated with a download URL.",
+                  "properties": {
+                    "successful": {
+                      "type": "boolean"
+                    },
+                    "reportFileUrl": {
+                      "type": "string",
+                      "description": "URL to download the report file (present on successful report tasks)."
+                    },
+                    "error": {
+                      "type": "object",
+                      "description": "Error details for a failed async task.",
+                      "properties": {
+                        "title": {
+                          "type": "string",
+                          "description": "Short error title summarising the failure."
+                        },
+                        "messageText": {
+                          "type": "string",
+                          "description": "Detailed error message body."
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "getSyncTask": {
+      "description": "Minimum role: Workspace Administrator.\n\nReturns the current status and result of a sync task. Task states: `IN_PROGRESS`, `COMPLETE`. On failure, `result.successful` is false and `result.error` contains details.",
+      "parameters": [
+        {
+          "name": "modelId",
+          "in": "path",
+          "description": "Model identifier (32-character uppercase hex string). From `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2).",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "syncTaskId",
+          "in": "path",
+          "description": "Sync task identifier (32-character uppercase hex string). Returned by `POST /models/{modelId}/alm/syncTasks`.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "request_body": null,
+      "response": {
+        "status": "200",
+        "media_type": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "meta": {
+              "type": "object",
+              "description": "Response envelope metadata. Contains the schema URL that identifies the response type and optional paging information for list responses.",
+              "required": [
+                "schema"
+              ],
+              "properties": {
+                "schema": {
+                  "type": "string",
+                  "description": "URL identifying the response schema."
+                },
+                "paging": {
+                  "type": "object",
+                  "required": [
+                    "currentPageSize",
+                    "offset",
+                    "totalSize"
+                  ],
+                  "properties": {
+                    "currentPageSize": {
+                      "type": "integer"
+                    },
+                    "offset": {
+                      "type": "integer"
+                    },
+                    "totalSize": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            },
+            "status": {
+              "type": "object",
+              "description": "Anaplan API response status. The code mirrors the HTTP status code; the message is a human-readable outcome string.",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "description": "Numeric response code, mirrors the HTTP status code.",
+                  "example": 200
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Human-readable outcome string.",
+                  "example": "Success"
+                }
+              }
+            },
+            "task": {
+              "type": "object",
+              "properties": {
+                "taskId": {
+                  "type": "string",
+                  "pattern": "^[0-9A-F]{32}$"
+                },
+                "taskUrl": {
+                  "type": "string",
+                  "description": "URL to poll for this task's current status."
+                },
+                "taskState": {
+                  "type": "string",
+                  "enum": [
+                    "IN_PROGRESS",
+                    "COMPLETE"
+                  ]
+                },
+                "creationTime": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "result": {
+                  "type": "object",
+                  "description": "Outcome of an async task. Check `successful` first; if false, `error` contains details. On successful report tasks, `reportFileUrl` is populated with a download URL.",
+                  "properties": {
+                    "successful": {
+                      "type": "boolean"
+                    },
+                    "reportFileUrl": {
+                      "type": "string",
+                      "description": "URL to download the report file (present on successful report tasks)."
+                    },
+                    "error": {
+                      "type": "object",
+                      "description": "Error details for a failed async task.",
+                      "properties": {
+                        "title": {
+                          "type": "string",
+                          "description": "Short error title summarising the failure."
+                        },
+                        "messageText": {
+                          "type": "string",
+                          "description": "Detailed error message body."
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "createComparisonReportTask": {
+      "description": "Minimum role: Workspace Administrator.\n\nStarts an asynchronous task to generate a full comparison report between a source revision and a specified target revision (sourceRevisionId, sourceModelId and targetRevisionId are all required). Poll the task info endpoint to check progress. The caller must hold the Workspace Administrator role on both the source and target models.",
+      "parameters": [
+        {
+          "name": "modelId",
+          "in": "path",
+          "description": "Model identifier (32-character uppercase hex string). From `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2).",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "request_body": {
+        "media_type": "application/json",
+        "required": true,
+        "schema": {
+          "type": "object",
+          "required": [
+            "sourceRevisionId",
+            "sourceModelId",
+            "targetRevisionId"
+          ],
+          "properties": {
+            "sourceRevisionId": {
+              "type": "string",
+              "pattern": "^[0-9A-F]{32}$",
+              "description": "Source revision identifier (32-character uppercase hex string). From `GET /models/{sourceModelId}/alm/revisions` (`revisions[].id`) \u2014 a revision of the source model, where `{sourceModelId}` is this body's `sourceModelId`."
+            },
+            "sourceModelId": {
+              "type": "string",
+              "pattern": "^[0-9A-F]{32}$",
+              "description": "Source model identifier (32-character uppercase hex string) of the model supplying the source revision. See the `sourceModelId` query parameter on `GET /models/{modelId}/alm/syncableRevisions` for the full process of identifying it (via the `appliedToModels` list of the target model's latest revision). Ultimately an Anaplan model ID from `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2)."
+            },
+            "targetRevisionId": {
+              "type": "string",
+              "pattern": "^[0-9A-F]{32}$",
+              "description": "Target revision identifier (32-character uppercase hex string). From `GET /models/{modelId}/alm/revisions` (`revisions[].id`) on the request-path model (`{modelId}`). Required for comparison and summary report tasks."
+            }
+          }
+        }
+      },
+      "response": {
+        "status": "201",
+        "media_type": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "meta": {
+              "type": "object",
+              "description": "Response envelope metadata. Contains the schema URL that identifies the response type and optional paging information for list responses.",
+              "required": [
+                "schema"
+              ],
+              "properties": {
+                "schema": {
+                  "type": "string",
+                  "description": "URL identifying the response schema."
+                },
+                "paging": {
+                  "type": "object",
+                  "required": [
+                    "currentPageSize",
+                    "offset",
+                    "totalSize"
+                  ],
+                  "properties": {
+                    "currentPageSize": {
+                      "type": "integer"
+                    },
+                    "offset": {
+                      "type": "integer"
+                    },
+                    "totalSize": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            },
+            "status": {
+              "type": "object",
+              "description": "Anaplan API response status. The code mirrors the HTTP status code; the message is a human-readable outcome string.",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "description": "Numeric response code, mirrors the HTTP status code.",
+                  "example": 200
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Human-readable outcome string.",
+                  "example": "Success"
+                }
+              }
+            },
+            "task": {
+              "type": "object",
+              "properties": {
+                "taskId": {
+                  "type": "string",
+                  "pattern": "^[0-9A-F]{32}$",
+                  "description": "Report task identifier (32-character uppercase hex string)."
+                },
+                "taskUrl": {
+                  "type": "string"
+                },
+                "taskState": {
+                  "type": "string",
+                  "enum": [
+                    "IN_PROGRESS",
+                    "COMPLETE"
+                  ]
+                },
+                "result": {
+                  "type": "object",
+                  "description": "Outcome of an async task. Check `successful` first; if false, `error` contains details. On successful report tasks, `reportFileUrl` is populated with a download URL.",
+                  "properties": {
+                    "successful": {
+                      "type": "boolean"
+                    },
+                    "reportFileUrl": {
+                      "type": "string",
+                      "description": "URL to download the report file (present on successful report tasks)."
+                    },
+                    "error": {
+                      "type": "object",
+                      "description": "Error details for a failed async task.",
+                      "properties": {
+                        "title": {
+                          "type": "string",
+                          "description": "Short error title summarising the failure."
+                        },
+                        "messageText": {
+                          "type": "string",
+                          "description": "Detailed error message body."
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "getComparisonReportTask": {
+      "description": "Minimum role: Workspace Administrator.\n\nReturns the status of a comparison report generation task. On success, `result.successful` is true and `result.reportFileUrl` contains the download URL. On failure, `result.error` contains title and messageText.",
+      "parameters": [
+        {
+          "name": "modelId",
+          "in": "path",
+          "description": "Model identifier (32-character uppercase hex string). From `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2).",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "taskId",
+          "in": "path",
+          "description": "Report task identifier (32-character uppercase hex string), scoped to its report type: use the id from `POST /models/{modelId}/alm/comparisonReportTasks` only under `.../comparisonReportTasks/{taskId}`, and the id from `POST /models/{modelId}/alm/summaryReportTasks` only under `.../summaryReportTasks/{taskId}`. They are not interchangeable.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "request_body": null,
+      "response": {
+        "status": "200",
+        "media_type": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "meta": {
+              "type": "object",
+              "description": "Response envelope metadata. Contains the schema URL that identifies the response type and optional paging information for list responses.",
+              "required": [
+                "schema"
+              ],
+              "properties": {
+                "schema": {
+                  "type": "string",
+                  "description": "URL identifying the response schema."
+                },
+                "paging": {
+                  "type": "object",
+                  "required": [
+                    "currentPageSize",
+                    "offset",
+                    "totalSize"
+                  ],
+                  "properties": {
+                    "currentPageSize": {
+                      "type": "integer"
+                    },
+                    "offset": {
+                      "type": "integer"
+                    },
+                    "totalSize": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            },
+            "status": {
+              "type": "object",
+              "description": "Anaplan API response status. The code mirrors the HTTP status code; the message is a human-readable outcome string.",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "description": "Numeric response code, mirrors the HTTP status code.",
+                  "example": 200
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Human-readable outcome string.",
+                  "example": "Success"
+                }
+              }
+            },
+            "task": {
+              "type": "object",
+              "properties": {
+                "taskId": {
+                  "type": "string",
+                  "pattern": "^[0-9A-F]{32}$",
+                  "description": "Report task identifier (32-character uppercase hex string)."
+                },
+                "taskUrl": {
+                  "type": "string"
+                },
+                "taskState": {
+                  "type": "string",
+                  "enum": [
+                    "IN_PROGRESS",
+                    "COMPLETE"
+                  ]
+                },
+                "result": {
+                  "type": "object",
+                  "description": "Outcome of an async task. Check `successful` first; if false, `error` contains details. On successful report tasks, `reportFileUrl` is populated with a download URL.",
+                  "properties": {
+                    "successful": {
+                      "type": "boolean"
+                    },
+                    "reportFileUrl": {
+                      "type": "string",
+                      "description": "URL to download the report file (present on successful report tasks)."
+                    },
+                    "error": {
+                      "type": "object",
+                      "description": "Error details for a failed async task.",
+                      "properties": {
+                        "title": {
+                          "type": "string",
+                          "description": "Short error title summarising the failure."
+                        },
+                        "messageText": {
+                          "type": "string",
+                          "description": "Detailed error message body."
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "getComparisonReport": {
+      "description": "Minimum role: Workspace Administrator.\n\nDownloads the full comparison report as a tab-separated values (TSV) file. The report is available for 48 hours after generation and includes sections for: Lists Added, Modules Added, Roles Changed, Changes Within Lists, and Line Items Added.\n\n**HIGH VOLUME** \u2014 the full report is returned whole in one non-paginated response (observed ~147 KB) and can be larger; there is no paging. Fetch it only when you need the complete diff.",
+      "parameters": [
+        {
+          "name": "modelId",
+          "in": "path",
+          "description": "Model identifier (32-character uppercase hex string). From `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2).",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "targetRevisionId",
+          "in": "path",
+          "description": "Target revision identifier (32-character uppercase hex string). From `GET /models/{modelId}/alm/revisions`.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sourceRevisionId",
+          "in": "path",
+          "description": "Source revision identifier (32-character uppercase hex string). From `GET /models/{modelId}/alm/revisions`.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "request_body": null,
+      "response": null,
+      "response_note": "no documented 2xx JSON response schema \u2014 probe a read operation to learn it"
+    },
+    "createSummaryReportTask": {
+      "description": "Minimum role: Workspace Administrator.\n\nStarts an asynchronous task to generate a summary report between a source revision and a specified target revision (sourceRevisionId, sourceModelId and targetRevisionId are all required). Poll the task info endpoint to check progress.",
+      "parameters": [
+        {
+          "name": "modelId",
+          "in": "path",
+          "description": "Model identifier (32-character uppercase hex string). From `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2).",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "request_body": {
+        "media_type": "application/json",
+        "required": true,
+        "schema": {
+          "type": "object",
+          "required": [
+            "sourceRevisionId",
+            "sourceModelId",
+            "targetRevisionId"
+          ],
+          "properties": {
+            "sourceRevisionId": {
+              "type": "string",
+              "pattern": "^[0-9A-F]{32}$",
+              "description": "Source revision identifier (32-character uppercase hex string). From `GET /models/{sourceModelId}/alm/revisions` (`revisions[].id`) \u2014 a revision of the source model, where `{sourceModelId}` is this body's `sourceModelId`."
+            },
+            "sourceModelId": {
+              "type": "string",
+              "pattern": "^[0-9A-F]{32}$",
+              "description": "Source model identifier (32-character uppercase hex string) of the model supplying the source revision. See the `sourceModelId` query parameter on `GET /models/{modelId}/alm/syncableRevisions` for the full process of identifying it (via the `appliedToModels` list of the target model's latest revision). Ultimately an Anaplan model ID from `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2)."
+            },
+            "targetRevisionId": {
+              "type": "string",
+              "pattern": "^[0-9A-F]{32}$",
+              "description": "Target revision identifier (32-character uppercase hex string). From `GET /models/{modelId}/alm/revisions` (`revisions[].id`) on the request-path model (`{modelId}`). Required for comparison and summary report tasks."
+            }
+          }
+        }
+      },
+      "response": {
+        "status": "201",
+        "media_type": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "meta": {
+              "type": "object",
+              "description": "Response envelope metadata. Contains the schema URL that identifies the response type and optional paging information for list responses.",
+              "required": [
+                "schema"
+              ],
+              "properties": {
+                "schema": {
+                  "type": "string",
+                  "description": "URL identifying the response schema."
+                },
+                "paging": {
+                  "type": "object",
+                  "required": [
+                    "currentPageSize",
+                    "offset",
+                    "totalSize"
+                  ],
+                  "properties": {
+                    "currentPageSize": {
+                      "type": "integer"
+                    },
+                    "offset": {
+                      "type": "integer"
+                    },
+                    "totalSize": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            },
+            "status": {
+              "type": "object",
+              "description": "Anaplan API response status. The code mirrors the HTTP status code; the message is a human-readable outcome string.",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "description": "Numeric response code, mirrors the HTTP status code.",
+                  "example": 200
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Human-readable outcome string.",
+                  "example": "Success"
+                }
+              }
+            },
+            "task": {
+              "type": "object",
+              "properties": {
+                "taskId": {
+                  "type": "string",
+                  "pattern": "^[0-9A-F]{32}$",
+                  "description": "Report task identifier (32-character uppercase hex string)."
+                },
+                "taskUrl": {
+                  "type": "string"
+                },
+                "taskState": {
+                  "type": "string",
+                  "enum": [
+                    "IN_PROGRESS",
+                    "COMPLETE"
+                  ]
+                },
+                "result": {
+                  "type": "object",
+                  "description": "Outcome of an async task. Check `successful` first; if false, `error` contains details. On successful report tasks, `reportFileUrl` is populated with a download URL.",
+                  "properties": {
+                    "successful": {
+                      "type": "boolean"
+                    },
+                    "reportFileUrl": {
+                      "type": "string",
+                      "description": "URL to download the report file (present on successful report tasks)."
+                    },
+                    "error": {
+                      "type": "object",
+                      "description": "Error details for a failed async task.",
+                      "properties": {
+                        "title": {
+                          "type": "string",
+                          "description": "Short error title summarising the failure."
+                        },
+                        "messageText": {
+                          "type": "string",
+                          "description": "Detailed error message body."
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "getSummaryReportTask": {
+      "description": "Minimum role: Workspace Administrator.\n\nReturns the status of a summary report generation task. On success, `result.successful` is true and `result.reportFileUrl` contains the download URL.",
+      "parameters": [
+        {
+          "name": "modelId",
+          "in": "path",
+          "description": "Model identifier (32-character uppercase hex string). From `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2).",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "taskId",
+          "in": "path",
+          "description": "Report task identifier (32-character uppercase hex string), scoped to its report type: use the id from `POST /models/{modelId}/alm/comparisonReportTasks` only under `.../comparisonReportTasks/{taskId}`, and the id from `POST /models/{modelId}/alm/summaryReportTasks` only under `.../summaryReportTasks/{taskId}`. They are not interchangeable.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "request_body": null,
+      "response": {
+        "status": "200",
+        "media_type": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "meta": {
+              "type": "object",
+              "description": "Response envelope metadata. Contains the schema URL that identifies the response type and optional paging information for list responses.",
+              "required": [
+                "schema"
+              ],
+              "properties": {
+                "schema": {
+                  "type": "string",
+                  "description": "URL identifying the response schema."
+                },
+                "paging": {
+                  "type": "object",
+                  "required": [
+                    "currentPageSize",
+                    "offset",
+                    "totalSize"
+                  ],
+                  "properties": {
+                    "currentPageSize": {
+                      "type": "integer"
+                    },
+                    "offset": {
+                      "type": "integer"
+                    },
+                    "totalSize": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            },
+            "status": {
+              "type": "object",
+              "description": "Anaplan API response status. The code mirrors the HTTP status code; the message is a human-readable outcome string.",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "description": "Numeric response code, mirrors the HTTP status code.",
+                  "example": 200
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Human-readable outcome string.",
+                  "example": "Success"
+                }
+              }
+            },
+            "task": {
+              "type": "object",
+              "properties": {
+                "taskId": {
+                  "type": "string",
+                  "pattern": "^[0-9A-F]{32}$",
+                  "description": "Report task identifier (32-character uppercase hex string)."
+                },
+                "taskUrl": {
+                  "type": "string"
+                },
+                "taskState": {
+                  "type": "string",
+                  "enum": [
+                    "IN_PROGRESS",
+                    "COMPLETE"
+                  ]
+                },
+                "result": {
+                  "type": "object",
+                  "description": "Outcome of an async task. Check `successful` first; if false, `error` contains details. On successful report tasks, `reportFileUrl` is populated with a download URL.",
+                  "properties": {
+                    "successful": {
+                      "type": "boolean"
+                    },
+                    "reportFileUrl": {
+                      "type": "string",
+                      "description": "URL to download the report file (present on successful report tasks)."
+                    },
+                    "error": {
+                      "type": "object",
+                      "description": "Error details for a failed async task.",
+                      "properties": {
+                        "title": {
+                          "type": "string",
+                          "description": "Short error title summarising the failure."
+                        },
+                        "messageText": {
+                          "type": "string",
+                          "description": "Detailed error message body."
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "getSummaryReport": {
+      "description": "Minimum role: Workspace Administrator.\n\nDownloads the summary report as JSON. The report is available for 48 hours after generation. Change types with zero differences are omitted. Properties within a change type are omitted if items were only created (not modified or deleted).",
+      "parameters": [
+        {
+          "name": "modelId",
+          "in": "path",
+          "description": "Model identifier (32-character uppercase hex string). From `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2).",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "targetRevisionId",
+          "in": "path",
+          "description": "Target revision identifier (32-character uppercase hex string). From `GET /models/{modelId}/alm/revisions`.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sourceRevisionId",
+          "in": "path",
+          "description": "Source revision identifier (32-character uppercase hex string). From `GET /models/{modelId}/alm/revisions`.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "request_body": null,
+      "response": {
+        "status": "200",
+        "media_type": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "summaryReport": {
+              "type": "object",
+              "properties": {
+                "targetRevisionId": {
+                  "type": "string",
+                  "pattern": "^[0-9A-F]{32}$",
+                  "description": "Target revision identifier (32-character uppercase hex string)."
+                },
+                "sourceRevisionId": {
+                  "type": "string",
+                  "pattern": "^[0-9A-F]{32}$",
+                  "description": "Source revision identifier (32-character uppercase hex string)."
+                },
+                "totals": {
+                  "type": "object",
+                  "properties": {
+                    "modified": {
+                      "type": "integer"
+                    },
+                    "deleted": {
+                      "type": "integer"
+                    },
+                    "created": {
+                      "type": "integer"
+                    }
+                  }
+                },
+                "differences": {
+                  "type": "object",
+                  "description": "Change details by category. Categories with no changes are omitted.",
+                  "properties": {
+                    "lineItems": {
+                      "type": "object"
+                    },
+                    "rolesContents": {
+                      "type": "object"
+                    },
+                    "lists": {
+                      "type": "object"
+                    },
+                    "modules": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
