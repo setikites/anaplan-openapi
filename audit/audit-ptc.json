@@ -1,0 +1,493 @@
+{
+  "catalog": [
+    {
+      "op_id": "getAuditEvents",
+      "method": "GET",
+      "path": "/events",
+      "summary": "Retrieve audit events (large responses \u2014 see description)",
+      "parameters": [
+        {
+          "name": "type",
+          "in": "query",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "name": "dateFrom",
+          "in": "query",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "name": "dateTo",
+          "in": "query",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "name": "intervalInHours",
+          "in": "query",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "name": "offset",
+          "in": "query",
+          "required": false,
+          "type": "integer"
+        }
+      ]
+    },
+    {
+      "op_id": "searchAuditEvents",
+      "method": "POST",
+      "path": "/events/search",
+      "summary": "Search audit events (large responses \u2014 see description)",
+      "parameters": [
+        {
+          "name": "type",
+          "in": "query",
+          "required": false,
+          "type": "string"
+        }
+      ],
+      "body_fields": [
+        "from",
+        "to",
+        "interval"
+      ]
+    }
+  ],
+  "detail": {
+    "getAuditEvents": {
+      "description": "Minimum role: Tenant Auditor.\n\nRetrieves audit events for the tenant associated with the authenticated user. Use `type` to filter by event category. Use `dateFrom`/`dateTo` for a specific date range, or `intervalInHours` for a rolling window; the queried range cannot exceed 30 days. If no date filter is supplied, the previous 30 days are returned. Use `limit` and `offset` for pagination (the documented limit cap of 10000 is not enforced server-side \u2014 see the `limit` parameter).\n\n**HIGH VOLUME** \u2014 audit events are unbounded: a single busy hour can exceed 1,500 events (~825 KB), and with no date filter the default window is the previous 30 days. With no `limit`, a client that auto-follows `meta.paging` merges every page into one response and overflows its token budget. Always pass an explicit `limit` (start small, ~50\u2013100) and narrow the query with `type` plus a tight time range (`intervalInHours`/`interval` or explicit dates). To sweep the full set, hand-page with `limit`+`offset` or filter server-side \u2014 never pull a whole window in one call. CEF output (`Accept: text/plain`) ignores `limit`/`offset` and always returns the entire window.\n\nSet `Accept: text/plain` to receive results in Common Event Format (CEF). Default is `application/json`.",
+      "parameters": [
+        {
+          "name": "type",
+          "in": "query",
+          "description": "Type of events to return. Each value filters to events whose `eventTypeId` carries a matching prefix. Accepted values: `all` (every event), `user_activity` (`USR-*`), `access_control` (`AUTHZ-*`), `int` (integrations, `INT-*`), `conn_mgmt` (connection / SAML management, `CONN-*`), `comment` (`COMMENT-*`), `byok` (Bring Your Own Key encryption), `plan_iq` (PlanIQ), and `forecaster`. A `workflow` category exists for the Workflow product but is omitted from the enum (product not enabled on the test tenant). Omitting the parameter is equivalent to `all` (the default). The enum is not enforced server-side \u2014 an unrecognised value is treated as `all` rather than rejected.",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "all",
+              "user_activity",
+              "access_control",
+              "int",
+              "conn_mgmt",
+              "comment",
+              "byok",
+              "plan_iq",
+              "forecaster"
+            ],
+            "default": "all"
+          }
+        },
+        {
+          "name": "dateFrom",
+          "in": "query",
+          "description": "Start of the event date range (Unix timestamp in milliseconds, UTC). The span between `dateFrom` and `dateTo` cannot exceed 30 days \u2014 a wider range returns 400 `FAILURE_BAD_REQUEST`.",
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "name": "dateTo",
+          "in": "query",
+          "description": "End of the event date range (Unix timestamp in milliseconds, UTC). The span between `dateFrom` and `dateTo` cannot exceed 30 days \u2014 a wider range returns 400 `FAILURE_BAD_REQUEST`.",
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "name": "intervalInHours",
+          "in": "query",
+          "description": "Return events from the previous N hours. For example, `2` returns the last two hours of events. Bound by the same 30-day cap as the date range: a value above `720` (30 days) returns 400 `FAILURE_BAD_REQUEST`.",
+          "schema": {
+            "type": "integer",
+            "maximum": 720
+          }
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "description": "Maximum number of results to return per page. The documented cap of 10000 is not enforced server-side \u2014 larger limits are honored and return more than 10000 records.",
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "name": "offset",
+          "in": "query",
+          "description": "Zero-based index of the first result to return. Use with `limit` for pagination.",
+          "schema": {
+            "type": "integer"
+          }
+        }
+      ],
+      "request_body": null,
+      "response": {
+        "status": "200",
+        "media_type": "application/json",
+        "schema": {
+          "type": "object",
+          "description": "Response envelope for audit event list and search endpoints.",
+          "required": [
+            "response"
+          ],
+          "properties": {
+            "meta": {
+              "type": "object",
+              "properties": {
+                "paging": {
+                  "type": "object",
+                  "description": "Pagination metadata included in audit event list responses.",
+                  "required": [
+                    "currentPageSize",
+                    "totalSize",
+                    "offSet"
+                  ],
+                  "properties": {
+                    "currentPageSize": {
+                      "type": "integer"
+                    },
+                    "totalSize": {
+                      "type": "integer",
+                      "description": "Total number of results matching the query."
+                    },
+                    "offSet": {
+                      "type": "integer",
+                      "description": "Zero-based index of the first result in this page."
+                    },
+                    "nextOffset": {
+                      "type": "integer",
+                      "description": "Offset to use to retrieve the next page, if more results exist."
+                    },
+                    "nextUrl": {
+                      "type": "string"
+                    },
+                    "previousUrl": {
+                      "type": "string",
+                      "description": "URL to call to retrieve the previous page of results. Present once paging past the first page (offset > 0)."
+                    }
+                  }
+                }
+              }
+            },
+            "response": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "integer",
+                    "description": "Unique event identifier (Snowflake ID)."
+                  },
+                  "eventTypeId": {
+                    "type": "string",
+                    "description": "Event type code.",
+                    "example": "DSM-DAO0267I"
+                  },
+                  "userId": {
+                    "type": "string",
+                    "description": "Identifier of the user who performed the action. Regular user IDs are 32-character lowercase hex strings. Events generated by internal system processes carry an `INTERNAL_` prefix followed by a numeric identifier.",
+                    "example": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4"
+                  },
+                  "tenantId": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{32}$",
+                    "example": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4"
+                  },
+                  "objectId": {
+                    "type": "string",
+                    "description": "Identifier of the object acted upon. Format varies by object type: model, workspace, and user objects use a 32-character lowercase hex string; connection objects (CONN-* events) use a `con_` prefix followed by a base62 string. Absent when no specific object is associated with the event.",
+                    "example": "con_P7JGok4rAnkvJArx"
+                  },
+                  "objectTypeId": {
+                    "type": "string",
+                    "description": "Type of the object acted upon, if applicable."
+                  },
+                  "objectTenantId": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{32}$",
+                    "description": "Tenant identifier of the object acted upon \u2014 32-character lowercase hex string. Typically matches `tenantId` for objects within the same tenant."
+                  },
+                  "additionalAttributes": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "nullable": true,
+                    "description": "Event-type-specific attributes as a free-form map. Keys vary by event type. The API may return an explicit `null` for this field (observed on some `USR-8` login events), so treat it as optional rather than always-present.",
+                    "example": {
+                      "clientName": "MyApp"
+                    }
+                  },
+                  "message": {
+                    "type": "string",
+                    "description": "Human-readable description of the event."
+                  },
+                  "success": {
+                    "type": "boolean"
+                  },
+                  "errorNumber": {
+                    "type": "string",
+                    "description": "Error code, if the action failed."
+                  },
+                  "ipAddress": {
+                    "type": "string",
+                    "description": "IP address from which the action was performed."
+                  },
+                  "userAgent": {
+                    "type": "string"
+                  },
+                  "sessionId": {
+                    "type": "string",
+                    "description": "Session identifier associated with the event, if applicable. Not observed in any events during live testing across all event types (`user_activity`, `access_control`, `int`, `conn_mgmt`, `comment`) \u2014 may be populated only for specific event categories or tenant configurations."
+                  },
+                  "hostName": {
+                    "type": "string",
+                    "description": "Hostname of the server that recorded the event."
+                  },
+                  "serviceVersion": {
+                    "type": "string",
+                    "description": "Version of the Anaplan service that generated the event."
+                  },
+                  "eventDate": {
+                    "type": "integer",
+                    "description": "Timestamp when the event occurred (Unix milliseconds, UTC)."
+                  },
+                  "eventTimeZone": {
+                    "type": "string",
+                    "description": "Time zone of `eventDate`.",
+                    "example": "UTC"
+                  },
+                  "createdDate": {
+                    "type": "integer",
+                    "description": "Timestamp when the event was stored in the audit database (Unix milliseconds, UTC)."
+                  },
+                  "createdTimeZone": {
+                    "type": "string",
+                    "description": "Time zone of `createdDate`.",
+                    "example": "UTC"
+                  },
+                  "checksum": {
+                    "type": "string",
+                    "description": "Checksum for verifying event record integrity. Returned as a short numeric string, not a SHA-256 hash.",
+                    "example": "1118902891"
+                  }
+                }
+              },
+              "description": "Array of audit event records."
+            }
+          }
+        }
+      }
+    },
+    "searchAuditEvents": {
+      "description": "Minimum role: Tenant Auditor.\n\nRetrieves audit events for the tenant associated with the authenticated user using a JSON request body to specify the time range. Use `from`/`to` for a specific date range, or `interval` for a rolling window in hours. Use `type` query parameter to filter by event category.\n\n**HIGH VOLUME** \u2014 audit events are unbounded: a single busy hour can exceed 1,500 events (~825 KB), and with no date filter the default window is the previous 30 days. With no `limit`, a client that auto-follows `meta.paging` merges every page into one response and overflows its token budget. Always pass an explicit `limit` (start small, ~50\u2013100) and narrow the query with `type` plus a tight time range (`intervalInHours`/`interval` or explicit dates). To sweep the full set, hand-page with `limit`+`offset` or filter server-side \u2014 never pull a whole window in one call. CEF output (`Accept: text/plain`) ignores `limit`/`offset` and always returns the entire window.\n\nSet `Accept: text/plain` to receive results in Common Event Format (CEF). Default is `application/json`.",
+      "parameters": [
+        {
+          "name": "type",
+          "in": "query",
+          "description": "Type of events to return. Same vocabulary as the `type` filter on `GET /events` (each value matches an `eventTypeId` prefix): `all`, `user_activity`, `access_control`, `int`, `conn_mgmt`, `comment`, `byok`, `plan_iq`, `forecaster`. Omitting the parameter is equivalent to `all` (the default). The enum is not enforced server-side.",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "all",
+              "user_activity",
+              "access_control",
+              "int",
+              "conn_mgmt",
+              "comment",
+              "byok",
+              "plan_iq",
+              "forecaster"
+            ],
+            "default": "all"
+          }
+        }
+      ],
+      "request_body": {
+        "media_type": "application/json",
+        "required": false,
+        "schema": {
+          "type": "object",
+          "description": "Request body for the POST /events/search endpoint. Specify `from`/`to` for a date range or `interval` for a rolling window. If `to` is omitted, results up to the current time are returned. If `from` is omitted, results from the earliest available event are returned.",
+          "properties": {
+            "from": {
+              "type": "integer",
+              "description": "Start of the event date range (Unix timestamp in milliseconds, UTC)."
+            },
+            "to": {
+              "type": "integer",
+              "description": "End of the event date range (Unix timestamp in milliseconds, UTC)."
+            },
+            "interval": {
+              "type": "integer",
+              "description": "Return events from the previous N hours."
+            }
+          }
+        }
+      },
+      "response": {
+        "status": "200",
+        "media_type": "application/json",
+        "schema": {
+          "type": "object",
+          "description": "Response envelope for audit event list and search endpoints.",
+          "required": [
+            "response"
+          ],
+          "properties": {
+            "meta": {
+              "type": "object",
+              "properties": {
+                "paging": {
+                  "type": "object",
+                  "description": "Pagination metadata included in audit event list responses.",
+                  "required": [
+                    "currentPageSize",
+                    "totalSize",
+                    "offSet"
+                  ],
+                  "properties": {
+                    "currentPageSize": {
+                      "type": "integer"
+                    },
+                    "totalSize": {
+                      "type": "integer",
+                      "description": "Total number of results matching the query."
+                    },
+                    "offSet": {
+                      "type": "integer",
+                      "description": "Zero-based index of the first result in this page."
+                    },
+                    "nextOffset": {
+                      "type": "integer",
+                      "description": "Offset to use to retrieve the next page, if more results exist."
+                    },
+                    "nextUrl": {
+                      "type": "string"
+                    },
+                    "previousUrl": {
+                      "type": "string",
+                      "description": "URL to call to retrieve the previous page of results. Present once paging past the first page (offset > 0)."
+                    }
+                  }
+                }
+              }
+            },
+            "response": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "integer",
+                    "description": "Unique event identifier (Snowflake ID)."
+                  },
+                  "eventTypeId": {
+                    "type": "string",
+                    "description": "Event type code.",
+                    "example": "DSM-DAO0267I"
+                  },
+                  "userId": {
+                    "type": "string",
+                    "description": "Identifier of the user who performed the action. Regular user IDs are 32-character lowercase hex strings. Events generated by internal system processes carry an `INTERNAL_` prefix followed by a numeric identifier.",
+                    "example": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4"
+                  },
+                  "tenantId": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{32}$",
+                    "example": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4"
+                  },
+                  "objectId": {
+                    "type": "string",
+                    "description": "Identifier of the object acted upon. Format varies by object type: model, workspace, and user objects use a 32-character lowercase hex string; connection objects (CONN-* events) use a `con_` prefix followed by a base62 string. Absent when no specific object is associated with the event.",
+                    "example": "con_P7JGok4rAnkvJArx"
+                  },
+                  "objectTypeId": {
+                    "type": "string",
+                    "description": "Type of the object acted upon, if applicable."
+                  },
+                  "objectTenantId": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{32}$",
+                    "description": "Tenant identifier of the object acted upon \u2014 32-character lowercase hex string. Typically matches `tenantId` for objects within the same tenant."
+                  },
+                  "additionalAttributes": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "nullable": true,
+                    "description": "Event-type-specific attributes as a free-form map. Keys vary by event type. The API may return an explicit `null` for this field (observed on some `USR-8` login events), so treat it as optional rather than always-present.",
+                    "example": {
+                      "clientName": "MyApp"
+                    }
+                  },
+                  "message": {
+                    "type": "string",
+                    "description": "Human-readable description of the event."
+                  },
+                  "success": {
+                    "type": "boolean"
+                  },
+                  "errorNumber": {
+                    "type": "string",
+                    "description": "Error code, if the action failed."
+                  },
+                  "ipAddress": {
+                    "type": "string",
+                    "description": "IP address from which the action was performed."
+                  },
+                  "userAgent": {
+                    "type": "string"
+                  },
+                  "sessionId": {
+                    "type": "string",
+                    "description": "Session identifier associated with the event, if applicable. Not observed in any events during live testing across all event types (`user_activity`, `access_control`, `int`, `conn_mgmt`, `comment`) \u2014 may be populated only for specific event categories or tenant configurations."
+                  },
+                  "hostName": {
+                    "type": "string",
+                    "description": "Hostname of the server that recorded the event."
+                  },
+                  "serviceVersion": {
+                    "type": "string",
+                    "description": "Version of the Anaplan service that generated the event."
+                  },
+                  "eventDate": {
+                    "type": "integer",
+                    "description": "Timestamp when the event occurred (Unix milliseconds, UTC)."
+                  },
+                  "eventTimeZone": {
+                    "type": "string",
+                    "description": "Time zone of `eventDate`.",
+                    "example": "UTC"
+                  },
+                  "createdDate": {
+                    "type": "integer",
+                    "description": "Timestamp when the event was stored in the audit database (Unix milliseconds, UTC)."
+                  },
+                  "createdTimeZone": {
+                    "type": "string",
+                    "description": "Time zone of `createdDate`.",
+                    "example": "UTC"
+                  },
+                  "checksum": {
+                    "type": "string",
+                    "description": "Checksum for verifying event record integrity. Returned as a short numeric string, not a SHA-256 hash.",
+                    "example": "1118902891"
+                  }
+                }
+              },
+              "description": "Array of audit event records."
+            }
+          }
+        }
+      }
+    }
+  }
+}

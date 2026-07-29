@@ -1,0 +1,121 @@
+{
+  "catalog": [
+    {
+      "op_id": "exportUsers",
+      "method": "GET",
+      "path": "/users/export",
+      "summary": "Export all users to CSV",
+      "parameters": [
+        {
+          "name": "Limit",
+          "in": "query",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "name": "Offset",
+          "in": "query",
+          "required": false,
+          "type": "integer"
+        }
+      ]
+    },
+    {
+      "op_id": "importUsers",
+      "method": "PUT",
+      "path": "/users/import",
+      "summary": "Import users from CSV",
+      "parameters": [],
+      "body_fields": [
+        "file"
+      ]
+    }
+  ],
+  "detail": {
+    "exportUsers": {
+      "description": "Minimum role: Tenant Administrator.\n\nDownloads all users in the tenant as a CSV file. Columns: `username`, `first_name`, `last_name`, `licenses`. Use `Limit` and `Offset` to page through large tenants.",
+      "parameters": [
+        {
+          "name": "Limit",
+          "in": "query",
+          "description": "Maximum number of rows to return.",
+          "required": false,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "name": "Offset",
+          "in": "query",
+          "description": "Number of rows to skip before returning results.",
+          "required": false,
+          "schema": {
+            "type": "integer"
+          }
+        }
+      ],
+      "request_body": null,
+      "response": null,
+      "response_note": "no documented 2xx JSON response schema \u2014 probe a read operation to learn it"
+    },
+    "importUsers": {
+      "description": "Minimum role: Tenant Administrator.\n\nBulk-creates or updates users by uploading a CSV file. Users are matched by `username` (email address); existing users are updated, new addresses are created.\n\nCSV columns: `username`, `first_name`, `last_name`, `licenses`. Constraints: at least one data row, no more than 500 rows, no duplicate email addresses, no empty cells. Licenses must be quoted and comma-separated when a user holds more than one.\n\nReturns 207 Multi-Status with per-row counts and line-level errors.",
+      "parameters": [],
+      "request_body": {
+        "media_type": "multipart/form-data",
+        "required": true,
+        "schema": {
+          "type": "object",
+          "required": [
+            "file"
+          ],
+          "properties": {
+            "file": {
+              "type": "string",
+              "format": "binary",
+              "description": "CSV file containing user records to import."
+            }
+          }
+        }
+      },
+      "response": {
+        "status": "207",
+        "media_type": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "accepted": {
+              "type": "integer",
+              "description": "Total number of data rows found in the CSV (excluding the header)."
+            },
+            "created": {
+              "type": "integer",
+              "description": "Number of rows that resulted in a new user being created."
+            },
+            "updated": {
+              "type": "integer",
+              "description": "Number of rows that resulted in an existing user being updated."
+            },
+            "errors": {
+              "type": "array",
+              "description": "Line-level validation errors. Empty when all rows were accepted.",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "line": {
+                    "type": "integer",
+                    "description": "1-based line number in the CSV (excluding the header row) where the error occurred."
+                  },
+                  "message": {
+                    "type": "string",
+                    "description": "Human-readable description of why the row was rejected."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

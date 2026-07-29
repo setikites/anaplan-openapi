@@ -59,6 +59,18 @@ uv run python scripts/sync_yaml.py <api>/<api>-openapi.json
 uv run python scripts/validate.py <api>/<api>-openapi.json
 ```
 
+The repo also commits two generated agent artifacts per spec. Regenerate them after an
+edit, then confirm nothing drifted:
+
+```sh
+uv run python scripts/make_mcp.py <api>/<api>-openapi.json
+uv run python scripts/make_ptc.py <api>/<api>-openapi.json   # skips 3 excluded APIs
+uv run python scripts/check_generated.py
+```
+
+`make_ptc.py` writes no file for `authentication`, `oauth` or `financial-consolidation`.
+See [docs/mcp-agent-access.md](docs/mcp-agent-access.md) for the reason.
+
 ## Element ordering
 
 All specs must follow the canonical field ordering defined in
