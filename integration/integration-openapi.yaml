@@ -363,7 +363,7 @@ paths:
       description: |-
         Minimum role: Standard User.
 
-        Model-direct alternate URL form — identical behaviour to `/workspaces/{workspaceId}/models/{modelId}/dimensions/{dimensionId}/items` POST.
+        Model-direct alternate URL form — identical behavior to `/workspaces/{workspaceId}/models/{modelId}/dimensions/{dimensionId}/items` POST.
 
         Retrieve the items from a dimension that match one of a list of names or a list or codes.
 
@@ -1323,20 +1323,20 @@ paths:
 
         Sets cell values in a module.
 
-        Ensure the request body is an array of `CellWrite` objects. Each object is for an updated individual cell and its full set of dimensions.
+        Make sure the request body is an array of `CellWrite` objects. Each object is for an updated individual cell and its full set of dimensions.
 
         The response contains a summary of the number of cells updated successfully and the details of why some cells that could not be updated.
 
         **Notes:**
 
-        *   Ensure the user has write access enabled.
-        *   Ensure the request includes all of the required fields.
-        *   Ensure the request has a `value` field that is either a string, number or boolean and is compatible with the line item format/data type.
+        *   Make sure the user has write access enabled.
+        *   Make sure the request includes all of the required fields.
+        *   Make sure the request has a `value` field that is either a string, number or boolean and is compatible with the line item format/data type.
         *   If one cell cannot update, the other cells in the request still continue to update.
         *   Workspace administrators can import data into any cell (except aggregate cells, see below), including read-only and invisible cells.
         *   You can update a maximum of 1000 cells per request. For larger scale writes we recommend you use the import API.
         *   Write cell data does not apply to aggregate cells.
-            *   An aggregate cell is a cell where one of its dimension items has it’s own child items
+            *   An aggregate cell is a cell where one of its dimension items has its own child items
             *   This includes aggregate cells for line Items with breakback enabled
             *   For a line Item that is dimensioned by a composite list, the only writeable cells are the child items, that are defined directly in the dimension list and not defined in a parent list.
         *   In the future, use of this call may be rate limited.
@@ -1654,7 +1654,7 @@ paths:
             *   DELETE_BY_SELECTION
             *   ORDER_HIERARCHY
             *   OPTIMIZER
-        *   To include additional information regarding the import data source in an import action, add the `?showImportDataSource=true` query parameter to the request.
+        *   To include additional information about the import data source in an import action, add the `?showImportDataSource=true` query parameter to the request.
       tags:
       - Model Metadata
       - Action Metadata
@@ -1798,8 +1798,8 @@ paths:
 
         **Notes:**
 
-        *   To apply a switchover date, ensure the `versionID` corresponds to a version in Anaplan that is set to either `forecast` or `variance`.
-        *   Ensure the switchover date is after the existing version switchover date.
+        *   To apply a switchover date, make sure the `versionID` corresponds to a version in Anaplan that is set to either `forecast` or `variance`.
+        *   Make sure the switchover date is after the existing version switchover date.
         *   To reset the switchover date to Blank, pass an empty string in the request body.
         *   In the future, use of this call may be rate limited.
 
@@ -1807,7 +1807,7 @@ paths:
 
         | **JSON element** | **Details** |
         | --- | --- |
-        | `date` | <br><br>*   Required<br>*   Description: An ISO-formatted (YYYY-MM-DD) date string is used to set the switchover date. An empty string resets the switchover date.  <br>    Dates earlier than the current switchover date (for example, `2021-01-01` when the current switchover is `2021-06-01`) or dates outside the current model year return a `400 Bad Request` response.<br>*   Example: `2021-06-01`<br><br> |
+        | `date` | <br><br>*   Required<br>*   Description: An ISO-formatted (YYYY-MM-DD) date string sets the switchover date. An empty string resets the switchover date.  <br>    Dates earlier than the current switchover date (for example, `2021-01-01` when the current switchover is `2021-06-01`) or dates outside the current model year return a `400 Bad Request` response.<br>*   Example: `2021-06-01`<br><br> |
       tags:
       - Transactional Write
       requestBody:
@@ -2772,7 +2772,7 @@ paths:
       description: |-
         Minimum role: Workspace Administrator.
 
-        Workspace-scoped alternate URL form — identical behaviour to `/models/{modelId}/currentPeriod` PUT.
+        Workspace-scoped alternate URL form — identical behavior to `/models/{modelId}/currentPeriod` PUT.
 
         Changes or resets the current period in Anaplan. When this call contains a specified date (for example, 2020-05-20), the API determines what period range contains the specified data and sets that range as the current period.  When the date value is set to blank in this call, the API resets the current period to blank.
 
@@ -3060,7 +3060,7 @@ paths:
       description: |-
         Minimum role: Standard User.
 
-        To run an export, you need the ID of its export definition. You can get a list of the export definitions with their ID for models in your workspace. This enables you to decide on the Export action to carry out. If you already know the ID of the export definition, you can skip this step.
+        To run an export, you need the ID of its export definition. You can get a list of the export definitions with their ID for models in your workspace. This lets you decide on the Export action to carry out. If you already know the ID of the export definition, you can skip this step.
 
         ### Headers
 
@@ -3130,7 +3130,7 @@ paths:
       description: |-
         Minimum role: Standard User.
 
-        You can use the API obtain metadata for an export definition using its ID, such as its column names, data types and export format.
+        Gets metadata for an export definition using its ID, such as its column names, data types and export format.
 
         *   If the export has its line items in columns, `dataTypes` shows the types. `"ENTITY"` is any member of a List.
         *   If the export has its line items in rows or pages, Anaplan does not know the types and `dataTypes` shows `"MIXED"`.
@@ -4902,7 +4902,7 @@ paths:
         | Update code  <br>(removing existing code) | id=id1  <br>name=n1  <br>code=c1 | id=id1  <br>name=n1  <br>code="" | This scenario does not provide a new code to replace the existing value. An error returns. | error: `INCOMPLETE_DATA` |
         | Update code without an existing code  <br>(assign a code without the id) | name=n1 | name=n1  <br>code=c1 | Success | name=n1  <br>code=c1 |
         | Update code with same name | name=n1  <br>code=c1 | name=n1  <br>code=c2 | The name is already used. An error returns. | error: `INCOMPLETE_DATA` |
-        | Update value with code only | name=n1  <br>code=c1  <br>properties{p1=1234} | code=c1  <br>properties{p1=1234} | Success  <br>It's valid to use the code to identify the record. | code=c1  <br>properties {p1=4321} |
+        | Update value with code only | name=n1  <br>code=c1  <br>properties{p1=1234} | code=c1  <br>properties{p1=1234} | Success  <br>It is valid to use the code to identify the record. | code=c1  <br>properties {p1=4321} |
         | Update value with name only.  <br>Do not specify the code | name=n1  <br>code=c1  <br>properties{p1=1234} | name=n1  <br>properties{p1=1234} | The code is required to identify the record. An error returns. | error: `INCOMPLETE_DATA` |
         | Update value with name only | name=n1  <br>properties{p1=1234} | name=n1  <br>properties{p1=4321} | Success  <br>When the code is not defined, the API can still update with the name. | name=n1  <br>properties{p1=4321} |
 
@@ -4973,7 +4973,7 @@ paths:
       description: |-
         Minimum role: Standard User.
 
-        Initiates an asynchronous read of all items in the specified list. Poll the returned `url` until `requestState` is COMPLETE, then retrieve pages via the pages sub-resource.
+        Starts an asynchronous read of all items in the specified list. Poll the returned `url` until `requestState` is COMPLETE, then retrieve pages via the pages sub-resource.
       tags:
       - Transactional Read
       responses:
@@ -5526,7 +5526,7 @@ paths:
         *   `result` is a JSON object that indicates whether a failure dump file was created, the `objectID`, and whether the task succeeded.
         *   `failureDumpAvailable` indicates whether this process container or an action within it has a failure dump file. **Note:** For a deletion action, `failureDumpAvailable` is always false.
         *   `nestedResults` indicates whether the actions carried out in the process were successful. This contains details in the form of a JSON array, which also contains some debug information when failures occur. Get the failure dump file to view the complete debug information.
-        *   `objectID` is the identifier of the process task or a task that it includes. For instance, if `nestedResults` has `failureDumpAvailable` true, you need the `objectID` within that section to obtain the related 'dump' file.
+        *   `objectID` is the identifier of the process task or a task that it includes. For instance, if `nestedResults` has `failureDumpAvailable` true, you need the `objectID` within that section to get the related 'dump' file.
         *   `taskID` is the ID that you specified in the request.
 
 
@@ -5842,11 +5842,11 @@ paths:
     - $ref: '#/components/parameters/ModelId'
     - $ref: '#/components/parameters/ViewId'
     post:
-      summary: Initiate long read request
+      summary: Start long read request
       description: |-
         Minimum role: Standard User.
 
-        Starts a large-volume read request of view data. This enables you to read data from views that are larger than a million cell count.
+        Starts a large-volume read request of view data. This lets you read data from views that are larger than a million cell count.
 
         **Note:**
 
@@ -5860,7 +5860,7 @@ paths:
         | --- | --- | --- |
         | `GRID_ALL_PAGES` | This layout respects the existing sorting and filtering you have imposed on a data grid before you launch the export. | [Export grid](https://help.anaplan.com/Import_and_Export/Export_Layouts/Export_Data_in_Grid_Layout.html) |
         | `TABULAR_SINGLE_ITEMS` | This layout takes all dimensions and puts them in columns, with the final column reserved for data. | [Export tabular single column](https://help.anaplan.com/Import_and_Export/Export_Layouts/Export_Data_in_Tabular_Single_Column_Layout.html) |
-        | `TABULAR_MULTI_COLUMN` | This layout enables you to export multiple data columns. If you set up a Boolean line item, you can use it as a filter to control which data is exported. This is especially useful when exporting from large modules. It saves the manual task of marking data cells for export. | [Export Tabular Multiple Column](https://help.anaplan.com/Import_and_Export/Export_Layouts/Export_Data_in_Tabular_Multiple_Column_Layout.html) |
+        | `TABULAR_MULTI_COLUMN` | This layout lets you export multiple data columns. If you set up a Boolean line item, you can use it as a filter to control which data is exported. This is especially useful when exporting from large modules. It saves the manual task of marking data cells for export. | [Export Tabular Multiple Column](https://help.anaplan.com/Import_and_Export/Export_Layouts/Export_Data_in_Tabular_Multiple_Column_Layout.html) |
       tags:
       - Transactional Read
       responses:
@@ -5907,12 +5907,12 @@ paths:
 
         *   When `requestState` is `COMPLETE` and `successful` is `true` , the export has completed successfully and the user can download all the pages.
         *   When `requestState` is `IN_PROGRESS` and `successful` is `false`, the export has not yet completed. You can download the available pages indicated by the `availablePages` field.
-        *   When `requestState` is `COMPLETE` and `successful` is `false`, this means the export failed. Retry and initiate a new export.
+        *   When `requestState` is `COMPLETE` and `successful` is `false`, this means the export failed. Retry and start a new export.
         *   When 'requestState' is 'NOT_STARTED' then simply check the status again.
         *   When requestState' is 'CANCELLED' then this request is completed by a 'DELETE' call.
 
 
-        We recommend you delete the last failed export before initiating a new export, using the delete export endpoint.
+        We recommend you delete the last failed export before you start a new export, using the delete export endpoint.
       tags:
       - Transactional Read
       responses:
@@ -5962,7 +5962,7 @@ paths:
       - Transactional Read
       responses:
         '200':
-          description: Read request cancelled or removed. Pages cleared from the file store.
+          description: Read request canceled or removed. Pages cleared from the file store.
           content:
             application/json:
               schema:

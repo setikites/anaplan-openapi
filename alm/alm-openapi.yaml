@@ -281,7 +281,7 @@ paths:
       description: |-
         Minimum role: Workspace Administrator.
 
-        Initiates a sync task to apply a source model revision to the target model.
+        Starts a sync task to apply a source model revision to the target model.
       operationId: createSyncTask
       x-anaplan-min-role: Workspace Administrator
       requestBody:

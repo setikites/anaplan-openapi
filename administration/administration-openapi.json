@@ -3,7 +3,7 @@
   "info": {
     "title": "Anaplan Administration API",
     "version": "1.0.0",
-    "description": "Bulk user management for an Anaplan tenant. Supports importing users from a CSV file and exporting all users to CSV.\n\nAuthentication: `AnaplanAuthToken` header, using a token obtained from the Authentication API or an OAuth Authorization Code access token."
+    "description": "Bulk user management for an Anaplan tenant. Supports importing users from a CSV file and exporting all users to CSV.\n\nAuthentication: `AnaplanAuthToken` header, using a token from the Authentication API or an OAuth Authorization Code access token."
   },
   "servers": [
     {

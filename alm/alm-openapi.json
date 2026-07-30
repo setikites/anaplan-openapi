@@ -400,7 +400,7 @@
       },
       "post": {
         "summary": "Create an ALM model sync task",
-        "description": "Minimum role: Workspace Administrator.\n\nInitiates a sync task to apply a source model revision to the target model.",
+        "description": "Minimum role: Workspace Administrator.\n\nStarts a sync task to apply a source model revision to the target model.",
         "operationId": "createSyncTask",
         "x-anaplan-min-role": "Workspace Administrator",
         "requestBody": {

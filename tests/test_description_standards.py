@@ -1118,6 +1118,102 @@ def test_no_use_this_call_preamble():
     )
 
 
+_LONG_WORDS: list[tuple[re.Pattern, str]] = [
+    (re.compile(r"\bobtain\w*\b", re.IGNORECASE), "get"),
+    (re.compile(r"\binitiat\w*\b", re.IGNORECASE), "start"),
+    (re.compile(r"\benables? you to\b", re.IGNORECASE), "lets you"),
+    (re.compile(r"\bensur\w*\b", re.IGNORECASE), "make sure"),
+    (re.compile(r"\bregarding\b", re.IGNORECASE), "about"),
+    (re.compile(r"\b(?:is|are) used to\b", re.IGNORECASE), "the verb alone"),
+]
+
+
+def test_no_long_words_in_prose():
+    """No description or summary sentence may use a long word with a short synonym (ADR 0007 §1).
+
+    An LLM that reads 'enables you to initiate a process' has to map the phrase
+    back to 'starts a process'. The short word removes that step.
+    """
+    violations = [
+        f"  [{spec}] {json_path}\n    {match.group()!r} — use {short!r}\n    {sentence!r}"
+        for spec, json_path, sentence in iter_prose_sentences()
+        for pattern, short in _LONG_WORDS
+        for match in [pattern.search(sentence)]
+        if match
+    ]
+    assert not violations, (
+        f"{len(violations)} long word(s) found in description or summary prose\n"
+        f"(ADR 0007 §1 — short common words):\n" + "\n".join(violations)
+    )
+
+
+# A contraction is an apostrophe followed by a verb remnant, or one of the few
+# pronoun + 's' forms. The possessive 's is exempt (ADR 0007 §2), so 'model's'
+# and 'user's' must pass. Both the straight and the curly apostrophe count.
+_CONTRACTION_RE = re.compile(
+    r"(?:\w['’](?:t|re|ve|ll|m|d)\b"
+    r"|\b(?:it|that|there|here|what|who|let|he|she)['’]s\b)",
+    re.IGNORECASE,
+)
+
+
+def test_no_contractions_in_prose():
+    """No description or summary sentence may use a contraction (ADR 0007 §1).
+
+    Write 'does not', not 'doesn't'. The possessive 's is not a contraction
+    (ADR 0007 §2): 'the model's calendar' passes.
+    """
+    violations = [
+        f"  [{spec}] {json_path}\n    {match.group()!r}\n    {sentence!r}"
+        for spec, json_path, sentence in iter_prose_sentences()
+        for match in [_CONTRACTION_RE.search(sentence)]
+        if match
+    ]
+    assert not violations, (
+        f"{len(violations)} contraction(s) found in description or summary prose\n"
+        f"(ADR 0007 §1 — write the words out in full):\n" + "\n".join(violations)
+    )
+
+
+def test_contraction_sweep_accepts_possessives():
+    """The contraction pattern must accept a possessive and reject a contraction."""
+    assert not _CONTRACTION_RE.search("Must match the model's workspace.")
+    assert not _CONTRACTION_RE.search("Components of the user’s real name.")
+    assert _CONTRACTION_RE.search("It's valid to use the code.")
+    assert _CONTRACTION_RE.search("The cell has it’s own child items.")
+    assert _CONTRACTION_RE.search("The task doesn't run.")
+
+
+# Case-sensitive: the API tokens CANCELLED and CANCELLING are enum values, not
+# prose (ADR 0007 §2), and an all-caps token must not fail this sweep.
+_BRITISH_SPELLINGS: list[tuple[re.Pattern, str]] = [
+    (re.compile(r"\b[Bb]ehaviour\w*\b"), "behavior"),
+    (re.compile(r"\b[Cc]ancell(?:ed|ing)\b"), "canceled / canceling"),
+]
+
+
+def test_no_british_spellings_in_prose():
+    """No description or summary sentence may use a British spelling (ADR 0007 §1)."""
+    violations = [
+        f"  [{spec}] {json_path}\n    {match.group()!r} — use {american!r}\n    {sentence!r}"
+        for spec, json_path, sentence in iter_prose_sentences()
+        for pattern, american in _BRITISH_SPELLINGS
+        for match in [pattern.search(sentence)]
+        if match
+    ]
+    assert not violations, (
+        f"{len(violations)} British spelling(s) found in description or summary prose\n"
+        f"(ADR 0007 §1 — American spelling):\n" + "\n".join(violations)
+    )
+
+
+def test_british_spelling_sweep_skips_enum_tokens():
+    """The spelling pattern must reject prose but accept the CANCELLED enum token."""
+    assert not any(p.search("The task state becomes CANCELLED.") for p, _ in _BRITISH_SPELLINGS)
+    assert any(p.search("Read request cancelled or removed.") for p, _ in _BRITISH_SPELLINGS)
+    assert any(p.search("Identical behaviour to POST.") for p, _ in _BRITISH_SPELLINGS)
+
+
 def test_prose_extraction_yields_summaries_and_paths():
     """Operation summaries must be extracted, and each sentence must carry its JSON path."""
     rows = list(iter_prose_sentences())

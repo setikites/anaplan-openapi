@@ -3222,7 +3222,7 @@
                         "type": "string"
                       },
                       "triggerSource": {
-                        "description": "What caused this run: `scheduled` (integration's own schedule), `manual` (user-initiated), or `scheduled_inf` (triggered by an integration flow schedule).",
+                        "description": "What caused this run: `scheduled` (integration's own schedule), `manual` (started by a user), or `scheduled_inf` (triggered by an integration flow schedule).",
                         "type": "string",
                         "enum": [
                           "scheduled",

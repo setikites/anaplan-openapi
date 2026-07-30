@@ -5,7 +5,7 @@ info:
   description: |-
     Bulk user management for an Anaplan tenant. Supports importing users from a CSV file and exporting all users to CSV.
 
-    Authentication: `AnaplanAuthToken` header, using a token obtained from the Authentication API or an OAuth Authorization Code access token.
+    Authentication: `AnaplanAuthToken` header, using a token from the Authentication API or an OAuth Authorization Code access token.
 servers:
 - url: https://api.anaplan.com/admin/1/0
   description: Production (US1, US2, US5, US7, EU1, EU2, EU4, AP1 and other legacy regions sharing the non-prefixed host)
