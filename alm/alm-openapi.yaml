@@ -238,7 +238,7 @@ paths:
       description: |-
         Minimum role: Workspace Administrator.
 
-        Returns all models that have had this revision applied. Deleted models are included with `modelDeleted: true`; their `modelName` and `workspaceId` are omitted.
+        Returns all models that have had this revision applied. Deleted models are included with `modelDeleted: true`. Their `modelName` and `workspaceId` are omitted.
 
         The first model in this list is the source model where revisions are created. Any model in this list can be a `sourceModelId` for discovering this revision (using `GET /models/{modelId}/alm/syncableRevisions`) and syncing it (using `POST /models/{modelId}/alm/syncTasks`).
       operationId: getAppliedToModels
@@ -400,7 +400,7 @@ paths:
 
         Downloads the full comparison report as a tab-separated values (TSV) file. The report is available for 48 hours after generation and includes sections for: Lists Added, Modules Added, Roles Changed, Changes Within Lists, and Line Items Added.
 
-        **HIGH VOLUME** — the full report is returned whole in one non-paginated response (observed ~147 KB) and can be larger; there is no paging. Fetch it only when you need the complete diff.
+        **HIGH VOLUME** — the full report is returned whole in one non-paginated response (observed ~147 KB) and can be larger. There is no paging. Fetch it only when you need the complete diff.
       operationId: getComparisonReport
       x-anaplan-min-role: Workspace Administrator
       responses:
@@ -611,8 +611,8 @@ components:
           $ref: '#/components/schemas/TaskResult'
     TaskResult:
       type: object
-      description: Outcome of an async task. Check `successful` first; if false, `error` contains details. On successful report
-        tasks, `reportFileUrl` is populated with a download URL.
+      description: Outcome of an async task. Check `successful` first. If it is false, `error` contains details. On successful
+        report tasks, `reportFileUrl` is populated with a download URL.
       properties:
         successful:
           type: boolean
@@ -681,7 +681,7 @@ components:
           type: integer
     Status:
       type: object
-      description: Anaplan API response status. The code mirrors the HTTP status code; the message is a human-readable outcome
+      description: Anaplan API response status. The code mirrors the HTTP status code. The message is a human-readable outcome
         string.
       properties:
         code:

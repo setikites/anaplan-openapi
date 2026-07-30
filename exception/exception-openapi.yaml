@@ -44,7 +44,7 @@ paths:
     parameters:
     - name: userGuid
       in: path
-      description: GUID of the user whose exception-user status is being changed; the same value as the Anaplan user ID. From
+      description: GUID of the user whose exception-user status changes. This value is the same as the Anaplan user ID. From
         `GET /users` (or `GET /users/me` for your own GUID) in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2).
       required: true
       schema:
@@ -80,8 +80,13 @@ paths:
         '204':
           description: Request processed successfully. No response body.
         '400':
-          description: 'Bad request. Possible causes: missing or invalid `op` value; missing or invalid `workspaceGuid`; workspace
-            is not SSO-enabled; requested user not found in workspace.'
+          description: |-
+            Bad request. Possible causes:
+
+            - The `op` value is missing or invalid.
+            - The `workspaceGuid` value is missing or invalid.
+            - The workspace is not SSO-enabled.
+            - The requested user is not found in the workspace.
           content:
             application/json:
               schema:
@@ -152,8 +157,11 @@ paths:
                   - userGuid: b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e6
                     email: bob@example.com
         '400':
-          description: 'Bad request. Possible causes: neither `workspaceGuid` nor `userGuid` provided (search criteria not
-            provided); invalid field values.'
+          description: |-
+            Bad request. Possible causes:
+
+            - Neither `workspaceGuid` nor `userGuid` is provided, so there are no search criteria.
+            - A field value is invalid.
           content:
             application/json:
               schema:
@@ -209,7 +217,7 @@ components:
           enum:
           - assign
           - unassign
-          description: 'Operation to perform: `assign` grants exception-user access; `unassign` revokes it.'
+          description: Operation to perform. `assign` grants exception-user access. `unassign` revokes it.
         workspaceGuid:
           type: string
           pattern: ^[0-9a-f]{32}$

@@ -414,7 +414,7 @@
           "client_secret": {
             "type": "string",
             "example": "XPkIavE7K0d",
-            "description": "Client secret. Required for Authorization Code Grant clients; omit for Device Grant clients."
+            "description": "Client secret. Required for Authorization Code Grant clients. Omit it for Device Grant clients."
           }
         }
       },

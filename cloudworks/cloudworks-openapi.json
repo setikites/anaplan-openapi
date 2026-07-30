@@ -83,17 +83,17 @@
                             "type": "integer"
                           },
                           "integrationErrorCode": {
-                            "description": "Error code set when `status` is 0; null when the connection is healthy.",
+                            "description": "Error code set when `status` is 0. The value is null when the connection is healthy.",
                             "type": "integer",
                             "nullable": true
                           },
                           "workspaceId": {
-                            "description": "Anaplan workspace ID for restricted-user connections; null for unrestricted connections.",
+                            "description": "Anaplan workspace ID for restricted-user connections. The value is null for unrestricted connections.",
                             "type": "string",
                             "nullable": true
                           },
                           "authMethod": {
-                            "description": "Authentication method used by this connection (denormalized from `body.authMethod`). `\"SAS-based\"` for SAS-token connections; null for connections created before this field was introduced.",
+                            "description": "Authentication method used by this connection (denormalized from `body.authMethod`). `\"SAS-based\"` for SAS-token connections. The value is null for connections created before this field was introduced.",
                             "type": "string",
                             "nullable": true
                           }
@@ -554,7 +554,7 @@
     "/integrations": {
       "get": {
         "summary": "Get all integrations — the list view carries no `jobs`, so no connection references",
-        "description": "Minimum role: Restricted Integration User.\n\nRetrieve all integrations. Returns 25 integrations if `offset` and `limit` are not provided.\n\nItems are `IntegrationSummary`: no `jobs`, therefore no `connectionId` anywhere in the response. Mapping connections to integrations costs one `getIntegrationById` call per integration; there is no bulk form.",
+        "description": "Minimum role: Restricted Integration User.\n\nRetrieve all integrations. Returns 25 integrations if `offset` and `limit` are not provided.\n\nItems are `IntegrationSummary`: no `jobs`, therefore no `connectionId` anywhere in the response. Mapping connections to integrations costs one `getIntegrationById` call per integration. There is no bulk form.",
         "operationId": "getIntegrations",
         "x-anaplan-min-role": "Restricted Integration User",
         "tags": [
@@ -720,7 +720,7 @@
                   },
                   "jobs": {
                     "type": "array",
-                    "description": "Import/export job definitions. Required for import/export integrations; optional for process integrations.",
+                    "description": "Import and export job definitions. Required for import and export integrations. Optional for process integrations.",
                     "items": {
                       "$ref": "#/components/schemas/Job"
                     }
@@ -920,7 +920,7 @@
       ],
       "get": {
         "summary": "Get integrations by model ID",
-        "description": "Minimum role: Restricted Integration User.\n\n**Deprecated:** This endpoint is no longer served — it returns an HTTP 404 from the gateway for any modelId, under every role. Retained in the spec for historical completeness; do not call it. See cloudworks/README.md for details.",
+        "description": "Minimum role: Restricted Integration User.\n\n**Deprecated:** This endpoint is no longer served — it returns an HTTP 404 from the gateway for any modelId, under every role. Retained in the spec for historical completeness. Do not call it. See cloudworks/README.md for details.",
         "operationId": "getIntegrationsByModel",
         "x-anaplan-min-role": "Restricted Integration User",
         "tags": [
@@ -1275,11 +1275,11 @@
                           ]
                         },
                         "processId": {
-                          "description": "Anaplan process ID; present only for Process integrations.",
+                          "description": "Anaplan process ID. Present only for Process integrations.",
                           "type": "string"
                         },
                         "version": {
-                          "description": "Integration schema version; currently \"2.0\".",
+                          "description": "Integration schema version. The current value is \"2.0\".",
                           "type": "string"
                         },
                         "schedule": {
@@ -1839,7 +1839,7 @@
                                   "stop",
                                   "continue"
                                 ],
-                                "description": "Default for `failure` is `stop`; default for `partial_success` is `continue`."
+                                "description": "Default for `failure` is `stop`. Default for `partial_success` is `continue`."
                               }
                             }
                           }
@@ -2315,7 +2315,7 @@
             "example": "Europe/Paris"
           },
           "status": {
-            "description": "Schedule enabled/disabled state. Present in GET responses; not required in create/update requests.",
+            "description": "Schedule enabled/disabled state. Present in GET responses. Not required in create or update requests.",
             "type": "string",
             "enum": [
               "Active",
@@ -2346,7 +2346,7 @@
           },
           "processId": {
             "type": "string",
-            "description": "Anaplan process ID (numeric string); present only for `Process` integrations.",
+            "description": "Anaplan process ID (numeric string). Present only for `Process` integrations.",
             "example": "118000000114"
           },
           "workspaceId": {
@@ -2373,7 +2373,7 @@
             "type": "string"
           },
           "latestRun": {
-            "description": "Details of the most recent run; absent if the integration has never been run.",
+            "description": "Details of the most recent run. Absent if the integration has never been run.",
             "type": "object",
             "properties": {
               "triggeredBy": {
@@ -2407,7 +2407,7 @@
                 "example": 12
               },
               "triggerSource": {
-                "description": "What triggered this run. `scheduled` = integration's own schedule; `manual` = user-initiated from the CloudWorks UI or API; `scheduled_inf` = triggered by an integration flow's schedule; `manual_inf` = manually triggered from within an integration flow; `nux_dashboard` = triggered from the CloudWorks NUX dashboard.",
+                "description": "What triggered this run.\n\n- `scheduled`: the integration's own schedule.\n- `manual`: a user, from the CloudWorks UI or the API.\n- `scheduled_inf`: the schedule of an integration flow.\n- `manual_inf`: a user, from within an integration flow.\n- `nux_dashboard`: the CloudWorks NUX dashboard.",
                 "type": "string",
                 "enum": [
                   "scheduled",
@@ -2450,7 +2450,7 @@
                 "type": "string"
               },
               "version": {
-                "description": "Integration schema version; currently \"2.0\".",
+                "description": "Integration schema version. The current value is \"2.0\".",
                 "type": "string"
               },
               "jobs": {
@@ -2560,7 +2560,7 @@
             ]
           },
           "notifications": {
-            "description": "Notification rules; each entry in config maps an outcome type to the users to notify.",
+            "description": "Notification rules. Each entry in config maps an outcome type to the users to notify.",
             "type": "object",
             "required": [
               "config"
@@ -2714,7 +2714,7 @@
             "type": "integer"
           },
           "latestRun": {
-            "description": "Details of the most recent run; absent if the flow has never been run.",
+            "description": "Details of the most recent run. Absent if the flow has never been run.",
             "type": "object",
             "properties": {
               "triggeredBy": {
@@ -2764,7 +2764,7 @@
             "type": "object",
             "properties": {
               "version": {
-                "description": "Schema version; currently \"2.0\".",
+                "description": "Schema version. The current value is \"2.0\".",
                 "type": "string",
                 "example": "2.0"
               },
@@ -2868,7 +2868,7 @@
                           "type": "string"
                         },
                         "executionErrorCode": {
-                          "description": "Error code if the step failed; null on success. Code 38 indicates partial success.",
+                          "description": "Error code if the step failed. The value is null on success. Code 38 indicates partial success.",
                           "type": "integer",
                           "nullable": true
                         },
@@ -2937,7 +2937,7 @@
         }
       },
       "Conflict": {
-        "description": "Conflict. Common causes: integration already running (409); integration not in a running state, so there is nothing to cancel (409); tenant integration count exceeded (409); resource is being referenced (409).",
+        "description": "Conflict. Common causes:\n\n- The integration is already running.\n- The integration is not in a running state, so there is nothing to cancel.\n- The tenant integration count is exceeded.\n- The resource is referenced by another object.",
         "content": {
           "application/json": {
             "schema": {
@@ -2957,7 +2957,7 @@
         }
       },
       "ServiceUnavailable": {
-        "description": "Service unavailable. Common causes: invalid workspace or model ID (503); integration trigger error (503).",
+        "description": "Service unavailable. Common causes:\n\n- The workspace ID or the model ID is invalid.\n- The integration trigger failed.",
         "content": {
           "application/json": {
             "schema": {

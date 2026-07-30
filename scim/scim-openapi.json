@@ -3,7 +3,7 @@
   "info": {
     "title": "Anaplan SCIM API",
     "version": "1.0.0",
-    "description": "Anaplan implementation of SCIM 2.0 (RFC 7644) for user identity management. Supports Users and Anaplan-specific entitlements only; Groups are not implemented."
+    "description": "Anaplan implementation of SCIM 2.0 (RFC 7644) for user identity management. Supports Users and Anaplan-specific entitlements only. Groups are not implemented."
   },
   "servers": [
     {
@@ -77,7 +77,7 @@
           {
             "name": "filter",
             "in": "query",
-            "description": "SCIM filter expression. The Anaplan implementation supports only a subset; unsupported operators or attributes return 400 with scimType `invalidValue`.\n\n**Operators:** `eq`, `ne`, `pr`, `gt`, `ge`, `lt`, `le`.\n\n**Logical operators / grouping:** `and`, `or`, and precedence grouping with `( )` (including nested groups).\n\n**Filterable attributes:** `userName`, `active`, `id`, `externalId`, and `name` sub-attributes via dot notation such as `name.familyName`.",
+            "description": "SCIM filter expression. The Anaplan implementation supports only a subset. Unsupported operators or attributes return 400 with scimType `invalidValue`.\n\n**Operators:** `eq`, `ne`, `pr`, `gt`, `ge`, `lt`, `le`.\n\n**Logical operators / grouping:** `and`, `or`, and precedence grouping with `( )` (including nested groups).\n\n**Filterable attributes:** `userName`, `active`, `id`, `externalId`, and `name` sub-attributes via dot notation such as `name.familyName`.",
             "schema": {
               "type": "string",
               "example": "userName eq \"john@example.com\""
@@ -233,7 +233,7 @@
         {
           "name": "id",
           "in": "path",
-          "description": "Anaplan-assigned hex-32 GUID of the user — the same value as the Anaplan user ID. From `GET /Users` (`Resources[].id`); if SCIM access is unavailable, the same GUID comes from `GET /users` or `GET /users/me` in the Integration API.",
+          "description": "Anaplan-assigned hex-32 GUID of the user — the same value as the Anaplan user ID. From `GET /Users` (`Resources[].id`). If SCIM access is unavailable, the same GUID comes from `GET /users` or `GET /users/me` in the Integration API.",
           "required": true,
           "schema": {
             "type": "string",
@@ -292,7 +292,7 @@
       },
       "put": {
         "summary": "Replace user",
-        "description": "Minimum role: User Administrator.\n\nPerforms a full replacement of a user resource. All mutable attributes must be provided; omitted attributes are cleared.",
+        "description": "Minimum role: User Administrator.\n\nPerforms a full replacement of a user resource. All mutable attributes must be provided. Omitted attributes are cleared.",
         "operationId": "replaceUser",
         "x-anaplan-min-role": "User Administrator",
         "requestBody": {
@@ -704,7 +704,7 @@
           },
           "externalId": {
             "type": "string",
-            "description": "Unique identifier assigned by the provisioning client. Format is caller-controlled; no pattern constraint."
+            "description": "Unique identifier assigned by the provisioning client. Format is caller-controlled. There is no pattern constraint."
           },
           "userName": {
             "type": "string",
@@ -770,7 +770,7 @@
               "properties": {
                 "value": {
                   "type": "string",
-                  "description": "The target resource ID of the entitlement. For `WORKSPACE` type this is a workspace GUID from `GET /workspaces` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2) (`workspaces[].id`); for `WORKSPACE_IDS` it is a comma-delimited list of those GUIDs.",
+                  "description": "The target resource ID of the entitlement. For `WORKSPACE` type this is a workspace GUID from `GET /workspaces` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2) (`workspaces[].id`). For `WORKSPACE_IDS` it is a comma-delimited list of those GUIDs.",
                   "example": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4"
                 },
                 "display": {
@@ -780,7 +780,7 @@
                 },
                 "type": {
                   "type": "string",
-                  "description": "Entitlement grouping format. `WORKSPACE` — one object per workspace (use this when writing); `WORKSPACE_IDS` — single object whose `value` is a comma-delimited list of workspace GUIDs; `WORKSPACE_NAMES` — single object whose `value` is a comma-delimited list of workspace names. Responses typically include all three variants for the same workspace set.",
+                  "description": "Entitlement grouping format.\n\n- `WORKSPACE`: one object per workspace. Use this form when writing.\n- `WORKSPACE_IDS`: a single object. Its `value` is a comma-delimited list of workspace GUIDs.\n- `WORKSPACE_NAMES`: a single object. Its `value` is a comma-delimited list of workspace names.\n\nResponses typically include all three variants for the same workspace set.",
                   "enum": [
                     "WORKSPACE",
                     "WORKSPACE_IDS",
@@ -819,7 +819,7 @@
         "properties": {
           "schemas": {
             "type": "array",
-            "description": "List of SCIM schema URNs declaring the envelope type; always `[\"urn:ietf:params:scim:api:messages:2.0:ListResponse\"]`.",
+            "description": "List of SCIM schema URNs declaring the envelope type. The value is always `[\"urn:ietf:params:scim:api:messages:2.0:ListResponse\"]`.",
             "items": {
               "type": "string"
             }
@@ -854,7 +854,7 @@
         "properties": {
           "schemas": {
             "type": "array",
-            "description": "List of SCIM schema URNs declaring the error type; always `[\"urn:ietf:params:scim:api:messages:2.0:Error\"]`.",
+            "description": "List of SCIM schema URNs declaring the error type. The value is always `[\"urn:ietf:params:scim:api:messages:2.0:Error\"]`.",
             "items": {
               "type": "string"
             }
@@ -884,7 +884,7 @@
         "properties": {
           "schemas": {
             "type": "array",
-            "description": "List of SCIM schema URNs declaring the patch request type; must include `urn:ietf:params:scim:api:messages:2.0:PatchOp`.",
+            "description": "List of SCIM schema URNs declaring the patch request type. The value must include `urn:ietf:params:scim:api:messages:2.0:PatchOp`.",
             "items": {
               "type": "string"
             }

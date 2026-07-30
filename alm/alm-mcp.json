@@ -309,7 +309,7 @@
       "get": {
         "operationId": "getAppliedToModels",
         "summary": "List models an ALM revision has been applied to",
-        "description": "Minimum role: Workspace Administrator.\n\nReturns all models that have had this revision applied. Deleted models are included with `modelDeleted: true`; their `modelName` and `workspaceId` are omitted.\n\nThe first model in this list is the source model where revisions are created. Any model in this list can be a `sourceModelId` for discovering this revision (using `GET /models/{modelId}/alm/syncableRevisions`) and syncing it (using `POST /models/{modelId}/alm/syncTasks`).",
+        "description": "Minimum role: Workspace Administrator.\n\nReturns all models that have had this revision applied. Deleted models are included with `modelDeleted: true`. Their `modelName` and `workspaceId` are omitted.\n\nThe first model in this list is the source model where revisions are created. Any model in this list can be a `sourceModelId` for discovering this revision (using `GET /models/{modelId}/alm/syncableRevisions`) and syncing it (using `POST /models/{modelId}/alm/syncTasks`).",
         "responses": {
           "200": {
             "description": "List of models the revision has been applied to."
@@ -487,7 +487,7 @@
       "get": {
         "operationId": "getComparisonReport",
         "summary": "Retrieve full ALM revision comparison report content (large responses \u2014 see description)",
-        "description": "Minimum role: Workspace Administrator.\n\nDownloads the full comparison report as a tab-separated values (TSV) file. The report is available for 48 hours after generation and includes sections for: Lists Added, Modules Added, Roles Changed, Changes Within Lists, and Line Items Added.\n\n**HIGH VOLUME** \u2014 the full report is returned whole in one non-paginated response (observed ~147 KB) and can be larger; there is no paging. Fetch it only when you need the complete diff.",
+        "description": "Minimum role: Workspace Administrator.\n\nDownloads the full comparison report as a tab-separated values (TSV) file. The report is available for 48 hours after generation and includes sections for: Lists Added, Modules Added, Roles Changed, Changes Within Lists, and Line Items Added.\n\n**HIGH VOLUME** \u2014 the full report is returned whole in one non-paginated response (observed ~147 KB) and can be larger. There is no paging. Fetch it only when you need the complete diff.",
         "responses": {
           "200": {
             "description": "Comparison report file (TSV)."

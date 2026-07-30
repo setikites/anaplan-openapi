@@ -67,7 +67,7 @@
     "/models": {
       "get": {
         "summary": "List user models (large responses — see description)",
-        "description": "Minimum role: Standard User.\n\nRetrieves information about all models in the user's default tenant.\n\nModels with `activeState` of `ARCHIVED` are typically inactive and not actionable; filter them out of results (keep only `activeState` != `ARCHIVED`) unless you specifically need archived models.\n\n**HIGH VOLUME** — this returns every model in the user's default tenant in one merged response; with no `limit` a client that auto-follows `meta.paging` combines every page and can overflow its token budget. Reduce volume by passing an explicit `limit` and paging with `offset`, by scoping server-side (the `s=` search filter, or the workspace-scoped `GET /workspaces/{workspaceId}/models` list) instead of full enumeration, and/or by using `search` to locate the specific op/params rather than pulling the whole collection.",
+        "description": "Minimum role: Standard User.\n\nRetrieves information about all models in the user's default tenant.\n\nModels with `activeState` of `ARCHIVED` are typically inactive and not actionable. Filter them out of results (keep only `activeState` != `ARCHIVED`) unless you specifically need archived models.\n\n**HIGH VOLUME** — this returns every model in the user's default tenant in one merged response. With no `limit` a client that auto-follows `meta.paging` combines every page and can overflow its token budget. Reduce volume by passing an explicit `limit` and paging with `offset`, by scoping server-side (the `s=` search filter, or the workspace-scoped `GET /workspaces/{workspaceId}/models` list) instead of full enumeration, and/or by using `search` to locate the specific op/params rather than pulling the whole collection.",
         "tags": [
           "General Workspace & Model Metadata"
         ],
@@ -87,7 +87,7 @@
           {
             "name": "sort",
             "in": "query",
-            "description": "Sort results. `+field` ascending, `-field` descending; prefix required and field name validated (bad or unknown field returns 400). Comma-separate to sort by multiple columns. Sortable fields: name, activeState.",
+            "description": "Sort results. `+field` ascending, `-field` descending. The prefix is required and the field name is validated (bad or unknown field returns 400). Comma-separate to sort by multiple columns. Sortable fields: name, activeState.",
             "schema": {
               "type": "string"
             },
@@ -194,7 +194,7 @@
           {
             "name": "sort",
             "in": "query",
-            "description": "Sort results. `+field` or unprefixed ascending, `-field` descending; comma-separate for multiple columns. `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order. Example: `+name`, `-id`.",
+            "description": "Sort results. `+field` or unprefixed ascending, `-field` descending. Comma-separate for multiple columns. `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order. Example: `+name`, `-id`.",
             "schema": {
               "type": "string"
             },
@@ -321,7 +321,7 @@
       },
       "put": {
         "summary": "Set current period",
-        "description": "Minimum role: Workspace Administrator.\n\nUse this call to change or reset the current period in Anaplan. When this call contains a specified date (for example, 2020-05-20), the API determines what period range contains the specified data and sets that range as the current period.  When the date value is set to blank in this call, the API resets the current period to blank.\n\n**Warning**: A change to your time settings is a potentially destructive action and may lead to data loss.  The new range of time periods may not include previous time periods. Any data in the removed time periods is deleted from the model.\n\n**Notes**:\n\n*   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response\n\n### Request body\n\n| **Body** | **Details** |\n| --- | --- |\n| `{date}` | <br><br>*   Required<br>*   Type: String<br>*   Description: The date to use to set, or reset, the current period. The date format is YYYY-MM-DD.  <br>    If the `date` parameter is left blank (for example, `/currentperiod?date=`) the current period resets.  <br>    If the date is not provided in the YYYY-MM-DD format, the call returns a `400 Bad Request` response with this message: `Invalid ISO date format '{date}'. Date should match format YYYY-MM-DD`  <br>    If this value falls outside of a valid range, the call returns a `400 Bad Request` response with this message: `Specified date '{date}' is out of timescale range {start of timescale} - {end of timescale}`.<br>*   Example: 2010-05-20<br><br> |",
+        "description": "Minimum role: Workspace Administrator.\n\nChanges or resets the current period in Anaplan. When this call contains a specified date (for example, 2020-05-20), the API determines what period range contains the specified data and sets that range as the current period.  When the date value is set to blank in this call, the API resets the current period to blank.\n\n**Warning**: A change to your time settings is a potentially destructive action and may lead to data loss.  The new range of time periods may not include previous time periods. Any data in the removed time periods is deleted from the model.\n\n**Notes**:\n\n*   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response\n\n### Request body\n\n| **Body** | **Details** |\n| --- | --- |\n| `{date}` | <br><br>*   Required<br>*   Type: String<br>*   Description: The date to use to set, or reset, the current period. The date format is YYYY-MM-DD.  <br>    If the `date` parameter is left blank (for example, `/currentperiod?date=`) the current period resets.  <br>    If the date is not provided in the YYYY-MM-DD format, the call returns a `400 Bad Request` response with this message: `Invalid ISO date format '{date}'. Date should match format YYYY-MM-DD`  <br>    If this value falls outside of a valid range, the call returns a `400 Bad Request` response with this message: `Specified date '{date}' is out of timescale range {start of timescale} - {end of timescale}`.<br>*   Example: 2010-05-20<br><br> |",
         "tags": [
           "Transactional Write"
         ],
@@ -396,7 +396,7 @@
             }
           },
           "400": {
-            "description": "Bad request. Occurs when: (1) the date is not in YYYY-MM-DD format — \"Invalid ISO date format '{date}'. Date should match format YYYY-MM-DD\"; (2) the date falls outside the model timescale — \"Specified date '{date}' is out of timescale range {start} - {end}\"; (3) date is supplied as both a query parameter and a request body field simultaneously."
+            "description": "Bad request. Occurs when: (1) the date is not in YYYY-MM-DD format — \"Invalid ISO date format '{date}'. Date should match format YYYY-MM-DD\". (2) The date falls outside the model timescale — \"Specified date '{date}' is out of timescale range {start} - {end}\". (3) The date is supplied as both a query parameter and a request body field at the same time."
           },
           "404": {
             "$ref": "#/components/responses/NotFoundOrNoAccess"
@@ -419,7 +419,7 @@
       ],
       "get": {
         "summary": "Model-direct form: Retrieve all items in a dimension",
-        "description": "Minimum role: Standard User.\n\nAlternate URL form — response is equivalent to `/workspaces/{workspaceId}/models/{modelId}/dimensions/{dimensionId}/items`.\n\nUse this call to retrieve the IDs, codes, and names for items in a specified dimension. The dimension must be a list, a list subset, a line item subset, or the Users dimension.\n\nCalls at model-level do not support the Time dimension. The calls return a `400` response. To avoid this, use the view dimension instead.\n\n**Notes**:\n\n*   This call is on the model-level. It returns all dimension items as it does not have view-level hiding, filtering, or [Selective Access](https://help.anaplan.com/anapedia/Content/Modeling/Users/Selective_Access.html). For the view-level endpoint, see Retrieve selected items in a dimension.\n*   If codes have not been set for an item, then the response excludes the `code` field.\n*   This call only supports the retrieval of dimensions and items from a dimension that contains a maximum of 1,000,000 items.  \n    The call returns a `400` response for any more than that number of items.\n*   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response.\n*   When the dimension has no items, the response omits the `items` key entirely rather than returning an empty array.",
+        "description": "Minimum role: Standard User.\n\nAlternate URL form — response is equivalent to `/workspaces/{workspaceId}/models/{modelId}/dimensions/{dimensionId}/items`.\n\nReturns the IDs, codes, and names of the items in a dimension. The dimension must be a list, a list subset, a line item subset, or the Users dimension.\n\nCalls at model-level do not support the Time dimension. The calls return a `400` response. To avoid this, use the view dimension instead.\n\n**Notes**:\n\n*   This call is on the model-level. It returns all dimension items as it does not have view-level hiding, filtering, or [Selective Access](https://help.anaplan.com/anapedia/Content/Modeling/Users/Selective_Access.html). For the view-level endpoint, see Retrieve selected items in a dimension.\n*   If codes have not been set for an item, then the response excludes the `code` field.\n*   This call only supports the retrieval of dimensions and items from a dimension that contains a maximum of 1,000,000 items.  \n    The call returns a `400` response for any more than that number of items.\n*   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response.\n*   When the dimension has no items, the response omits the `items` key entirely rather than returning an empty array.",
         "tags": [
           "Model Metadata",
           "List Metadata"
@@ -615,7 +615,7 @@
           {
             "name": "sort",
             "in": "query",
-            "description": "Sort results. `+field` or unprefixed ascending, `-field` descending; comma-separate for multiple columns. `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order. Example: `+name`, `-id`.",
+            "description": "Sort results. `+field` or unprefixed ascending, `-field` descending. Comma-separate for multiple columns. `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order. Example: `+name`, `-id`.",
             "schema": {
               "type": "string"
             },
@@ -787,7 +787,7 @@
           {
             "name": "sort",
             "in": "query",
-            "description": "Sort results. `+field` or unprefixed ascending, `-field` descending; comma-separate for multiple columns. `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order. Example: `+name`, `-id`.",
+            "description": "Sort results. `+field` or unprefixed ascending, `-field` descending. Comma-separate for multiple columns. `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order. Example: `+name`, `-id`.",
             "schema": {
               "type": "string"
             },
@@ -992,7 +992,7 @@
           {
             "name": "sort",
             "in": "query",
-            "description": "Sort results. `+field` or unprefixed ascending, `-field` descending; comma-separate for multiple columns. `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order. Example: `+name`, `-id`.",
+            "description": "Sort results. `+field` or unprefixed ascending, `-field` descending. Comma-separate for multiple columns. `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order. Example: `+name`, `-id`.",
             "schema": {
               "type": "string"
             },
@@ -1150,7 +1150,7 @@
       ],
       "get": {
         "summary": "Retrieve all line items in a model",
-        "description": "Minimum role: Standard User.\n\nUse this call to retrieve identifiers of all line items in a model.\n\n**Notes**:\n\n*   The returned line items are restricted just to those in modules to which the model role of the user has Read access.\n*   The response returns Items within a [flat list](https://help.anaplan.com/anapedia/Content/Modeling/Dimensions/Lists.html) (no hierarchy).\n*   This returns all the line items in the model. For line items in a specific module see Retrieve Line Items For a Module.\n*   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response",
+        "description": "Minimum role: Standard User.\n\nReturns the identifiers of all line items in a model.\n\n**Notes**:\n\n*   The returned line items are restricted just to those in modules to which the model role of the user has Read access.\n*   The response returns Items within a [flat list](https://help.anaplan.com/anapedia/Content/Modeling/Dimensions/Lists.html) (no hierarchy).\n*   This returns all the line items in the model. For line items in a specific module see Retrieve Line Items For a Module.\n*   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response",
         "tags": [
           "Model Metadata",
           "Line Item Metadata"
@@ -1264,7 +1264,7 @@
       ],
       "get": {
         "summary": "Retrieve dimensions IDs for a line item",
-        "description": "Minimum role: Standard User.\n\nUse this call to retrieve the IDs of dimensions that define a line item.\n\nFor reference, see Retrieve dimension items for a line item.\n\nNotes:\n\n*   This returns a list of all the dimensions that apply to that line item.",
+        "description": "Minimum role: Standard User.\n\nReturns the IDs of the dimensions that define a line item.\n\nFor reference, see Retrieve dimension items for a line item.\n\nNotes:\n\n*   This returns a list of all the dimensions that apply to that line item.",
         "tags": [
           "Model Metadata",
           "Line Item Metadata"
@@ -1350,7 +1350,7 @@
       ],
       "get": {
         "summary": "Retrieve dimension items for a line item",
-        "description": "Minimum role: Standard User.\n\nUse this call to retrieve IDs, codes, and names for dimension items that apply for the specified line item.\n\n**Notes**:\n\n*   This call works with any dimension type.\n*   Your requesting model role must allow read access to the module the line item belongs to. Otherwise, this call returns a `404 Not Found` HTTP status.\n*   The items in the response are ordered as listed in the Anaplan model.\n*   The response returns items within a [flat list](https://help.anaplan.com/anapedia/Content/Modeling/Dimensions/Lists.html) (no hierarchy).\n*   This returns dimension items that apply to a line item. For the view-level call, see Retrieve selected items in a dimension and for the model-level call, see Retrieve all items in a dimension.\n*   This call only supports the retrieval of dimension items where the dimension contains a maximum of 1,000,000 items. If the specified dimension contains more than 1,000,000 dimension items, then the call returns a 400 Bad Request HTTP status, instead of a subset of the dimension items.\n*   Providing a non-existent Line Item ID or Dimension ID returns a 404 Not Found HTTP status.\n*   If the request provides an invalid line item ID or dimension ID this call returns a `400 Bad Request` HTTP status.\n*   In the future, use of this call may be rate limited.\n*   When the dimension has no items, the response omits the `items` key entirely rather than returning an empty array.",
+        "description": "Minimum role: Standard User.\n\nReturns the IDs, codes, and names of the dimension items that apply to a line item.\n\n**Notes**:\n\n*   This call works with any dimension type.\n*   Your requesting model role must allow read access to the module the line item belongs to. Otherwise, this call returns a `404 Not Found` HTTP status.\n*   The items in the response are ordered as listed in the Anaplan model.\n*   The response returns items within a [flat list](https://help.anaplan.com/anapedia/Content/Modeling/Dimensions/Lists.html) (no hierarchy).\n*   This returns dimension items that apply to a line item. For the view-level call, see Retrieve selected items in a dimension and for the model-level call, see Retrieve all items in a dimension.\n*   This call only supports the retrieval of dimension items where the dimension contains a maximum of 1,000,000 items. If the specified dimension contains more than 1,000,000 dimension items, then the call returns a 400 Bad Request HTTP status, instead of a subset of the dimension items.\n*   Providing a non-existent Line Item ID or Dimension ID returns a 404 Not Found HTTP status.\n*   If the request provides an invalid line item ID or dimension ID this call returns a `400 Bad Request` HTTP status.\n*   In the future, use of this call may be rate limited.\n*   When the dimension has no items, the response omits the `items` key entirely rather than returning an empty array.",
         "tags": [
           "Model Metadata",
           "Line Item Metadata"
@@ -1422,7 +1422,7 @@
       ],
       "get": {
         "summary": "Model-direct form: Retrieve Lists",
-        "description": "Minimum role: Standard User.\n\nAlternate URL form — response is equivalent to `/workspaces/{workspaceId}/models/{modelId}/lists`.\n\nUse this call to retrieve lists for a specified workspace and model.",
+        "description": "Minimum role: Standard User.\n\nAlternate URL form — response is equivalent to `/workspaces/{workspaceId}/models/{modelId}/lists`.\n\nReturns the lists in a model.",
         "tags": [
           "Model Metadata",
           "List Metadata"
@@ -1514,7 +1514,7 @@
       ],
       "get": {
         "summary": "Model-direct form: Retrieve list metadata",
-        "description": "Minimum role: Standard User.\n\nAlternate URL form — response is equivalent to `/workspaces/{workspaceId}/models/{modelId}/lists/{listId}`.\n\nUse this call to retrieve metadata for a specified list. Field-level descriptions are in the response schema (ListMetadata). Metadata entries that are not set for a list (for example, no parent or no top level item) are omitted from the response.\n\n**Notes**:\n\n*   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response.",
+        "description": "Minimum role: Standard User.\n\nAlternate URL form — response is equivalent to `/workspaces/{workspaceId}/models/{modelId}/lists/{listId}`.\n\nReturns the metadata of a list. Field-level descriptions are in the response schema (ListMetadata). Metadata entries that are not set for a list (for example, no parent or no top level item) are omitted from the response.\n\n**Notes**:\n\n*   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response.",
         "tags": [
           "Model Metadata",
           "List Metadata"
@@ -1663,7 +1663,7 @@
       ],
       "put": {
         "summary": "Update current fiscal year",
-        "description": "Minimum role: Workspace Administrator.\n\nUse this call to update the current fiscal year for the model calendar. The year input value has to be a valid fiscal year supported by the model calendar in Anaplan. If successful, this call returns the updated fiscal year with start and end date associated with current model calendar type. This call returns a `400 bad request` message if the input value is out of range or model calendar type does not have an available fiscal year (for example, Weeks General).",
+        "description": "Minimum role: Workspace Administrator.\n\nUpdates the current fiscal year of the model calendar. The year input value has to be a valid fiscal year supported by the model calendar in Anaplan. If successful, this call returns the updated fiscal year with start and end date associated with current model calendar type. This call returns a `400 bad request` message if the input value is out of range or model calendar type does not have an available fiscal year (for example, Weeks General).",
         "tags": [
           "Transactional Write"
         ],
@@ -1738,7 +1738,7 @@
       ],
       "get": {
         "summary": "Retrieve IDs and names for all modules in a model",
-        "description": "Minimum role: Standard User.\n\nUse this call to retrieve the IDs and names of all modules for a specified model.\n\n**Notes**:\n\n*   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response",
+        "description": "Minimum role: Standard User.\n\nReturns the IDs and names of all modules in a model.\n\n**Notes**:\n\n*   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response",
         "tags": [
           "Model Metadata",
           "Module & Saved View Metadata"
@@ -1829,7 +1829,7 @@
       ],
       "post": {
         "summary": "Write cell data by coordinate to module",
-        "description": "Minimum role: Standard User.\n\nUse this call to set cell values in a module.\n\nEnsure the request body is an array of `CellWrite` objects. Each object is for an updated individual cell and its full set of dimensions.\n\nThe response contains a summary of the number of cells updated successfully and the details of why some cells that could not be updated.\n\n**Notes:**\n\n*   Ensure the user has write access enabled.\n*   Ensure the request includes all of the required fields.\n*   Ensure the request has a `value` field that is either a string, number or boolean and is compatible with the line item format/data type.\n*   If one cell cannot update, the other cells in the request still continue to update.\n*   Workspace administrators can import data into any cell (except aggregate cells, see below), including read-only and invisible cells.\n*   You can update a maximum of 1000 cells per request. For larger scale writes we recommend you use the import API.\n*   Write cell data does not apply to aggregate cells.\n    *   An aggregate cell is a cell where one of its dimension items has it’s own child items\n    *   This includes aggregate cells for line Items with breakback enabled\n    *   For a line Item that is dimensioned by a composite list, the only writeable cells are the child items, that are defined directly in the dimension list and not defined in a parent list.\n*   In the future, use of this call may be rate limited.",
+        "description": "Minimum role: Standard User.\n\nSets cell values in a module.\n\nEnsure the request body is an array of `CellWrite` objects. Each object is for an updated individual cell and its full set of dimensions.\n\nThe response contains a summary of the number of cells updated successfully and the details of why some cells that could not be updated.\n\n**Notes:**\n\n*   Ensure the user has write access enabled.\n*   Ensure the request includes all of the required fields.\n*   Ensure the request has a `value` field that is either a string, number or boolean and is compatible with the line item format/data type.\n*   If one cell cannot update, the other cells in the request still continue to update.\n*   Workspace administrators can import data into any cell (except aggregate cells, see below), including read-only and invisible cells.\n*   You can update a maximum of 1000 cells per request. For larger scale writes we recommend you use the import API.\n*   Write cell data does not apply to aggregate cells.\n    *   An aggregate cell is a cell where one of its dimension items has it’s own child items\n    *   This includes aggregate cells for line Items with breakback enabled\n    *   For a line Item that is dimensioned by a composite list, the only writeable cells are the child items, that are defined directly in the dimension list and not defined in a parent list.\n*   In the future, use of this call may be rate limited.",
         "tags": [
           "Transactional Write"
         ],
@@ -2112,7 +2112,7 @@
       ],
       "get": {
         "summary": "Retrieve IDs and names for views in a module",
-        "description": "Minimum role: Standard User.\n\nUse this call to retrieve all view IDs and names for a specified module. This call also returns the default view for the module. If the user adds the query parameter includesubsidiaryviews=true, unsaved subsidiary views will also be included in the results.\n\n**Notes**:\n\n*   For the default view, the `{viewId}` is the same as the `{moduleId}`\n*   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response\n*   For unsaved subsidiary views, the `{viewId}` and `{viewName}` are the same as the `{lineItemId}` and `{lineItemName}` that the subsidiary view is created from",
+        "description": "Minimum role: Standard User.\n\nReturns the IDs and names of all views in a module. This call also returns the default view for the module. If the user adds the query parameter includesubsidiaryviews=true, unsaved subsidiary views will also be included in the results.\n\n**Notes**:\n\n*   For the default view, the `{viewId}` is the same as the `{moduleId}`\n*   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response\n*   For unsaved subsidiary views, the `{viewId}` and `{viewName}` are the same as the `{lineItemId}` and `{lineItemName}` that the subsidiary view is created from",
         "tags": [
           "Model Metadata",
           "Module & Saved View Metadata"
@@ -2213,7 +2213,7 @@
           {
             "name": "sort",
             "in": "query",
-            "description": "Sort results. `+field` or unprefixed ascending, `-field` descending; comma-separate for multiple columns. `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order. Example: `+name`, `-id`.",
+            "description": "Sort results. `+field` or unprefixed ascending, `-field` descending. Comma-separate for multiple columns. `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order. Example: `+name`, `-id`.",
             "schema": {
               "type": "string"
             },
@@ -2289,7 +2289,7 @@
       ],
       "get": {
         "summary": "Retrieve metadata for a process",
-        "description": "Minimum role: Standard User.\n\nUse this call to retrieve the names and actions for a given Process in an Anaplan model.\n\n**Notes**:\n\n*   Actions which are imports or exports (`actionType` field is `IMPORT` or `EXPORT`) contain additional fields in the response (see below). Other actions just contain the `id`, `name`, and `actionType`.\n*   Actions are ordered in the sequence that they run when the Process itself is executed.\n*   In the future, use of this call may be rate limited.\n*   For an action with `actionType` of `IMPORT`, you can use the `importDataSourceId` value as the ID of a file for the `fileId` parameter when you upload or download files\n*   For actions with `actionType` of `EXPORT` or `IMPORT`, you can find more information about them if you use the IDs as `exportId` or `importId` in the export and import metadata endpoints.\n*   The possible values for actionType (non-exhaustive list):\n    *   IMPORT\n    *   EXPORT\n    *   DELETE_BY_SELECTION\n    *   ORDER_HIERARCHY\n    *   OPTIMIZER\n*   To include additional information regarding the import data source in an import action, add the `?showImportDataSource=true` query parameter to the request.",
+        "description": "Minimum role: Standard User.\n\nReturns the name and the actions of a process in an Anaplan model.\n\n**Notes**:\n\n*   Actions which are imports or exports (`actionType` field is `IMPORT` or `EXPORT`) contain additional fields in the response (see below). Other actions just contain the `id`, `name`, and `actionType`.\n*   Actions are ordered in the sequence that they run when the Process itself is executed.\n*   In the future, use of this call may be rate limited.\n*   For an action with `actionType` of `IMPORT`, you can use the `importDataSourceId` value as the ID of a file for the `fileId` parameter when you upload or download files\n*   For actions with `actionType` of `EXPORT` or `IMPORT`, you can find more information about them if you use the IDs as `exportId` or `importId` in the export and import metadata endpoints.\n*   The possible values for actionType (non-exhaustive list):\n    *   IMPORT\n    *   EXPORT\n    *   DELETE_BY_SELECTION\n    *   ORDER_HIERARCHY\n    *   OPTIMIZER\n*   To include additional information regarding the import data source in an import action, add the `?showImportDataSource=true` query parameter to the request.",
         "tags": [
           "Model Metadata",
           "Action Metadata"
@@ -2388,7 +2388,7 @@
       ],
       "get": {
         "summary": "Retrieve version metadata",
-        "description": "Minimum role: Workspace Administrator.\n\nUse this call to get information about the model versions. The response contains a list of the versions that the user has access to, and the model metadata that can be viewed from the UI.\n\n**Notes:**\n\n*   The returned versions only include the user’s model role with read access or higher.\n*   If the value for a field is set, it will be returned in the results.",
+        "description": "Minimum role: Workspace Administrator.\n\nReturns information about the model versions. The response contains a list of the versions that the user has access to, and the model metadata that can be viewed from the UI.\n\n**Notes:**\n\n*   The returned versions only include the user’s model role with read access or higher.\n*   If the value for a field is set, it will be returned in the results.",
         "tags": [
           "Model Metadata",
           "Model Setting Metadata"
@@ -2489,7 +2489,7 @@
       ],
       "put": {
         "summary": "Set version switchover date",
-        "description": "Minimum role: Workspace Administrator.\n\nUse this call to set the switchover date for a version. The response contains the response code, as well as the date and human-readable date period as shown in the UI.\n\n**Notes:**\n\n*   To apply a switchover date, ensure the `versionID` corresponds to a version in Anaplan that is set to either `forecast` or `variance`.\n*   Ensure the switchover date is after the existing version switchover date.\n*   To reset the switchover date to Blank, pass an empty string in the request body.\n*   In the future, use of this call may be rate limited.\n\n### Request body\n\n| **JSON element** | **Details** |\n| --- | --- |\n| `date` | <br><br>*   Required<br>*   Description: An ISO-formatted (YYYY-MM-DD) date string is used to set the switchover date. An empty string resets the switchover date.  <br>    Dates earlier than the current switchover date (for example, `2021-01-01` when the current switchover is `2021-06-01`) or dates outside the current model year return a `400 Bad Request` response.<br>*   Example: `2021-06-01`<br><br> |",
+        "description": "Minimum role: Workspace Administrator.\n\nSets the switchover date of a version. The response contains the response code, as well as the date and human-readable date period as shown in the UI.\n\n**Notes:**\n\n*   To apply a switchover date, ensure the `versionID` corresponds to a version in Anaplan that is set to either `forecast` or `variance`.\n*   Ensure the switchover date is after the existing version switchover date.\n*   To reset the switchover date to Blank, pass an empty string in the request body.\n*   In the future, use of this call may be rate limited.\n\n### Request body\n\n| **JSON element** | **Details** |\n| --- | --- |\n| `date` | <br><br>*   Required<br>*   Description: An ISO-formatted (YYYY-MM-DD) date string is used to set the switchover date. An empty string resets the switchover date.  <br>    Dates earlier than the current switchover date (for example, `2021-01-01` when the current switchover is `2021-06-01`) or dates outside the current model year return a `400 Bad Request` response.<br>*   Example: `2021-06-01`<br><br> |",
         "tags": [
           "Transactional Write"
         ],
@@ -2556,7 +2556,7 @@
       ],
       "get": {
         "summary": "Model-direct form: Retrieve IDs and names for all views in a model",
-        "description": "Minimum role: Standard User.\n\nAlternate URL form — response is equivalent to `/workspaces/{workspaceId}/models/{modelId}/views`.\n\nUse this call to retrieve the ID and name of all views for a model. The results include default and saved views. If you add the query parameter `includesubsidiaryviews=true`, this includes unsaved subsidiary views in the results. This call also retrieves the ID of the module that the views belong to.\n\n**Notes**:\n\n*   Single quotes enclose the module and view names that have special characters\n*   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response\n\n### Default views\n\nFor default views:\n\n*   The value of the {viewId} is identical to the value of the {moduleId}\n*   The value of the name is identical to the value of the module\n\n### Saved views\n\nFor saved views:\n\n*   The `name` consists of the module name, a period, and the saved view name. For example, `REP01 Profit & Loss Report.P & L by Country`\n    \n\nFor unsaved subsidiary views:\n\n*   The name consists of the module name and the line item name that the subsidiary view is created from\n*   These are separated by a period(.)",
+        "description": "Minimum role: Standard User.\n\nAlternate URL form — response is equivalent to `/workspaces/{workspaceId}/models/{modelId}/views`.\n\nReturns the ID and name of all views in a model. The results include default and saved views. If you add the query parameter `includesubsidiaryviews=true`, this includes unsaved subsidiary views in the results. This call also retrieves the ID of the module that the views belong to.\n\n**Notes**:\n\n*   Single quotes enclose the module and view names that have special characters\n*   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response\n\n### Default views\n\nFor default views:\n\n*   The value of the {viewId} is identical to the value of the {moduleId}\n*   The value of the name is identical to the value of the module\n\n### Saved views\n\nFor saved views:\n\n*   The `name` consists of the module name, a period, and the saved view name. For example, `REP01 Profit & Loss Report.P & L by Country`\n    \n\nFor unsaved subsidiary views:\n\n*   The name consists of the module name and the line item name that the subsidiary view is created from\n*   These are separated by a period(.)",
         "tags": [
           "Model Metadata",
           "Module & Saved View Metadata"
@@ -2670,7 +2670,7 @@
       ],
       "get": {
         "summary": "Retrieve metadata for dimensions on a view",
-        "description": "Minimum role: Standard User.\n\nUse this call to retrieve the name, IDs, and lists of names for the dimensions (columns, pages, rows) on a specified view.\n\n**Notes**:\n\n*   If a view has no dimensions on an axis, the call omits the axis field (for example, no `“rows”` field at all instead of `“rows”: []`)\n*   If a view is the default view, its `name` is set to be the same as the module name\n*   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response\n*   The `viewId` in this request can also be replaced by any valid `lineItemId`. If the Line Item has a changed dimensionality (has a Subsidiary View), the response returns the metadata applicable to that line item. Otherwise, the response returns the default metadata\n    \n\nYou can use this API call to [map dimensions to cell data export headers](https://help.anaplan.com/43cd0223-edaa-4289-9833-eb9b73666aac-Map-dimensions-to-cell-data-export-headers) or [transform grid CSV format to tabular single column format](https://help.anaplan.com/c8a665b9-6b23-4254-ac68-816657a6e878-Retrieve-the-view-metadata-and-grid-view-data).",
+        "description": "Minimum role: Standard User.\n\nReturns the name, the IDs, and the lists of names for the dimensions (columns, pages, rows) on a view.\n\n**Notes**:\n\n*   If a view has no dimensions on an axis, the call omits the axis field (for example, no `“rows”` field at all instead of `“rows”: []`)\n*   If a view is the default view, its `name` is set to be the same as the module name\n*   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response\n*   The `viewId` in this request can also be replaced by any valid `lineItemId`. If the Line Item has a changed dimensionality (has a Subsidiary View), the response returns the metadata applicable to that line item. Otherwise, the response returns the default metadata\n    \n\nYou can use this API call to [map dimensions to cell data export headers](https://help.anaplan.com/43cd0223-edaa-4289-9833-eb9b73666aac-Map-dimensions-to-cell-data-export-headers) or [transform grid CSV format to tabular single column format](https://help.anaplan.com/c8a665b9-6b23-4254-ac68-816657a6e878-Retrieve-the-view-metadata-and-grid-view-data).",
         "tags": [
           "Model Metadata",
           "Module & Saved View Metadata"
@@ -2780,7 +2780,7 @@
       ],
       "get": {
         "summary": "Retrieve cell data for a view (large responses — see description)",
-        "description": "Minimum role: Standard User.\n\nUse this call to retrieve the cell data for a view. You can either query for the default page, or provide page selectors to query for other pages. This call returns data in either a CSV grid response or as JSON.\n\n**Notes:**\n\n*   This call only supports the retrieval of cells from a view that contains a maximum of 1,000,000 cells. If the specified view contains more than 1,000,000 cells, then the call returns a `400 Bad Request` HTTP status, instead of a subset of the cells. Use the [quick sum bar](https://help.anaplan.com/anapedia/Content/New_User_Experience/Use/Worksheets/Grid/Quick-sum-bar.htm) in Anaplan to identify the number of cells in a view.\n*   If you call several times in a short amount of time, you may receive a `429` response.\n*   You can replace the `viewId` with any valid `lineItemId`. If the line item has a subsidiary view, the response returns the data as seen in that subsidiary view.\n*   For line items without a subsidiary view, the response returns data for the default view of the line item.\n\n### CSV responses\n\nThe first line of the CSV response contains the values of the page selectors. The response omits this line when there are no dimensions on pages.\n\nWhen there are multiple dimensions on columns, a line for each dimension follows the first line that contains the values of the page selectors.\n\nWhen there are multiple dimensions on rows, a column displays on the left, before the data, for each dimension on rows.\n\n### JSON responses\n\nTo receive a JSON-formatted response instead of a CSV-formatted response:\n\n1.  Pass an `Accept` header of `application/json`.\n2.  Pass a query parameter of `format` set to `v1`.\n    \n\nAll other parameters are the same as a CSV-formatted response.\n\nThe response returns `Content-Type` `application/json` with this format:\n\n*   A `pages` key with a value that is a list of the selected items for each page selector. If no page selectors exist for this view, the list displays as empty or absent.\n*   A `columnCoordinates` key with a value that is a list of the coordinates for all values in that column. Each list item is itself a list containing one or more values. The length of each list equals the number of dimensions on columns.\n*   A `rows` key with a value that is a list of row objects. Each row object contains:\n    *   A `rowCoordinates` key with a value that is a list of the coordinates for all values in the current row. Each list item is itself a list that contains one or more values. The length of each list equals the number of dimensions on rows.\n    *   A `cells` key with a value, which is a list of all the cell values in the current row.\n\nTo get the full coordinates for each cell, use the position of the cell value in the `cells` list, and find the column coordinates at the same position in the `columnCoordinates` list. Then, to uniquely specify the cell, combine the column coordinates with the `rowCoordinates` for the current row and any selected pages.\n\n**HIGH VOLUME** — a full grid export is returned in one non-paginated response (observed ~210 KB) and there is no `limit`/`offset` paging (the call is instead capped at 1,000,000 cells, returning `400` above that). Narrow the request with page selectors and request only the view/pages you need.",
+        "description": "Minimum role: Standard User.\n\nReturns the cell data of a view. You can either query for the default page, or provide page selectors to query for other pages. This call returns data in either a CSV grid response or as JSON.\n\n**Notes:**\n\n*   This call only supports the retrieval of cells from a view that contains a maximum of 1,000,000 cells. If the specified view contains more than 1,000,000 cells, then the call returns a `400 Bad Request` HTTP status, instead of a subset of the cells. Use the [quick sum bar](https://help.anaplan.com/anapedia/Content/New_User_Experience/Use/Worksheets/Grid/Quick-sum-bar.htm) in Anaplan to identify the number of cells in a view.\n*   If you call several times in a short amount of time, you may receive a `429` response.\n*   You can replace the `viewId` with any valid `lineItemId`. If the line item has a subsidiary view, the response returns the data as seen in that subsidiary view.\n*   For line items without a subsidiary view, the response returns data for the default view of the line item.\n\n### CSV responses\n\nThe first line of the CSV response contains the values of the page selectors. The response omits this line when there are no dimensions on pages.\n\nWhen there are multiple dimensions on columns, a line for each dimension follows the first line that contains the values of the page selectors.\n\nWhen there are multiple dimensions on rows, a column displays on the left, before the data, for each dimension on rows.\n\n### JSON responses\n\nTo receive a JSON-formatted response instead of a CSV-formatted response:\n\n1.  Pass an `Accept` header of `application/json`.\n2.  Pass a query parameter of `format` set to `v1`.\n    \n\nAll other parameters are the same as a CSV-formatted response.\n\nThe response returns `Content-Type` `application/json` with this format:\n\n*   A `pages` key with a value that is a list of the selected items for each page selector. If no page selectors exist for this view, the list displays as empty or absent.\n*   A `columnCoordinates` key with a value that is a list of the coordinates for all values in that column. Each list item is itself a list containing one or more values. The length of each list equals the number of dimensions on columns.\n*   A `rows` key with a value that is a list of row objects. Each row object contains:\n    *   A `rowCoordinates` key with a value that is a list of the coordinates for all values in the current row. Each list item is itself a list that contains one or more values. The length of each list equals the number of dimensions on rows.\n    *   A `cells` key with a value, which is a list of all the cell values in the current row.\n\nTo get the full coordinates for each cell, use the position of the cell value in the `cells` list, and find the column coordinates at the same position in the `columnCoordinates` list. Then, to uniquely specify the cell, combine the column coordinates with the `rowCoordinates` for the current row and any selected pages.\n\n**HIGH VOLUME** — a full grid export is returned in one non-paginated response (observed ~210 KB) and there is no `limit`/`offset` paging (the call is instead capped at 1,000,000 cells, returning `400` above that). Narrow the request with page selectors and request only the view/pages you need.",
         "tags": [
           "Transactional Read"
         ],
@@ -2788,7 +2788,7 @@
           {
             "name": "Accept",
             "in": "header",
-            "description": "Response format. `text/csv` (default) returns a CSV grid; `application/json` returns structured cell data (also requires query parameter format=v1). Append `;escaped=true` to quote sensitive CSV fields; some tenants block plain text/csv for security and require the escaped form.",
+            "description": "Response format. `text/csv` (default) returns a CSV grid. `application/json` returns structured cell data (also requires query parameter format=v1). Append `;escaped=true` to quote sensitive CSV fields. Some tenants block plain text/csv for security and require the escaped form.",
             "required": false,
             "schema": {
               "type": "string",
@@ -2815,7 +2815,7 @@
           {
             "name": "pages",
             "in": "query",
-            "description": "Page selector values, each in the form `dimensionId:itemId`, choosing which item to display for each page-axis dimension. The page-axis `dimensionId` values come from the `pages` array of `GET /models/{modelId}/views/{viewId}`; the `itemId` values for a given dimension come from `GET /workspaces/{workspaceId}/models/{modelId}/dimensions/{dimensionId}/items`. Both repeated-key form (`pages=a:b&pages=c:d`) and comma-separated form (`pages=a:b,c:d`) are accepted.",
+            "description": "Page selector values, each in the form `dimensionId:itemId`, choosing which item to display for each page-axis dimension. The page-axis `dimensionId` values come from the `pages` array of `GET /models/{modelId}/views/{viewId}`. The `itemId` values for a given dimension come from `GET /workspaces/{workspaceId}/models/{modelId}/dimensions/{dimensionId}/items`. Both repeated-key form (`pages=a:b&pages=c:d`) and comma-separated form (`pages=a:b,c:d`) are accepted.",
             "required": false,
             "schema": {
               "type": "array",
@@ -2833,7 +2833,7 @@
         ],
         "responses": {
           "200": {
-            "description": "View cell data. Returns text/csv by default; returns application/json when both Accept: application/json and format=v1 are set.",
+            "description": "View cell data. Returns text/csv by default. Returns application/json when both Accept: application/json and format=v1 are set.",
             "content": {
               "text/csv": {
                 "schema": {
@@ -2897,7 +2897,7 @@
       ],
       "get": {
         "summary": "Retrieve selected items in a dimension (large responses — see description)",
-        "description": "Minimum role: Standard User.\n\nUse this call to retrieve selected IDs, codes, and names for items in a specified dimension. This call returns data as filtered by the page builder when they configure the view. This call respects hidden items, filtering selections, and [Selective Access](https://help.anaplan.com/anapedia/Content/Modeling/Users/Selective_Access.html). If the view contains hidden or filtered items, these do not display in the response.\n\n**Notes**:\n\n*   This call works with any dimension type\n*   The items in the response may not be ordered\n*   The response returns Items within a [flat list](https://help.anaplan.com/anapedia/Content/Modeling/Dimensions/Lists.html) (no hierarchy)\n*   This is a view-level call. For the model-level call, see Retrieve all data for items in a dimension\n*   This call only supports the retrieval of dimension items within a view that contains a maximum of 1,000,000 cells. If the specified view contains more than 1,000,000 dimension items, then the call returns a `400 Bad Request` HTTP status, instead of a subset of the dimension items. Use the [quick sum bar](https://help.anaplan.com/anapedia/Content/New_User_Experience/Use/Worksheets/Grid/Quick-sum-bar.htm) in Anaplan to identify the number of dimension items in a view\n*   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response\n*   The `viewId` in this request can also be replaced by any valid `lineItemId`. If the Line Item has a changed dimensionality (has a Subsidiary View), the response returns the applicable dimension items for the given dimension. Otherwise, the response returns all default applicable dimension items for the given dimension\n\n**Note**: When the dimension has no items, the response omits the `items` key entirely rather than returning an empty array.\n\n**HIGH VOLUME** — all selected items are returned in one non-paginated response (observed ~149 KB); there is no `limit`/`offset` paging (the call is instead capped at 1,000,000 cells, returning `400` above that). Scope to the specific dimension and view you need rather than requesting broad dimensions.",
+        "description": "Minimum role: Standard User.\n\nReturns the selected IDs, codes, and names of the items in a dimension. This call returns data as filtered by the page builder when they configure the view. This call respects hidden items, filtering selections, and [Selective Access](https://help.anaplan.com/anapedia/Content/Modeling/Users/Selective_Access.html). If the view contains hidden or filtered items, these do not display in the response.\n\n**Notes**:\n\n*   This call works with any dimension type\n*   The items in the response may not be ordered\n*   The response returns Items within a [flat list](https://help.anaplan.com/anapedia/Content/Modeling/Dimensions/Lists.html) (no hierarchy)\n*   This is a view-level call. For the model-level call, see Retrieve all data for items in a dimension\n*   This call only supports the retrieval of dimension items within a view that contains a maximum of 1,000,000 cells. If the specified view contains more than 1,000,000 dimension items, then the call returns a `400 Bad Request` HTTP status, instead of a subset of the dimension items. Use the [quick sum bar](https://help.anaplan.com/anapedia/Content/New_User_Experience/Use/Worksheets/Grid/Quick-sum-bar.htm) in Anaplan to identify the number of dimension items in a view\n*   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response\n*   The `viewId` in this request can also be replaced by any valid `lineItemId`. If the Line Item has a changed dimensionality (has a Subsidiary View), the response returns the applicable dimension items for the given dimension. Otherwise, the response returns all default applicable dimension items for the given dimension\n\n**Note**: When the dimension has no items, the response omits the `items` key entirely rather than returning an empty array.\n\n**HIGH VOLUME** — all selected items are returned in one non-paginated response (observed ~149 KB). There is no `limit`/`offset` paging (the call is instead capped at 1,000,000 cells, returning `400` above that). Scope to the specific dimension and view you need rather than requesting broad dimensions.",
         "tags": [
           "Model Metadata",
           "List Metadata"
@@ -2959,7 +2959,7 @@
     "/users": {
       "get": {
         "summary": "List users (large responses — see description)",
-        "description": "Minimum role: Standard User.\n\nRetrieves all users within the tenant.\n\nDeactivated users (`active` is `false`) are typically not relevant to callers listing people; filter to `active=true` unless you specifically need inactive users.\n\n**HIGH VOLUME** — this returns every user in the tenant in one merged response; with no `limit` a client that auto-follows `meta.paging` combines every page and can overflow its token budget. Reduce volume by passing an explicit `limit` and paging with `offset`, by scoping server-side with the `s=` search filter instead of full enumeration, and/or by using `search` to locate the specific op/params rather than pulling the whole collection.",
+        "description": "Minimum role: Standard User.\n\nRetrieves all users within the tenant.\n\nDeactivated users (`active` is `false`) are typically not relevant to callers listing people. Filter to `active=true` unless you specifically need inactive users.\n\n**HIGH VOLUME** — this returns every user in the tenant in one merged response. With no `limit` a client that auto-follows `meta.paging` combines every page and can overflow its token budget. Reduce volume by passing an explicit `limit` and paging with `offset`, by scoping server-side with the `s=` search filter instead of full enumeration, and/or by using `search` to locate the specific op/params rather than pulling the whole collection.",
         "tags": [
           "User Data"
         ],
@@ -2970,7 +2970,7 @@
           {
             "name": "sort",
             "in": "query",
-            "description": "Sort results. `+field` ascending, `-field` descending; prefix required and field name validated (bad or unknown field returns 400). Comma-separate to sort by multiple columns. Sortable fields: firstName, lastName, email, active, lastLoginDate.",
+            "description": "Sort results. `+field` ascending, `-field` descending. The prefix is required and the field name is validated (bad or unknown field returns 400). Comma-separate to sort by multiple columns. Sortable fields: firstName, lastName, email, active, lastLoginDate.",
             "schema": {
               "type": "string"
             },
@@ -3086,7 +3086,7 @@
     "/workspaces": {
       "get": {
         "summary": "List user workspaces (large responses — see description)",
-        "description": "Minimum role: Standard User.\n\nRetrieves all workspaces a user has access to within the user's default tenant\n\n**HIGH VOLUME** — this returns every workspace the user can access in one merged response; with no `limit` a client that auto-follows `meta.paging` combines every page and can overflow its token budget (a `getWorkspaces` → per-workspace admins pipe produced a 335 KB result that exceeded the token cap). Reduce volume by passing an explicit `limit` and paging with `offset`, by scoping server-side with the `s=` search filter instead of full enumeration, and/or by using `search` to locate the specific op/params rather than pulling the whole collection.",
+        "description": "Minimum role: Standard User.\n\nRetrieves all workspaces a user has access to within the user's default tenant\n\n**HIGH VOLUME** — this returns every workspace the user can access in one merged response. With no `limit` a client that auto-follows `meta.paging` combines every page and can overflow its token budget (a `getWorkspaces` → per-workspace admins pipe produced a 335 KB result that exceeded the token cap). Reduce volume by passing an explicit `limit` and paging with `offset`, by scoping server-side with the `s=` search filter instead of full enumeration, and/or by using `search` to locate the specific op/params rather than pulling the whole collection.",
         "tags": [
           "General Workspace & Model Metadata"
         ],
@@ -3100,7 +3100,7 @@
           {
             "name": "sort",
             "in": "query",
-            "description": "Sort results. `+field` ascending, `-field` descending; prefix required and field name validated (bad or unknown field returns 400). Comma-separate to sort by multiple columns. Sortable fields: name, sizeAllowance.",
+            "description": "Sort results. `+field` ascending, `-field` descending. The prefix is required and the field name is validated (bad or unknown field returns 400). Comma-separate to sort by multiple columns. Sortable fields: name, sizeAllowance.",
             "schema": {
               "type": "string"
             },
@@ -3227,7 +3227,7 @@
       ],
       "get": {
         "summary": "List workspace administrators",
-        "description": "Minimum role: User Administrator.\n\nReturns all administrators for a workspace. Requires tenant admin privilege; workspace admin access alone is insufficient.\n\nDeactivated administrators (`active` is `false`) are typically not relevant to callers listing people; filter to `active=true` unless you specifically need inactive administrators.",
+        "description": "Minimum role: User Administrator.\n\nReturns all administrators for a workspace. Requires tenant admin privilege. Workspace admin access alone is insufficient.\n\nDeactivated administrators (`active` is `false`) are typically not relevant to callers listing people. Filter to `active=true` unless you specifically need inactive administrators.",
         "tags": [
           "General Workspace & Model Metadata"
         ],
@@ -3303,7 +3303,7 @@
       ],
       "post": {
         "summary": "Bulk delete models",
-        "description": "Minimum role: Standard User.\n\nDeletes multiple models in a workspace in a single request. Models that cannot be deleted (e.g., because they are currently open) are listed in `bulkDeleteModelsFailures`; the overall HTTP status is still 200 in that case.",
+        "description": "Minimum role: Standard User.\n\nDeletes multiple models in a workspace in a single request. Models that cannot be deleted (e.g., because they are currently open) are listed in `bulkDeleteModelsFailures`. The overall HTTP status is still 200 in that case.",
         "tags": [
           "General Workspace & Model Metadata"
         ],
@@ -3367,7 +3367,7 @@
       ],
       "get": {
         "summary": "List workspace models",
-        "description": "Minimum role: Standard User.\n\nReturns models accessible to the calling user within the specified workspace. The response shape is identical to `GET /2/0/models` but filtered to models within the given workspace.\n\nModels with `activeState` of `ARCHIVED` are typically inactive and not actionable; filter them out of results (keep only `activeState` != `ARCHIVED`) unless you specifically need archived models.",
+        "description": "Minimum role: Standard User.\n\nReturns models accessible to the calling user within the specified workspace. The response shape is identical to `GET /2/0/models` but filtered to models within the given workspace.\n\nModels with `activeState` of `ARCHIVED` are typically inactive and not actionable. Filter them out of results (keep only `activeState` != `ARCHIVED`) unless you specifically need archived models.",
         "tags": [
           "General Workspace & Model Metadata"
         ],
@@ -3428,7 +3428,7 @@
           {
             "name": "sort",
             "in": "query",
-            "description": "Sort results. `+field` or unprefixed ascending, `-field` descending; comma-separate for multiple columns. `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order. Example: `+name`, `-id`.",
+            "description": "Sort results. `+field` or unprefixed ascending, `-field` descending. Comma-separate for multiple columns. `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order. Example: `+name`, `-id`.",
             "schema": {
               "type": "string"
             },
@@ -3674,7 +3674,7 @@
       ],
       "get": {
         "summary": "Retrieve current period",
-        "description": "Minimum role: Workspace Administrator.\n\nUse this call to determine the value of the current period in Anaplan.\n\nIf the current period is not set in Anaplan, this call returns empty strings for the `periodText` and `lastDay` values of the `currentPeriod`.\n\n**Notes**:\n\n*   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response.",
+        "description": "Minimum role: Workspace Administrator.\n\nReturns the value of the current period in Anaplan.\n\nIf the current period is not set in Anaplan, this call returns empty strings for the `periodText` and `lastDay` values of the `currentPeriod`.\n\n**Notes**:\n\n*   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response.",
         "tags": [
           "Model Metadata",
           "Model Setting Metadata"
@@ -3734,7 +3734,7 @@
       },
       "put": {
         "summary": "Set current period (workspace-scoped)",
-        "description": "Minimum role: Workspace Administrator.\n\nWorkspace-scoped alternate URL form — identical behaviour to `/models/{modelId}/currentPeriod` PUT.\n\nUse this call to change or reset the current period in Anaplan. When this call contains a specified date (for example, 2020-05-20), the API determines what period range contains the specified data and sets that range as the current period.  When the date value is set to blank in this call, the API resets the current period to blank.\n\n**Warning**: A change to your time settings is a potentially destructive action and may lead to data loss.  The new range of time periods may not include previous time periods. Any data in the removed time periods is deleted from the model.\n\n**Notes**:\n\n*   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response\n\n### Request body\n\n| **Body** | **Details** |\n| --- | --- |\n| `{date}` | <br><br>*   Required<br>*   Type: String<br>*   Description: The date to use to set, or reset, the current period. The date format is YYYY-MM-DD.  <br>    If the `date` parameter is left blank (for example, `/currentperiod?date=`) the current period resets.  <br>    If the date is not provided in the YYYY-MM-DD format, the call returns a `400 Bad Request` response with this message: `Invalid ISO date format '{date}'. Date should match format YYYY-MM-DD`  <br>    If this value falls outside of a valid range, the call returns a `400 Bad Request` response with this message: `Specified date '{date}' is out of timescale range {start of timescale} - {end of timescale}`.<br>*   Example: 2010-05-20<br><br> |",
+        "description": "Minimum role: Workspace Administrator.\n\nWorkspace-scoped alternate URL form — identical behaviour to `/models/{modelId}/currentPeriod` PUT.\n\nChanges or resets the current period in Anaplan. When this call contains a specified date (for example, 2020-05-20), the API determines what period range contains the specified data and sets that range as the current period.  When the date value is set to blank in this call, the API resets the current period to blank.\n\n**Warning**: A change to your time settings is a potentially destructive action and may lead to data loss.  The new range of time periods may not include previous time periods. Any data in the removed time periods is deleted from the model.\n\n**Notes**:\n\n*   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response\n\n### Request body\n\n| **Body** | **Details** |\n| --- | --- |\n| `{date}` | <br><br>*   Required<br>*   Type: String<br>*   Description: The date to use to set, or reset, the current period. The date format is YYYY-MM-DD.  <br>    If the `date` parameter is left blank (for example, `/currentperiod?date=`) the current period resets.  <br>    If the date is not provided in the YYYY-MM-DD format, the call returns a `400 Bad Request` response with this message: `Invalid ISO date format '{date}'. Date should match format YYYY-MM-DD`  <br>    If this value falls outside of a valid range, the call returns a `400 Bad Request` response with this message: `Specified date '{date}' is out of timescale range {start of timescale} - {end of timescale}`.<br>*   Example: 2010-05-20<br><br> |",
         "tags": [
           "Transactional Write"
         ],
@@ -3809,7 +3809,7 @@
             }
           },
           "400": {
-            "description": "Bad request. Occurs when: (1) the date is not in YYYY-MM-DD format — \"Invalid ISO date format '{date}'. Date should match format YYYY-MM-DD\"; (2) the date falls outside the model timescale — \"Specified date '{date}' is out of timescale range {start} - {end}\"; (3) date is supplied as both a query parameter and a request body field simultaneously."
+            "description": "Bad request. Occurs when: (1) the date is not in YYYY-MM-DD format — \"Invalid ISO date format '{date}'. Date should match format YYYY-MM-DD\". (2) The date falls outside the model timescale — \"Specified date '{date}' is out of timescale range {start} - {end}\". (3) The date is supplied as both a query parameter and a request body field at the same time."
           },
           "404": {
             "$ref": "#/components/responses/NotFoundOrNoAccess"
@@ -3914,7 +3914,7 @@
       ],
       "get": {
         "summary": "Retrieve all items in a dimension",
-        "description": "Minimum role: Standard User.\n\nUse this call to retrieve the IDs, codes, and names for items in a specified dimension. The dimension must be a list, a list subset, a line item subset, or the Users dimension.\n\nCalls at model-level do not support the Time dimension. The calls return a `400` response. To avoid this, use the view dimension instead.\n\n**Notes**:\n\n*   This call is on the model-level. It returns all dimension items as it does not have view-level hiding, filtering, or [Selective Access](https://help.anaplan.com/anapedia/Content/Modeling/Users/Selective_Access.html). For the view-level endpoint, see Retrieve selected items in a dimension.\n*   If codes have not been set for an item, then the response excludes the `code` field.\n*   This call only supports the retrieval of dimensions and items from a dimension that contains a maximum of 1,000,000 items.  \n    The call returns a `400` response for any more than that number of items.\n*   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response.\n*   When the dimension has no items, the response omits the `items` key entirely rather than returning an empty array.",
+        "description": "Minimum role: Standard User.\n\nReturns the IDs, codes, and names of the items in a dimension. The dimension must be a list, a list subset, a line item subset, or the Users dimension.\n\nCalls at model-level do not support the Time dimension. The calls return a `400` response. To avoid this, use the view dimension instead.\n\n**Notes**:\n\n*   This call is on the model-level. It returns all dimension items as it does not have view-level hiding, filtering, or [Selective Access](https://help.anaplan.com/anapedia/Content/Modeling/Users/Selective_Access.html). For the view-level endpoint, see Retrieve selected items in a dimension.\n*   If codes have not been set for an item, then the response excludes the `code` field.\n*   This call only supports the retrieval of dimensions and items from a dimension that contains a maximum of 1,000,000 items.  \n    The call returns a `400` response for any more than that number of items.\n*   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response.\n*   When the dimension has no items, the response omits the `items` key entirely rather than returning an empty array.",
         "tags": [
           "Model Metadata",
           "List Metadata"
@@ -4113,7 +4113,7 @@
           {
             "name": "sort",
             "in": "query",
-            "description": "Sort results. `+field` or unprefixed ascending, `-field` descending; comma-separate for multiple columns. `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order. Example: `+name`, `-id`.",
+            "description": "Sort results. `+field` or unprefixed ascending, `-field` descending. Comma-separate for multiple columns. `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order. Example: `+name`, `-id`.",
             "schema": {
               "type": "string"
             },
@@ -4492,7 +4492,7 @@
           {
             "name": "sort",
             "in": "query",
-            "description": "Sort results. `+field` or unprefixed ascending, `-field` descending; comma-separate for multiple columns. `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order. Example: `+name`, `-id`.",
+            "description": "Sort results. `+field` or unprefixed ascending, `-field` descending. Comma-separate for multiple columns. `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order. Example: `+name`, `-id`.",
             "schema": {
               "type": "string"
             },
@@ -4991,7 +4991,7 @@
           {
             "name": "sort",
             "in": "query",
-            "description": "Sort results. `+field` or unprefixed ascending, `-field` descending; comma-separate for multiple columns. `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order. Example: `+name`, `-id`.",
+            "description": "Sort results. `+field` or unprefixed ascending, `-field` descending. Comma-separate for multiple columns. `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order. Example: `+name`, `-id`.",
             "schema": {
               "type": "string"
             },
@@ -5072,7 +5072,7 @@
       ],
       "get": {
         "summary": "Get the metadata for an import definition",
-        "description": "Minimum role: Standard User.\n\nYou can use the API to obtain metadata for an import definition for module and list imports using the import ID. This enables you to use mappings on your imports without querying the import file itself. You can retrieve:\n\n*   Name\n*   Type\n*   Source\n*   Column Count\n\n### Headers\n\n*   `Authorization:AnaplanAuthToken {anaplan_auth_token}`\n*   `Content-Type:application/json`\n\n### Parameters\n\n#",
+        "description": "Minimum role: Standard User.\n\nReturns the metadata of an import definition for module and list imports, by import ID. This metadata lets you use mappings on your imports without a query against the import file itself. You can retrieve:\n\n*   Name\n*   Type\n*   Source\n*   Column Count\n\n### Headers\n\n*   `Authorization:AnaplanAuthToken {anaplan_auth_token}`\n*   `Content-Type:application/json`\n\n### Parameters\n\n#",
         "tags": [
           "Model Metadata",
           "Action Metadata"
@@ -5370,7 +5370,7 @@
       ],
       "get": {
         "summary": "Check dump file for failures",
-        "description": "Minimum role: Standard User.\n\nIf data could not be imported for an import task, a 'dump' file is created depending on the failure. This contains details of the failures that occurred. Use this information to fix the problems and then try the import again.\n\n**Note:** To prevent timeouts on large files, download the dump file in chunks. It is possible to download dump files without chunking, but it is strongly recommended that chunking is used instead.\n\n1.  Query the number of chunks in a dump file.  \n    \n2.  Download the chunks sequentially.  \n    \n3.  Concatenate the chunks on your host.\n    \n\nDump files are:\n\n*   Removed 48 hours after the last access of the file or the next time an import task successfully executes with no errors.\n*   Maintained on a user-by-user basis and overwritten when the user performs the same import.\n    \n\nWhen an import task has errors, the API maintains a dump file for the task ID with the error.  Any earlier task IDs are erased, though `failureDumpAvailable` can be True for those task IDs.  If a dump file is removed or replaced, then attempting to download the dump file via the API results in a 404 (Not found) HTTP status.\n\nIf you use `/tasks?sort=-creationDate` in the URL, it is possible for tasks created by other users to appear first for which the dump file is unavailable to the accessing user.  It is also possible that a task that the accessing user ran, and for which a dump file is still available, to be further down on the same list.\n\n**Note:** The `taskID` is the last task of the user who carried out the specified import.",
+        "description": "Minimum role: Standard User.\n\nIf data could not be imported for an import task, a 'dump' file is created depending on the failure. This contains details of the failures that occurred. Use this information to fix the problems and then try the import again.\n\n**Note:** To prevent timeouts on large files, download the dump file in chunks. You can download dump files without chunking, but chunking is strongly recommended.\n\n1.  Query the number of chunks in a dump file.  \n    \n2.  Download the chunks sequentially.  \n    \n3.  Concatenate the chunks on your host.\n    \n\nDump files are:\n\n*   Removed 48 hours after the last access of the file or the next time an import task successfully executes with no errors.\n*   Maintained on a user-by-user basis and overwritten when the user performs the same import.\n    \n\nWhen an import task has errors, the API maintains a dump file for the task ID with the error.  Any earlier task IDs are erased, though `failureDumpAvailable` can be True for those task IDs.  If a dump file is removed or replaced, then attempting to download the dump file via the API results in a 404 (Not found) HTTP status.\n\nIf you use `/tasks?sort=-creationDate` in the URL, tasks created by other users can appear first, and their dump files are not available to the accessing user.  A task that the accessing user ran, and whose dump file is still available, can appear further down the same list.\n\n**Note:** The `taskID` is the last task of the user who carried out the specified import.",
         "tags": [
           "Bulk Write"
         ],
@@ -5412,7 +5412,7 @@
       ],
       "get": {
         "summary": "Query the number of chunks in a dump file",
-        "description": "Minimum role: Standard User.\n\nBegin by querying the number of chunks using the `/chunks` endpoint.\n\nIt is possible for a dump file to be very large. To help manage the size of a dump file and prevent timeouts, download the dump file in chunks. Chunks are 10mb or less and numbered sequentially from 0.\n\n### Headers\n\n*   `Authorization:AnaplanAuthToken {anaplan_auth_token}`\n*   `Content-Type:application/json`",
+        "description": "Minimum role: Standard User.\n\nBegin by querying the number of chunks using the `/chunks` endpoint.\n\nA dump file can be very large. To help manage the size of a dump file and prevent timeouts, download the dump file in chunks. Chunks are 10mb or less and numbered sequentially from 0.\n\n### Headers\n\n*   `Authorization:AnaplanAuthToken {anaplan_auth_token}`\n*   `Content-Type:application/json`",
         "tags": [
           "Bulk Write"
         ],
@@ -5482,7 +5482,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Dump file chunk content. Plain text with CSV-formatted error rows; each row contains _Status_, data columns, _Line_, and _Error_1_ fields.",
+            "description": "Dump file chunk content. Plain text with CSV-formatted error rows. Each row contains _Status_, data columns, _Line_, and _Error_1_ fields.",
             "content": {
               "text/plain": {
                 "schema": {
@@ -5509,7 +5509,7 @@
       ],
       "get": {
         "summary": "Workspace-scoped form: Retrieve all line items in a model",
-        "description": "Minimum role: Standard User.\n\nAlternate URL form — response is equivalent to `/models/{modelId}/lineItems`.\n\nUse this call to retrieve identifiers of all line items in a model.\n\n**Notes**:\n\n*   The returned line items are restricted just to those in modules to which the model role of the user has Read access.\n*   The response returns Items within a [flat list](https://help.anaplan.com/anapedia/Content/Modeling/Dimensions/Lists.html) (no hierarchy).\n*   This returns all the line items in the model. For line items in a specific module see Retrieve Line Items For a Module.\n*   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response",
+        "description": "Minimum role: Standard User.\n\nAlternate URL form — response is equivalent to `/models/{modelId}/lineItems`.\n\nReturns the identifiers of all line items in a model.\n\n**Notes**:\n\n*   The returned line items are restricted just to those in modules to which the model role of the user has Read access.\n*   The response returns Items within a [flat list](https://help.anaplan.com/anapedia/Content/Modeling/Dimensions/Lists.html) (no hierarchy).\n*   This returns all the line items in the model. For line items in a specific module see Retrieve Line Items For a Module.\n*   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response",
         "tags": [
           "Model Metadata",
           "Line Item Metadata"
@@ -5626,7 +5626,7 @@
       ],
       "get": {
         "summary": "Workspace-scoped form: Retrieve dimensions IDs for a line item",
-        "description": "Minimum role: Standard User.\n\nAlternate URL form — response is equivalent to `/models/{modelId}/lineItems/{lineItemId}/dimensions`.\n\nUse this call to retrieve the IDs of dimensions that define a line item.\n\nFor reference, see Retrieve dimension items for a line item.\n\nNotes:\n\n*   This returns a list of all the dimensions that apply to that line item.",
+        "description": "Minimum role: Standard User.\n\nAlternate URL form — response is equivalent to `/models/{modelId}/lineItems/{lineItemId}/dimensions`.\n\nReturns the IDs of the dimensions that define a line item.\n\nFor reference, see Retrieve dimension items for a line item.\n\nNotes:\n\n*   This returns a list of all the dimensions that apply to that line item.",
         "tags": [
           "Model Metadata",
           "Line Item Metadata"
@@ -5715,7 +5715,7 @@
       ],
       "get": {
         "summary": "Workspace-scoped form: Retrieve dimension items for a line item",
-        "description": "Minimum role: Standard User.\n\nAlternate URL form — response is equivalent to `/models/{modelId}/lineItems/{lineItemId}/dimensions/{dimensionId}/items`.\n\nUse this call to retrieve IDs, codes, and names for dimension items that apply for the specified line item.\n\n**Notes**:\n\n*   This call works with any dimension type.\n*   Your requesting model role must allow read access to the module the line item belongs to. Otherwise, this call returns a `404 Not Found` HTTP status.\n*   The items in the response are ordered as listed in the Anaplan model.\n*   The response returns items within a [flat list](https://help.anaplan.com/anapedia/Content/Modeling/Dimensions/Lists.html) (no hierarchy).\n*   This returns dimension items that apply to a line item. For the view-level call, see Retrieve selected items in a dimension and for the model-level call, see Retrieve all items in a dimension.\n*   This call only supports the retrieval of dimension items where the dimension contains a maximum of 1,000,000 items. If the specified dimension contains more than 1,000,000 dimension items, then the call returns a 400 Bad Request HTTP status, instead of a subset of the dimension items.\n*   Providing a non-existent Line Item ID or Dimension ID returns a 404 Not Found HTTP status.\n*   If the request provides an invalid line item ID or dimension ID this call returns a `400 Bad Request` HTTP status.\n*   In the future, use of this call may be rate limited.\n*   When the dimension has no items, the response omits the `items` key entirely rather than returning an empty array.",
+        "description": "Minimum role: Standard User.\n\nAlternate URL form — response is equivalent to `/models/{modelId}/lineItems/{lineItemId}/dimensions/{dimensionId}/items`.\n\nReturns the IDs, codes, and names of the dimension items that apply to a line item.\n\n**Notes**:\n\n*   This call works with any dimension type.\n*   Your requesting model role must allow read access to the module the line item belongs to. Otherwise, this call returns a `404 Not Found` HTTP status.\n*   The items in the response are ordered as listed in the Anaplan model.\n*   The response returns items within a [flat list](https://help.anaplan.com/anapedia/Content/Modeling/Dimensions/Lists.html) (no hierarchy).\n*   This returns dimension items that apply to a line item. For the view-level call, see Retrieve selected items in a dimension and for the model-level call, see Retrieve all items in a dimension.\n*   This call only supports the retrieval of dimension items where the dimension contains a maximum of 1,000,000 items. If the specified dimension contains more than 1,000,000 dimension items, then the call returns a 400 Bad Request HTTP status, instead of a subset of the dimension items.\n*   Providing a non-existent Line Item ID or Dimension ID returns a 404 Not Found HTTP status.\n*   If the request provides an invalid line item ID or dimension ID this call returns a `400 Bad Request` HTTP status.\n*   In the future, use of this call may be rate limited.\n*   When the dimension has no items, the response omits the `items` key entirely rather than returning an empty array.",
         "tags": [
           "Model Metadata",
           "Line Item Metadata"
@@ -5790,7 +5790,7 @@
       ],
       "get": {
         "summary": "Retrieve Lists",
-        "description": "Minimum role: Standard User.\n\nUse this call to retrieve lists for a specified workspace and model.",
+        "description": "Minimum role: Standard User.\n\nReturns the lists in a model.",
         "tags": [
           "Model Metadata",
           "List Metadata"
@@ -5885,7 +5885,7 @@
       ],
       "get": {
         "summary": "Retrieve list metadata",
-        "description": "Minimum role: Standard User.\n\nUse this call to retrieve metadata for a specified list. Field-level descriptions are in the response schema (ListMetadata). Metadata entries that are not set for a list (for example, no parent or no top level item) are omitted from the response.\n\n**Notes**:\n\n*   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response.",
+        "description": "Minimum role: Standard User.\n\nReturns the metadata of a list. Field-level descriptions are in the response schema (ListMetadata). Metadata entries that are not set for a list (for example, no parent or no top level item) are omitted from the response.\n\n**Notes**:\n\n*   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response.",
         "tags": [
           "Model Metadata",
           "List Metadata"
@@ -5982,7 +5982,7 @@
       ],
       "get": {
         "summary": "Retrieve list data (large responses — see description)",
-        "description": "Minimum role: Standard User.\n\nUse this call to retrieve list data for the items in a specified list.\n\nYou can filter on optional fields by setting the `includeAll` query parameter.\n\n**Notes:**\n\n*   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response.\n    \n\nThe following list data always displays in the query response:\n\n| **Default List Data** | **Description** |\n| --- | --- |\n| `id` | The Anaplan ID of the item in the list. |\n| `name` | The name of the item in the list. |\n| `code` | The code value for an item in the list (if specified) |\n| `parent` | The name of the parent item in the list. |\n| `parentId` | The Anaplan ID of the parent item in the list. |\n| `listId` | The Anaplan ID of the list to which the parent item belongs. This ID displays if the list has a **Parent Hierarchy** set under the **Configure** tab in Anaplan. |\n| `listName` | The name of list to which the parent item belongs. The name displays if the list has a **Parent Hierarchy** set under the **Configure** tab in Anaplan. |\n\nSet the `includeAll` query parameter to true to display the following optional list data fields in the response.\n\n| **Optional List Data** | **Description** |\n| --- | --- |\n| `write` | If [Selective Access](https://help.anaplan.com/anapedia/Content/Modeling/Users/Selective_Access.html) is enabled for the list, you can add individual users to provide `write` access. Users with `write` access can view and edit data associated with the list items. |\n| `read` | If [Selective Access](https://help.anaplan.com/anapedia/Content/Modeling/Users/Selective_Access.html) is enabled for the list, you can add individual users to provide `read` access. Users with `read` access can view the data associated with the list items but not edit it. |\n| `subsets` | If the value of the subset column is true, the associated item belongs to that subset.  You can view subsets under **Subsets** tab in Anaplan. |\n| `properties` | The value of each custom list property. |\n\n**HIGH VOLUME** — a list's items can be very large (observed ~9.7 MB for a single list). With no `limit`, a client that auto-follows `meta.paging` merges every page into one response and overflows its token budget. Always pass an explicit `limit` and page with `offset`, and scope to a single list rather than enumerating everything.",
+        "description": "Minimum role: Standard User.\n\nReturns the list data of the items in a list.\n\nYou can filter on optional fields by setting the `includeAll` query parameter.\n\n**Notes:**\n\n*   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response.\n    \n\nThe following list data always displays in the query response:\n\n| **Default List Data** | **Description** |\n| --- | --- |\n| `id` | The Anaplan ID of the item in the list. |\n| `name` | The name of the item in the list. |\n| `code` | The code value for an item in the list (if specified) |\n| `parent` | The name of the parent item in the list. |\n| `parentId` | The Anaplan ID of the parent item in the list. |\n| `listId` | The Anaplan ID of the list to which the parent item belongs. This ID displays if the list has a **Parent Hierarchy** set under the **Configure** tab in Anaplan. |\n| `listName` | The name of list to which the parent item belongs. The name displays if the list has a **Parent Hierarchy** set under the **Configure** tab in Anaplan. |\n\nSet the `includeAll` query parameter to true to display the following optional list data fields in the response.\n\n| **Optional List Data** | **Description** |\n| --- | --- |\n| `write` | If [Selective Access](https://help.anaplan.com/anapedia/Content/Modeling/Users/Selective_Access.html) is enabled for the list, you can add individual users to provide `write` access. Users with `write` access can view and edit data associated with the list items. |\n| `read` | If [Selective Access](https://help.anaplan.com/anapedia/Content/Modeling/Users/Selective_Access.html) is enabled for the list, you can add individual users to provide `read` access. Users with `read` access can view the data associated with the list items but not edit it. |\n| `subsets` | If the value of the subset column is true, the associated item belongs to that subset.  You can view subsets under **Subsets** tab in Anaplan. |\n| `properties` | The value of each custom list property. |\n\n**HIGH VOLUME** — a list's items can be very large (observed ~9.7 MB for a single list). With no `limit`, a client that auto-follows `meta.paging` merges every page into one response and overflows its token budget. Always pass an explicit `limit` and page with `offset`, and scope to a single list rather than enumerating everything.",
         "tags": [
           "Transactional Read"
         ],
@@ -6066,7 +6066,7 @@
       },
       "post": {
         "summary": "Add or delete list items",
-        "description": "Minimum role: Standard User.\n\nUse this call to add items to a list. You must provide the list ID and data for each item. You can add one or more items in each request.\n\n**Notes:**\n\n*   A maximum of 100,000 list items can be added with a single call.\n\n### Request body\n\n| **List Data** | **Description** |\n| --- | --- |\n| `{name}` | The name value for the item in the list. |\n| `{code}` | The code value for the item in the list. |\n| `{parent}` | The name of the parent item in the list |\n| `{properties}` | The value of each custom list property. |\n| `{subsets}` | The value of each custom list subset. |\n\n### Logic for add items\n\nThe add list items behavior uses specific logic with names and codes. This logic varies between [general lists](https://help.anaplan.com/f7f01453-71bc-4046-935a-b9d7cb47d15a-General-Lists) and [numbered lists](https://help.anaplan.com/54b75174-848f-482b-a051-a9a063ece50c-Numbered-Lists) in Anaplan.\n\n### Add items to a general list\n\n| **Scenario** | **Existing** | **Input in API** | **Behavior** | **Result** |\n| --- | --- | --- | --- | --- |\n| Add a new list Item | There are no existing items | name=n1  <br>code=c1 | Success.  <br>A new list item is created. | name=n1  <br>code=c1 |\n| Add list item with name conflicts | name=n1  <br>code=c1 | name=n1  <br>code=c2 | There is a duplicate name. A new list item is not added. | An error message returns. |\n| Add list item with code conflicts | name=n1  <br>code=c1 | name=n2  <br>code=c1 | There is a duplicate name. A new list item is not added. | An error message returns. |\n| Add list item without name | There are no existing items | code=c1 | There is a missing name. A new list item is not added. | An error message returns. |\n\n### Add items to a numbered list\n\nFor a numbered list, the name column is used for the index. The name is automatically generated. When you add an item, the API does not allow a name as an input.\n\n| **Scenario** | **Existing** | **Input in API** | **Behavior** | **Result** |\n| --- | --- | --- | --- | --- |\n| Add a new list Item | There are no existing items | name=n1  <br>code=c1 | A name is not a valid input. A new list item is not added. | An error message returns. |\n| Add a new list item | There are no existing items | code=c1 | Success.  <br>A new item is added. | success code=c1 |\n| Add a list item with a conflicting code | code=c1 | code=c1 | There is a duplicate code. A new list item is not added. | An error message returns. |",
+        "description": "Minimum role: Standard User.\n\nAdds items to a list. You must provide the list ID and data for each item. You can add one or more items in each request.\n\n**Notes:**\n\n*   A maximum of 100,000 list items can be added with a single call.\n\n### Request body\n\n| **List Data** | **Description** |\n| --- | --- |\n| `{name}` | The name value for the item in the list. |\n| `{code}` | The code value for the item in the list. |\n| `{parent}` | The name of the parent item in the list |\n| `{properties}` | The value of each custom list property. |\n| `{subsets}` | The value of each custom list subset. |\n\n### Logic for add items\n\nThe add list items behavior uses specific logic with names and codes. This logic varies between [general lists](https://help.anaplan.com/f7f01453-71bc-4046-935a-b9d7cb47d15a-General-Lists) and [numbered lists](https://help.anaplan.com/54b75174-848f-482b-a051-a9a063ece50c-Numbered-Lists) in Anaplan.\n\n### Add items to a general list\n\n| **Scenario** | **Existing** | **Input in API** | **Behavior** | **Result** |\n| --- | --- | --- | --- | --- |\n| Add a new list Item | There are no existing items | name=n1  <br>code=c1 | Success.  <br>A new list item is created. | name=n1  <br>code=c1 |\n| Add list item with name conflicts | name=n1  <br>code=c1 | name=n1  <br>code=c2 | There is a duplicate name. A new list item is not added. | An error message returns. |\n| Add list item with code conflicts | name=n1  <br>code=c1 | name=n2  <br>code=c1 | There is a duplicate name. A new list item is not added. | An error message returns. |\n| Add list item without name | There are no existing items | code=c1 | There is a missing name. A new list item is not added. | An error message returns. |\n\n### Add items to a numbered list\n\nFor a numbered list, the name column is used for the index. The name is automatically generated. When you add an item, the API does not allow a name as an input.\n\n| **Scenario** | **Existing** | **Input in API** | **Behavior** | **Result** |\n| --- | --- | --- | --- | --- |\n| Add a new list Item | There are no existing items | name=n1  <br>code=c1 | A name is not a valid input. A new list item is not added. | An error message returns. |\n| Add a new list item | There are no existing items | code=c1 | Success.  <br>A new item is added. | success code=c1 |\n| Add a list item with a conflicting code | code=c1 | code=c1 | There is a duplicate code. A new list item is not added. | An error message returns. |",
         "tags": [
           "Transactional Write"
         ],
@@ -6105,7 +6105,7 @@
                       "properties": {
                         "name": {
                           "type": "string",
-                          "description": "Item display name. Required for named lists when adding; used as identifier when deleting."
+                          "description": "Item display name. Required for named lists when adding. Used as the identifier when deleting."
                         },
                         "code": {
                           "type": "string",
@@ -6113,7 +6113,7 @@
                         },
                         "id": {
                           "type": "string",
-                          "description": "Item ID. Returned by GET list items; can be used as identifier when deleting."
+                          "description": "Item ID. Returned by GET list items. Can be used as the identifier when deleting."
                         },
                         "parent": {
                           "type": "string",
@@ -6162,7 +6162,7 @@
         },
         "responses": {
           "200": {
-            "description": "Operation completed; per-item failures reported inline",
+            "description": "Operation completed. Per-item failures are reported inline.",
             "content": {
               "application/json": {
                 "example": {
@@ -6243,13 +6243,13 @@
       },
       "put": {
         "summary": "Update list items",
-        "description": "Minimum role: Standard User.\n\nUse this call to update items to a list. You must provide the model ID and list ID on the request URL. There are two kinds of lists in Anaplan: standard list and numbered list. For a standard list, the API identifies the item using the id, code, or name. For numbered list, the API uses the id or code. If property or subset is not specified in the input, the existing value is not updated. You can update one or more items in each request.\n\nWhen you specify the list item identifier, select one of the appropriate identifiers (id, code, or name). If the request contains multiple identifiers, the API returns an error.\n\n**Notes:**\n\n*   A maximum of 100,000 list items can be updated with a single call.\n    \n\nNote: When an update to a list item completes successfully, all downstream calculations are also complete. This includes cells linked by formulas to the cells being updated.\n\n### Request body\n\n| **List Data** | **Description** |\n| --- | --- |\n| `{name}` | The name value for the item in the list. |\n| `{code}` | The code value for the item in the list. |\n| `{id}` | The Anaplan ID of the item in the list. |\n| `{parent}` | The name of the parent item in the list |\n| `{properties}` | The value of each custom list property. |\n| `{subsets}` | The value of each custom list subset. |\n\n### Update logic\n\nThe update list item endpoint logic varies by the update scenario.\n\n| **Scenario** | **Existing** | **Input in API** | **Behavior** | **Result** |\n| --- | --- | --- | --- | --- |\n| Update list item | name=n1  <br>code=c1 | name=n1  <br>code=c1 | Success | name=n1  <br>code=c1 |\n| Update name | name=n1  <br>code=c1 | name=n2  <br>code=c1 | Success | name=n2  <br>code=c1 |\n| Update code | id=id1  <br>name=n1  <br>code=c1 | id=id1  <br>name=n1  <br>code=c2 | Success | id=id1  <br>name=n1  <br>code=c2 |\n| Update code without existing code | id=id1  <br>name=n1 | id=id1  <br>name=n1  <br>code=c2 | Success | id=id1  <br>name=n1  <br>code=c2 |\n| Update code  <br>(removing existing code) | id=id1  <br>name=n1  <br>code=c1 | id=id1  <br>name=n1  <br>code=\"\" | This scenario does not provide a new code to replace the existing value. An error returns. | error: `INCOMPLETE_DATA` |\n| Update code without an existing code  <br>(assign a code without the id) | name=n1 | name=n1  <br>code=c1 | Success | name=n1  <br>code=c1 |\n| Update code with same name | name=n1  <br>code=c1 | name=n1  <br>code=c2 | The name is already used. An error returns. | error: `INCOMPLETE_DATA` |\n| Update value with code only | name=n1  <br>code=c1  <br>properties{p1=1234} | code=c1  <br>properties{p1=1234} | Success  <br>It's valid to use the code to identify the record. | code=c1  <br>properties {p1=4321} |\n| Update value with name only.  <br>Do not specify the code | name=n1  <br>code=c1  <br>properties{p1=1234} | name=n1  <br>properties{p1=1234} | The code is required to identify the record. An error returns. | error: `INCOMPLETE_DATA` |\n| Update value with name only | name=n1  <br>properties{p1=1234} | name=n1  <br>properties{p1=4321} | Success  <br>When the code is not defined, the API can still update with the name. | name=n1  <br>properties{p1=4321} |\n\n### Response 200 body\n\nThe response body contains a JSON object that contains `total` (total number of items in request), `updated` (number of items updated), `ignored` (number of items ignored), and `failures` fields. On `failures`, each field contains information about any errors encountered while performing the update action. `requestIndex` is the index in the input items array.",
+        "description": "Minimum role: Standard User.\n\nUpdates items in a list. You must provide the model ID and list ID on the request URL. There are two kinds of lists in Anaplan: standard list and numbered list. For a standard list, the API identifies the item using the id, code, or name. For numbered list, the API uses the id or code. If property or subset is not specified in the input, the existing value is not updated. You can update one or more items in each request.\n\nWhen you specify the list item identifier, select one of the appropriate identifiers (id, code, or name). If the request contains multiple identifiers, the API returns an error.\n\n**Notes:**\n\n*   A maximum of 100,000 list items can be updated with a single call.\n    \n\nNote: When an update to a list item completes successfully, all downstream calculations are also complete. This includes cells linked by formulas to the cells being updated.\n\n### Request body\n\n| **List Data** | **Description** |\n| --- | --- |\n| `{name}` | The name value for the item in the list. |\n| `{code}` | The code value for the item in the list. |\n| `{id}` | The Anaplan ID of the item in the list. |\n| `{parent}` | The name of the parent item in the list |\n| `{properties}` | The value of each custom list property. |\n| `{subsets}` | The value of each custom list subset. |\n\n### Update logic\n\nThe update list item endpoint logic varies by the update scenario.\n\n| **Scenario** | **Existing** | **Input in API** | **Behavior** | **Result** |\n| --- | --- | --- | --- | --- |\n| Update list item | name=n1  <br>code=c1 | name=n1  <br>code=c1 | Success | name=n1  <br>code=c1 |\n| Update name | name=n1  <br>code=c1 | name=n2  <br>code=c1 | Success | name=n2  <br>code=c1 |\n| Update code | id=id1  <br>name=n1  <br>code=c1 | id=id1  <br>name=n1  <br>code=c2 | Success | id=id1  <br>name=n1  <br>code=c2 |\n| Update code without existing code | id=id1  <br>name=n1 | id=id1  <br>name=n1  <br>code=c2 | Success | id=id1  <br>name=n1  <br>code=c2 |\n| Update code  <br>(removing existing code) | id=id1  <br>name=n1  <br>code=c1 | id=id1  <br>name=n1  <br>code=\"\" | This scenario does not provide a new code to replace the existing value. An error returns. | error: `INCOMPLETE_DATA` |\n| Update code without an existing code  <br>(assign a code without the id) | name=n1 | name=n1  <br>code=c1 | Success | name=n1  <br>code=c1 |\n| Update code with same name | name=n1  <br>code=c1 | name=n1  <br>code=c2 | The name is already used. An error returns. | error: `INCOMPLETE_DATA` |\n| Update value with code only | name=n1  <br>code=c1  <br>properties{p1=1234} | code=c1  <br>properties{p1=1234} | Success  <br>It's valid to use the code to identify the record. | code=c1  <br>properties {p1=4321} |\n| Update value with name only.  <br>Do not specify the code | name=n1  <br>code=c1  <br>properties{p1=1234} | name=n1  <br>properties{p1=1234} | The code is required to identify the record. An error returns. | error: `INCOMPLETE_DATA` |\n| Update value with name only | name=n1  <br>properties{p1=1234} | name=n1  <br>properties{p1=4321} | Success  <br>When the code is not defined, the API can still update with the name. | name=n1  <br>properties{p1=4321} |\n\n### Response 200 body\n\nThe response body contains a JSON object that contains `total` (total number of items in request), `updated` (number of items updated), `ignored` (number of items ignored), and `failures` fields. On `failures`, each field contains information about any errors encountered while performing the update action. `requestIndex` is the index in the input items array.",
         "tags": [
           "Transactional Write"
         ],
         "responses": {
           "200": {
-            "description": "List items updated; per-item failures reported inline",
+            "description": "List items updated. Per-item failures are reported inline.",
             "content": {
               "application/json": {
                 "example": {
@@ -6397,7 +6397,7 @@
       ],
       "get": {
         "summary": "Get current fiscal year",
-        "description": "Minimum role: Workspace Administrator.\n\nUse this call to get the current fiscal year with the start and end date from the model calendar. The value of the start and end date is determined by the calendar type set in the model. This value is not always a range from Jan 1 to Dec 31. The API returns an empty value If the calendar type does not have an available fiscal year (for example, Weeks General).",
+        "description": "Minimum role: Workspace Administrator.\n\nReturns the current fiscal year with the start date and the end date from the model calendar. The value of the start and end date is determined by the calendar type set in the model. This value is not always a range from Jan 1 to Dec 31. The API returns an empty value If the calendar type does not have an available fiscal year (for example, Weeks General).",
         "tags": [
           "Model Metadata",
           "Model Setting Metadata"
@@ -6458,7 +6458,7 @@
       ],
       "get": {
         "summary": "Workspace-scoped form: Retrieve IDs and names for all modules in a model",
-        "description": "Minimum role: Standard User.\n\nAlternate URL form — response is equivalent to `/models/{modelId}/modules`.\n\nUse this call to retrieve the IDs and names of all modules for a specified model.\n\n**Notes**:\n\n*   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response",
+        "description": "Minimum role: Standard User.\n\nAlternate URL form — response is equivalent to `/models/{modelId}/modules`.\n\nReturns the IDs and names of all modules in a model.\n\n**Notes**:\n\n*   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response",
         "tags": [
           "Model Metadata",
           "Module & Saved View Metadata"
@@ -6704,7 +6704,7 @@
       ],
       "get": {
         "summary": "Workspace-scoped form: Retrieve IDs and names for views in a module",
-        "description": "Minimum role: Standard User.\n\nAlternate URL form — response is equivalent to `/models/{modelId}/modules/{moduleId}/views`.\n\nUse this call to retrieve all view IDs and names for a specified module. This call also returns the default view for the module. If the user adds the query parameter includesubsidiaryviews=true, unsaved subsidiary views will also be included in the results.\n\n**Notes**:\n\n*   For the default view, the `{viewId}` is the same as the `{moduleId}`\n*   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response\n*   For unsaved subsidiary views, the `{viewId}` and `{viewName}` are the same as the `{lineItemId}` and `{lineItemName}` that the subsidiary view is created from",
+        "description": "Minimum role: Standard User.\n\nAlternate URL form — response is equivalent to `/models/{modelId}/modules/{moduleId}/views`.\n\nReturns the IDs and names of all views in a module. This call also returns the default view for the module. If the user adds the query parameter includesubsidiaryviews=true, unsaved subsidiary views will also be included in the results.\n\n**Notes**:\n\n*   For the default view, the `{viewId}` is the same as the `{moduleId}`\n*   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response\n*   For unsaved subsidiary views, the `{viewId}` and `{viewName}` are the same as the `{lineItemId}` and `{lineItemName}` that the subsidiary view is created from",
         "tags": [
           "Model Metadata",
           "Module & Saved View Metadata"
@@ -6808,7 +6808,7 @@
           {
             "name": "sort",
             "in": "query",
-            "description": "Sort results. `+field` or unprefixed ascending, `-field` descending; comma-separate for multiple columns. `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order. Example: `+name`, `-id`.",
+            "description": "Sort results. `+field` or unprefixed ascending, `-field` descending. Comma-separate for multiple columns. `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order. Example: `+name`, `-id`.",
             "schema": {
               "type": "string"
             },
@@ -6887,7 +6887,7 @@
       ],
       "get": {
         "summary": "Retrieve metadata for a process",
-        "description": "Minimum role: Standard User.\n\nWorkspace-prefixed form of `GET /models/{modelId}/processes/{processId}`. Returns the same `processMetadata` response shape. Use this form when a workspace ID is available; the model-direct form is also valid.",
+        "description": "Minimum role: Standard User.\n\nWorkspace-prefixed form of `GET /models/{modelId}/processes/{processId}`. Returns the same `processMetadata` response shape. Use this form when a workspace ID is available. The model-direct form is also valid.",
         "tags": [
           "Model Metadata",
           "Action Metadata"
@@ -7264,7 +7264,7 @@
       ],
       "get": {
         "summary": "Retrieve IDs and names for all views in a model",
-        "description": "Minimum role: Standard User.\n\nUse this call to retrieve the ID and name of all views for a model. The results include default and saved views. If you add the query parameter `includesubsidiaryviews=true`, this includes unsaved subsidiary views in the results. This call also retrieves the ID of the module that the views belong to.\n\n**Notes**:\n\n*   Single quotes enclose the module and view names that have special characters\n*   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response\n\n### Default views\n\nFor default views:\n\n*   The value of the {viewId} is identical to the value of the {moduleId}\n*   The value of the name is identical to the value of the module\n\n### Saved views\n\nFor saved views:\n\n*   The `name` consists of the module name, a period, and the saved view name. For example, `REP01 Profit & Loss Report.P & L by Country`\n    \n\nFor unsaved subsidiary views:\n\n*   The name consists of the module name and the line item name that the subsidiary view is created from\n*   These are separated by a period(.)",
+        "description": "Minimum role: Standard User.\n\nReturns the ID and name of all views in a model. The results include default and saved views. If you add the query parameter `includesubsidiaryviews=true`, this includes unsaved subsidiary views in the results. This call also retrieves the ID of the module that the views belong to.\n\n**Notes**:\n\n*   Single quotes enclose the module and view names that have special characters\n*   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response\n\n### Default views\n\nFor default views:\n\n*   The value of the {viewId} is identical to the value of the {moduleId}\n*   The value of the name is identical to the value of the module\n\n### Saved views\n\nFor saved views:\n\n*   The `name` consists of the module name, a period, and the saved view name. For example, `REP01 Profit & Loss Report.P & L by Country`\n    \n\nFor unsaved subsidiary views:\n\n*   The name consists of the module name and the line item name that the subsidiary view is created from\n*   These are separated by a period(.)",
         "tags": [
           "Model Metadata",
           "Module & Saved View Metadata"
@@ -7381,7 +7381,7 @@
       ],
       "get": {
         "summary": "Workspace-scoped form: Retrieve metadata for dimensions on a view",
-        "description": "Minimum role: Standard User.\n\nAlternate URL form — response is equivalent to `/models/{modelId}/views/{viewId}`.\n\nUse this call to retrieve the name, IDs, and lists of names for the dimensions (columns, pages, rows) on a specified view.\n\n**Notes**:\n\n*   If a view has no dimensions on an axis, the call omits the axis field (for example, no `“rows”` field at all instead of `“rows”: []`)\n*   If a view is the default view, its `name` is set to be the same as the module name\n*   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response\n*   The `viewId` in this request can also be replaced by any valid `lineItemId`. If the Line Item has a changed dimensionality (has a Subsidiary View), the response returns the metadata applicable to that line item. Otherwise, the response returns the default metadata\n    \n\nYou can use this API call to [map dimensions to cell data export headers](https://help.anaplan.com/43cd0223-edaa-4289-9833-eb9b73666aac-Map-dimensions-to-cell-data-export-headers) or [transform grid CSV format to tabular single column format](https://help.anaplan.com/c8a665b9-6b23-4254-ac68-816657a6e878-Retrieve-the-view-metadata-and-grid-view-data).",
+        "description": "Minimum role: Standard User.\n\nAlternate URL form — response is equivalent to `/models/{modelId}/views/{viewId}`.\n\nReturns the name, the IDs, and the lists of names for the dimensions (columns, pages, rows) on a view.\n\n**Notes**:\n\n*   If a view has no dimensions on an axis, the call omits the axis field (for example, no `“rows”` field at all instead of `“rows”: []`)\n*   If a view is the default view, its `name` is set to be the same as the module name\n*   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response\n*   The `viewId` in this request can also be replaced by any valid `lineItemId`. If the Line Item has a changed dimensionality (has a Subsidiary View), the response returns the metadata applicable to that line item. Otherwise, the response returns the default metadata\n    \n\nYou can use this API call to [map dimensions to cell data export headers](https://help.anaplan.com/43cd0223-edaa-4289-9833-eb9b73666aac-Map-dimensions-to-cell-data-export-headers) or [transform grid CSV format to tabular single column format](https://help.anaplan.com/c8a665b9-6b23-4254-ac68-816657a6e878-Retrieve-the-view-metadata-and-grid-view-data).",
         "tags": [
           "Model Metadata",
           "Module & Saved View Metadata"
@@ -7494,7 +7494,7 @@
       ],
       "post": {
         "summary": "Initiate long read request",
-        "description": "Minimum role: Standard User.\n\nUse this call to initiate a large volume read request of view data. This enables you to read data from views that are larger than a million cell count.\n\n**Note:**\n\n*   As a best practice, use the Delete read requests call to clear all pages from completed exports as soon as you download all pages. Doing so will make space available for future exports.\n\n### Request Body\n\nThis API supports exporting data in the following formats:\n\n| **Type** | **Description** | **More information** |\n| --- | --- | --- |\n| `GRID_ALL_PAGES` | This layout respects the existing sorting and filtering you have imposed on a data grid before you launch the export. | [Export grid](https://help.anaplan.com/Import_and_Export/Export_Layouts/Export_Data_in_Grid_Layout.html) |\n| `TABULAR_SINGLE_ITEMS` | This layout takes all dimensions and puts them in columns, with the final column reserved for data. | [Export tabular single column](https://help.anaplan.com/Import_and_Export/Export_Layouts/Export_Data_in_Tabular_Single_Column_Layout.html) |\n| `TABULAR_MULTI_COLUMN` | This layout enables you to export multiple data columns. If you set up a Boolean line item, you can use it as a filter to control which data is exported. This is especially useful when exporting from large modules. It saves the manual task of marking data cells for export. | [Export Tabular Multiple Column](https://help.anaplan.com/Import_and_Export/Export_Layouts/Export_Data_in_Tabular_Multiple_Column_Layout.html) |",
+        "description": "Minimum role: Standard User.\n\nStarts a large-volume read request of view data. This enables you to read data from views that are larger than a million cell count.\n\n**Note:**\n\n*   As a best practice, use the Delete read requests call to clear all pages from completed exports as soon as you download all pages. Doing so will make space available for future exports.\n\n### Request Body\n\nThis API supports exporting data in the following formats:\n\n| **Type** | **Description** | **More information** |\n| --- | --- | --- |\n| `GRID_ALL_PAGES` | This layout respects the existing sorting and filtering you have imposed on a data grid before you launch the export. | [Export grid](https://help.anaplan.com/Import_and_Export/Export_Layouts/Export_Data_in_Grid_Layout.html) |\n| `TABULAR_SINGLE_ITEMS` | This layout takes all dimensions and puts them in columns, with the final column reserved for data. | [Export tabular single column](https://help.anaplan.com/Import_and_Export/Export_Layouts/Export_Data_in_Tabular_Single_Column_Layout.html) |\n| `TABULAR_MULTI_COLUMN` | This layout enables you to export multiple data columns. If you set up a Boolean line item, you can use it as a filter to control which data is exported. This is especially useful when exporting from large modules. It saves the manual task of marking data cells for export. | [Export Tabular Multiple Column](https://help.anaplan.com/Import_and_Export/Export_Layouts/Export_Data_in_Tabular_Multiple_Column_Layout.html) |",
         "tags": [
           "Transactional Read"
         ],
@@ -7558,7 +7558,7 @@
       ],
       "get": {
         "summary": "Retrieve status of large read request",
-        "description": "Minimum role: Standard User.\n\nUse this call to check the status of an export action after a bulk data long request is initiated. You can use it to check how many pages are available to download.\n\n### Response scenarios\n\n*   When `requestState` is `COMPLETE` and `successful` is `true` , the export has completed successfully and the user can download all the pages.\n*   When `requestState` is `IN_PROGRESS` and `successful` is `false`, the export has not yet completed. You can download the available pages indicated by the `availablePages` field.\n*   When `requestState` is `COMPLETE` and `successful` is `false`, this means the export failed. Retry and initiate a new export.\n*   When 'requestState' is 'NOT_STARTED' then simply check the status again.\n*   When requestState' is 'CANCELLED' then this request is completed by a 'DELETE' call.\n    \n\nWe recommend you delete the last failed export before initiating a new export, using the delete export endpoint.",
+        "description": "Minimum role: Standard User.\n\nReturns the status of an export action after a bulk data long request starts. You can use it to check how many pages are available to download.\n\n### Response scenarios\n\n*   When `requestState` is `COMPLETE` and `successful` is `true` , the export has completed successfully and the user can download all the pages.\n*   When `requestState` is `IN_PROGRESS` and `successful` is `false`, the export has not yet completed. You can download the available pages indicated by the `availablePages` field.\n*   When `requestState` is `COMPLETE` and `successful` is `false`, this means the export failed. Retry and initiate a new export.\n*   When 'requestState' is 'NOT_STARTED' then simply check the status again.\n*   When requestState' is 'CANCELLED' then this request is completed by a 'DELETE' call.\n    \n\nWe recommend you delete the last failed export before initiating a new export, using the delete export endpoint.",
         "tags": [
           "Transactional Read"
         ],
@@ -7609,13 +7609,13 @@
       },
       "delete": {
         "summary": "Delete Read Request",
-        "description": "Minimum role: Standard User.\n\nUse this call to delete or cancel an initiated read request. This removes all the pages from the file store and stops the ongoing read request.\n\n**Notes**:\n\n*   As a best practice, use this call to clear all pages from completed exports as soon as you download all pages. Doing so will make space available for future exports.\n*   The system will automatically reclaim space for read requests not accessed for over 30 minutes. The same applies to failed read requests.\n\n### Response 200 body",
+        "description": "Minimum role: Standard User.\n\nDeletes or cancels a read request that started. This removes all the pages from the file store and stops the ongoing read request.\n\n**Notes**:\n\n*   As a best practice, use this call to clear all pages from completed exports as soon as you download all pages. Doing so will make space available for future exports.\n*   The system will automatically reclaim space for read requests not accessed for over 30 minutes. The same applies to failed read requests.\n\n### Response 200 body",
         "tags": [
           "Transactional Read"
         ],
         "responses": {
           "200": {
-            "description": "Read request cancelled or removed; pages cleared from file store.",
+            "description": "Read request cancelled or removed. Pages cleared from the file store.",
             "content": {
               "application/json": {
                 "schema": {
@@ -7677,7 +7677,7 @@
       ],
       "get": {
         "summary": "Download Pages",
-        "description": "Minimum role: Standard User.\n\nUse this call to download the available pages, either when the read request is in progress, or when the request is completed. This request returns a CSV format response of the export list items.\n\nYou can download pages while the export is in progress. You can download up to `availablePages` number of pages returned by the export status API.\n\nNote that page numbers start with zero. That means if 10 pages are available, you can download from page=0 through page=9\n\n**Note:**\n\n*   As a best practice, use the **Delete read requests** call to clear all pages from completed exports as soon as you download all pages. Doing so will make space available for future exports.",
+        "description": "Minimum role: Standard User.\n\nDownloads the available pages, either when the read request is in progress, or when the request is complete. This request returns a CSV format response of the export list items.\n\nYou can download pages while the export is in progress. You can download up to `availablePages` number of pages returned by the export status API.\n\nNote that page numbers start with zero. That means if 10 pages are available, you can download from page=0 through page=9\n\n**Note:**\n\n*   As a best practice, use the **Delete read requests** call to clear all pages from completed exports as soon as you download all pages. Doing so will make space available for future exports.",
         "tags": [
           "Transactional Read"
         ],
@@ -7717,7 +7717,7 @@
       ],
       "get": {
         "summary": "List workspace visitors",
-        "description": "Minimum role: User Administrator.\n\nReturns all visitors for a workspace. Requires tenant admin privilege; workspace admin access alone is insufficient.\n\nDeactivated visitors (`active` is `false`) are typically not relevant to callers listing people; filter to `active=true` unless you specifically need inactive visitors.",
+        "description": "Minimum role: User Administrator.\n\nReturns all visitors for a workspace. Requires tenant admin privilege. Workspace admin access alone is insufficient.\n\nDeactivated visitors (`active` is `false`) are typically not relevant to callers listing people. Filter to `active=true` unless you specifically need inactive visitors.",
         "tags": [
           "General Workspace & Model Metadata"
         ],
@@ -7823,7 +7823,7 @@
       "ChunkId": {
         "name": "chunkId",
         "in": "path",
-        "description": "The chunk identifier. From the `id` values returned by the sibling `GET .../chunks` list endpoint for the file or dump. Chunk ids are zero-based; chunk `0` is always the first chunk of a file that has any content.",
+        "description": "The chunk identifier. From the `id` values returned by the sibling `GET .../chunks` list endpoint for the file or dump. Chunk ids are zero-based. Chunk `0` is always the first chunk of a file that has any content.",
         "required": true,
         "schema": {
           "type": "string"
@@ -7965,7 +7965,7 @@
       "Search": {
         "name": "s",
         "in": "query",
-        "description": "Optional case-insensitive substring filter (matches anywhere in the field). Supports wildcards `%` (0-n characters) and `_` (exactly 1 character). Omit to return all items. **Undocumented, and behavior is endpoint-specific.** `GET /workspaces` and `GET /users` are verified with the Workspace Administrator role. `GET /models` requires the Tenant Admin role; otherwise it returns the full model list unfiltered.",
+        "description": "Optional case-insensitive substring filter (matches anywhere in the field). Supports wildcards `%` (0-n characters) and `_` (exactly 1 character). Omit to return all items. **Undocumented, and behavior is endpoint-specific.** `GET /workspaces` and `GET /users` are verified with the Workspace Administrator role. `GET /models` requires the Tenant Admin role. Without that role it returns the full model list unfiltered.",
         "required": false,
         "schema": {
           "type": "string"
@@ -8276,7 +8276,7 @@
           },
           "id": {
             "type": "string",
-            "description": "12- or 13-digit numeric identifier. Default views share the module prefix 102; named saved views use higher-range prefixes (up to 13 digits)."
+            "description": "12- or 13-digit numeric identifier. Default views share the module prefix 102. Named saved views use higher-range prefixes (up to 13 digits)."
           },
           "moduleId": {
             "type": "string"
@@ -8723,7 +8723,7 @@
             "items": {
               "type": "string"
             },
-            "description": "Selected item labels for each page-axis dimension; empty when no page dimensions exist."
+            "description": "Selected item labels for each page-axis dimension. The array is empty when no page dimensions exist."
           },
           "columnCoordinates": {
             "type": "array",
@@ -8733,7 +8733,7 @@
                 "type": "string"
               }
             },
-            "description": "Coordinate labels for each column; each inner array has one entry per column dimension."
+            "description": "Coordinate labels for each column. Each inner array has one entry per column dimension."
           },
           "rows": {
             "type": "array",
@@ -8752,14 +8752,14 @@
             "items": {
               "type": "string"
             },
-            "description": "Coordinate labels for this row; one entry per row dimension."
+            "description": "Coordinate labels for this row. There is one entry per row dimension."
           },
           "cells": {
             "type": "array",
             "items": {
               "type": "string"
             },
-            "description": "Cell values in column order; positions correspond to columnCoordinates."
+            "description": "Cell values in column order. Positions correspond to columnCoordinates."
           }
         }
       },
@@ -8885,7 +8885,7 @@
           },
           "id": {
             "type": "string",
-            "description": "12-digit numeric identifier. The prefix 116 marks this as an export definition; the export output file shares this same ID."
+            "description": "12-digit numeric identifier. The prefix 116 marks this as an export definition. The export output file shares this same ID."
           },
           "name": {
             "type": "string"
@@ -8983,7 +8983,7 @@
           },
           "firstDataRow": {
             "type": "integer",
-            "description": "Row number of the first data row. 0 means no data rows are configured; otherwise 1-based (row 1 = first row of the file)."
+            "description": "Row number of the first data row. 0 means no data rows are configured. Other values are 1-based (row 1 = first row of the file)."
           },
           "format": {
             "type": "string"
@@ -8994,7 +8994,7 @@
           },
           "id": {
             "type": "string",
-            "description": "12-digit numeric identifier. Import source files use the prefix 113; export output files use 116, matching their parent export's ID."
+            "description": "12-digit numeric identifier. Import source files use the prefix 113. Export output files use 116, matching their parent export's ID."
           },
           "language": {
             "type": "string"
@@ -9043,7 +9043,7 @@
           },
           "importDataSourceId": {
             "type": "string",
-            "description": "The id of the data source this import reads. When the source is an uploaded file this is its file id (prefix 113, from `GET /models/{modelId}/files`); upload to this file id, then run the import. For model, list, or saved-view sources it is the source object id instead.",
+            "description": "The id of the data source this import reads. When the source is an uploaded file this is its file id (prefix 113, from `GET /models/{modelId}/files`). Upload to this file id, then run the import. For model, list, or saved-view sources it is the source object id instead.",
             "example": "113000000006"
           },
           "importType": {
@@ -9164,7 +9164,7 @@
           },
           "formatMetadata": {
             "type": "object",
-            "description": "Formatting configuration for the line item; the fields present depend on the format.",
+            "description": "Formatting configuration for the line item. The fields present depend on the format.",
             "properties": {
               "comparisonIncrease": {
                 "type": "string"
@@ -9318,7 +9318,7 @@
             "type": "number"
           },
           "failures": {
-            "description": "An array of cell write failures; empty when all cells updated successfully.",
+            "description": "An array of cell write failures. The array is empty when all cells update successfully.",
             "type": "array",
             "items": {
               "type": "object",
@@ -9363,7 +9363,7 @@
           },
           "progress": {
             "type": "number",
-            "description": "Execution progress as a fraction (0.0–1.0); typically 1.0 on completion"
+            "description": "Execution progress as a fraction (0.0–1.0). The value is typically 1.0 on completion."
           },
           "result": {
             "$ref": "#/components/schemas/TaskResult",
@@ -9448,7 +9448,7 @@
           },
           "taskId": {
             "type": "string",
-            "description": "Unique identifier for the task; use this to poll GET .../tasks/{taskId}."
+            "description": "Unique identifier for the task. Use this to poll GET .../tasks/{taskId}."
           },
           "taskState": {
             "enum": [
@@ -9499,7 +9499,7 @@
         }
       },
       "Status": {
-        "description": "Response status object present in every Anaplan API response envelope. `code` is the Anaplan-specific status code (not the HTTP status code); `message` is the human-readable outcome.",
+        "description": "Response status object present in every Anaplan API response envelope. `code` is the Anaplan-specific status code (not the HTTP status code). `message` is the human-readable outcome.",
         "type": "object",
         "properties": {
           "code": {
@@ -9515,7 +9515,7 @@
         }
       },
       "Meta": {
-        "description": "Response metadata envelope present in paginated Anaplan API responses. `schema` is a URL to the JSON schema definition for the response body; `paging` holds cursor-based navigation state.",
+        "description": "Response metadata envelope present in paginated Anaplan API responses. `schema` is a URL to the JSON schema definition for the response body. `paging` holds cursor-based navigation state.",
         "type": "object",
         "required": [
           "schema"

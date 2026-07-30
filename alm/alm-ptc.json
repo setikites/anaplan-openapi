@@ -468,7 +468,7 @@
             },
             "status": {
               "type": "object",
-              "description": "Anaplan API response status. The code mirrors the HTTP status code; the message is a human-readable outcome string.",
+              "description": "Anaplan API response status. The code mirrors the HTTP status code. The message is a human-readable outcome string.",
               "properties": {
                 "code": {
                   "type": "integer",
@@ -578,7 +578,7 @@
             },
             "status": {
               "type": "object",
-              "description": "Anaplan API response status. The code mirrors the HTTP status code; the message is a human-readable outcome string.",
+              "description": "Anaplan API response status. The code mirrors the HTTP status code. The message is a human-readable outcome string.",
               "properties": {
                 "code": {
                   "type": "integer",
@@ -729,7 +729,7 @@
             },
             "status": {
               "type": "object",
-              "description": "Anaplan API response status. The code mirrors the HTTP status code; the message is a human-readable outcome string.",
+              "description": "Anaplan API response status. The code mirrors the HTTP status code. The message is a human-readable outcome string.",
               "properties": {
                 "code": {
                   "type": "integer",
@@ -860,7 +860,7 @@
             },
             "status": {
               "type": "object",
-              "description": "Anaplan API response status. The code mirrors the HTTP status code; the message is a human-readable outcome string.",
+              "description": "Anaplan API response status. The code mirrors the HTTP status code. The message is a human-readable outcome string.",
               "properties": {
                 "code": {
                   "type": "integer",
@@ -916,7 +916,7 @@
       }
     },
     "getAppliedToModels": {
-      "description": "Minimum role: Workspace Administrator.\n\nReturns all models that have had this revision applied. Deleted models are included with `modelDeleted: true`; their `modelName` and `workspaceId` are omitted.\n\nThe first model in this list is the source model where revisions are created. Any model in this list can be a `sourceModelId` for discovering this revision (using `GET /models/{modelId}/alm/syncableRevisions`) and syncing it (using `POST /models/{modelId}/alm/syncTasks`).",
+      "description": "Minimum role: Workspace Administrator.\n\nReturns all models that have had this revision applied. Deleted models are included with `modelDeleted: true`. Their `modelName` and `workspaceId` are omitted.\n\nThe first model in this list is the source model where revisions are created. Any model in this list can be a `sourceModelId` for discovering this revision (using `GET /models/{modelId}/alm/syncableRevisions`) and syncing it (using `POST /models/{modelId}/alm/syncTasks`).",
       "parameters": [
         {
           "name": "modelId",
@@ -978,7 +978,7 @@
             },
             "status": {
               "type": "object",
-              "description": "Anaplan API response status. The code mirrors the HTTP status code; the message is a human-readable outcome string.",
+              "description": "Anaplan API response status. The code mirrors the HTTP status code. The message is a human-readable outcome string.",
               "properties": {
                 "code": {
                   "type": "integer",
@@ -1086,7 +1086,7 @@
             },
             "status": {
               "type": "object",
-              "description": "Anaplan API response status. The code mirrors the HTTP status code; the message is a human-readable outcome string.",
+              "description": "Anaplan API response status. The code mirrors the HTTP status code. The message is a human-readable outcome string.",
               "properties": {
                 "code": {
                   "type": "integer",
@@ -1126,7 +1126,7 @@
                   },
                   "result": {
                     "type": "object",
-                    "description": "Outcome of an async task. Check `successful` first; if false, `error` contains details. On successful report tasks, `reportFileUrl` is populated with a download URL.",
+                    "description": "Outcome of an async task. Check `successful` first. If it is false, `error` contains details. On successful report tasks, `reportFileUrl` is populated with a download URL.",
                     "properties": {
                       "successful": {
                         "type": "boolean"
@@ -1240,7 +1240,7 @@
             },
             "status": {
               "type": "object",
-              "description": "Anaplan API response status. The code mirrors the HTTP status code; the message is a human-readable outcome string.",
+              "description": "Anaplan API response status. The code mirrors the HTTP status code. The message is a human-readable outcome string.",
               "properties": {
                 "code": {
                   "type": "integer",
@@ -1278,7 +1278,7 @@
                 },
                 "result": {
                   "type": "object",
-                  "description": "Outcome of an async task. Check `successful` first; if false, `error` contains details. On successful report tasks, `reportFileUrl` is populated with a download URL.",
+                  "description": "Outcome of an async task. Check `successful` first. If it is false, `error` contains details. On successful report tasks, `reportFileUrl` is populated with a download URL.",
                   "properties": {
                     "successful": {
                       "type": "boolean"
@@ -1372,7 +1372,7 @@
             },
             "status": {
               "type": "object",
-              "description": "Anaplan API response status. The code mirrors the HTTP status code; the message is a human-readable outcome string.",
+              "description": "Anaplan API response status. The code mirrors the HTTP status code. The message is a human-readable outcome string.",
               "properties": {
                 "code": {
                   "type": "integer",
@@ -1410,7 +1410,7 @@
                 },
                 "result": {
                   "type": "object",
-                  "description": "Outcome of an async task. Check `successful` first; if false, `error` contains details. On successful report tasks, `reportFileUrl` is populated with a download URL.",
+                  "description": "Outcome of an async task. Check `successful` first. If it is false, `error` contains details. On successful report tasks, `reportFileUrl` is populated with a download URL.",
                   "properties": {
                     "successful": {
                       "type": "boolean"
@@ -1523,7 +1523,7 @@
             },
             "status": {
               "type": "object",
-              "description": "Anaplan API response status. The code mirrors the HTTP status code; the message is a human-readable outcome string.",
+              "description": "Anaplan API response status. The code mirrors the HTTP status code. The message is a human-readable outcome string.",
               "properties": {
                 "code": {
                   "type": "integer",
@@ -1557,7 +1557,7 @@
                 },
                 "result": {
                   "type": "object",
-                  "description": "Outcome of an async task. Check `successful` first; if false, `error` contains details. On successful report tasks, `reportFileUrl` is populated with a download URL.",
+                  "description": "Outcome of an async task. Check `successful` first. If it is false, `error` contains details. On successful report tasks, `reportFileUrl` is populated with a download URL.",
                   "properties": {
                     "successful": {
                       "type": "boolean"
@@ -1651,7 +1651,7 @@
             },
             "status": {
               "type": "object",
-              "description": "Anaplan API response status. The code mirrors the HTTP status code; the message is a human-readable outcome string.",
+              "description": "Anaplan API response status. The code mirrors the HTTP status code. The message is a human-readable outcome string.",
               "properties": {
                 "code": {
                   "type": "integer",
@@ -1685,7 +1685,7 @@
                 },
                 "result": {
                   "type": "object",
-                  "description": "Outcome of an async task. Check `successful` first; if false, `error` contains details. On successful report tasks, `reportFileUrl` is populated with a download URL.",
+                  "description": "Outcome of an async task. Check `successful` first. If it is false, `error` contains details. On successful report tasks, `reportFileUrl` is populated with a download URL.",
                   "properties": {
                     "successful": {
                       "type": "boolean"
@@ -1717,7 +1717,7 @@
       }
     },
     "getComparisonReport": {
-      "description": "Minimum role: Workspace Administrator.\n\nDownloads the full comparison report as a tab-separated values (TSV) file. The report is available for 48 hours after generation and includes sections for: Lists Added, Modules Added, Roles Changed, Changes Within Lists, and Line Items Added.\n\n**HIGH VOLUME** \u2014 the full report is returned whole in one non-paginated response (observed ~147 KB) and can be larger; there is no paging. Fetch it only when you need the complete diff.",
+      "description": "Minimum role: Workspace Administrator.\n\nDownloads the full comparison report as a tab-separated values (TSV) file. The report is available for 48 hours after generation and includes sections for: Lists Added, Modules Added, Roles Changed, Changes Within Lists, and Line Items Added.\n\n**HIGH VOLUME** \u2014 the full report is returned whole in one non-paginated response (observed ~147 KB) and can be larger. There is no paging. Fetch it only when you need the complete diff.",
       "parameters": [
         {
           "name": "modelId",
@@ -1833,7 +1833,7 @@
             },
             "status": {
               "type": "object",
-              "description": "Anaplan API response status. The code mirrors the HTTP status code; the message is a human-readable outcome string.",
+              "description": "Anaplan API response status. The code mirrors the HTTP status code. The message is a human-readable outcome string.",
               "properties": {
                 "code": {
                   "type": "integer",
@@ -1867,7 +1867,7 @@
                 },
                 "result": {
                   "type": "object",
-                  "description": "Outcome of an async task. Check `successful` first; if false, `error` contains details. On successful report tasks, `reportFileUrl` is populated with a download URL.",
+                  "description": "Outcome of an async task. Check `successful` first. If it is false, `error` contains details. On successful report tasks, `reportFileUrl` is populated with a download URL.",
                   "properties": {
                     "successful": {
                       "type": "boolean"
@@ -1961,7 +1961,7 @@
             },
             "status": {
               "type": "object",
-              "description": "Anaplan API response status. The code mirrors the HTTP status code; the message is a human-readable outcome string.",
+              "description": "Anaplan API response status. The code mirrors the HTTP status code. The message is a human-readable outcome string.",
               "properties": {
                 "code": {
                   "type": "integer",
@@ -1995,7 +1995,7 @@
                 },
                 "result": {
                   "type": "object",
-                  "description": "Outcome of an async task. Check `successful` first; if false, `error` contains details. On successful report tasks, `reportFileUrl` is populated with a download URL.",
+                  "description": "Outcome of an async task. Check `successful` first. If it is false, `error` contains details. On successful report tasks, `reportFileUrl` is populated with a download URL.",
                   "properties": {
                     "successful": {
                       "type": "boolean"
