@@ -7,6 +7,9 @@ ADR 0003 rules encoded here:
       description ('Integration ID.', 'Job type.') is worse than nothing.
   §3  Enum field descriptions must explain what values *do*, not just list them.
 
+ADR 0007 (STE prose standard) governs how a description reads rather than what
+it says. Its sweeps build on iter_prose_sentences() at the end of this file.
+
 These tests are table-driven. To sweep the next spec, add rows to the tables
 below — no new test functions needed.
 """
@@ -647,9 +650,10 @@ def test_no_enum_restatement_descriptions():
 # restates the field or schema name is worse than no description — it trains
 # readers to ignore descriptions, obscuring the ones that genuinely add value.
 #
-# This test sweeps all 9 specs automatically. No manual table entries needed.
+# This test sweeps all ten specs automatically. No manual table entries needed.
 
 _ALL_API_DIRS = [
+    "administration",
     "alm",
     "audit",
     "authentication",
@@ -860,18 +864,20 @@ def test_no_unconfirmed_patterns():
 # Case-sensitive patterns for proper nouns so that lowercase occurrences in
 # cross-reference URLs (apiary.io, postman.com) are not flagged.
 
-def _walk_all_descriptions(obj: object, path: str = "") -> Iterator[tuple[str, str]]:
-    """Yield (json_path, description_text) for every 'description' string in the spec."""
+def _walk_all_descriptions(
+    obj: object, path: str = "", keys: tuple[str, ...] = ("description",)
+) -> Iterator[tuple[str, str]]:
+    """Yield (json_path, text) for every string under one of `keys` in the spec."""
     if isinstance(obj, dict):
         for key, value in obj.items():
             child_path = f"{path}/{key}" if path else key
-            if key == "description" and isinstance(value, str):
+            if key in keys and isinstance(value, str):
                 yield child_path, value
             else:
-                yield from _walk_all_descriptions(value, child_path)
+                yield from _walk_all_descriptions(value, child_path, keys)
     elif isinstance(obj, list):
         for i, item in enumerate(obj):
-            yield from _walk_all_descriptions(item, f"{path}/{i}")
+            yield from _walk_all_descriptions(item, f"{path}/{i}", keys)
 
 
 _PROVENANCE_NOUN_PATTERNS: list[tuple[re.Pattern, str]] = [
@@ -977,3 +983,102 @@ def test_no_tautological_descriptions():
         f"(ADR 0003 §2 — a description must say something the field name does not):\n"
         + "\n".join(violations)
     )
+
+
+# ─── ADR 0007 prose extraction ───────────────────────────────────────────────
+#
+# ADR 0003 governs what a description says; ADR 0007 governs how it reads.
+# The prose sweeps (no semicolons, no contractions, sentence length, ...) all
+# build on iter_prose_sentences() below.
+#
+# Before splitting into sentences, the spans ADR 0007 §2 exempts are removed:
+# code spans (`CANCELLED`), URLs, markdown table rows, bullet lines, and
+# headings. servers[].description is skipped whole — those are comma-separated
+# region lists, not prose.
+
+_PROSE_KEYS = ("description", "summary")
+
+_CODE_SPAN_RE = re.compile(r"`[^`]*`")
+_URL_RE = re.compile(r"<?https?://[^\s>)\]]+>?")
+# Markdown table rows, bullets, numbered items, headings, and block quotes.
+_NON_PROSE_LINE_RE = re.compile(r"^\s*(?:\||[-*+]\s|\d+[.)]\s|#{1,6}\s|>)")
+# Abbreviations whose period does not end a sentence.
+_ABBREV_RE = re.compile(r"\b(?:e\.g|i\.e|etc|vs|approx|cf)\.", re.IGNORECASE)
+_SENTENCE_SPLIT_RE = re.compile(r"(?<=[.!?])\s+")
+_ABBREV_MARK = "\x00"
+
+
+def _strip_exempt_spans(text: str) -> str:
+    """Remove the spans ADR 0007 §2 exempts from the prose rules."""
+    kept = [ln for ln in text.splitlines() if not _NON_PROSE_LINE_RE.match(ln)]
+    text = "\n".join(kept)
+    text = _CODE_SPAN_RE.sub(" ", text)
+    return _URL_RE.sub(" ", text)
+
+
+def _prose_sentences(text: str) -> Iterator[str]:
+    """Yield whitespace-normalized sentences from one description or summary."""
+    text = _strip_exempt_spans(text)
+    text = _ABBREV_RE.sub(lambda m: m.group(0).replace(".", _ABBREV_MARK), text)
+    for chunk in _SENTENCE_SPLIT_RE.split(text):
+        sentence = " ".join(chunk.replace(_ABBREV_MARK, ".").split())
+        if sentence:
+            yield sentence
+
+
+def iter_prose_sentences() -> Iterator[tuple[str, str, str]]:
+    """Yield (spec, json_path, sentence) for every description and summary in the specs.
+
+    The unit of a prose rule is one sentence, so a failure message can quote the
+    offending sentence rather than a 200-word description. json_path locates it.
+    """
+    for api_dir in _ALL_API_DIRS:
+        spec_path = REPO_ROOT / api_dir / f"{api_dir}-openapi.json"
+        if not spec_path.exists():
+            continue
+        spec = json.loads(spec_path.read_text(encoding="utf-8"))
+        for json_path, text in _walk_all_descriptions(spec, keys=_PROSE_KEYS):
+            if json_path.startswith("servers/"):
+                continue  # region lists, not prose (ADR 0007 §2)
+            for sentence in _prose_sentences(text):
+                yield api_dir, json_path, sentence
+
+
+def test_prose_extraction_removes_exempt_spans():
+    """The prose helper must drop code spans, URLs, table rows, and bullets (ADR 0007 §2)."""
+    text = (
+        "Cancel the task. The state becomes `CANCELLED`.\n"
+        "| Field | Meaning |\n"
+        "| --- | --- |\n"
+        "- A bullet line with a `code` span.\n"
+        "See https://example.com/docs for detail."
+    )
+    assert list(_prose_sentences(text)) == [
+        "Cancel the task.",
+        "The state becomes .",
+        "See for detail.",
+    ]
+
+
+def test_prose_extraction_keeps_abbreviations_in_one_sentence():
+    """'e.g.' must not split a sentence in two — the sweeps count words per sentence."""
+    assert list(_prose_sentences("Use a terminal state, e.g. COMPLETE, to stop.")) == [
+        "Use a terminal state, e.g. COMPLETE, to stop."
+    ]
+
+
+def test_prose_extraction_covers_every_spec():
+    """iter_prose_sentences must yield sentences from all ten specs, not just some."""
+    seen = {spec for spec, _, _ in iter_prose_sentences()}
+    assert seen == set(_ALL_API_DIRS), (
+        f"prose extraction missed: {sorted(set(_ALL_API_DIRS) - seen)}"
+    )
+
+
+def test_prose_extraction_yields_summaries_and_paths():
+    """Operation summaries must be extracted, and each sentence must carry its JSON path."""
+    rows = list(iter_prose_sentences())
+    assert any("/summary" in path for _, path, _ in rows), (
+        "no 'summary' text extracted — ADR 0007 covers summary as well as description"
+    )
+    assert all(path and sentence for _, path, sentence in rows)
