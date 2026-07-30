@@ -134,7 +134,7 @@
       "post": {
         "operationId": "searchExceptionUsers",
         "summary": "Search exception users",
-        "description": "Minimum role: Standard User.\n\nSearch by workspace to list all exception users in that workspace (including visitors), or search by user to list all workspaces where that user has exception-user access (visitors' workspaces are excluded from the by-user results). Exactly one of `workspaceGuid` or `userGuid` must be provided.",
+        "description": "Minimum role: Standard User.\n\nSearch by workspace to list all exception users in that workspace, visitors included. Search by user to list all workspaces where that user has exception-user access. The by-user results exclude visitors' workspaces. Exactly one of `workspaceGuid` or `userGuid` must be provided.",
         "requestBody": {
           "required": true,
           "content": {

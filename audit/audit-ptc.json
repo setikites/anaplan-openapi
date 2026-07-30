@@ -66,7 +66,7 @@
   ],
   "detail": {
     "getAuditEvents": {
-      "description": "Minimum role: Tenant Auditor.\n\nRetrieves audit events for the tenant associated with the authenticated user. Use `type` to filter by event category. Use `dateFrom`/`dateTo` for a specific date range, or `intervalInHours` for a rolling window. The queried range cannot exceed 30 days. If no date filter is supplied, the previous 30 days are returned. Use `limit` and `offset` for pagination (the documented limit cap of 10000 is not enforced server-side \u2014 see the `limit` parameter).\n\n**HIGH VOLUME** \u2014 audit events are unbounded: a single busy hour can exceed 1,500 events (~825 KB), and with no date filter the default window is the previous 30 days. With no `limit`, a client that auto-follows `meta.paging` merges every page into one response and overflows its token budget. Always pass an explicit `limit` (start small, ~50\u2013100) and narrow the query with `type` plus a tight time range (`intervalInHours`/`interval` or explicit dates). To sweep the full set, hand-page with `limit`+`offset` or filter server-side \u2014 never pull a whole window in one call. CEF output (`Accept: text/plain`) ignores `limit`/`offset` and always returns the entire window.\n\nSet `Accept: text/plain` to receive results in Common Event Format (CEF). Default is `application/json`.",
+      "description": "Minimum role: Tenant Auditor.\n\nRetrieves audit events for the tenant associated with the authenticated user. Use `type` to filter by event category. Use `dateFrom`/`dateTo` for a specific date range, or `intervalInHours` for a rolling window. The queried range cannot exceed 30 days. If no date filter is supplied, the previous 30 days are returned. Use `limit` and `offset` for pagination (the documented limit cap of 10000 is not enforced server-side \u2014 see the `limit` parameter).\n\n**HIGH VOLUME** \u2014 audit events are unbounded. A single busy hour can exceed 1,500 events (~825 KB). With no date filter, the default window is the previous 30 days. With no `limit`, a client that auto-follows `meta.paging` merges every page into one response and overflows its token budget. Always pass an explicit `limit` (start small, ~50\u2013100) and narrow the query with `type` plus a tight time range (`intervalInHours`/`interval` or explicit dates). To sweep the full set, hand-page with `limit`+`offset` or filter server-side \u2014 never pull a whole window in one call. CEF output (`Accept: text/plain`) ignores `limit`/`offset` and always returns the entire window.\n\nSet `Accept: text/plain` to receive results in Common Event Format (CEF). Default is `application/json`.",
       "parameters": [
         {
           "name": "type",
@@ -246,7 +246,7 @@
                   },
                   "sessionId": {
                     "type": "string",
-                    "description": "Session identifier associated with the event, if applicable. Not observed in any events during live testing across all event types (`user_activity`, `access_control`, `int`, `conn_mgmt`, `comment`) \u2014 may be populated only for specific event categories or tenant configurations."
+                    "description": "Session identifier associated with the event, if applicable. Not observed in any events during live testing across all event types (`user_activity`, `access_control`, `int`, `conn_mgmt`, `comment`). The field may be populated only for specific event categories or tenant configurations."
                   },
                   "hostName": {
                     "type": "string",
@@ -288,7 +288,7 @@
       }
     },
     "searchAuditEvents": {
-      "description": "Minimum role: Tenant Auditor.\n\nRetrieves audit events for the tenant associated with the authenticated user using a JSON request body to specify the time range. Use `from`/`to` for a specific date range, or `interval` for a rolling window in hours. Use `type` query parameter to filter by event category.\n\n**HIGH VOLUME** \u2014 audit events are unbounded: a single busy hour can exceed 1,500 events (~825 KB), and with no date filter the default window is the previous 30 days. With no `limit`, a client that auto-follows `meta.paging` merges every page into one response and overflows its token budget. Always pass an explicit `limit` (start small, ~50\u2013100) and narrow the query with `type` plus a tight time range (`intervalInHours`/`interval` or explicit dates). To sweep the full set, hand-page with `limit`+`offset` or filter server-side \u2014 never pull a whole window in one call. CEF output (`Accept: text/plain`) ignores `limit`/`offset` and always returns the entire window.\n\nSet `Accept: text/plain` to receive results in Common Event Format (CEF). Default is `application/json`.",
+      "description": "Minimum role: Tenant Auditor.\n\nRetrieves audit events for the tenant associated with the authenticated user using a JSON request body to specify the time range. Use `from`/`to` for a specific date range, or `interval` for a rolling window in hours. Use `type` query parameter to filter by event category.\n\n**HIGH VOLUME** \u2014 audit events are unbounded. A single busy hour can exceed 1,500 events (~825 KB). With no date filter, the default window is the previous 30 days. With no `limit`, a client that auto-follows `meta.paging` merges every page into one response and overflows its token budget. Always pass an explicit `limit` (start small, ~50\u2013100) and narrow the query with `type` plus a tight time range (`intervalInHours`/`interval` or explicit dates). To sweep the full set, hand-page with `limit`+`offset` or filter server-side \u2014 never pull a whole window in one call. CEF output (`Accept: text/plain`) ignores `limit`/`offset` and always returns the entire window.\n\nSet `Accept: text/plain` to receive results in Common Event Format (CEF). Default is `application/json`.",
       "parameters": [
         {
           "name": "type",
@@ -448,7 +448,7 @@
                   },
                   "sessionId": {
                     "type": "string",
-                    "description": "Session identifier associated with the event, if applicable. Not observed in any events during live testing across all event types (`user_activity`, `access_control`, `int`, `conn_mgmt`, `comment`) \u2014 may be populated only for specific event categories or tenant configurations."
+                    "description": "Session identifier associated with the event, if applicable. Not observed in any events during live testing across all event types (`user_activity`, `access_control`, `int`, `conn_mgmt`, `comment`). The field may be populated only for specific event categories or tenant configurations."
                   },
                   "hostName": {
                     "type": "string",

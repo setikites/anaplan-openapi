@@ -73,7 +73,7 @@
       "response_note": "no documented 2xx JSON response schema \u2014 probe a read operation to learn it"
     },
     "searchExceptionUsers": {
-      "description": "Minimum role: Standard User.\n\nSearch by workspace to list all exception users in that workspace (including visitors), or search by user to list all workspaces where that user has exception-user access (visitors' workspaces are excluded from the by-user results). Exactly one of `workspaceGuid` or `userGuid` must be provided.",
+      "description": "Minimum role: Standard User.\n\nSearch by workspace to list all exception users in that workspace, visitors included. Search by user to list all workspaces where that user has exception-user access. The by-user results exclude visitors' workspaces. Exactly one of `workspaceGuid` or `userGuid` must be provided.",
       "parameters": [],
       "request_body": {
         "media_type": "application/json",

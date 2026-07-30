@@ -100,9 +100,9 @@ paths:
       - name: sourceModelId
         in: query
         description: Model identifier (32-character uppercase hex string) of the source model whose revisions to evaluate.
-          For a model already participating in ALM, a good choice is the **first** model in the `appliedToModels` list of
-          its latest revision — the source model where its revisions are created. Find it with `GET /models/{modelId}/alm/latestRevision`
-          (for the revision id), then `GET /models/{modelId}/alm/revisions/{revisionId}/appliedToModels` (`appliedToModels[].modelId`).
+          For a model already in ALM, use the **first** model in the `appliedToModels` list of its latest revision. That model
+          is the source model where its revisions are created. Find it with `GET /models/{modelId}/alm/latestRevision` (for
+          the revision id), then `GET /models/{modelId}/alm/revisions/{revisionId}/appliedToModels` (`appliedToModels[].modelId`).
           Ultimately an Anaplan model ID from `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2).
         required: true
         schema:
@@ -343,7 +343,7 @@ paths:
       description: |-
         Minimum role: Workspace Administrator.
 
-        Starts an asynchronous task to generate a full comparison report between a source revision and a specified target revision (sourceRevisionId, sourceModelId and targetRevisionId are all required). Poll the task info endpoint to check progress. The caller must hold the Workspace Administrator role on both the source and target models.
+        Starts an asynchronous task that generates a full comparison report between a source revision and a target revision. The body must carry sourceRevisionId, sourceModelId, and targetRevisionId. Poll the task info endpoint to check progress. The caller must hold the Workspace Administrator role on both the source and target models.
       operationId: createComparisonReportTask
       x-anaplan-min-role: Workspace Administrator
       requestBody:
@@ -398,7 +398,13 @@ paths:
       description: |-
         Minimum role: Workspace Administrator.
 
-        Downloads the full comparison report as a tab-separated values (TSV) file. The report is available for 48 hours after generation and includes sections for: Lists Added, Modules Added, Roles Changed, Changes Within Lists, and Line Items Added.
+        Downloads the full comparison report as a tab-separated values (TSV) file. The report is available for 48 hours after generation. It has these sections:
+
+        - Lists Added
+        - Modules Added
+        - Roles Changed
+        - Changes Within Lists
+        - Line Items Added
 
         **HIGH VOLUME** — the full report is returned whole in one non-paginated response (observed ~147 KB) and can be larger. There is no paging. Fetch it only when you need the complete diff.
       operationId: getComparisonReport
@@ -528,8 +534,8 @@ components:
           type: string
           pattern: ^[0-9A-F]{32}$
           description: Source revision identifier (32-character uppercase hex string). From `GET /models/{targetModelId}/alm/syncableRevisions?sourceModelId={sourceModelId}`
-            (`revisions[].id`) — the source model's revisions that can be synced into the target model, where `{targetModelId}`
-            is the request-path model and `{sourceModelId}` is this body's `sourceModelId`.
+            (`revisions[].id`) — the source model's revisions that can be synced into the target model. `{targetModelId}`
+            is the request-path model. `{sourceModelId}` is this body's `sourceModelId`.
         sourceModelId:
           type: string
           pattern: ^[0-9A-F]{32}$
@@ -727,8 +733,8 @@ components:
           $ref: '#/components/schemas/SyncTask'
     SyncTaskListResponse:
       type: object
-      description: When no sync tasks exist in the last 48 hours, the response contains only meta and status — the 'tasks'
-        key is omitted entirely rather than returning an empty array.
+      description: When no sync tasks exist in the last 48 hours, the response contains only meta and status. The 'tasks'
+        key is omitted rather than returned as an empty array.
       properties:
         meta:
           $ref: '#/components/schemas/Meta'
@@ -821,9 +827,11 @@ components:
     TaskId:
       name: taskId
       in: path
-      description: 'Report task identifier (32-character uppercase hex string), scoped to its report type: use the id from
-        `POST /models/{modelId}/alm/comparisonReportTasks` only under `.../comparisonReportTasks/{taskId}`, and the id from
-        `POST /models/{modelId}/alm/summaryReportTasks` only under `.../summaryReportTasks/{taskId}`. They are not interchangeable.'
+      description: |-
+        Report task identifier (32-character uppercase hex string), scoped to its report type. The two report task types are not interchangeable:
+
+        - The id from `POST /models/{modelId}/alm/comparisonReportTasks` resolves only under `.../comparisonReportTasks/{taskId}`.
+        - The id from `POST /models/{modelId}/alm/summaryReportTasks` resolves only under `.../summaryReportTasks/{taskId}`.
       required: true
       schema:
         type: string

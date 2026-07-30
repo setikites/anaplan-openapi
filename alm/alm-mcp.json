@@ -149,7 +149,7 @@
           {
             "name": "sourceModelId",
             "in": "query",
-            "description": "Model identifier (32-character uppercase hex string) of the source model whose revisions to evaluate. For a model already participating in ALM, a good choice is the **first** model in the `appliedToModels` list of its latest revision \u2014 the source model where its revisions are created. Find it with `GET /models/{modelId}/alm/latestRevision` (for the revision id), then `GET /models/{modelId}/alm/revisions/{revisionId}/appliedToModels` (`appliedToModels[].modelId`). Ultimately an Anaplan model ID from `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2).",
+            "description": "Model identifier (32-character uppercase hex string) of the source model whose revisions to evaluate. For a model already in ALM, use the **first** model in the `appliedToModels` list of its latest revision. That model is the source model where its revisions are created. Find it with `GET /models/{modelId}/alm/latestRevision` (for the revision id), then `GET /models/{modelId}/alm/revisions/{revisionId}/appliedToModels` (`appliedToModels[].modelId`). Ultimately an Anaplan model ID from `GET /models` in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2).",
             "required": true,
             "schema": {
               "type": "string"
@@ -419,7 +419,7 @@
       "post": {
         "operationId": "createComparisonReportTask",
         "summary": "Create a full ALM revision comparison report generation task",
-        "description": "Minimum role: Workspace Administrator.\n\nStarts an asynchronous task to generate a full comparison report between a source revision and a specified target revision (sourceRevisionId, sourceModelId and targetRevisionId are all required). Poll the task info endpoint to check progress. The caller must hold the Workspace Administrator role on both the source and target models.",
+        "description": "Minimum role: Workspace Administrator.\n\nStarts an asynchronous task that generates a full comparison report between a source revision and a target revision. The body must carry sourceRevisionId, sourceModelId, and targetRevisionId. Poll the task info endpoint to check progress. The caller must hold the Workspace Administrator role on both the source and target models.",
         "requestBody": {
           "required": true,
           "content": {
@@ -487,7 +487,7 @@
       "get": {
         "operationId": "getComparisonReport",
         "summary": "Retrieve full ALM revision comparison report content (large responses \u2014 see description)",
-        "description": "Minimum role: Workspace Administrator.\n\nDownloads the full comparison report as a tab-separated values (TSV) file. The report is available for 48 hours after generation and includes sections for: Lists Added, Modules Added, Roles Changed, Changes Within Lists, and Line Items Added.\n\n**HIGH VOLUME** \u2014 the full report is returned whole in one non-paginated response (observed ~147 KB) and can be larger. There is no paging. Fetch it only when you need the complete diff.",
+        "description": "Minimum role: Workspace Administrator.\n\nDownloads the full comparison report as a tab-separated values (TSV) file. The report is available for 48 hours after generation. It has these sections:\n\n- Lists Added\n- Modules Added\n- Roles Changed\n- Changes Within Lists\n- Line Items Added\n\n**HIGH VOLUME** \u2014 the full report is returned whole in one non-paginated response (observed ~147 KB) and can be larger. There is no paging. Fetch it only when you need the complete diff.",
         "responses": {
           "200": {
             "description": "Comparison report file (TSV)."
@@ -639,7 +639,7 @@
           "sourceRevisionId": {
             "type": "string",
             "pattern": "^[0-9A-F]{32}$",
-            "description": "Source revision identifier (32-character uppercase hex string). From `GET /models/{targetModelId}/alm/syncableRevisions?sourceModelId={sourceModelId}` (`revisions[].id`) \u2014 the source model's revisions that can be synced into the target model, where `{targetModelId}` is the request-path model and `{sourceModelId}` is this body's `sourceModelId`."
+            "description": "Source revision identifier (32-character uppercase hex string). From `GET /models/{targetModelId}/alm/syncableRevisions?sourceModelId={sourceModelId}` (`revisions[].id`) \u2014 the source model's revisions that can be synced into the target model. `{targetModelId}` is the request-path model. `{sourceModelId}` is this body's `sourceModelId`."
           },
           "sourceModelId": {
             "type": "string",
@@ -683,7 +683,7 @@
       "TaskId": {
         "name": "taskId",
         "in": "path",
-        "description": "Report task identifier (32-character uppercase hex string), scoped to its report type: use the id from `POST /models/{modelId}/alm/comparisonReportTasks` only under `.../comparisonReportTasks/{taskId}`, and the id from `POST /models/{modelId}/alm/summaryReportTasks` only under `.../summaryReportTasks/{taskId}`. They are not interchangeable.",
+        "description": "Report task identifier (32-character uppercase hex string), scoped to its report type. The two report task types are not interchangeable:\n\n- The id from `POST /models/{modelId}/alm/comparisonReportTasks` resolves only under `.../comparisonReportTasks/{taskId}`.\n- The id from `POST /models/{modelId}/alm/summaryReportTasks` resolves only under `.../summaryReportTasks/{taskId}`.",
         "required": true,
         "schema": {
           "type": "string"

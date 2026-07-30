@@ -44,7 +44,11 @@ paths:
 
         Models with `activeState` of `ARCHIVED` are typically inactive and not actionable. Filter them out of results (keep only `activeState` != `ARCHIVED`) unless you specifically need archived models.
 
-        **HIGH VOLUME** — this returns every model in the user's default tenant in one merged response. With no `limit` a client that auto-follows `meta.paging` combines every page and can overflow its token budget. Reduce volume by passing an explicit `limit` and paging with `offset`, by scoping server-side (the `s=` search filter, or the workspace-scoped `GET /workspaces/{workspaceId}/models` list) instead of full enumeration, and/or by using `search` to locate the specific op/params rather than pulling the whole collection.
+        **HIGH VOLUME** — this returns every model in the user's default tenant in one merged response. With no `limit` a client that auto-follows `meta.paging` combines every page and can overflow its token budget. Reduce volume in one or more of these ways:
+
+        - Pass an explicit `limit` and page with `offset`.
+        - Scope server-side with the `s=` search filter, or with the workspace-scoped `GET /workspaces/{workspaceId}/models` list, instead of full enumeration.
+        - Use `search` to locate the specific op and params rather than pulling the whole collection.
       tags:
       - General Workspace & Model Metadata
       parameters:
@@ -210,7 +214,7 @@ paths:
       description: |-
         Minimum role: Workspace Administrator.
 
-        Changes or resets the current period in Anaplan. When this call contains a specified date (for example, 2020-05-20), the API determines what period range contains the specified data and sets that range as the current period.  When the date value is set to blank in this call, the API resets the current period to blank.
+        Changes or resets the current period in Anaplan. When this call contains a specified date (for example, 2020-05-20), the API determines what period range contains the specified data. The API sets that range as the current period.  When the date value is set to blank in this call, the API resets the current period to blank.
 
         **Warning**: A change to your time settings is a potentially destructive action and may lead to data loss.  The new range of time periods may not include previous time periods. Any data in the removed time periods is deleted from the model.
 
@@ -437,7 +441,7 @@ paths:
           description: |-
             Not found — the referenced resource does not exist.
 
-            Also returned when the caller holds a NO ACCESS role on the model — Anaplan masks that as `404` rather than `403` so the resource is not confirmed to exist.
+            Also returned when the caller holds a NO ACCESS role on the model. Anaplan masks that as `404` rather than `403`, so the response does not confirm that the resource exists.
         '400':
           description: Bad request — check the request parameters and body.
       x-anaplan-min-role: Standard User
@@ -1169,7 +1173,7 @@ paths:
       description: |-
         Minimum role: Workspace Administrator.
 
-        Model-direct equivalent of `GET /workspaces/{workspaceId}/models/{modelId}/modelCalendar`. Returns the same response shape: a `modelCalendar` object containing the current fiscal year with start and end dates (empty object when the calendar type has no fiscal year, e.g., Weeks General).
+        Model-direct equivalent of `GET /workspaces/{workspaceId}/models/{modelId}/modelCalendar`. Returns the same response shape: a `modelCalendar` object with the current fiscal year, plus its start and end dates. The object is empty when the calendar type has no fiscal year, for example, Weeks General.
       tags:
       - Model Metadata
       - Model Setting Metadata
@@ -1209,7 +1213,7 @@ paths:
       description: |-
         Minimum role: Workspace Administrator.
 
-        Updates the current fiscal year of the model calendar. The year input value has to be a valid fiscal year supported by the model calendar in Anaplan. If successful, this call returns the updated fiscal year with start and end date associated with current model calendar type. This call returns a `400 bad request` message if the input value is out of range or model calendar type does not have an available fiscal year (for example, Weeks General).
+        Updates the current fiscal year of the model calendar. The year input value has to be a valid fiscal year supported by the model calendar in Anaplan. If successful, this call returns the updated fiscal year with start and end date associated with current model calendar type. This call returns a `400 bad request` message if the input value is out of range. It returns the same message if the model calendar type has no available fiscal year, for example, Weeks General.
       tags:
       - Transactional Write
       requestBody:
@@ -1963,7 +1967,7 @@ paths:
         *   The `viewId` in this request can also be replaced by any valid `lineItemId`. If the Line Item has a changed dimensionality (has a Subsidiary View), the response returns the metadata applicable to that line item. Otherwise, the response returns the default metadata
 
 
-        You can use this API call to [map dimensions to cell data export headers](https://help.anaplan.com/43cd0223-edaa-4289-9833-eb9b73666aac-Map-dimensions-to-cell-data-export-headers) or [transform grid CSV format to tabular single column format](https://help.anaplan.com/c8a665b9-6b23-4254-ac68-816657a6e878-Retrieve-the-view-metadata-and-grid-view-data).
+        You can use this API call to [map dimensions to cell data export headers](https://help.anaplan.com/43cd0223-edaa-4289-9833-eb9b73666aac-Map-dimensions-to-cell-data-export-headers). You can also use it to [transform grid CSV format to tabular single column format](https://help.anaplan.com/c8a665b9-6b23-4254-ac68-816657a6e878-Retrieve-the-view-metadata-and-grid-view-data).
       tags:
       - Model Metadata
       - Module & Saved View Metadata
@@ -2060,7 +2064,7 @@ paths:
 
         All other parameters are the same as a CSV-formatted response.
 
-        The response returns `Content-Type` `application/json` with this format:
+        The response returns `Content-Type` `application/json`. The format is:
 
         *   A `pages` key with a value that is a list of the selected items for each page selector. If no page selectors exist for this view, the list displays as empty or absent.
         *   A `columnCoordinates` key with a value that is a list of the coordinates for all values in that column. Each list item is itself a list containing one or more values. The length of each list equals the number of dimensions on columns.
@@ -2068,9 +2072,9 @@ paths:
             *   A `rowCoordinates` key with a value that is a list of the coordinates for all values in the current row. Each list item is itself a list that contains one or more values. The length of each list equals the number of dimensions on rows.
             *   A `cells` key with a value, which is a list of all the cell values in the current row.
 
-        To get the full coordinates for each cell, use the position of the cell value in the `cells` list, and find the column coordinates at the same position in the `columnCoordinates` list. Then, to uniquely specify the cell, combine the column coordinates with the `rowCoordinates` for the current row and any selected pages.
+        To get the full coordinates for each cell, use the position of the cell value in the `cells` list. Find the column coordinates at the same position in the `columnCoordinates` list. Then combine the column coordinates with the `rowCoordinates` for the current row and any selected pages to uniquely specify the cell.
 
-        **HIGH VOLUME** — a full grid export is returned in one non-paginated response (observed ~210 KB) and there is no `limit`/`offset` paging (the call is instead capped at 1,000,000 cells, returning `400` above that). Narrow the request with page selectors and request only the view/pages you need.
+        **HIGH VOLUME** — a full grid export is returned in one non-paginated response (observed ~210 KB). There is no `limit`/`offset` paging. The call is instead capped at 1,000,000 cells, and returns `400` above that. Narrow the request with page selectors and request only the view/pages you need.
       tags:
       - Transactional Read
       parameters:
@@ -2210,7 +2214,11 @@ paths:
 
         Deactivated users (`active` is `false`) are typically not relevant to callers listing people. Filter to `active=true` unless you specifically need inactive users.
 
-        **HIGH VOLUME** — this returns every user in the tenant in one merged response. With no `limit` a client that auto-follows `meta.paging` combines every page and can overflow its token budget. Reduce volume by passing an explicit `limit` and paging with `offset`, by scoping server-side with the `s=` search filter instead of full enumeration, and/or by using `search` to locate the specific op/params rather than pulling the whole collection.
+        **HIGH VOLUME** — this returns every user in the tenant in one merged response. With no `limit` a client that auto-follows `meta.paging` combines every page and can overflow its token budget. Reduce volume in one or more of these ways:
+
+        - Pass an explicit `limit` and page with `offset`.
+        - Scope server-side with the `s=` search filter instead of full enumeration.
+        - Use `search` to locate the specific op and params rather than pulling the whole collection.
       tags:
       - User Data
       parameters:
@@ -2303,9 +2311,13 @@ paths:
       description: |-
         Minimum role: Standard User.
 
-        Retrieves all workspaces a user has access to within the user's default tenant
+        Retrieves all workspaces a user has access to within the user's default tenant.
 
-        **HIGH VOLUME** — this returns every workspace the user can access in one merged response. With no `limit` a client that auto-follows `meta.paging` combines every page and can overflow its token budget (a `getWorkspaces` → per-workspace admins pipe produced a 335 KB result that exceeded the token cap). Reduce volume by passing an explicit `limit` and paging with `offset`, by scoping server-side with the `s=` search filter instead of full enumeration, and/or by using `search` to locate the specific op/params rather than pulling the whole collection.
+        **HIGH VOLUME** — this returns every workspace the user can access in one merged response. With no `limit`, a client that auto-follows `meta.paging` combines every page and can overflow its token budget. A `getWorkspaces` → per-workspace admins pipe produced a 335 KB result that exceeded the token cap. Reduce volume in one or more of these ways:
+
+        - Pass an explicit `limit` and page with `offset`.
+        - Scope server-side with the `s=` search filter instead of full enumeration.
+        - Use `search` to locate the specific op and params rather than pulling the whole collection.
       tags:
       - General Workspace & Model Metadata
       parameters:
@@ -2602,7 +2614,7 @@ paths:
 
         #
 
-        **Note:** Returns `200` with an empty task list rather than `404` when the parent object does not exist, or when the caller holds a NO ACCESS role on the model.
+        **Note:** Returns `200` with an empty task list rather than `404` when the parent object does not exist. The same applies when the caller holds a NO ACCESS role on the model.
       tags:
       - Bulk Other
       parameters:
@@ -2774,7 +2786,7 @@ paths:
 
         Workspace-scoped alternate URL form — identical behavior to `/models/{modelId}/currentPeriod` PUT.
 
-        Changes or resets the current period in Anaplan. When this call contains a specified date (for example, 2020-05-20), the API determines what period range contains the specified data and sets that range as the current period.  When the date value is set to blank in this call, the API resets the current period to blank.
+        Changes or resets the current period in Anaplan. When this call contains a specified date (for example, 2020-05-20), the API determines what period range contains the specified data. The API sets that range as the current period.  When the date value is set to blank in this call, the API resets the current period to blank.
 
         **Warning**: A change to your time settings is a potentially destructive action and may lead to data loss.  The new range of time periods may not include previous time periods. Any data in the removed time periods is deleted from the model.
 
@@ -3047,7 +3059,7 @@ paths:
           description: |-
             Not found — the referenced resource does not exist.
 
-            Also returned when the caller holds a NO ACCESS role on the model — Anaplan masks that as `404` rather than `403` so the resource is not confirmed to exist.
+            Also returned when the caller holds a NO ACCESS role on the model. Anaplan masks that as `404` rather than `403`, so the response does not confirm that the resource exists.
         '400':
           description: Bad request — check the request parameters and body.
       x-anaplan-min-role: Standard User
@@ -3208,7 +3220,7 @@ paths:
       description: |-
         Minimum role: Standard User.
 
-        **Note:** Returns `200` with an empty task list rather than `404` when the parent object does not exist, or when the caller holds a NO ACCESS role on the model.
+        **Note:** Returns `200` with an empty task list rather than `404` when the parent object does not exist. The same applies when the caller holds a NO ACCESS role on the model.
       parameters:
       - name: sort
         in: query
@@ -3317,7 +3329,7 @@ paths:
         *   `taskId` is the ID that you specified in the request.
 
 
-        Here is a list of each possible `taskState`:
+        The possible `taskState` values are:
 
         | **Status** | **Description** |
         | --- | --- |
@@ -3327,7 +3339,7 @@ paths:
         | CANCELLING | The task is currently being canceled. Cancellation is not yet complete. |
         | CANCELLED | The task has been canceled and the changes have been rolled back. |
 
-        If failures occur during the export task `details` contains a JSON array that contains debug information
+        If failures occur during the export task, `details` contains a JSON array with debug information.
 
         ### Headers
 
@@ -3470,7 +3482,7 @@ paths:
 
         Returns the raw content of the file as `application/octet-stream` — the file body itself, not a JSON metadata envelope. Response bytes are identical to concatenating every chunk from `GET .../files/{fileId}/chunks/{chunkId}`, so this is the single-call alternative to the chunked download path.
 
-        **HIGH VOLUME** — this returns the complete file in one response (observed ~462 KB, and files can be far larger). For anything but tiny files use the chunked download path instead: `GET /workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks` to enumerate chunks, then `GET /workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks/{chunkId}` to fetch each — never hold the whole body in one response.
+        **HIGH VOLUME** — this returns the complete file in one response (observed ~462 KB, and files can be far larger). For anything but tiny files, use the chunked download path instead. Call `GET /workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks` to enumerate chunks, then `GET /workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks/{chunkId}` to fetch each one. Never hold the whole body in one response.
 
         This endpoint returns no metadata. Per-file metadata (`name`, `chunkCount`, `delimiter`, `encoding`, `format`, `headerRow`, `separator`) comes from the file list endpoint `GET /models/{modelId}/files`, which lists every file in the model.
 
@@ -3490,14 +3502,14 @@ paths:
           description: |-
             File not found, file holds no content (`chunkCount` of 0), or endpoint not available for this account role.
 
-            Also returned when the caller holds a NO ACCESS role on the model — Anaplan masks that as `404` rather than `403` so the resource is not confirmed to exist.
+            Also returned when the caller holds a NO ACCESS role on the model. Anaplan masks that as `404` rather than `403`, so the response does not confirm that the resource exists.
       x-anaplan-min-role: Standard User
     post:
       summary: Set the chunk count
       description: |-
         Minimum role: Standard User.
 
-        To upload a file, we recommend setting the `chunkcount` metadata of an upload so that the server knows how many chunks to process during an upload. Set the `chunkcount` to -1 if you do not know how many chunks there will be and will be marking the upload complete when all chunks have been uploaded. If you want to upload the file in a single chunk, see Upload file as a single chunk.
+        To upload a file, we recommend setting the `chunkcount` metadata of an upload so that the server knows how many chunks to process during an upload. Set the `chunkcount` to -1 if you do not know how many chunks there will be. In that case, mark the upload complete after all chunks are uploaded. If you want to upload the file in a single chunk, see Upload file as a single chunk.
 
         Use chunking:
 
@@ -3957,7 +3969,7 @@ paths:
 
         #
 
-        **Note:** Returns `200` with an empty task list rather than `404` when the parent object does not exist, or when the caller holds a NO ACCESS role on the model.
+        **Note:** Returns `200` with an empty task list rather than `404` when the parent object does not exist. The same applies when the caller holds a NO ACCESS role on the model.
       tags:
       - Model Metadata
       - Action Metadata
@@ -4051,7 +4063,7 @@ paths:
         *   `taskID` is the ID that you specified in the request.
 
 
-        Here is a list of each possible `taskState`:
+        The possible `taskState` values are:
 
         | **Status** | **Description** |
         | --- | --- |
@@ -4174,7 +4186,7 @@ paths:
         *   Maintained on a user-by-user basis and overwritten when the user performs the same import.
 
 
-        When an import task has errors, the API maintains a dump file for the task ID with the error.  Any earlier task IDs are erased, though `failureDumpAvailable` can be True for those task IDs.  If a dump file is removed or replaced, then attempting to download the dump file via the API results in a 404 (Not found) HTTP status.
+        When an import task has errors, the API maintains a dump file for the task ID with the error.  Any earlier task IDs are erased, though `failureDumpAvailable` can be True for those task IDs.  A dump file can be removed or replaced. A download of that dump file through the API then returns a 404 (Not found) HTTP status.
 
         If you use `/tasks?sort=-creationDate` in the URL, tasks created by other users can appear first, and their dump files are not available to the accessing user.  A task that the accessing user ran, and whose dump file is still available, can appear further down the same list.
 
@@ -4195,7 +4207,7 @@ paths:
           description: |-
             Dump file not found, not yet available, or has expired (48-hour TTL after last access).
 
-            Also returned when the caller holds a NO ACCESS role on the model — Anaplan masks that as `404` rather than `403` so the resource is not confirmed to exist.
+            Also returned when the caller holds a NO ACCESS role on the model. Anaplan masks that as `404` rather than `403`, so the response does not confirm that the resource exists.
       x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/dump/chunks:
     parameters:
@@ -4241,7 +4253,7 @@ paths:
           description: |-
             Dump file not found or not yet available for this task.
 
-            Also returned when the caller holds a NO ACCESS role on the model — Anaplan masks that as `404` rather than `403` so the resource is not confirmed to exist.
+            Also returned when the caller holds a NO ACCESS role on the model. Anaplan masks that as `404` rather than `403`, so the response does not confirm that the resource exists.
       x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks/{taskId}/dump/chunks/{chunkId}:
     parameters:
@@ -4275,7 +4287,7 @@ paths:
           description: |-
             Chunk not found or dump has expired.
 
-            Also returned when the caller holds a NO ACCESS role on the model — Anaplan masks that as `404` rather than `403` so the resource is not confirmed to exist.
+            Also returned when the caller holds a NO ACCESS role on the model. Anaplan masks that as `404` rather than `403`, so the response does not confirm that the resource exists.
       x-anaplan-min-role: Standard User
   /workspaces/{workspaceId}/models/{modelId}/lineItems:
     parameters:
@@ -4628,7 +4640,7 @@ paths:
         *   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response.
 
 
-        The following list data always displays in the query response:
+        These list data fields always display in the query response:
 
         | **Default List Data** | **Description** |
         | --- | --- |
@@ -4640,7 +4652,7 @@ paths:
         | `listId` | The Anaplan ID of the list to which the parent item belongs. This ID displays if the list has a **Parent Hierarchy** set under the **Configure** tab in Anaplan. |
         | `listName` | The name of list to which the parent item belongs. The name displays if the list has a **Parent Hierarchy** set under the **Configure** tab in Anaplan. |
 
-        Set the `includeAll` query parameter to true to display the following optional list data fields in the response.
+        Set `includeAll` to true to also display the optional fields.
 
         | **Optional List Data** | **Description** |
         | --- | --- |
@@ -5441,7 +5453,7 @@ paths:
 
         #
 
-        **Note:** Returns `200` with an empty task list rather than `404` when the parent object does not exist, or when the caller holds a NO ACCESS role on the model.
+        **Note:** Returns `200` with an empty task list rather than `404` when the parent object does not exist. The same applies when the caller holds a NO ACCESS role on the model.
       tags:
       - Bulk Other
       parameters:
@@ -5530,7 +5542,7 @@ paths:
         *   `taskID` is the ID that you specified in the request.
 
 
-        Here is a list of each possible `taskState`:
+        The possible `taskState` values are:
 
         | **Status** | **Description** |
         | --- | --- |
@@ -5775,7 +5787,7 @@ paths:
         *   The `viewId` in this request can also be replaced by any valid `lineItemId`. If the Line Item has a changed dimensionality (has a Subsidiary View), the response returns the metadata applicable to that line item. Otherwise, the response returns the default metadata
 
 
-        You can use this API call to [map dimensions to cell data export headers](https://help.anaplan.com/43cd0223-edaa-4289-9833-eb9b73666aac-Map-dimensions-to-cell-data-export-headers) or [transform grid CSV format to tabular single column format](https://help.anaplan.com/c8a665b9-6b23-4254-ac68-816657a6e878-Retrieve-the-view-metadata-and-grid-view-data).
+        You can use this API call to [map dimensions to cell data export headers](https://help.anaplan.com/43cd0223-edaa-4289-9833-eb9b73666aac-Map-dimensions-to-cell-data-export-headers). You can also use it to [transform grid CSV format to tabular single column format](https://help.anaplan.com/c8a665b9-6b23-4254-ac68-816657a6e878-Retrieve-the-view-metadata-and-grid-view-data).
       tags:
       - Model Metadata
       - Module & Saved View Metadata
@@ -6208,11 +6220,10 @@ components:
     TaskId:
       name: taskId
       in: path
-      description: 'Task identifier, scoped to the parent action/import/export/process that launched it: a taskId is valid
-        only under the same parent, so an action''s taskId will not resolve under a process, import, or export. Returned when
-        a run is launched by `POST /workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks` (or the equivalent
-        actions, exports, or processes tasks endpoint), and listed by the matching `GET .../tasks` — `tasks[].taskId`, except
-        the import tasks response, which nests it under `task.taskId`.'
+      description: Task identifier, scoped to the parent action, import, export, or process that launched it. A taskId is
+        valid only under the same parent. An action's taskId does not resolve under a process, import, or export. `POST /workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks`
+        returns it, as does the equivalent actions, exports, or processes tasks endpoint. The matching `GET .../tasks` lists
+        it under `tasks[].taskId`. The import tasks response instead nests it under `task.taskId`.
       required: true
       schema:
         type: string
@@ -6828,8 +6839,8 @@ components:
           type: integer
     CellWrite:
       type: object
-      description: A request to set the value of a single cell, identified by the line item it belongs to plus one coordinate
-        for each dimension that applies to that line item (including Time and Versions).
+      description: A request to set the value of a single cell. The cell is identified by its line item plus one coordinate
+        for each dimension that applies to that line item. Time and Versions count as dimensions.
       properties:
         lineItemId:
           type: string
