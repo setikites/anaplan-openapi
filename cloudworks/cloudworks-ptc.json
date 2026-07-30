@@ -1092,7 +1092,7 @@
         {
           "name": "myIntegrations",
           "in": "query",
-          "description": "Scope of the returned list. Set to `1` to return only the current user's integrations. Omitted or set to `0` (the default), the response spans integrations owned by every user the caller can see \u2014 use this scoping when answering tenant-wide questions, such as which connections no integration references.",
+          "description": "Scope of the returned list. Set to `1` to return only the current user's integrations. Omitted or set to `0` (the default), the response spans integrations owned by every user the caller can see. Use this scoping for tenant-wide questions, such as which connections no integration references.",
           "schema": {
             "type": "integer",
             "enum": [
@@ -1510,7 +1510,7 @@
                         },
                         "fileId": {
                           "type": "string",
-                          "description": "Anaplan file ID. Present when target is Anaplan. For an import (`*ToAnaplan`), this is the file the import action reads \u2014 from that import's metadata via `GET /models/{modelId}/imports/{importId}` (`importDataSourceId`) in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2), not the model-wide `GET /models/{modelId}/files` list. For an export (`AnaplanTo*`), the file is identified by the export action itself \u2014 `fileId` equals the `exportId`, with no separate file lookup."
+                          "description": "Anaplan file ID. Present when target is Anaplan. For an import (`*ToAnaplan`), this is the file the import action reads. Get it from that import's metadata via `GET /models/{modelId}/imports/{importId}` (`importDataSourceId`) in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2). It does not come from the model-wide `GET /models/{modelId}/files` list. For an export (`AnaplanTo*`), the file is identified by the export action itself \u2014 `fileId` equals the `exportId`, with no separate file lookup."
                         },
                         "connectionId": {
                           "type": "string",
@@ -1594,7 +1594,7 @@
       }
     },
     "getIntegrationById": {
-      "description": "Minimum role: Restricted Integration User.\n\nThe only op that reveals which connections an integration uses: `integration.jobs[].sources[]` and `targets[]` carry `connectionId`. `getIntegrations` does not return `jobs`, so mapping connections to integrations costs one call per integration.\n\nImports bind the connection in `sources`, exports in `targets` \u2014 read both. `integrationType: \"Process\"` does not mean no connection: a process integration whose actions read from or write to the connected cloud data store carries `jobs` with `sources`/`targets` pointing at a connection, so a sweep must cover every integration type.",
+      "description": "Minimum role: Restricted Integration User.\n\nThe only op that reveals which connections an integration uses: `integration.jobs[].sources[]` and `targets[]` carry `connectionId`. `getIntegrations` does not return `jobs`, so mapping connections to integrations costs one call per integration.\n\nImports bind the connection in `sources`, exports in `targets` \u2014 read both. `integrationType: \"Process\"` does not mean no connection. A process integration also carries `jobs` with `sources`/`targets` that point at a connection. This happens when its actions read from or write to the connected cloud data store. A sweep must therefore cover every integration type.",
       "parameters": [
         {
           "name": "integrationId",
@@ -1848,7 +1848,7 @@
                       "type": "string"
                     },
                     "jobs": {
-                      "description": "Import/export job definitions, each carrying the `connectionId` of the connection it binds. Present on a process integration whose actions read from or write to the connected cloud data store, so `integrationType: \"Process\"` does not imply the absence of a connection.",
+                      "description": "Import/export job definitions, each carrying the `connectionId` of the connection it binds. Present on a process integration whose actions read from or write to the connected cloud data store. `integrationType: \"Process\"` therefore does not imply the absence of a connection.",
                       "type": "array",
                       "items": {
                         "type": "object",
@@ -1935,7 +1935,7 @@
                                 },
                                 "fileId": {
                                   "type": "string",
-                                  "description": "Anaplan file ID. Present when target is Anaplan. For an import (`*ToAnaplan`), this is the file the import action reads \u2014 from that import's metadata via `GET /models/{modelId}/imports/{importId}` (`importDataSourceId`) in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2), not the model-wide `GET /models/{modelId}/files` list. For an export (`AnaplanTo*`), the file is identified by the export action itself \u2014 `fileId` equals the `exportId`, with no separate file lookup."
+                                  "description": "Anaplan file ID. Present when target is Anaplan. For an import (`*ToAnaplan`), this is the file the import action reads. Get it from that import's metadata via `GET /models/{modelId}/imports/{importId}` (`importDataSourceId`) in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2). It does not come from the model-wide `GET /models/{modelId}/files` list. For an export (`AnaplanTo*`), the file is identified by the export action itself \u2014 `fileId` equals the `exportId`, with no separate file lookup."
                                 },
                                 "connectionId": {
                                   "type": "string",
@@ -2225,7 +2225,7 @@
                         },
                         "fileId": {
                           "type": "string",
-                          "description": "Anaplan file ID. Present when target is Anaplan. For an import (`*ToAnaplan`), this is the file the import action reads \u2014 from that import's metadata via `GET /models/{modelId}/imports/{importId}` (`importDataSourceId`) in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2), not the model-wide `GET /models/{modelId}/files` list. For an export (`AnaplanTo*`), the file is identified by the export action itself \u2014 `fileId` equals the `exportId`, with no separate file lookup."
+                          "description": "Anaplan file ID. Present when target is Anaplan. For an import (`*ToAnaplan`), this is the file the import action reads. Get it from that import's metadata via `GET /models/{modelId}/imports/{importId}` (`importDataSourceId`) in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2). It does not come from the model-wide `GET /models/{modelId}/files` list. For an export (`AnaplanTo*`), the file is identified by the export action itself \u2014 `fileId` equals the `exportId`, with no separate file lookup."
                         },
                         "connectionId": {
                           "type": "string",

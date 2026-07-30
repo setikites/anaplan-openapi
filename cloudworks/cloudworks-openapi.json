@@ -3,7 +3,7 @@
   "info": {
     "title": "Anaplan CloudWorks API",
     "version": "2.0.0",
-    "description": "The Anaplan CloudWorks API lets you create your own connections and integrations with Anaplan CloudWorks, supporting data movement between cloud storage services (Amazon S3, Google BigQuery, Azure Blob Storage) and Anaplan models.\n\n**Base URL**: Both `https://api.cloudworks.anaplan.com/2/0/` and `https://api.anaplan.com/cloudworks/2/0/` are active. The `api.cloudworks.anaplan.com` form is listed first. Both `AnaplanAuthToken` and `Bearer` (with an AnaplanAuthToken value) are accepted.\n\n**Date and time formats used across this API:**\n- `startDate` / `endDate` on run records: ISO 8601 UTC with milliseconds — `YYYY-MM-DDTHH:MM:SS.sssZ`\n- `lastRun` on run records: Unix timestamp integer (seconds since epoch)\n- `createdDate` / `modifiedDate` on integration flow steps: space-separated timestamp with timezone — `YYYY-MM-DD HH:MM:SS.uuuuuu+00:00`\n- `schedule.nextScheduleDate` and similar date-only fields: ISO 8601 date — `YYYY-MM-DD`\n\n**ID formats used across this API:**\n- Most entity IDs (`integrationId`, `connectionId`, `workspaceId`, `notificationId`, flow `id`, run `id`, `traceId`, `userGuid`): 32-character lowercase hex\n- `modelId`: 32-character **uppercase** hex (the only uppercase ID in the API)\n- `processId`, `actionId`, `fileId`: numeric string"
+    "description": "The Anaplan CloudWorks API lets you create your own connections and integrations with Anaplan CloudWorks. An integration moves data between a cloud storage service and an Anaplan model. The supported services are Amazon S3, Google BigQuery, and Azure Blob Storage.\n\n**Base URL**: Both `https://api.cloudworks.anaplan.com/2/0/` and `https://api.anaplan.com/cloudworks/2/0/` are active. The `api.cloudworks.anaplan.com` form is listed first. Both `AnaplanAuthToken` and `Bearer` (with an AnaplanAuthToken value) are accepted.\n\n**Date and time formats used across this API:**\n- `startDate` / `endDate` on run records: ISO 8601 UTC with milliseconds — `YYYY-MM-DDTHH:MM:SS.sssZ`\n- `lastRun` on run records: Unix timestamp integer (seconds since epoch)\n- `createdDate` / `modifiedDate` on integration flow steps: space-separated timestamp with timezone — `YYYY-MM-DD HH:MM:SS.uuuuuu+00:00`\n- `schedule.nextScheduleDate` and similar date-only fields: ISO 8601 date — `YYYY-MM-DD`\n\n**ID formats used across this API:**\n- Most entity IDs (`integrationId`, `connectionId`, `workspaceId`, `notificationId`, flow `id`, run `id`, `traceId`, `userGuid`): 32-character lowercase hex\n- `modelId`: 32-character **uppercase** hex (the only uppercase ID in the API)\n- `processId`, `actionId`, `fileId`: numeric string"
   },
   "servers": [
     {
@@ -582,7 +582,7 @@
           {
             "name": "myIntegrations",
             "in": "query",
-            "description": "Scope of the returned list. Set to `1` to return only the current user's integrations. Omitted or set to `0` (the default), the response spans integrations owned by every user the caller can see — use this scoping when answering tenant-wide questions, such as which connections no integration references.",
+            "description": "Scope of the returned list. Set to `1` to return only the current user's integrations. Omitted or set to `0` (the default), the response spans integrations owned by every user the caller can see. Use this scoping for tenant-wide questions, such as which connections no integration references.",
             "schema": {
               "type": "integer",
               "enum": [
@@ -777,7 +777,7 @@
       ],
       "get": {
         "summary": "Get integration by ID — the only op returning its connection references (`jobs[].sources[]`/`targets[].connectionId`)",
-        "description": "Minimum role: Restricted Integration User.\n\nThe only op that reveals which connections an integration uses: `integration.jobs[].sources[]` and `targets[]` carry `connectionId`. `getIntegrations` does not return `jobs`, so mapping connections to integrations costs one call per integration.\n\nImports bind the connection in `sources`, exports in `targets` — read both. `integrationType: \"Process\"` does not mean no connection: a process integration whose actions read from or write to the connected cloud data store carries `jobs` with `sources`/`targets` pointing at a connection, so a sweep must cover every integration type.",
+        "description": "Minimum role: Restricted Integration User.\n\nThe only op that reveals which connections an integration uses: `integration.jobs[].sources[]` and `targets[]` carry `connectionId`. `getIntegrations` does not return `jobs`, so mapping connections to integrations costs one call per integration.\n\nImports bind the connection in `sources`, exports in `targets` — read both. `integrationType: \"Process\"` does not mean no connection. A process integration also carries `jobs` with `sources`/`targets` that point at a connection. This happens when its actions read from or write to the connected cloud data store. A sweep must therefore cover every integration type.",
         "operationId": "getIntegrationById",
         "x-anaplan-min-role": "Restricted Integration User",
         "tags": [
@@ -2179,7 +2179,7 @@
                 },
                 "fileId": {
                   "type": "string",
-                  "description": "Anaplan file ID. Present when target is Anaplan. For an import (`*ToAnaplan`), this is the file the import action reads — from that import's metadata via `GET /models/{modelId}/imports/{importId}` (`importDataSourceId`) in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2), not the model-wide `GET /models/{modelId}/files` list. For an export (`AnaplanTo*`), the file is identified by the export action itself — `fileId` equals the `exportId`, with no separate file lookup."
+                  "description": "Anaplan file ID. Present when target is Anaplan. For an import (`*ToAnaplan`), this is the file the import action reads. Get it from that import's metadata via `GET /models/{modelId}/imports/{importId}` (`importDataSourceId`) in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2). It does not come from the model-wide `GET /models/{modelId}/files` list. For an export (`AnaplanTo*`), the file is identified by the export action itself — `fileId` equals the `exportId`, with no separate file lookup."
                 },
                 "connectionId": {
                   "type": "string",
@@ -2454,7 +2454,7 @@
                 "type": "string"
               },
               "jobs": {
-                "description": "Import/export job definitions, each carrying the `connectionId` of the connection it binds. Present on a process integration whose actions read from or write to the connected cloud data store, so `integrationType: \"Process\"` does not imply the absence of a connection.",
+                "description": "Import/export job definitions, each carrying the `connectionId` of the connection it binds. Present on a process integration whose actions read from or write to the connected cloud data store. `integrationType: \"Process\"` therefore does not imply the absence of a connection.",
                 "type": "array",
                 "items": {
                   "$ref": "#/components/schemas/Job"

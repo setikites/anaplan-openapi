@@ -1214,6 +1214,43 @@ def test_british_spelling_sweep_skips_enum_tokens():
     assert any(p.search("Identical behaviour to POST.") for p, _ in _BRITISH_SPELLINGS)
 
 
+_MAX_SENTENCE_WORDS = 25
+
+
+def test_no_long_sentences_in_prose():
+    """No description or summary sentence may run past 25 words (ADR 0007 §1).
+
+    One sentence carries one idea. A 40-word sentence that packs three error
+    causes into one run costs the reader — human or LLM — a second pass. Split
+    it. Where the sentence enumerates, write a markdown list instead: a bare
+    period swap leaves a run of short fragments.
+
+    Code spans, URLs, table rows, bullet lines, and the servers[].description
+    region lists are exempt (ADR 0007 §2), so a long ID list or a wide table row
+    does not fail this sweep.
+    """
+    violations = [
+        f"  [{spec}] {json_path}\n    ({len(sentence.split())} words) {sentence!r}"
+        for spec, json_path, sentence in iter_prose_sentences()
+        if len(sentence.split()) > _MAX_SENTENCE_WORDS
+    ]
+    assert not violations, (
+        f"{len(violations)} sentence(s) over {_MAX_SENTENCE_WORDS} words found in "
+        f"description or summary prose\n"
+        f"(ADR 0007 §1 — one sentence per idea, at or below {_MAX_SENTENCE_WORDS} "
+        f"words; use a markdown list for an enumeration):\n" + "\n".join(violations)
+    )
+
+
+def test_sentence_length_sweep_skips_server_region_lists():
+    """The servers[].description region lists must stay outside the prose sweeps (ADR 0007 §2).
+
+    They are comma-separated data-center lists, not prose. Several run past 25
+    words and must not fail the length sweep.
+    """
+    assert not any(path.startswith("servers/") for _, path, _ in iter_prose_sentences())
+
+
 def test_prose_extraction_yields_summaries_and_paths():
     """Operation summaries must be extracted, and each sentence must carry its JSON path."""
     rows = list(iter_prose_sentences())
