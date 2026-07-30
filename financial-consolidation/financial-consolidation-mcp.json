@@ -3,7 +3,7 @@
   "info": {
     "title": "Anaplan Financial Consolidation API",
     "version": "v2305.1",
-    "description": "API for financial consolidation workflows on the Fluence platform (acquired by Anaplan). Enables automation of data management, metadata synchronization, workflow control, and user administration.\n\nHost: `fluenceapi-prod.fluence.app` \u2014 different from all other Anaplan APIs. No regional variants are known; a single production endpoint serves all tenants.\n\nEvery request requires the `X_API_TOKEN` header (created in the Security module) and the `TENANT` header identifying the target tenant."
+    "description": "API for financial consolidation workflows on the Fluence platform (acquired by Anaplan). Enables automation of data management, metadata synchronization, workflow control, and user administration.\n\nHost: `fluenceapi-prod.fluence.app` \u2014 different from all other Anaplan APIs. No regional variants are known. A single production endpoint serves all tenants.\n\nEvery request requires the `X_API_TOKEN` header (created in the Security module) and the `TENANT` header identifying the target tenant."
   },
   "servers": [
     {
@@ -724,7 +724,7 @@
     "schemas": {
       "ODataRecord": {
         "type": "object",
-        "description": "A row in a client schema staging table. Field names and types are defined by the table's schema and vary by client configuration.\n\nSupported data types per field:\n- **string** \u2014 alphanumeric text (dimension member names such as `Scenario_Name`)\n- **number** \u2014 integer or decimal (e.g. `Amount`, `Periodic_Amount`)\n- **boolean** \u2014 `1` for true, `0` for false\n\nDimension fields conventionally end with `_Name`; measure fields use bare names.",
+        "description": "A row in a client schema staging table. Field names and types are defined by the table's schema and vary by client configuration.\n\nSupported data types per field:\n- **string** \u2014 alphanumeric text (dimension member names such as `Scenario_Name`)\n- **number** \u2014 integer or decimal (e.g. `Amount`, `Periodic_Amount`)\n- **boolean** \u2014 `1` for true, `0` for false\n\nDimension fields conventionally end with `_Name`. Measure fields use bare names.",
         "additionalProperties": {
           "oneOf": [
             {

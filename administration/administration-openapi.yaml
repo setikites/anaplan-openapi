@@ -81,7 +81,7 @@ paths:
       description: |-
         Minimum role: Tenant Administrator.
 
-        Bulk-creates or updates users by uploading a CSV file. Users are matched by `username` (email address); existing users are updated, new addresses are created.
+        Bulk-creates or updates users by uploading a CSV file. Users are matched by `username` (email address). Existing users are updated, and new addresses are created.
 
         CSV columns: `username`, `first_name`, `last_name`, `licenses`. Constraints: at least one data row, no more than 500 rows, no duplicate email addresses, no empty cells. Licenses must be quoted and comma-separated when a user holds more than one.
 

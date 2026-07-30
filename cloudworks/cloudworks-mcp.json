@@ -448,7 +448,7 @@
       "get": {
         "operationId": "getIntegrations",
         "summary": "Get all integrations \u2014 the list view carries no `jobs`, so no connection references",
-        "description": "Minimum role: Restricted Integration User.\n\nRetrieve all integrations. Returns 25 integrations if `offset` and `limit` are not provided.\n\nItems are `IntegrationSummary`: no `jobs`, therefore no `connectionId` anywhere in the response. Mapping connections to integrations costs one `getIntegrationById` call per integration; there is no bulk form.",
+        "description": "Minimum role: Restricted Integration User.\n\nRetrieve all integrations. Returns 25 integrations if `offset` and `limit` are not provided.\n\nItems are `IntegrationSummary`: no `jobs`, therefore no `connectionId` anywhere in the response. Mapping connections to integrations costs one `getIntegrationById` call per integration. There is no bulk form.",
         "parameters": [
           {
             "name": "offset",
@@ -550,7 +550,7 @@
                   },
                   "jobs": {
                     "type": "array",
-                    "description": "Import/export job definitions. Required for import/export integrations; optional for process integrations.",
+                    "description": "Import and export job definitions. Required for import and export integrations. Optional for process integrations.",
                     "items": {
                       "$ref": "#/components/schemas/Job"
                     }
@@ -703,7 +703,7 @@
       "get": {
         "operationId": "getIntegrationsByModel",
         "summary": "Get integrations by model ID",
-        "description": "Minimum role: Restricted Integration User.\n\n**Deprecated:** This endpoint is no longer served \u2014 it returns an HTTP 404 from the gateway for any modelId, under every role. Retained in the spec for historical completeness; do not call it. See cloudworks/README.md for details.",
+        "description": "Minimum role: Restricted Integration User.\n\n**Deprecated:** This endpoint is no longer served \u2014 it returns an HTTP 404 from the gateway for any modelId, under every role. Retained in the spec for historical completeness. Do not call it. See cloudworks/README.md for details.",
         "responses": {
           "200": {
             "description": "Integrations associated with the model."
@@ -1269,7 +1269,7 @@
                                   "stop",
                                   "continue"
                                 ],
-                                "description": "Default for `failure` is `stop`; default for `partial_success` is `continue`."
+                                "description": "Default for `failure` is `stop`. Default for `partial_success` is `continue`."
                               }
                             }
                           }
@@ -1639,7 +1639,7 @@
             "example": "Europe/Paris"
           },
           "status": {
-            "description": "Schedule enabled/disabled state. Present in GET responses; not required in create/update requests.",
+            "description": "Schedule enabled/disabled state. Present in GET responses. Not required in create or update requests.",
             "type": "string",
             "enum": [
               "Active",
@@ -1682,7 +1682,7 @@
             ]
           },
           "notifications": {
-            "description": "Notification rules; each entry in config maps an outcome type to the users to notify.",
+            "description": "Notification rules. Each entry in config maps an outcome type to the users to notify.",
             "type": "object",
             "required": [
               "config"

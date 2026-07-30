@@ -5,7 +5,7 @@ info:
   description: |-
     API for financial consolidation workflows on the Fluence platform (acquired by Anaplan). Enables automation of data management, metadata synchronization, workflow control, and user administration.
 
-    Host: `fluenceapi-prod.fluence.app` — different from all other Anaplan APIs. No regional variants are known; a single production endpoint serves all tenants.
+    Host: `fluenceapi-prod.fluence.app` — different from all other Anaplan APIs. No regional variants are known. A single production endpoint serves all tenants.
 
     Every request requires the `X_API_TOKEN` header (created in the Security module) and the `TENANT` header identifying the target tenant.
 servers:
@@ -770,7 +770,7 @@ components:
         - **number** — integer or decimal (e.g. `Amount`, `Periodic_Amount`)
         - **boolean** — `1` for true, `0` for false
 
-        Dimension fields conventionally end with `_Name`; measure fields use bare names.
+        Dimension fields conventionally end with `_Name`. Measure fields use bare names.
       additionalProperties:
         oneOf:
         - type: string

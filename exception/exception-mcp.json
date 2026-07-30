@@ -69,7 +69,7 @@
         {
           "name": "userGuid",
           "in": "path",
-          "description": "GUID of the user whose exception-user status is being changed; the same value as the Anaplan user ID. From `GET /users` (or `GET /users/me` for your own GUID) in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2).",
+          "description": "GUID of the user whose exception-user status changes. This value is the same as the Anaplan user ID. From `GET /users` (or `GET /users/me` for your own GUID) in the [Integration API](https://help.anaplan.com/integration-api-v20-3107aa54-d12b-4c48-9550-3561c84adbb2).",
           "required": true,
           "schema": {
             "type": "string",
@@ -113,7 +113,7 @@
             "description": "Request processed successfully. No response body."
           },
           "400": {
-            "description": "Bad request. Possible causes: missing or invalid `op` value; missing or invalid `workspaceGuid`; workspace is not SSO-enabled; requested user not found in workspace."
+            "description": "Bad request. Possible causes:\n\n- The `op` value is missing or invalid.\n- The `workspaceGuid` value is missing or invalid.\n- The workspace is not SSO-enabled.\n- The requested user is not found in the workspace."
           },
           "401": {
             "description": "Invalid or missing token."
@@ -164,7 +164,7 @@
             "description": "Successful search. Returns a list of workspace records, each containing the exception users in that workspace."
           },
           "400": {
-            "description": "Bad request. Possible causes: neither `workspaceGuid` nor `userGuid` provided (search criteria not provided); invalid field values."
+            "description": "Bad request. Possible causes:\n\n- Neither `workspaceGuid` nor `userGuid` is provided, so there are no search criteria.\n- A field value is invalid."
           },
           "401": {
             "description": "Invalid or missing token."
@@ -197,7 +197,7 @@
               "assign",
               "unassign"
             ],
-            "description": "Operation to perform: `assign` grants exception-user access; `unassign` revokes it."
+            "description": "Operation to perform. `assign` grants exception-user access. `unassign` revokes it."
           },
           "workspaceGuid": {
             "type": "string",

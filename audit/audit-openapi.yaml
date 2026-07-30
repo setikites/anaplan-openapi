@@ -15,7 +15,7 @@ paths:
       description: |-
         Minimum role: Tenant Auditor.
 
-        Retrieves audit events for the tenant associated with the authenticated user. Use `type` to filter by event category. Use `dateFrom`/`dateTo` for a specific date range, or `intervalInHours` for a rolling window; the queried range cannot exceed 30 days. If no date filter is supplied, the previous 30 days are returned. Use `limit` and `offset` for pagination (the documented limit cap of 10000 is not enforced server-side — see the `limit` parameter).
+        Retrieves audit events for the tenant associated with the authenticated user. Use `type` to filter by event category. Use `dateFrom`/`dateTo` for a specific date range, or `intervalInHours` for a rolling window. The queried range cannot exceed 30 days. If no date filter is supplied, the previous 30 days are returned. Use `limit` and `offset` for pagination (the documented limit cap of 10000 is not enforced server-side — see the `limit` parameter).
 
         **HIGH VOLUME** — audit events are unbounded: a single busy hour can exceed 1,500 events (~825 KB), and with no date filter the default window is the previous 30 days. With no `limit`, a client that auto-follows `meta.paging` merges every page into one response and overflows its token budget. Always pass an explicit `limit` (start small, ~50–100) and narrow the query with `type` plus a tight time range (`intervalInHours`/`interval` or explicit dates). To sweep the full set, hand-page with `limit`+`offset` or filter server-side — never pull a whole window in one call. CEF output (`Accept: text/plain`) ignores `limit`/`offset` and always returns the entire window.
 
@@ -204,9 +204,9 @@ components:
           example: a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4
         objectId:
           type: string
-          description: 'Identifier of the object acted upon. Format varies by object type: model, workspace, and user objects
-            use a 32-character lowercase hex string; connection objects (CONN-* events) use a `con_` prefix followed by a
-            base62 string. Absent when no specific object is associated with the event.'
+          description: Identifier of the object acted upon. Format varies by object type. Model, workspace, and user objects
+            use a 32-character lowercase hex string. Connection objects (CONN-* events) use a `con_` prefix followed by a
+            base62 string. Absent when no specific object is associated with the event.
           example: con_P7JGok4rAnkvJArx
         objectTypeId:
           type: string

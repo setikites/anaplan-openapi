@@ -42,9 +42,9 @@ paths:
 
         Retrieves information about all models in the user's default tenant.
 
-        Models with `activeState` of `ARCHIVED` are typically inactive and not actionable; filter them out of results (keep only `activeState` != `ARCHIVED`) unless you specifically need archived models.
+        Models with `activeState` of `ARCHIVED` are typically inactive and not actionable. Filter them out of results (keep only `activeState` != `ARCHIVED`) unless you specifically need archived models.
 
-        **HIGH VOLUME** — this returns every model in the user's default tenant in one merged response; with no `limit` a client that auto-follows `meta.paging` combines every page and can overflow its token budget. Reduce volume by passing an explicit `limit` and paging with `offset`, by scoping server-side (the `s=` search filter, or the workspace-scoped `GET /workspaces/{workspaceId}/models` list) instead of full enumeration, and/or by using `search` to locate the specific op/params rather than pulling the whole collection.
+        **HIGH VOLUME** — this returns every model in the user's default tenant in one merged response. With no `limit` a client that auto-follows `meta.paging` combines every page and can overflow its token budget. Reduce volume by passing an explicit `limit` and paging with `offset`, by scoping server-side (the `s=` search filter, or the workspace-scoped `GET /workspaces/{workspaceId}/models` list) instead of full enumeration, and/or by using `search` to locate the specific op/params rather than pulling the whole collection.
       tags:
       - General Workspace & Model Metadata
       parameters:
@@ -57,8 +57,9 @@ paths:
       - $ref: '#/components/parameters/Search'
       - name: sort
         in: query
-        description: 'Sort results. `+field` ascending, `-field` descending; prefix required and field name validated (bad
-          or unknown field returns 400). Comma-separate to sort by multiple columns. Sortable fields: name, activeState.'
+        description: 'Sort results. `+field` ascending, `-field` descending. The prefix is required and the field name is
+          validated (bad or unknown field returns 400). Comma-separate to sort by multiple columns. Sortable fields: name,
+          activeState.'
         schema:
           type: string
         example: +name
@@ -125,7 +126,7 @@ paths:
       parameters:
       - name: sort
         in: query
-        description: 'Sort results. `+field` or unprefixed ascending, `-field` descending; comma-separate for multiple columns.
+        description: 'Sort results. `+field` or unprefixed ascending, `-field` descending. Comma-separate for multiple columns.
           `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order.
           Example: `+name`, `-id`.'
         schema:
@@ -209,7 +210,7 @@ paths:
       description: |-
         Minimum role: Workspace Administrator.
 
-        Use this call to change or reset the current period in Anaplan. When this call contains a specified date (for example, 2020-05-20), the API determines what period range contains the specified data and sets that range as the current period.  When the date value is set to blank in this call, the API resets the current period to blank.
+        Changes or resets the current period in Anaplan. When this call contains a specified date (for example, 2020-05-20), the API determines what period range contains the specified data and sets that range as the current period.  When the date value is set to blank in this call, the API resets the current period to blank.
 
         **Warning**: A change to your time settings is a potentially destructive action and may lead to data loss.  The new range of time periods may not include previous time periods. Any data in the removed time periods is deleted from the model.
 
@@ -274,9 +275,9 @@ paths:
                     $ref: '#/components/schemas/CurrentPeriod'
         '400':
           description: 'Bad request. Occurs when: (1) the date is not in YYYY-MM-DD format — "Invalid ISO date format ''{date}''.
-            Date should match format YYYY-MM-DD"; (2) the date falls outside the model timescale — "Specified date ''{date}''
-            is out of timescale range {start} - {end}"; (3) date is supplied as both a query parameter and a request body
-            field simultaneously.'
+            Date should match format YYYY-MM-DD". (2) The date falls outside the model timescale — "Specified date ''{date}''
+            is out of timescale range {start} - {end}". (3) The date is supplied as both a query parameter and a request body
+            field at the same time.'
         '404':
           $ref: '#/components/responses/NotFoundOrNoAccess'
         '429':
@@ -293,7 +294,7 @@ paths:
 
         Alternate URL form — response is equivalent to `/workspaces/{workspaceId}/models/{modelId}/dimensions/{dimensionId}/items`.
 
-        Use this call to retrieve the IDs, codes, and names for items in a specified dimension. The dimension must be a list, a list subset, a line item subset, or the Users dimension.
+        Returns the IDs, codes, and names of the items in a dimension. The dimension must be a list, a list subset, a line item subset, or the Users dimension.
 
         Calls at model-level do not support the Time dimension. The calls return a `400` response. To avoid this, use the view dimension instead.
 
@@ -455,7 +456,7 @@ paths:
       parameters:
       - name: sort
         in: query
-        description: 'Sort results. `+field` or unprefixed ascending, `-field` descending; comma-separate for multiple columns.
+        description: 'Sort results. `+field` or unprefixed ascending, `-field` descending. Comma-separate for multiple columns.
           `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order.
           Example: `+name`, `-id`.'
         schema:
@@ -593,7 +594,7 @@ paths:
       parameters:
       - name: sort
         in: query
-        description: 'Sort results. `+field` or unprefixed ascending, `-field` descending; comma-separate for multiple columns.
+        description: 'Sort results. `+field` or unprefixed ascending, `-field` descending. Comma-separate for multiple columns.
           `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order.
           Example: `+name`, `-id`.'
         schema:
@@ -731,7 +732,7 @@ paths:
       parameters:
       - name: sort
         in: query
-        description: 'Sort results. `+field` or unprefixed ascending, `-field` descending; comma-separate for multiple columns.
+        description: 'Sort results. `+field` or unprefixed ascending, `-field` descending. Comma-separate for multiple columns.
           `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order.
           Example: `+name`, `-id`.'
         schema:
@@ -843,7 +844,7 @@ paths:
       description: |-
         Minimum role: Standard User.
 
-        Use this call to retrieve identifiers of all line items in a model.
+        Returns the identifiers of all line items in a model.
 
         **Notes**:
 
@@ -923,7 +924,7 @@ paths:
       description: |-
         Minimum role: Standard User.
 
-        Use this call to retrieve the IDs of dimensions that define a line item.
+        Returns the IDs of the dimensions that define a line item.
 
         For reference, see Retrieve dimension items for a line item.
 
@@ -980,7 +981,7 @@ paths:
       description: |-
         Minimum role: Standard User.
 
-        Use this call to retrieve IDs, codes, and names for dimension items that apply for the specified line item.
+        Returns the IDs, codes, and names of the dimension items that apply to a line item.
 
         **Notes**:
 
@@ -1042,7 +1043,7 @@ paths:
 
         Alternate URL form — response is equivalent to `/workspaces/{workspaceId}/models/{modelId}/lists`.
 
-        Use this call to retrieve lists for a specified workspace and model.
+        Returns the lists in a model.
       tags:
       - Model Metadata
       - List Metadata
@@ -1100,7 +1101,7 @@ paths:
 
         Alternate URL form — response is equivalent to `/workspaces/{workspaceId}/models/{modelId}/lists/{listId}`.
 
-        Use this call to retrieve metadata for a specified list. Field-level descriptions are in the response schema (ListMetadata). Metadata entries that are not set for a list (for example, no parent or no top level item) are omitted from the response.
+        Returns the metadata of a list. Field-level descriptions are in the response schema (ListMetadata). Metadata entries that are not set for a list (for example, no parent or no top level item) are omitted from the response.
 
         **Notes**:
 
@@ -1208,7 +1209,7 @@ paths:
       description: |-
         Minimum role: Workspace Administrator.
 
-        Use this call to update the current fiscal year for the model calendar. The year input value has to be a valid fiscal year supported by the model calendar in Anaplan. If successful, this call returns the updated fiscal year with start and end date associated with current model calendar type. This call returns a `400 bad request` message if the input value is out of range or model calendar type does not have an available fiscal year (for example, Weeks General).
+        Updates the current fiscal year of the model calendar. The year input value has to be a valid fiscal year supported by the model calendar in Anaplan. If successful, this call returns the updated fiscal year with start and end date associated with current model calendar type. This call returns a `400 bad request` message if the input value is out of range or model calendar type does not have an available fiscal year (for example, Weeks General).
       tags:
       - Transactional Write
       requestBody:
@@ -1259,7 +1260,7 @@ paths:
       description: |-
         Minimum role: Standard User.
 
-        Use this call to retrieve the IDs and names of all modules for a specified model.
+        Returns the IDs and names of all modules in a model.
 
         **Notes**:
 
@@ -1320,7 +1321,7 @@ paths:
       description: |-
         Minimum role: Standard User.
 
-        Use this call to set cell values in a module.
+        Sets cell values in a module.
 
         Ensure the request body is an array of `CellWrite` objects. Each object is for an updated individual cell and its full set of dimensions.
 
@@ -1516,7 +1517,7 @@ paths:
       description: |-
         Minimum role: Standard User.
 
-        Use this call to retrieve all view IDs and names for a specified module. This call also returns the default view for the module. If the user adds the query parameter includesubsidiaryviews=true, unsaved subsidiary views will also be included in the results.
+        Returns the IDs and names of all views in a module. This call also returns the default view for the module. If the user adds the query parameter includesubsidiaryviews=true, unsaved subsidiary views will also be included in the results.
 
         **Notes**:
 
@@ -1589,7 +1590,7 @@ paths:
       parameters:
       - name: sort
         in: query
-        description: 'Sort results. `+field` or unprefixed ascending, `-field` descending; comma-separate for multiple columns.
+        description: 'Sort results. `+field` or unprefixed ascending, `-field` descending. Comma-separate for multiple columns.
           `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order.
           Example: `+name`, `-id`.'
         schema:
@@ -1638,7 +1639,7 @@ paths:
       description: |-
         Minimum role: Standard User.
 
-        Use this call to retrieve the names and actions for a given Process in an Anaplan model.
+        Returns the name and the actions of a process in an Anaplan model.
 
         **Notes**:
 
@@ -1721,7 +1722,7 @@ paths:
       description: |-
         Minimum role: Workspace Administrator.
 
-        Use this call to get information about the model versions. The response contains a list of the versions that the user has access to, and the model metadata that can be viewed from the UI.
+        Returns information about the model versions. The response contains a list of the versions that the user has access to, and the model metadata that can be viewed from the UI.
 
         **Notes:**
 
@@ -1793,7 +1794,7 @@ paths:
       description: |-
         Minimum role: Workspace Administrator.
 
-        Use this call to set the switchover date for a version. The response contains the response code, as well as the date and human-readable date period as shown in the UI.
+        Sets the switchover date of a version. The response contains the response code, as well as the date and human-readable date period as shown in the UI.
 
         **Notes:**
 
@@ -1853,7 +1854,7 @@ paths:
 
         Alternate URL form — response is equivalent to `/workspaces/{workspaceId}/models/{modelId}/views`.
 
-        Use this call to retrieve the ID and name of all views for a model. The results include default and saved views. If you add the query parameter `includesubsidiaryviews=true`, this includes unsaved subsidiary views in the results. This call also retrieves the ID of the module that the views belong to.
+        Returns the ID and name of all views in a model. The results include default and saved views. If you add the query parameter `includesubsidiaryviews=true`, this includes unsaved subsidiary views in the results. This call also retrieves the ID of the module that the views belong to.
 
         **Notes**:
 
@@ -1952,7 +1953,7 @@ paths:
       description: |-
         Minimum role: Standard User.
 
-        Use this call to retrieve the name, IDs, and lists of names for the dimensions (columns, pages, rows) on a specified view.
+        Returns the name, the IDs, and the lists of names for the dimensions (columns, pages, rows) on a view.
 
         **Notes**:
 
@@ -2032,7 +2033,7 @@ paths:
       description: |-
         Minimum role: Standard User.
 
-        Use this call to retrieve the cell data for a view. You can either query for the default page, or provide page selectors to query for other pages. This call returns data in either a CSV grid response or as JSON.
+        Returns the cell data of a view. You can either query for the default page, or provide page selectors to query for other pages. This call returns data in either a CSV grid response or as JSON.
 
         **Notes:**
 
@@ -2075,8 +2076,8 @@ paths:
       parameters:
       - name: Accept
         in: header
-        description: Response format. `text/csv` (default) returns a CSV grid; `application/json` returns structured cell
-          data (also requires query parameter format=v1). Append `;escaped=true` to quote sensitive CSV fields; some tenants
+        description: Response format. `text/csv` (default) returns a CSV grid. `application/json` returns structured cell
+          data (also requires query parameter format=v1). Append `;escaped=true` to quote sensitive CSV fields. Some tenants
           block plain text/csv for security and require the escaped form.
         required: false
         schema:
@@ -2097,8 +2098,8 @@ paths:
       - name: pages
         in: query
         description: Page selector values, each in the form `dimensionId:itemId`, choosing which item to display for each
-          page-axis dimension. The page-axis `dimensionId` values come from the `pages` array of `GET /models/{modelId}/views/{viewId}`;
-          the `itemId` values for a given dimension come from `GET /workspaces/{workspaceId}/models/{modelId}/dimensions/{dimensionId}/items`.
+          page-axis dimension. The page-axis `dimensionId` values come from the `pages` array of `GET /models/{modelId}/views/{viewId}`.
+          The `itemId` values for a given dimension come from `GET /workspaces/{workspaceId}/models/{modelId}/dimensions/{dimensionId}/items`.
           Both repeated-key form (`pages=a:b&pages=c:d`) and comma-separated form (`pages=a:b,c:d`) are accepted.
         required: false
         schema:
@@ -2112,7 +2113,7 @@ paths:
         explode: true
       responses:
         '200':
-          description: 'View cell data. Returns text/csv by default; returns application/json when both Accept: application/json
+          description: 'View cell data. Returns text/csv by default. Returns application/json when both Accept: application/json
             and format=v1 are set.'
           content:
             text/csv:
@@ -2149,7 +2150,7 @@ paths:
       description: |-
         Minimum role: Standard User.
 
-        Use this call to retrieve selected IDs, codes, and names for items in a specified dimension. This call returns data as filtered by the page builder when they configure the view. This call respects hidden items, filtering selections, and [Selective Access](https://help.anaplan.com/anapedia/Content/Modeling/Users/Selective_Access.html). If the view contains hidden or filtered items, these do not display in the response.
+        Returns the selected IDs, codes, and names of the items in a dimension. This call returns data as filtered by the page builder when they configure the view. This call respects hidden items, filtering selections, and [Selective Access](https://help.anaplan.com/anapedia/Content/Modeling/Users/Selective_Access.html). If the view contains hidden or filtered items, these do not display in the response.
 
         **Notes**:
 
@@ -2163,7 +2164,7 @@ paths:
 
         **Note**: When the dimension has no items, the response omits the `items` key entirely rather than returning an empty array.
 
-        **HIGH VOLUME** — all selected items are returned in one non-paginated response (observed ~149 KB); there is no `limit`/`offset` paging (the call is instead capped at 1,000,000 cells, returning `400` above that). Scope to the specific dimension and view you need rather than requesting broad dimensions.
+        **HIGH VOLUME** — all selected items are returned in one non-paginated response (observed ~149 KB). There is no `limit`/`offset` paging (the call is instead capped at 1,000,000 cells, returning `400` above that). Scope to the specific dimension and view you need rather than requesting broad dimensions.
       tags:
       - Model Metadata
       - List Metadata
@@ -2207,18 +2208,18 @@ paths:
 
         Retrieves all users within the tenant.
 
-        Deactivated users (`active` is `false`) are typically not relevant to callers listing people; filter to `active=true` unless you specifically need inactive users.
+        Deactivated users (`active` is `false`) are typically not relevant to callers listing people. Filter to `active=true` unless you specifically need inactive users.
 
-        **HIGH VOLUME** — this returns every user in the tenant in one merged response; with no `limit` a client that auto-follows `meta.paging` combines every page and can overflow its token budget. Reduce volume by passing an explicit `limit` and paging with `offset`, by scoping server-side with the `s=` search filter instead of full enumeration, and/or by using `search` to locate the specific op/params rather than pulling the whole collection.
+        **HIGH VOLUME** — this returns every user in the tenant in one merged response. With no `limit` a client that auto-follows `meta.paging` combines every page and can overflow its token budget. Reduce volume by passing an explicit `limit` and paging with `offset`, by scoping server-side with the `s=` search filter instead of full enumeration, and/or by using `search` to locate the specific op/params rather than pulling the whole collection.
       tags:
       - User Data
       parameters:
       - $ref: '#/components/parameters/Search'
       - name: sort
         in: query
-        description: 'Sort results. `+field` ascending, `-field` descending; prefix required and field name validated (bad
-          or unknown field returns 400). Comma-separate to sort by multiple columns. Sortable fields: firstName, lastName,
-          email, active, lastLoginDate.'
+        description: 'Sort results. `+field` ascending, `-field` descending. The prefix is required and the field name is
+          validated (bad or unknown field returns 400). Comma-separate to sort by multiple columns. Sortable fields: firstName,
+          lastName, email, active, lastLoginDate.'
         schema:
           type: string
         example: +firstName
@@ -2304,7 +2305,7 @@ paths:
 
         Retrieves all workspaces a user has access to within the user's default tenant
 
-        **HIGH VOLUME** — this returns every workspace the user can access in one merged response; with no `limit` a client that auto-follows `meta.paging` combines every page and can overflow its token budget (a `getWorkspaces` → per-workspace admins pipe produced a 335 KB result that exceeded the token cap). Reduce volume by passing an explicit `limit` and paging with `offset`, by scoping server-side with the `s=` search filter instead of full enumeration, and/or by using `search` to locate the specific op/params rather than pulling the whole collection.
+        **HIGH VOLUME** — this returns every workspace the user can access in one merged response. With no `limit` a client that auto-follows `meta.paging` combines every page and can overflow its token budget (a `getWorkspaces` → per-workspace admins pipe produced a 335 KB result that exceeded the token cap). Reduce volume by passing an explicit `limit` and paging with `offset`, by scoping server-side with the `s=` search filter instead of full enumeration, and/or by using `search` to locate the specific op/params rather than pulling the whole collection.
       tags:
       - General Workspace & Model Metadata
       parameters:
@@ -2312,8 +2313,9 @@ paths:
       - $ref: '#/components/parameters/Search'
       - name: sort
         in: query
-        description: 'Sort results. `+field` ascending, `-field` descending; prefix required and field name validated (bad
-          or unknown field returns 400). Comma-separate to sort by multiple columns. Sortable fields: name, sizeAllowance.'
+        description: 'Sort results. `+field` ascending, `-field` descending. The prefix is required and the field name is
+          validated (bad or unknown field returns 400). Comma-separate to sort by multiple columns. Sortable fields: name,
+          sizeAllowance.'
         schema:
           type: string
         example: +name
@@ -2392,9 +2394,9 @@ paths:
       description: |-
         Minimum role: User Administrator.
 
-        Returns all administrators for a workspace. Requires tenant admin privilege; workspace admin access alone is insufficient.
+        Returns all administrators for a workspace. Requires tenant admin privilege. Workspace admin access alone is insufficient.
 
-        Deactivated administrators (`active` is `false`) are typically not relevant to callers listing people; filter to `active=true` unless you specifically need inactive administrators.
+        Deactivated administrators (`active` is `false`) are typically not relevant to callers listing people. Filter to `active=true` unless you specifically need inactive administrators.
       tags:
       - General Workspace & Model Metadata
       parameters:
@@ -2443,7 +2445,7 @@ paths:
       description: |-
         Minimum role: Standard User.
 
-        Deletes multiple models in a workspace in a single request. Models that cannot be deleted (e.g., because they are currently open) are listed in `bulkDeleteModelsFailures`; the overall HTTP status is still 200 in that case.
+        Deletes multiple models in a workspace in a single request. Models that cannot be deleted (e.g., because they are currently open) are listed in `bulkDeleteModelsFailures`. The overall HTTP status is still 200 in that case.
       tags:
       - General Workspace & Model Metadata
       requestBody:
@@ -2488,7 +2490,7 @@ paths:
 
         Returns models accessible to the calling user within the specified workspace. The response shape is identical to `GET /2/0/models` but filtered to models within the given workspace.
 
-        Models with `activeState` of `ARCHIVED` are typically inactive and not actionable; filter them out of results (keep only `activeState` != `ARCHIVED`) unless you specifically need archived models.
+        Models with `activeState` of `ARCHIVED` are typically inactive and not actionable. Filter them out of results (keep only `activeState` != `ARCHIVED`) unless you specifically need archived models.
       tags:
       - General Workspace & Model Metadata
       parameters:
@@ -2539,7 +2541,7 @@ paths:
       parameters:
       - name: sort
         in: query
-        description: 'Sort results. `+field` or unprefixed ascending, `-field` descending; comma-separate for multiple columns.
+        description: 'Sort results. `+field` or unprefixed ascending, `-field` descending. Comma-separate for multiple columns.
           `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order.
           Example: `+name`, `-id`.'
         schema:
@@ -2721,7 +2723,7 @@ paths:
       description: |-
         Minimum role: Workspace Administrator.
 
-        Use this call to determine the value of the current period in Anaplan.
+        Returns the value of the current period in Anaplan.
 
         If the current period is not set in Anaplan, this call returns empty strings for the `periodText` and `lastDay` values of the `currentPeriod`.
 
@@ -2772,7 +2774,7 @@ paths:
 
         Workspace-scoped alternate URL form — identical behaviour to `/models/{modelId}/currentPeriod` PUT.
 
-        Use this call to change or reset the current period in Anaplan. When this call contains a specified date (for example, 2020-05-20), the API determines what period range contains the specified data and sets that range as the current period.  When the date value is set to blank in this call, the API resets the current period to blank.
+        Changes or resets the current period in Anaplan. When this call contains a specified date (for example, 2020-05-20), the API determines what period range contains the specified data and sets that range as the current period.  When the date value is set to blank in this call, the API resets the current period to blank.
 
         **Warning**: A change to your time settings is a potentially destructive action and may lead to data loss.  The new range of time periods may not include previous time periods. Any data in the removed time periods is deleted from the model.
 
@@ -2837,9 +2839,9 @@ paths:
                     $ref: '#/components/schemas/CurrentPeriod'
         '400':
           description: 'Bad request. Occurs when: (1) the date is not in YYYY-MM-DD format — "Invalid ISO date format ''{date}''.
-            Date should match format YYYY-MM-DD"; (2) the date falls outside the model timescale — "Specified date ''{date}''
-            is out of timescale range {start} - {end}"; (3) date is supplied as both a query parameter and a request body
-            field simultaneously.'
+            Date should match format YYYY-MM-DD". (2) The date falls outside the model timescale — "Specified date ''{date}''
+            is out of timescale range {start} - {end}". (3) The date is supplied as both a query parameter and a request body
+            field at the same time.'
         '404':
           $ref: '#/components/responses/NotFoundOrNoAccess'
         '429':
@@ -2904,7 +2906,7 @@ paths:
       description: |-
         Minimum role: Standard User.
 
-        Use this call to retrieve the IDs, codes, and names for items in a specified dimension. The dimension must be a list, a list subset, a line item subset, or the Users dimension.
+        Returns the IDs, codes, and names of the items in a dimension. The dimension must be a list, a list subset, a line item subset, or the Users dimension.
 
         Calls at model-level do not support the Time dimension. The calls return a `400` response. To avoid this, use the view dimension instead.
 
@@ -3074,7 +3076,7 @@ paths:
       parameters:
       - name: sort
         in: query
-        description: 'Sort results. `+field` or unprefixed ascending, `-field` descending; comma-separate for multiple columns.
+        description: 'Sort results. `+field` or unprefixed ascending, `-field` descending. Comma-separate for multiple columns.
           `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order.
           Example: `+name`, `-id`.'
         schema:
@@ -3386,7 +3388,7 @@ paths:
       parameters:
       - name: sort
         in: query
-        description: 'Sort results. `+field` or unprefixed ascending, `-field` descending; comma-separate for multiple columns.
+        description: 'Sort results. `+field` or unprefixed ascending, `-field` descending. Comma-separate for multiple columns.
           `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order.
           Example: `+name`, `-id`.'
         schema:
@@ -3815,7 +3817,7 @@ paths:
       parameters:
       - name: sort
         in: query
-        description: 'Sort results. `+field` or unprefixed ascending, `-field` descending; comma-separate for multiple columns.
+        description: 'Sort results. `+field` or unprefixed ascending, `-field` descending. Comma-separate for multiple columns.
           `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order.
           Example: `+name`, `-id`.'
         schema:
@@ -3867,7 +3869,7 @@ paths:
       description: |-
         Minimum role: Standard User.
 
-        You can use the API to obtain metadata for an import definition for module and list imports using the import ID. This enables you to use mappings on your imports without querying the import file itself. You can retrieve:
+        Returns the metadata of an import definition for module and list imports, by import ID. This metadata lets you use mappings on your imports without a query against the import file itself. You can retrieve:
 
         *   Name
         *   Type
@@ -4157,7 +4159,7 @@ paths:
 
         If data could not be imported for an import task, a 'dump' file is created depending on the failure. This contains details of the failures that occurred. Use this information to fix the problems and then try the import again.
 
-        **Note:** To prevent timeouts on large files, download the dump file in chunks. It is possible to download dump files without chunking, but it is strongly recommended that chunking is used instead.
+        **Note:** To prevent timeouts on large files, download the dump file in chunks. You can download dump files without chunking, but chunking is strongly recommended.
 
         1.  Query the number of chunks in a dump file.
 
@@ -4174,7 +4176,7 @@ paths:
 
         When an import task has errors, the API maintains a dump file for the task ID with the error.  Any earlier task IDs are erased, though `failureDumpAvailable` can be True for those task IDs.  If a dump file is removed or replaced, then attempting to download the dump file via the API results in a 404 (Not found) HTTP status.
 
-        If you use `/tasks?sort=-creationDate` in the URL, it is possible for tasks created by other users to appear first for which the dump file is unavailable to the accessing user.  It is also possible that a task that the accessing user ran, and for which a dump file is still available, to be further down on the same list.
+        If you use `/tasks?sort=-creationDate` in the URL, tasks created by other users can appear first, and their dump files are not available to the accessing user.  A task that the accessing user ran, and whose dump file is still available, can appear further down the same list.
 
         **Note:** The `taskID` is the last task of the user who carried out the specified import.
       tags:
@@ -4208,7 +4210,7 @@ paths:
 
         Begin by querying the number of chunks using the `/chunks` endpoint.
 
-        It is possible for a dump file to be very large. To help manage the size of a dump file and prevent timeouts, download the dump file in chunks. Chunks are 10mb or less and numbered sequentially from 0.
+        A dump file can be very large. To help manage the size of a dump file and prevent timeouts, download the dump file in chunks. Chunks are 10mb or less and numbered sequentially from 0.
 
         ### Headers
 
@@ -4263,7 +4265,7 @@ paths:
       - Bulk Write
       responses:
         '200':
-          description: Dump file chunk content. Plain text with CSV-formatted error rows; each row contains _Status_, data
+          description: Dump file chunk content. Plain text with CSV-formatted error rows. Each row contains _Status_, data
             columns, _Line_, and _Error_1_ fields.
           content:
             text/plain:
@@ -4286,7 +4288,7 @@ paths:
 
         Alternate URL form — response is equivalent to `/models/{modelId}/lineItems`.
 
-        Use this call to retrieve identifiers of all line items in a model.
+        Returns the identifiers of all line items in a model.
 
         **Notes**:
 
@@ -4369,7 +4371,7 @@ paths:
 
         Alternate URL form — response is equivalent to `/models/{modelId}/lineItems/{lineItemId}/dimensions`.
 
-        Use this call to retrieve the IDs of dimensions that define a line item.
+        Returns the IDs of the dimensions that define a line item.
 
         For reference, see Retrieve dimension items for a line item.
 
@@ -4429,7 +4431,7 @@ paths:
 
         Alternate URL form — response is equivalent to `/models/{modelId}/lineItems/{lineItemId}/dimensions/{dimensionId}/items`.
 
-        Use this call to retrieve IDs, codes, and names for dimension items that apply for the specified line item.
+        Returns the IDs, codes, and names of the dimension items that apply to a line item.
 
         **Notes**:
 
@@ -4490,7 +4492,7 @@ paths:
       description: |-
         Minimum role: Standard User.
 
-        Use this call to retrieve lists for a specified workspace and model.
+        Returns the lists in a model.
       tags:
       - Model Metadata
       - List Metadata
@@ -4547,7 +4549,7 @@ paths:
       description: |-
         Minimum role: Standard User.
 
-        Use this call to retrieve metadata for a specified list. Field-level descriptions are in the response schema (ListMetadata). Metadata entries that are not set for a list (for example, no parent or no top level item) are omitted from the response.
+        Returns the metadata of a list. Field-level descriptions are in the response schema (ListMetadata). Metadata entries that are not set for a list (for example, no parent or no top level item) are omitted from the response.
 
         **Notes**:
 
@@ -4617,7 +4619,7 @@ paths:
       description: |-
         Minimum role: Standard User.
 
-        Use this call to retrieve list data for the items in a specified list.
+        Returns the list data of the items in a list.
 
         You can filter on optional fields by setting the `includeAll` query parameter.
 
@@ -4701,7 +4703,7 @@ paths:
       description: |-
         Minimum role: Standard User.
 
-        Use this call to add items to a list. You must provide the list ID and data for each item. You can add one or more items in each request.
+        Adds items to a list. You must provide the list ID and data for each item. You can add one or more items in each request.
 
         **Notes:**
 
@@ -4771,13 +4773,14 @@ paths:
                     properties:
                       name:
                         type: string
-                        description: Item display name. Required for named lists when adding; used as identifier when deleting.
+                        description: Item display name. Required for named lists when adding. Used as the identifier when
+                          deleting.
                       code:
                         type: string
                         description: Item code. Used as primary identifier for numbered lists.
                       id:
                         type: string
-                        description: Item ID. Returned by GET list items; can be used as identifier when deleting.
+                        description: Item ID. Returned by GET list items. Can be used as the identifier when deleting.
                       parent:
                         type: string
                         description: Parent item name for hierarchical lists.
@@ -4806,7 +4809,7 @@ paths:
                   s11: true
       responses:
         '200':
-          description: Operation completed; per-item failures reported inline
+          description: Operation completed. Per-item failures are reported inline.
           content:
             application/json:
               example:
@@ -4864,7 +4867,7 @@ paths:
       description: |-
         Minimum role: Standard User.
 
-        Use this call to update items to a list. You must provide the model ID and list ID on the request URL. There are two kinds of lists in Anaplan: standard list and numbered list. For a standard list, the API identifies the item using the id, code, or name. For numbered list, the API uses the id or code. If property or subset is not specified in the input, the existing value is not updated. You can update one or more items in each request.
+        Updates items in a list. You must provide the model ID and list ID on the request URL. There are two kinds of lists in Anaplan: standard list and numbered list. For a standard list, the API identifies the item using the id, code, or name. For numbered list, the API uses the id or code. If property or subset is not specified in the input, the existing value is not updated. You can update one or more items in each request.
 
         When you specify the list item identifier, select one of the appropriate identifiers (id, code, or name). If the request contains multiple identifiers, the API returns an error.
 
@@ -4910,7 +4913,7 @@ paths:
       - Transactional Write
       responses:
         '200':
-          description: List items updated; per-item failures reported inline
+          description: List items updated. Per-item failures are reported inline.
           content:
             application/json:
               example:
@@ -5009,7 +5012,7 @@ paths:
       description: |-
         Minimum role: Workspace Administrator.
 
-        Use this call to get the current fiscal year with the start and end date from the model calendar. The value of the start and end date is determined by the calendar type set in the model. This value is not always a range from Jan 1 to Dec 31. The API returns an empty value If the calendar type does not have an available fiscal year (for example, Weeks General).
+        Returns the current fiscal year with the start date and the end date from the model calendar. The value of the start and end date is determined by the calendar type set in the model. This value is not always a range from Jan 1 to Dec 31. The API returns an empty value If the calendar type does not have an available fiscal year (for example, Weeks General).
       tags:
       - Model Metadata
       - Model Setting Metadata
@@ -5052,7 +5055,7 @@ paths:
 
         Alternate URL form — response is equivalent to `/models/{modelId}/modules`.
 
-        Use this call to retrieve the IDs and names of all modules for a specified model.
+        Returns the IDs and names of all modules in a model.
 
         **Notes**:
 
@@ -5221,7 +5224,7 @@ paths:
 
         Alternate URL form — response is equivalent to `/models/{modelId}/modules/{moduleId}/views`.
 
-        Use this call to retrieve all view IDs and names for a specified module. This call also returns the default view for the module. If the user adds the query parameter includesubsidiaryviews=true, unsaved subsidiary views will also be included in the results.
+        Returns the IDs and names of all views in a module. This call also returns the default view for the module. If the user adds the query parameter includesubsidiaryviews=true, unsaved subsidiary views will also be included in the results.
 
         **Notes**:
 
@@ -5307,7 +5310,7 @@ paths:
       parameters:
       - name: sort
         in: query
-        description: 'Sort results. `+field` or unprefixed ascending, `-field` descending; comma-separate for multiple columns.
+        description: 'Sort results. `+field` or unprefixed ascending, `-field` descending. Comma-separate for multiple columns.
           `name` and `id` reorder results. Field name not validated — unknown fields return 200 and fall back to default order.
           Example: `+name`, `-id`.'
         schema:
@@ -5357,7 +5360,7 @@ paths:
       description: |-
         Minimum role: Standard User.
 
-        Workspace-prefixed form of `GET /models/{modelId}/processes/{processId}`. Returns the same `processMetadata` response shape. Use this form when a workspace ID is available; the model-direct form is also valid.
+        Workspace-prefixed form of `GET /models/{modelId}/processes/{processId}`. Returns the same `processMetadata` response shape. Use this form when a workspace ID is available. The model-direct form is also valid.
       tags:
       - Model Metadata
       - Action Metadata
@@ -5660,7 +5663,7 @@ paths:
       description: |-
         Minimum role: Standard User.
 
-        Use this call to retrieve the ID and name of all views for a model. The results include default and saved views. If you add the query parameter `includesubsidiaryviews=true`, this includes unsaved subsidiary views in the results. This call also retrieves the ID of the module that the views belong to.
+        Returns the ID and name of all views in a model. The results include default and saved views. If you add the query parameter `includesubsidiaryviews=true`, this includes unsaved subsidiary views in the results. This call also retrieves the ID of the module that the views belong to.
 
         **Notes**:
 
@@ -5762,7 +5765,7 @@ paths:
 
         Alternate URL form — response is equivalent to `/models/{modelId}/views/{viewId}`.
 
-        Use this call to retrieve the name, IDs, and lists of names for the dimensions (columns, pages, rows) on a specified view.
+        Returns the name, the IDs, and the lists of names for the dimensions (columns, pages, rows) on a view.
 
         **Notes**:
 
@@ -5843,7 +5846,7 @@ paths:
       description: |-
         Minimum role: Standard User.
 
-        Use this call to initiate a large volume read request of view data. This enables you to read data from views that are larger than a million cell count.
+        Starts a large-volume read request of view data. This enables you to read data from views that are larger than a million cell count.
 
         **Note:**
 
@@ -5898,7 +5901,7 @@ paths:
       description: |-
         Minimum role: Standard User.
 
-        Use this call to check the status of an export action after a bulk data long request is initiated. You can use it to check how many pages are available to download.
+        Returns the status of an export action after a bulk data long request starts. You can use it to check how many pages are available to download.
 
         ### Response scenarios
 
@@ -5947,7 +5950,7 @@ paths:
       description: |-
         Minimum role: Standard User.
 
-        Use this call to delete or cancel an initiated read request. This removes all the pages from the file store and stops the ongoing read request.
+        Deletes or cancels a read request that started. This removes all the pages from the file store and stops the ongoing read request.
 
         **Notes**:
 
@@ -5959,7 +5962,7 @@ paths:
       - Transactional Read
       responses:
         '200':
-          description: Read request cancelled or removed; pages cleared from file store.
+          description: Read request cancelled or removed. Pages cleared from the file store.
           content:
             application/json:
               schema:
@@ -5997,7 +6000,7 @@ paths:
       description: |-
         Minimum role: Standard User.
 
-        Use this call to download the available pages, either when the read request is in progress, or when the request is completed. This request returns a CSV format response of the export list items.
+        Downloads the available pages, either when the read request is in progress, or when the request is complete. This request returns a CSV format response of the export list items.
 
         You can download pages while the export is in progress. You can download up to `availablePages` number of pages returned by the export status API.
 
@@ -6032,9 +6035,9 @@ paths:
       description: |-
         Minimum role: User Administrator.
 
-        Returns all visitors for a workspace. Requires tenant admin privilege; workspace admin access alone is insufficient.
+        Returns all visitors for a workspace. Requires tenant admin privilege. Workspace admin access alone is insufficient.
 
-        Deactivated visitors (`active` is `false`) are typically not relevant to callers listing people; filter to `active=true` unless you specifically need inactive visitors.
+        Deactivated visitors (`active` is `false`) are typically not relevant to callers listing people. Filter to `active=true` unless you specifically need inactive visitors.
       tags:
       - General Workspace & Model Metadata
       parameters:
@@ -6111,7 +6114,7 @@ components:
       name: chunkId
       in: path
       description: The chunk identifier. From the `id` values returned by the sibling `GET .../chunks` list endpoint for the
-        file or dump. Chunk ids are zero-based; chunk `0` is always the first chunk of a file that has any content.
+        file or dump. Chunk ids are zero-based. Chunk `0` is always the first chunk of a file that has any content.
       required: true
       schema:
         type: string
@@ -6236,7 +6239,7 @@ components:
       description: Optional case-insensitive substring filter (matches anywhere in the field). Supports wildcards `%` (0-n
         characters) and `_` (exactly 1 character). Omit to return all items. **Undocumented, and behavior is endpoint-specific.**
         `GET /workspaces` and `GET /users` are verified with the Workspace Administrator role. `GET /models` requires the
-        Tenant Admin role; otherwise it returns the full model list unfiltered.
+        Tenant Admin role. Without that role it returns the full model list unfiltered.
       required: false
       schema:
         type: string
@@ -6465,7 +6468,7 @@ components:
           type: string
         id:
           type: string
-          description: 12- or 13-digit numeric identifier. Default views share the module prefix 102; named saved views use
+          description: 12- or 13-digit numeric identifier. Default views share the module prefix 102. Named saved views use
             higher-range prefixes (up to 13 digits).
         moduleId:
           type: string
@@ -6776,14 +6779,14 @@ components:
           type: array
           items:
             type: string
-          description: Selected item labels for each page-axis dimension; empty when no page dimensions exist.
+          description: Selected item labels for each page-axis dimension. The array is empty when no page dimensions exist.
         columnCoordinates:
           type: array
           items:
             type: array
             items:
               type: string
-          description: Coordinate labels for each column; each inner array has one entry per column dimension.
+          description: Coordinate labels for each column. Each inner array has one entry per column dimension.
         rows:
           type: array
           items:
@@ -6796,12 +6799,12 @@ components:
           type: array
           items:
             type: string
-          description: Coordinate labels for this row; one entry per row dimension.
+          description: Coordinate labels for this row. There is one entry per row dimension.
         cells:
           type: array
           items:
             type: string
-          description: Cell values in column order; positions correspond to columnCoordinates.
+          description: Cell values in column order. Positions correspond to columnCoordinates.
     ViewReadRequest:
       description: Result record for a large-view read operation. Tracks the asynchronous read state and provides a URL for
         downloading the data once it is ready.
@@ -6893,7 +6896,7 @@ components:
           - TABULAR_MULTI_COLUMN
         id:
           type: string
-          description: 12-digit numeric identifier. The prefix 116 marks this as an export definition; the export output file
+          description: 12-digit numeric identifier. The prefix 116 marks this as an export definition. The export output file
             shares this same ID.
         name:
           type: string
@@ -6964,8 +6967,8 @@ components:
           description: 'Character encoding of the file. Observed values: ISO-8859-1, UTF-16LE, UTF-8.'
         firstDataRow:
           type: integer
-          description: Row number of the first data row. 0 means no data rows are configured; otherwise 1-based (row 1 = first
-            row of the file).
+          description: Row number of the first data row. 0 means no data rows are configured. Other values are 1-based (row
+            1 = first row of the file).
         format:
           type: string
         headerRow:
@@ -6973,7 +6976,7 @@ components:
           description: 1-based row number of the column-header row in a delimited file.
         id:
           type: string
-          description: 12-digit numeric identifier. Import source files use the prefix 113; export output files use 116, matching
+          description: 12-digit numeric identifier. Import source files use the prefix 113. Export output files use 116, matching
             their parent export's ID.
         language:
           type: string
@@ -7009,7 +7012,7 @@ components:
         importDataSourceId:
           type: string
           description: The id of the data source this import reads. When the source is an uploaded file this is its file id
-            (prefix 113, from `GET /models/{modelId}/files`); upload to this file id, then run the import. For model, list,
+            (prefix 113, from `GET /models/{modelId}/files`). Upload to this file id, then run the import. For model, list,
             or saved-view sources it is the source object id instead.
           example: '113000000006'
         importType:
@@ -7094,7 +7097,7 @@ components:
           description: Data format of the line item (for example, NUMBER, TEXT, BOOLEAN, DATE).
         formatMetadata:
           type: object
-          description: Formatting configuration for the line item; the fields present depend on the format.
+          description: Formatting configuration for the line item. The fields present depend on the format.
           properties:
             comparisonIncrease:
               type: string
@@ -7198,7 +7201,7 @@ components:
         numberOfCellsChanged:
           type: number
         failures:
-          description: An array of cell write failures; empty when all cells updated successfully.
+          description: An array of cell write failures. The array is empty when all cells update successfully.
           type: array
           items:
             type: object
@@ -7229,7 +7232,7 @@ components:
           description: Human-readable description of the current execution step
         progress:
           type: number
-          description: Execution progress as a fraction (0.0–1.0); typically 1.0 on completion
+          description: Execution progress as a fraction (0.0–1.0). The value is typically 1.0 on completion.
         result:
           $ref: '#/components/schemas/TaskResult'
           description: Task result object, populated after the task reaches a terminal state (COMPLETE or CANCELLED). Absent
@@ -7290,7 +7293,7 @@ components:
           description: Task creation time in milliseconds since epoch.
         taskId:
           type: string
-          description: Unique identifier for the task; use this to poll GET .../tasks/{taskId}.
+          description: Unique identifier for the task. Use this to poll GET .../tasks/{taskId}.
         taskState:
           enum:
           - NOT_STARTED
@@ -7331,7 +7334,7 @@ components:
           example: https://api.anaplan.com/2/0/models?limit=20&offset=0
     Status:
       description: Response status object present in every Anaplan API response envelope. `code` is the Anaplan-specific status
-        code (not the HTTP status code); `message` is the human-readable outcome.
+        code (not the HTTP status code). `message` is the human-readable outcome.
       type: object
       properties:
         code:
@@ -7344,7 +7347,7 @@ components:
           example: Success
     Meta:
       description: Response metadata envelope present in paginated Anaplan API responses. `schema` is a URL to the JSON schema
-        definition for the response body; `paging` holds cursor-based navigation state.
+        definition for the response body. `paging` holds cursor-based navigation state.
       type: object
       required:
       - schema

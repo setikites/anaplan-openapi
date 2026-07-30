@@ -1075,6 +1075,49 @@ def test_prose_extraction_covers_every_spec():
     )
 
 
+def test_no_semicolons_in_prose():
+    """No description or summary sentence may use a semicolon (ADR 0007 §1).
+
+    A semicolon joins two ideas that read better as two sentences. Where the
+    semicolons separate a list of alternatives, write a markdown bullet list —
+    a bare period swap leaves a run of fragments.
+
+    Code spans are exempt (ADR 0007 §2), so `;escaped=true` does not fail.
+    """
+    violations = [
+        f"  [{spec}] {json_path}\n    {sentence!r}"
+        for spec, json_path, sentence in iter_prose_sentences()
+        if ";" in sentence
+    ]
+    assert not violations, (
+        f"{len(violations)} semicolon(s) found in description or summary prose\n"
+        f"(ADR 0007 §1 — write two sentences, or a bullet list for a set of "
+        f"alternatives):\n" + "\n".join(violations)
+    )
+
+
+_USE_THIS_CALL_RE = re.compile(r"^Use this call to\b", re.IGNORECASE)
+
+
+def test_no_use_this_call_preamble():
+    """No description sentence may open with 'Use this call to' (ADR 0007 §1).
+
+    The verb already appears in the sibling summary. The preamble adds nothing
+    and pushes the real content into the second clause. Start with the verb:
+    'Returns the lists in a model.', not 'Use this call to retrieve lists ...'.
+    """
+    violations = [
+        f"  [{spec}] {json_path}\n    {sentence!r}"
+        for spec, json_path, sentence in iter_prose_sentences()
+        if _USE_THIS_CALL_RE.match(sentence)
+    ]
+    assert not violations, (
+        f"{len(violations)} 'Use this call to' preamble(s) found\n"
+        f"(ADR 0007 §1 — start the sentence with the verb; the summary already "
+        f"names the call):\n" + "\n".join(violations)
+    )
+
+
 def test_prose_extraction_yields_summaries_and_paths():
     """Operation summaries must be extracted, and each sentence must carry its JSON path."""
     rows = list(iter_prose_sentences())
