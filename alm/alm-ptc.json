@@ -1159,7 +1159,7 @@
       }
     },
     "createSyncTask": {
-      "description": "Minimum role: Workspace Administrator.\n\nInitiates a sync task to apply a source model revision to the target model.",
+      "description": "Minimum role: Workspace Administrator.\n\nStarts a sync task to apply a source model revision to the target model.",
       "parameters": [
         {
           "name": "modelId",

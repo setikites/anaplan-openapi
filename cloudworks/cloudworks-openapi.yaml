@@ -3,7 +3,7 @@ info:
   title: Anaplan CloudWorks API
   version: 2.0.0
   description: |-
-    The Anaplan CloudWorks API enables you to create your own connections and integrations with Anaplan CloudWorks, supporting data movement between cloud storage services (Amazon S3, Google BigQuery, Azure Blob Storage) and Anaplan models.
+    The Anaplan CloudWorks API lets you create your own connections and integrations with Anaplan CloudWorks, supporting data movement between cloud storage services (Amazon S3, Google BigQuery, Azure Blob Storage) and Anaplan models.
 
     **Base URL**: Both `https://api.cloudworks.anaplan.com/2/0/` and `https://api.anaplan.com/cloudworks/2/0/` are active. The `api.cloudworks.anaplan.com` form is listed first. Both `AnaplanAuthToken` and `Bearer` (with an AnaplanAuthToken value) are accepted.
 
@@ -1844,8 +1844,8 @@ components:
           description: 32-character lowercase hex trace identifier, useful for support diagnostics.
           type: string
         triggerSource:
-          description: 'What caused this run: `scheduled` (integration''s own schedule), `manual` (user-initiated), or `scheduled_inf`
-            (triggered by an integration flow schedule).'
+          description: 'What caused this run: `scheduled` (integration''s own schedule), `manual` (started by a user), or
+            `scheduled_inf` (triggered by an integration flow schedule).'
           type: string
           enum:
           - scheduled
