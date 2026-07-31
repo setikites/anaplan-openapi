@@ -31,7 +31,8 @@ YAML copy:
 ```
 <api>/<api>-openapi.json   # canonical OpenAPI 3.0 spec
 <api>/<api>-openapi.yaml   # YAML equivalent (generated from the JSON)
-<api>/<api>-mcp.json       # slimmed spec for MCP tool generation (generated)
+<api>/<api>-mcp.json       # slimmed spec for MCP tool generation (generated,
+                           # seven APIs only — see docs/mcp-agent-access.md)
 <api>/<api>-ptc.json       # catalog + detail for programmatic tool calling (generated,
                            # seven APIs only — see docs/mcp-agent-access.md)
 ```

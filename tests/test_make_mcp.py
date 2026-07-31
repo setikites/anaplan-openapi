@@ -5,12 +5,17 @@ make_mcp once emitted component schemas in `set`-iteration order, so regeneratin
 scripts/check_generated.py drift check). Emission now follows the source spec's order.
 """
 
+import json
 import pathlib
 import sys
 
+import pytest
+
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent / "scripts"))
 
-from make_mcp import render_mcp, transform  # noqa: E402
+from make_mcp import EXCLUDED, main, render_mcp, transform  # noqa: E402
+
+REPO = pathlib.Path(__file__).parent.parent
 
 
 def _spec():
@@ -60,3 +65,19 @@ def test_schema_emission_follows_source_order():
 def test_render_is_deterministic():
     spec = _spec()
     assert render_mcp(spec) == render_mcp(spec)
+
+
+def test_excluded_apis_produce_no_artifact(tmp_path):
+    assert EXCLUDED == {"authentication", "oauth", "financial-consolidation"}
+    api_dir = tmp_path / "oauth"
+    api_dir.mkdir()
+    src = api_dir / "oauth-openapi.json"
+    src.write_text(json.dumps(_spec()), encoding="utf-8")
+    with pytest.raises(SystemExit):
+        main(str(src))
+    assert not (api_dir / "oauth-mcp.json").exists()
+
+
+@pytest.mark.parametrize("api", sorted(EXCLUDED))
+def test_no_committed_artifact_for_excluded_apis(api):
+    assert not (REPO / api / f"{api}-mcp.json").exists()

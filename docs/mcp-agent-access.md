@@ -182,7 +182,8 @@ They are siblings. Each one serves a different surface, so their output stays in
 
 Both synthesize a missing `operationId`, drop the workspace-scoped path where a
 model-direct twin exists, and strip `example`, `pattern` and `format` from opaque ID
-parameters. Both keep the prose verbatim.
+parameters. Both keep the prose verbatim. Both exclude the same three APIs
+(`authentication`, `oauth`, `financial-consolidation`), so each script emits seven files.
 
 ### `<api>-ptc.json`
 
@@ -205,11 +206,11 @@ document assembly runs at request time.
 Seven APIs are covered: `administration`, `alm`, `audit`, `cloudworks`, `exception`,
 `integration` and `scim`. Together they hold 134 operations.
 
-Three APIs get no `-ptc.json` file at all. `authentication` and `oauth` are excluded
-because token minting is host-side and stays outside the surface an agent can touch.
-`financial-consolidation` is excluded because its paging is not implemented downstream.
-The exclusion is a build-time decision, so a configuration mistake downstream cannot reach
-an excluded operation.
+The same three APIs get no `-ptc.json` and no `-mcp.json` file at all. `authentication` and
+`oauth` are excluded because token minting is host-side and stays outside the surface an
+agent can touch. `financial-consolidation` is excluded because its paging is not implemented
+downstream. The exclusion is a build-time decision, so a configuration mistake downstream
+cannot reach an excluded operation.
 
 Two properties of the source documents shape the output.
 
@@ -228,4 +229,4 @@ uv run python scripts/make_ptc.py <api>/<api>-openapi.json
 ```
 
 `scripts/check_generated.py` verifies every artifact against its source. It also fails if a
-`-ptc.json` file exists for one of the three excluded APIs.
+`-mcp.json` or `-ptc.json` file exists for one of the three excluded APIs.
