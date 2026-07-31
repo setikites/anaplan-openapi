@@ -11,12 +11,21 @@ is dropped. Specs without that duality are unaffected (regex just never matches)
 
 Descriptions are kept verbatim — prose can't be auto-summarized reliably; trim by hand if needed.
 
+Three APIs are excluded at build time and get no -mcp.json at all — see EXCLUDED. A consumer
+must not be able to reach an excluded operation through a config mistake. scripts/make_ptc.py
+applies the same list.
+
 Usage: uv run python scripts/make_mcp.py integration/integration-openapi.json
 """
 
 import json
+import pathlib
 import re
 import sys
+
+# authentication + oauth: token minting is host-side and stays outside the agent surface.
+# financial-consolidation: its paging is not implemented downstream.
+EXCLUDED = {"authentication", "oauth", "financial-consolidation"}
 
 METHODS = {"get", "post", "put", "patch", "delete", "head", "options", "trace"}
 KEEP = ("summary", "description", "parameters", "requestBody", "security")
@@ -136,6 +145,9 @@ def render_mcp(spec):
 def main(src):
     if not src.endswith("-openapi.json"):
         sys.exit(f"expected a *-openapi.json file, got: {src}")
+    api = pathlib.Path(src).parent.name
+    if api in EXCLUDED:
+        sys.exit(f"{api} is excluded from the MCP surface — no -mcp.json is produced")
     dst = src.replace("-openapi.json", "-mcp.json")
     d = json.load(open(src, encoding="utf-8"))
     with open(dst, "w", encoding="utf-8") as f:

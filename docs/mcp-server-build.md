@@ -15,7 +15,7 @@ every tool works off that dict. That dict *is* the metaprogramming.
 ## Ownership split
 
 - **`anaplan-openapi` (this repo)** owns the specs. `scripts/make_mcp.py` produces
-  the 10 `*-mcp.json`. They are generated artifacts (currently untracked). Pick one
+  the 7 `*-mcp.json`. They are generated artifacts (currently untracked). Pick one
   and stick to it: **commit them** or **publish on a git tag**. The MCP server needs a
   stable pinned copy, never a live regen.
 - **`anaplan-mcp` (new repo)** vendors the specs as a **git submodule** pinned to a tag

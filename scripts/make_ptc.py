@@ -20,8 +20,9 @@ opaque-ID constraint stripping, verbatim prose, source-order emission.
 
 Dropped relative to make_mcp: `security` and `securitySchemes`. Auth is host-side.
 
-Three APIs are excluded at build time and get no -ptc.json at all — see EXCLUDED. A
-consumer must not be able to reach an excluded operation through a config mistake.
+Three APIs are excluded at build time and get no -ptc.json at all — see make_mcp.EXCLUDED,
+which make_mcp applies to -mcp.json too. A consumer must not be able to reach an excluded
+operation through a config mistake.
 
 Response `$ref` graphs in these specs are recursive, so the resolver carries a per-branch
 cycle guard and a depth cap. Truncation is marked in the committed artifact (an
@@ -37,11 +38,8 @@ import pathlib
 import re
 import sys
 
-from make_mcp import METHODS, WS, opid, strip_id_constraints
-
-# authentication + oauth: token minting is host-side and stays outside the agent surface.
-# financial-consolidation: its paging is not implemented downstream.
-EXCLUDED = {"authentication", "oauth", "financial-consolidation"}
+# EXCLUDED is defined in make_mcp and shared: both surfaces exclude the same three APIs.
+from make_mcp import EXCLUDED, METHODS, WS, opid, strip_id_constraints
 
 MAX_DEPTH = 40  # ponytail: deepest real schema here is far under this; raise if one grows
 TRUNC = "x-ptc-truncated"
