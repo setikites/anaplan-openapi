@@ -6,7 +6,7 @@
 |--------|-----------|-------|
 | Apiary docs | ✓ | https://scimapi.docs.apiary.io/ — primary source |
 | Postman collection | ✓ | Official Anaplan Collection — top-level "SCIM" folder (Users CRUD, Metadata: ServiceProviderConfig, ResourceTypes, Schemas) |
-| Live testing | Partial | ResourceTypes and Schemas responses extracted; User CRUD not yet tested |
+| Live testing | Partial | Auth schemes (#44), `DELETE /Users/{id}` probe (#43), filter operators and attributes (#223), and the `USER_ADMIN` role gate (#180) confirmed. User create, update, and delete write paths not tested. |
 
 ## Servers
 
@@ -60,7 +60,7 @@ The `ServiceProviderConfig` endpoint documents only Basic and AnaplanAuthToken. 
 
 An Anaplan API key is accepted as the Bearer credential — `Authorization: Bearer <api-key>` — in addition to an AnaplanAuthToken value. Note this is the opposite convention from the Exception Users API, which requires its own `AnaplanApiKey` prefix (`Authorization: AnaplanApiKey <api-key>`) and rejects `Bearer`. SCIM has no `AnaplanApiKey` scheme; send the key under `Bearer`. Not yet covered by a live test in `tests/test_scim_live.py`.
 
-Calls require either an Anaplan API Key or a user with the `USER_ADMIN` role.
+Calls to `/Users` require either an Anaplan API Key or a user with the `USER_ADMIN` role. The three discovery endpoints (`/ServiceProviderConfig`, `/ResourceTypes`, `/Schemas`) need no credential at all — live testing returned 200 with no `Authorization` header (issue #180). The spec records this as `x-anaplan-min-role: None` on those three operations and `User Administrator` on the six `/Users` operations.
 
 ## Endpoints
 
@@ -143,16 +143,25 @@ Accept: application/json
 
 ## Testing Coverage
 
+Live tests are in `tests/test_scim_live.py` (8 tests). Run them with:
+
+```
+uv run --env-file .env pytest tests/test_scim_live.py --live
+```
+
 | Endpoint | Happy Path | Error Cases | Notes |
 |----------|-----------|-------------|-------|
-| `GET /Users` | Partial | ✓ | Auth schemes confirmed (issue #44); filter operators/attributes probed live with USER_ADMIN token (issue #223) |
-| `POST /Users` | — | — | Not yet tested |
-| `GET /Users/{id}` | — | — | Not yet tested |
-| `PUT /Users/{id}` | — | — | Not yet tested |
-| `PATCH /Users/{id}` | — | — | Not yet tested |
-| `GET /ServiceProviderConfig` | — | — | Not yet tested |
-| `GET /ResourceTypes` | ✓ | — | Live response captured above |
-| `GET /Schemas` | ✓ | — | Live response captured above |
+| `GET /Users` | ✓ | ✓ | Auth schemes confirmed (issue #44). Filter operators and attributes probed with a `USER_ADMIN` token (issue #223). Role gate confirmed both ways — Standard User gets 403, User Admin gets 200 (issue #180) |
+| `POST /Users` | — | — | Write path not tested. The `USER_ADMIN` gate is enforced at the `/Users` resource level, so the `GET /Users` gate result covers all six `/Users` operations |
+| `GET /Users/{id}` | — | — | Not tested |
+| `PUT /Users/{id}` | — | — | Write path not tested |
+| `PATCH /Users/{id}` | — | — | Write path not tested |
+| `DELETE /Users/{id}` | — | ✓ | Endpoint existence confirmed — a fake user ID returns 403, not 405 (issue #43) |
+| `GET /ServiceProviderConfig` | ✓ | — | Returns 200 with no `Authorization` header (issue #180) |
+| `GET /ResourceTypes` | ✓ | — | Live response captured above. Returns 200 with no `Authorization` header (issue #180) |
+| `GET /Schemas` | ✓ | — | Live response captured above. Returns 200 with no `Authorization` header (issue #180) |
+
+Not covered by a live test: the Anaplan API key sent as the `Bearer` credential (see Authentication above), and every request body that creates or changes a user.
 
 ## Discrepancies and Notes
 

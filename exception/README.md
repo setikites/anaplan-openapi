@@ -7,13 +7,20 @@
 | Apiary docs | ✓ | https://exceptionusersapi2.docs.apiary.io/ — primary source |
 | Local blueprint | ✓ | `sources/exception/apiary-blueprint.json` — Apiary blueprint cached locally |
 | Postman collection | ✓ | Official Anaplan Collection — top-level "Exception Users" folder, 4 requests |
-| Live testing | ✓ | Auth schemes, search contract (by workspace and by user), and PATCH error probe confirmed via OAuth Authorization Code grant (issue #51) |
+| Live testing | ✓ | Auth schemes, search contract (by workspace and by user), and PATCH error probe confirmed via OAuth Authorization Code grant (issue #51). Minimum role confirmed per operation by a role ladder on one certificate account (issue #181) |
 
 ## Purpose
 
 Manage exception users — users who are permitted to bypass SSO enforcement — in Anaplan workspaces. Intended for tenants with SSO enabled who need to allow specific users (e.g. service accounts or emergency access accounts) to log in with a password instead.
 
-Requires the **Tenant Security Admin** role.
+The minimum role is per operation, not per API (live-confirmed, issue #181):
+
+| Operation | Minimum role |
+|-----------|--------------|
+| `POST /permissions/exception-users/search` | **Standard User** — returns 200 with data even after the Workspace Admin role is dropped. Only workspace visibility bounds the result |
+| `PATCH /permissions/exception-users/users/{userGuid}` | **Tenant Security Admin** — Standard User and Workspace Admin both get 403 |
+
+The whole-API "Tenant Security Admin" assumption held for the write path only. The spec carries these values as `x-anaplan-min-role`.
 
 ## Servers
 
@@ -98,16 +105,31 @@ Descriptions removed as tautological (ADR 0003 §2):
 
 ## Testing Coverage
 
-Live tests run with OAuth Authorization Code grant (`AnaplanAuthToken {access_token}`), Tenant Security Admin role. Run with `--live --allow-writes`.
+The automated live tests are in `tests/test_exception_live.py` (6 tests). They run with the OAuth Authorization Code grant (`AnaplanAuthToken {access_token}`) and the Tenant Security Admin role. Run them with `--live --allow-writes`:
+
+```
+uv run --env-file .env pytest tests/test_exception_live.py --live --allow-writes
+```
 
 | Endpoint | Test | Result | Notes |
 |----------|------|--------|-------|
-| `POST /search` | AnaplanAuthToken (OAuth) accepted | ✓ | Auth confirmed; non-401, non-FAILURE_BAD_HEADER response |
+| `POST /search` | AnaplanAuthToken (OAuth) accepted | ✓ | Auth confirmed. Response is neither 401 nor FAILURE_BAD_HEADER |
 | `POST /search` | Bearer (OAuth) rejected | ✓ | 400 FAILURE_BAD_HEADER — Bearer not accepted even for valid OAuth tokens |
-| `POST /search` | AnaplanApiKey accepted | ✓ | 400 without FAILURE_BAD_HEADER confirms auth layer accepted key |
+| `POST /search` | AnaplanApiKey accepted | ✓ | 400 without FAILURE_BAD_HEADER confirms the auth layer accepted the key |
 | `POST /search` | Search by workspace — response shape | ✓ | 200 with `response` array of `{ workspaceGuid, workspaceName, users }` objects |
 | `POST /search` | Search by user — response shape | ✓ | 200 with `response` array |
 | `PATCH /users/{userGuid}` | Invalid `op` returns 400 | ✓ | `op: "invalid_op"` returns 400 as expected |
+
+### Minimum-role ladder (issue #181, manual)
+
+The role ladder ran by hand against one certificate account. The roles were changed between runs, so no automated test covers it.
+
+| Operation | Standard User | Workspace Admin | Tenant Security Admin |
+|-----------|---------------|-----------------|-----------------------|
+| `POST /search` | 200 with data | 200 | 200 |
+| `PATCH /users/{userGuid}` | 403 | 403 | 204 |
+
+Send a **valid** body to reach the authorization gate on the PATCH path. An invalid `op` returns 400 because body validation runs before the role check. That 400 never exercises the gate.
 
 ## Postman Collection
 

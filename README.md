@@ -49,11 +49,11 @@ openapi-generator-cli generate -i integration/integration-openapi.json -g python
 | Authentication | [`authentication/`](authentication/) | [`authentication-openapi.json`](authentication/authentication-openapi.json) | High — live-tested |
 | OAuth 2.0 | [`oauth/`](oauth/) | [`oauth-openapi.json`](oauth/oauth-openapi.json) | High — live-tested |
 | Integration | [`integration/`](integration/) | [`integration-openapi.json`](integration/integration-openapi.json) | High — live-tested |
-| CloudWorks | [`cloudworks/`](cloudworks/) | [`cloudworks-openapi.json`](cloudworks/cloudworks-openapi.json) | High |
-| SCIM | [`scim/`](scim/) | [`scim-openapi.json`](scim/scim-openapi.json) | Medium |
-| ALM | [`alm/`](alm/) | [`alm-openapi.json`](alm/alm-openapi.json) | Medium |
+| CloudWorks | [`cloudworks/`](cloudworks/) | [`cloudworks-openapi.json`](cloudworks/cloudworks-openapi.json) | High — live-tested |
+| SCIM | [`scim/`](scim/) | [`scim-openapi.json`](scim/scim-openapi.json) | Medium — live-tested (reads only; user write paths untested) |
+| ALM | [`alm/`](alm/) | [`alm-openapi.json`](alm/alm-openapi.json) | Medium — live-tested (reads and role gates; no revision or sync is created) |
 | Audit | [`audit/`](audit/) | [`audit-openapi.json`](audit/audit-openapi.json) | High — live-tested |
-| Financial Consolidation | [`financial-consolidation/`](financial-consolidation/) | [`financial-consolidation-openapi.json`](financial-consolidation/financial-consolidation-openapi.json) | Low |
+| Financial Consolidation | [`financial-consolidation/`](financial-consolidation/) | [`financial-consolidation-openapi.json`](financial-consolidation/financial-consolidation-openapi.json) | Low — **no live testing** (needs Fluence credentials) |
 | Exception Users | [`exception/`](exception/) | [`exception-openapi.json`](exception/exception-openapi.json) | High — live-tested |
 | Administration | [`administration/`](administration/) | [`administration-openapi.json`](administration/administration-openapi.json) | Low — live-tested (role-gated; full 200 path requires Tenant Administrator) |
 
@@ -65,14 +65,24 @@ lifecycle, and regional server URLs); a test keeps the two in sync.
 
 ## Authentication at a glance
 
-Anaplan APIs use three authentication schemes depending on the API. Each spec's
-`securitySchemes` is authoritative; this is a summary:
+The scheme an API accepts varies. Each spec's `securitySchemes` is
+authoritative. This table summarizes them, and live testing confirmed every row:
 
 | Scheme | Header | Used by |
 |--------|--------|---------|
-| HTTP Basic | `Authorization: Basic <base64>` | Authentication API (to obtain a token) |
-| Bearer Token | `Authorization: Bearer <token>` | OAuth, Integration, CloudWorks, SCIM, ALM, Audit |
-| AnaplanAuthToken | `Authorization: AnaplanAuthToken <token>` | Integration, Exception Users |
+| AnaplanAuthToken | `Authorization: AnaplanAuthToken <token>` | Integration, CloudWorks, SCIM, ALM, Audit, Exception Users, Administration, and the token operations of the Authentication API |
+| Bearer Token | `Authorization: Bearer <token>` | Integration, CloudWorks, SCIM, ALM |
+| HTTP Basic | `Authorization: Basic <base64>` | Authentication API (to obtain a token), SCIM |
+| CA Certificate | `Authorization: CACertificate <cert>` | Authentication API (to obtain a token) |
+| AnaplanApiKey | `Authorization: AnaplanApiKey <key>` | Exception Users |
+| `X_API_TOKEN` + `TENANT` | Two separate headers | Financial Consolidation (Fluence platform) |
+
+The OAuth 2.0 API needs no `Authorization` header. It is the authorization
+server itself, so all parameters travel in the request body or the query string.
+
+Four APIs reject `Bearer`: Audit, Exception Users, Administration, and the
+Authentication API. Send an OAuth access token to those four with the
+`AnaplanAuthToken` prefix instead.
 
 Tokens are obtained via the [Authentication API](authentication/) or
 [OAuth 2.0 API](oauth/).

@@ -81,9 +81,16 @@ None of the OAuth service endpoints require an `Authorization` request header. A
 
 ## Testing Coverage
 
+The automated tests are in `tests/test_oauth_integration_live.py` (13 tests). Run them with:
+
+```
+uv run --env-file .env pytest tests/test_oauth_integration_live.py --live
+```
+
 | Endpoint | Happy Path | Error Cases | Automation Limitation |
 |----------|-----------|-------------|----------------------|
-| `GET /auth/authorize` | Partial (302 verified) | Partial | 302 + Location header confirmed; login step and code callback require browser |
+| `GET /auth/authorize` | Partial (302 verified) | ✓ | The 302 and its Location header are confirmed. The login step and the code callback need a browser |
+| `GET /auth/prelogin` | ✓ | ✓ | Returns the login page directly. Missing required parameters are covered |
 | `POST /oauth/device/code` | ✓ | ✓ | Device approval step requires browser |
 | `POST /oauth/token` (device grant) | ✓ | ✓ | Requires user to approve at `verification_uri` |
 | `POST /oauth/token` (auth code grant) | ✓ | ✓ | Requires browser redirect to obtain code; tested via `scripts/oauth/oauth_authcode.py`, which exchanges the code and stores the token blob in the OS keyring (chunked) under `ANAPLAN_OAUTH_KEYRING_SERVICE` — see [docs/TESTING.md](../docs/TESTING.md#authorization-code-grant--audit-live-tests-issue-58) |

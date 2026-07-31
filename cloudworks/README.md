@@ -63,7 +63,13 @@ Findings:
 
 Canonical lifecycle and confidence are in the [confidence table in CONTEXT.md](../CONTEXT.md#confidence-table).
 
-Live tests run against real tenant data (June 2026). All previously-open questions on auth, base URL, connection shapes, integration shapes, run history, notifications, and integration flows are now confirmed — see the Discoveries section below.
+Live tests run against real tenant data (June and July 2026). The suite is `tests/test_cloudworks_live.py` (15 tests). Run it with:
+
+```
+uv run --env-file .env pytest tests/test_cloudworks_live.py --live
+```
+
+All earlier open questions on auth, base URL, connection shapes, integration shapes, run history, notifications, and integration flows are confirmed — see the Discoveries section below. Two mutation tests need extra setup and skip without it: the connection lifecycle test needs `CLOUDWORKS_DISPOSABLE_CONNECTION_ID`, and the mutation lifecycle test needs `--allow-writes` and the named target workspace and model in the tenant. Three response shapes stay unconfirmed: `PUT` and `PATCH` on a connection, and the `200` from `POST /integrations/{integrationId}/cancel`.
 
 ## Discoveries from Live Testing (June 2026)
 
