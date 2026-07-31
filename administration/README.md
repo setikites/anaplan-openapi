@@ -7,7 +7,7 @@
 | Apiary docs | — | No Apiary documentation exists for this API |
 | Postman collection | — | Not included in the official Anaplan Postman collection |
 | Help docs | ✓ | Hand-authored from Anaplan help documentation (issue #119) |
-| Live testing | ✓ | Partial — token accepted; 500 returned without Tenant Administrator role (issue #120) |
+| Live testing | Partial | Auth schemes, regional servers, and role-denied behavior confirmed (issue #120, #191). The 200 and 207 paths need an account with the Tenant Administrator role — see Testing Coverage below |
 
 ## Purpose
 
@@ -59,6 +59,26 @@ Downloads all users in the tenant as a CSV file.
 **CSV columns**: `username`, `first_name`, `last_name`, `licenses`
 
 Optional query parameters: `Limit` (maximum rows to return) and `Offset` (rows to skip).
+
+## Testing Coverage
+
+Live tests are in `tests/test_administration_live.py` (5 tests). Run them with:
+
+```
+uv run --env-file .env pytest tests/test_administration_live.py --live
+```
+
+The import test also needs `--allow-writes` and `ADMINISTRATION_EMAIL`. It re-imports one exported user with unchanged values, so the tenant does not change.
+
+| Test | Endpoint | Status |
+|------|----------|--------|
+| `test_auth_scheme_probe` | `GET /users/export` | ✓ Confirmed — AnaplanAuthToken reaches the application, Bearer gets an empty 401 |
+| `test_regional_server_probe` | `GET /users/export` | ✓ Confirmed — 11 of 12 regional hosts respond, `au1a.api2.anaplan.com` unreachable |
+| `test_export_users` | `GET /users/export` | ⚠ Warns and returns early without the Tenant Administrator role. The 200 `text/csv` body and its four columns stay unconfirmed |
+| `test_user_csv_row` | `GET /users/export` | ⚠ Skips without the Tenant Administrator role or `ADMINISTRATION_EMAIL` |
+| `test_import_users` | `PUT /users/import` | ⚠ Skips with `test_user_csv_row`. The 207 body and its `accepted`, `created`, and `updated` counts stay unconfirmed |
+
+The minimum role for both operations is **Tenant Administrator** (`x-anaplan-min-role` in the spec). No account with that role has run the suite yet, so the happy paths of both endpoints remain untested against live data.
 
 ## Discrepancies and Notes
 

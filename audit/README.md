@@ -40,7 +40,17 @@ Confirmed via live testing (the Apiary blueprint is not publicly readable):
 
 Canonical lifecycle and confidence are in the [confidence table in CONTEXT.md](../CONTEXT.md#confidence-table).
 
-The spec is **hand-maintained and live-tested** (`tests/test_audit_live.py`, issues #58–#61): the `/events` and `/events/search` paths were discovered and confirmed against the live API with a Tenant Auditor role. Do not rebuild from the bootstrap script.
+The spec is **hand-maintained and live-tested** (`tests/test_audit_live.py`, 21 tests, issues #58–#61). Both the `/events` and `/events/search` paths were discovered and confirmed against the live API with the Tenant Auditor role. Do not rebuild from the bootstrap script.
+
+Run the suite with:
+
+```
+uv run --env-file .env pytest tests/test_audit_live.py --live
+```
+
+The tests need an Authorization Code grant token in the OS keyring for an account that holds the Tenant Auditor role. Without it the role-gated tests skip. The setup steps are in [docs/TESTING.md](../docs/TESTING.md#authorization-code-grant--audit-live-tests-issue-58).
+
+Coverage by area: auth and role gate, the `AuditEvent` field and type contract, schema validation of real records, the `type` filter enum, date-range and `intervalInHours` windows, the 30-day cap, `limit` and `offset` paging, and CEF (`text/plain`) output. `POST /events/search` is covered for the response envelope only.
 
 ## Discovered Discrepancies
 

@@ -86,6 +86,17 @@ From documentation review (all to be added to the spec in a follow-up issue):
 
 Note: role endpoints use singular `/user/{username}/roles`, not `/users/{username}/roles` — this appears to be an intentional inconsistency in the API.
 
+## Testing Coverage
+
+**No live testing.** This is the only one of the 10 specs with no live coverage, and its confidence stays Low.
+
+`tests/test_financial_consolidation_live.py` exists but skips every test. It holds no test functions yet, only the skip marker and a note. Live testing needs two credentials from a Financial Consolidation (Fluence) environment that CI does not have:
+
+- `X_API_TOKEN` — a token created in the Fluence Security module
+- `TENANT` — the target tenant name
+
+When those credentials are available, remove the skip marker and write tests after the pattern in `tests/test_audit_live.py`. Every item under Open questions below needs live confirmation.
+
 ## Open questions
 
 1. **Regional deployments**: Only a single production host (`fluenceapi-prod.fluence.app`) is documented. It is unknown whether there are region-specific endpoints for other Anaplan regions (EU, APAC, etc.). The Fluence acquisition may mean this API does not follow Anaplan's usual multi-region deployment model.

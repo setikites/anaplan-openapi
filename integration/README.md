@@ -151,6 +151,48 @@ Endpoints covered (all paths relative to the `/2/0` base URL):
 | `test_path_duality[versions]` | `GET /workspaces/{workspaceId}/models/{modelId}/versions` (workspace form — issue #27) |
 | `test_path_duality[file-chunks]` | `GET /models/{modelId}/files/{fileId}/chunks` (model-direct form — issue #27) |
 | `test_path_duality[modelCalendar]` | `GET /models/{modelId}/modelCalendar` (model-direct form — issue #27) |
+| `test_list_imports` | `GET /workspaces/{workspaceId}/models/{modelId}/imports/` |
+| `test_get_import_metadata` | `GET /workspaces/{workspaceId}/models/{modelId}/imports/{importId}` |
+| `test_list_import_tasks` | `GET .../imports/{importId}/tasks` |
+| `test_get_import_task` | `GET .../imports/{importId}/tasks/{taskId}` |
+| `test_import_dump` | `GET .../imports/{importId}/tasks/{taskId}/dump` (`text/plain`, or 404 when no dump) |
+| `test_import_dump_chunks` | `GET .../imports/{importId}/tasks/{taskId}/dump/chunks` |
+| `test_import_dump_chunk_download` | `GET .../imports/{importId}/tasks/{taskId}/dump/chunks/{chunkId}` |
+| `test_list_exports` | `GET /workspaces/{workspaceId}/models/{modelId}/exports` |
+| `test_get_export_metadata` | `GET /workspaces/{workspaceId}/models/{modelId}/exports/{exportId}` |
+| `test_list_export_tasks` | `GET .../exports/{exportId}/tasks` |
+| `test_run_export_and_poll_task` | `POST .../exports/{exportId}/tasks` + poll to a terminal state (write-guarded) |
+| `test_list_actions` | `GET /workspaces/{workspaceId}/models/{modelId}/actions` |
+| `test_list_action_tasks` | `GET .../actions/{actionId}/tasks` |
+| `test_list_processes` | `GET /workspaces/{workspaceId}/models/{modelId}/processes` |
+| `test_get_process_detail` | `GET /models/{modelId}/processes/{processId}` |
+| `test_list_process_tasks` | `GET .../processes/{processId}/tasks` |
+| `test_delete_list_items` | `POST .../lists/{listId}/items?action=delete` (write-guarded) |
+| `test_model_dimension_items_post_empty_body_returns_400` | `POST /models/{modelId}/dimensions/{dimensionId}/items` with an empty body (write-guarded) |
+| `test_current_period_invalid_date_in_body_returns_400` | `PUT /models/{modelId}/currentPeriod`, bad date in the body (write-guarded) |
+| `test_current_period_invalid_date_as_query_param_returns_400` | `PUT /models/{modelId}/currentPeriod?date=`, bad date (write-guarded) |
+| `test_workspace_current_period_put_invalid_date_returns_400` | `PUT /workspaces/{workspaceId}/models/{modelId}/currentPeriod`, bad date (write-guarded) |
+| `test_model_category_values` | `GET /workspaces/{workspaceId}/models` — confirms embedded `categoryValues` |
+| `test_s_param_filters` | The `s` prefix filter on the list endpoints that accept it (issue #31) |
+| `test_sort_param` | The `sort` parameter with `+` and `-` prefixes (issue #31) |
+| `test_tasks_sort_param` | The `sort` parameter on the task-list endpoints (issue #31) |
+| `test_view_data_pages_single_value` | `GET /models/{modelId}/views/{viewId}/data?pages=dimId:itemId` (issue #31) |
+| `test_view_data_pages_repeated_key` | The same endpoint with `pages` as a repeated key (issue #31) |
+
+### NO ACCESS masking sweep (issue #225)
+
+These six tests need a second principal that holds the **NO ACCESS** role on one
+model. They skip when that credential is absent. They confirm the 404 masking
+documented under Discovered Discrepancies below.
+
+| Test | Confirms |
+|------|----------|
+| `test_model_scoped_get_returns_404_under_no_access` | Every model-scoped GET that declares `NotFoundOrNoAccess` returns 404 |
+| `test_model_scoped_get_without_404_does_not_return_404` | The exempted GETs do not return 404 |
+| `test_no_access_model_metadata_is_readable` | `GET /models/{modelId}` still returns 200 |
+| `test_no_access_model_is_listed_by_workspace` | The model still appears in `GET /workspaces/{workspaceId}/models` |
+| `test_task_list_returns_empty_200_under_no_access` | The four task-list endpoints return 200 with an empty list |
+| `test_no_access_404_body_matches_error_response_schema` | The 404 body matches `components/schemas/ErrorResponse` |
 
 ## Modern Endpoint Validation (post-legacy retirement)
 

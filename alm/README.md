@@ -140,8 +140,22 @@ Run live tests with:
 uv run --env-file .env pytest tests/test_alm_live.py --live
 ```
 
-Required `.env` variables: `ANAPLAN_USERNAME`, `ANAPLAN_PASSWORD`.
-Optional: `ANAPLAN_WORKSPACE_ID` (default: `8a868cdb8b7841a2018beedb91d644d7`), `ANAPLAN_MODEL_ID` (default: `0939A1C8E7FB46799372EC24A72FE93B`), `ANAPLAN_ALM_BASE_URL`, `ANAPLAN_OAUTH_ACCESS_TOKEN`.
+Required `.env` variables: `ANAPLAN_USERNAME`, `ANAPLAN_PASSWORD`, `ANAPLAN_ALM_WORKSPACE_ID`, `ANAPLAN_ALM_MODEL_ID`.
+Optional: `ANAPLAN_ALM_SOURCE_MODEL_ID`, `ANAPLAN_ALM_TARGET_MODEL_ID`, `ANAPLAN_ALM_BASE_URL`, `ANAPLAN_OAUTH_ACCESS_TOKEN`, and the certificate variables listed in [docs/TESTING.md](../docs/TESTING.md).
+
+### Coverage
+
+The suite holds 19 tests. Every read endpoint is covered. No test creates a revision or runs a sync.
+
+| Area | Endpoints | Status |
+|------|-----------|--------|
+| Auth schemes | `GET /alm/latestRevision` | ✓ AnaplanAuthToken, Bearer with an Anaplan token, and an OAuth Bearer token all probed |
+| Revisions | `GET /alm/latestRevision`, `GET /alm/revisions`, `GET /alm/revisions/{revisionId}/appliedToModels` | ✓ Response shape, ID formats, and the date filter confirmed |
+| Sync tasks | `GET /alm/syncTasks`, `GET /alm/syncableRevisions`, `POST /alm/syncTasks` | ✓ Read shapes confirmed. POST covered by the 400 required-field case only |
+| Report tasks and results | The six comparison and summary report endpoints | ✓ Minimum role confirmed by an A/B run on one certificate account (issue #194). These tests skip without `ANAPLAN_CA_CERT_PATH` |
+| Online status | `POST/PUT /models/{modelId}/onlineStatus` | — Not tested |
+
+All 16 operations carry `x-anaplan-min-role: Workspace Administrator` in the spec. The six report endpoints confirmed that role live. The others hold it from the Apiary documentation.
 
 ## Discovered Discrepancies
 

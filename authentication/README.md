@@ -103,7 +103,7 @@ Live testing confirmed that `Bearer {token}` is **rejected** on `/token/validate
 
 `BearerAuth` was removed from the spec. Tokens issued by this API (via Basic or CA Certificate auth) must always be sent as `AnaplanAuthToken {token}`, not `Bearer {token}`.
 
-Note: OAuth Bearer tokens (issued by the OAuth 2.0 API) have not been tested against these endpoints. They are expected to be incompatible since these endpoints manage AnaplanAuthTokens specifically.
+Note: OAuth Bearer tokens (issued by the OAuth 2.0 API) remain unconfirmed on these endpoints. `test_security_scheme_oauth_bearer_on_token_endpoints` probes `/token/validate` and `/token/refresh` with an OAuth token, but it skips unless `ANAPLAN_OAUTH_ACCESS_TOKEN` is set in `.env`. No run with that variable set has been recorded. These endpoints manage AnaplanAuthTokens, so the expected result is rejection.
 
 ## Known Discrepancies
 
@@ -151,14 +151,17 @@ Based on live testing against the Anaplan Authentication API:
 
 ## Test Coverage
 
-- ✅ Happy path: authenticate → validate → refresh → validate → logout
-- ✅ Error cases: invalid credentials, expired/revoked tokens
-- ✅ CA certificate authentication workflow
-- ✅ Invalid Authorization header formats
-- ✅ Response schema validation
+`tests/test_auth_integration_live.py` holds 8 live tests. All four endpoints are covered.
 
-## Next Steps
+| Test | Covers | Status |
+|------|--------|--------|
+| `test_auth_workflow_basic_auth` | authenticate → validate → refresh → validate → logout, with Basic auth | ✓ |
+| `test_auth_workflow_ca_cert` | The same flow with CA certificate auth | ✓ Skips without `ANAPLAN_CA_CERT_PATH` and `ANAPLAN_CA_KEY_PATH` |
+| `test_invalid_credentials` | 401 for a wrong username or password | ✓ |
+| `test_invalid_auth_header_formats` | Malformed `Authorization` header values | ✓ Some values the HTTP client rejects before the request is sent |
+| `test_response_enum_values` | Enum values in the token responses | ✓ |
+| `test_response_schemas_valid` | Response bodies against the spec schemas | ✓ |
+| `test_security_scheme_bearer_with_basic_auth_token` | Bearer rejected on validate, refresh, and logout | ✓ |
+| `test_security_scheme_oauth_bearer_on_token_endpoints` | An OAuth Bearer token on validate and refresh | ⚠ Skips without `ANAPLAN_OAUTH_ACCESS_TOKEN`. No result recorded |
 
-1. Run live tests with your credentials
-2. Document any discrepancies found in the "Undocumented Behaviors" section above
-3. Report findings as GitHub issues if spec updates are needed
+Record any new difference from the spec under "Undocumented Behaviors" above, and open a GitHub issue when the spec needs a change.
