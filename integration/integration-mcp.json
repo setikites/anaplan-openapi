@@ -67,7 +67,7 @@
     "/models": {
       "get": {
         "operationId": "getModels",
-        "summary": "List user models (large responses \u2014 see description)",
+        "summary": "List models the user can open (large responses \u2014 see description)",
         "description": "Minimum role: Standard User.\n\nRetrieves information about all models in the user's default tenant.\n\nModels with `activeState` of `ARCHIVED` are typically inactive and not actionable. Filter them out of results (keep only `activeState` != `ARCHIVED`) unless you specifically need archived models.\n\n**HIGH VOLUME** \u2014 this returns every model in the user's default tenant in one merged response. With no `limit` a client that auto-follows `meta.paging` combines every page and can overflow its token budget. Reduce volume in one or more of these ways:\n\n- Pass an explicit `limit` and page with `offset`.\n- Scope server-side with the `s=` search filter, or with the workspace-scoped `GET /workspaces/{workspaceId}/models` list, instead of full enumeration.\n- Use `search` to locate the specific op and params rather than pulling the whole collection.",
         "parameters": [
           {
@@ -113,7 +113,7 @@
       ],
       "get": {
         "operationId": "getModelsByModelid",
-        "summary": "Get single model metadata",
+        "summary": "Get model by ID (single model metadata)",
         "description": "Minimum role: Standard User.",
         "parameters": [
           {
@@ -418,7 +418,7 @@
       ],
       "get": {
         "operationId": "getModelsByModelidFilesByFileidChunks",
-        "summary": "Get Chunks Details (model-direct)",
+        "summary": "List file chunks to download file content (model-direct)",
         "description": "Minimum role: Standard User.\n\nModel-direct equivalent of `GET /workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks`. Returns the same response shape: a `chunks` array of `{id, name}` objects (key omitted entirely when `chunkCount` is 0).",
         "parameters": [
           {
@@ -446,7 +446,7 @@
       ],
       "get": {
         "operationId": "getModelsByModelidImports",
-        "summary": "Get a list of import actions",
+        "summary": "List imports in a model (import actions)",
         "description": "Minimum role: Standard User.\n\nModel-direct form of `GET /workspaces/{workspaceId}/models/{modelId}/imports`. Returns the same response shape without requiring a workspace ID. Lists import definitions available for the specified model.",
         "parameters": [
           {
@@ -860,7 +860,7 @@
       ],
       "get": {
         "operationId": "getModelsByModelidModulesByModuleidLineitems",
-        "summary": "Retrieve all line item metadata in a module",
+        "summary": "Retrieve line items in a module (all line item metadata)",
         "description": "Minimum role: Standard User.\n\n**Note:**This is an early access endpoint and is not generally available yet.\n\nUse this call when you want to get all line items and metadata in a module.",
         "parameters": [
           {
@@ -1136,8 +1136,8 @@
       ],
       "get": {
         "operationId": "getModelsByModelidViewsByViewidData",
-        "summary": "Retrieve cell data for a view (large responses \u2014 see description)",
-        "description": "Minimum role: Standard User.\n\nReturns the cell data of a view. You can either query for the default page, or provide page selectors to query for other pages. This call returns data in either a CSV grid response or as JSON.\n\n**Notes:**\n\n*   This call only supports the retrieval of cells from a view that contains a maximum of 1,000,000 cells. If the specified view contains more than 1,000,000 cells, then the call returns a `400 Bad Request` HTTP status, instead of a subset of the cells. Use the [quick sum bar](https://help.anaplan.com/anapedia/Content/New_User_Experience/Use/Worksheets/Grid/Quick-sum-bar.htm) in Anaplan to identify the number of cells in a view.\n*   If you call several times in a short amount of time, you may receive a `429` response.\n*   You can replace the `viewId` with any valid `lineItemId`. If the line item has a subsidiary view, the response returns the data as seen in that subsidiary view.\n*   For line items without a subsidiary view, the response returns data for the default view of the line item.\n\n### CSV responses\n\nThe first line of the CSV response contains the values of the page selectors. The response omits this line when there are no dimensions on pages.\n\nWhen there are multiple dimensions on columns, a line for each dimension follows the first line that contains the values of the page selectors.\n\nWhen there are multiple dimensions on rows, a column displays on the left, before the data, for each dimension on rows.\n\n### JSON responses\n\nTo receive a JSON-formatted response instead of a CSV-formatted response:\n\n1.  Pass an `Accept` header of `application/json`.\n2.  Pass a query parameter of `format` set to `v1`.\n    \n\nAll other parameters are the same as a CSV-formatted response.\n\nThe response returns `Content-Type` `application/json`. The format is:\n\n*   A `pages` key with a value that is a list of the selected items for each page selector. If no page selectors exist for this view, the list displays as empty or absent.\n*   A `columnCoordinates` key with a value that is a list of the coordinates for all values in that column. Each list item is itself a list containing one or more values. The length of each list equals the number of dimensions on columns.\n*   A `rows` key with a value that is a list of row objects. Each row object contains:\n    *   A `rowCoordinates` key with a value that is a list of the coordinates for all values in the current row. Each list item is itself a list that contains one or more values. The length of each list equals the number of dimensions on rows.\n    *   A `cells` key with a value, which is a list of all the cell values in the current row.\n\nTo get the full coordinates for each cell, use the position of the cell value in the `cells` list. Find the column coordinates at the same position in the `columnCoordinates` list. Then combine the column coordinates with the `rowCoordinates` for the current row and any selected pages to uniquely specify the cell.\n\n**HIGH VOLUME** \u2014 a full grid export is returned in one non-paginated response (observed ~210 KB). There is no `limit`/`offset` paging. The call is instead capped at 1,000,000 cells, and returns `400` above that. Narrow the request with page selectors and request only the view/pages you need.",
+        "summary": "Read cell data for a view (large responses \u2014 see description)",
+        "description": "Minimum role: Standard User.\n\nReturns the cell data of a view. A module has a default view, so read module data with this call. You can either query for the default page, or provide page selectors to query for other pages. This call returns data in either a CSV grid response or as JSON.\n\n**Notes:**\n\n*   This call only supports the retrieval of cells from a view that contains a maximum of 1,000,000 cells. If the specified view contains more than 1,000,000 cells, then the call returns a `400 Bad Request` HTTP status, instead of a subset of the cells. Use the [quick sum bar](https://help.anaplan.com/anapedia/Content/New_User_Experience/Use/Worksheets/Grid/Quick-sum-bar.htm) in Anaplan to identify the number of cells in a view.\n*   If you call several times in a short amount of time, you may receive a `429` response.\n*   You can replace the `viewId` with any valid `lineItemId`. If the line item has a subsidiary view, the response returns the data as seen in that subsidiary view.\n*   For line items without a subsidiary view, the response returns data for the default view of the line item.\n\n### CSV responses\n\nThe first line of the CSV response contains the values of the page selectors. The response omits this line when there are no dimensions on pages.\n\nWhen there are multiple dimensions on columns, a line for each dimension follows the first line that contains the values of the page selectors.\n\nWhen there are multiple dimensions on rows, a column displays on the left, before the data, for each dimension on rows.\n\n### JSON responses\n\nTo receive a JSON-formatted response instead of a CSV-formatted response:\n\n1.  Pass an `Accept` header of `application/json`.\n2.  Pass a query parameter of `format` set to `v1`.\n    \n\nAll other parameters are the same as a CSV-formatted response.\n\nThe response returns `Content-Type` `application/json`. The format is:\n\n*   A `pages` key with a value that is a list of the selected items for each page selector. If no page selectors exist for this view, the list displays as empty or absent.\n*   A `columnCoordinates` key with a value that is a list of the coordinates for all values in that column. Each list item is itself a list containing one or more values. The length of each list equals the number of dimensions on columns.\n*   A `rows` key with a value that is a list of row objects. Each row object contains:\n    *   A `rowCoordinates` key with a value that is a list of the coordinates for all values in the current row. Each list item is itself a list that contains one or more values. The length of each list equals the number of dimensions on rows.\n    *   A `cells` key with a value, which is a list of all the cell values in the current row.\n\nTo get the full coordinates for each cell, use the position of the cell value in the `cells` list. Find the column coordinates at the same position in the `columnCoordinates` list. Then combine the column coordinates with the `rowCoordinates` for the current row and any selected pages to uniquely specify the cell.\n\n**HIGH VOLUME** \u2014 a full grid export is returned in one non-paginated response (observed ~210 KB). There is no `limit`/`offset` paging. The call is instead capped at 1,000,000 cells, and returns `400` above that. Narrow the request with page selectors and request only the view/pages you need.",
         "parameters": [
           {
             "name": "Accept",
@@ -1212,7 +1212,7 @@
       ],
       "get": {
         "operationId": "getModelsByModelidViewsByViewidDimensionsByDimensionidItems",
-        "summary": "Retrieve selected items in a dimension (large responses \u2014 see description)",
+        "summary": "Retrieve selected items in view dimensions (large responses \u2014 see description)",
         "description": "Minimum role: Standard User.\n\nReturns the selected IDs, codes, and names of the items in a dimension. This call returns data as filtered by the page builder when they configure the view. This call respects hidden items, filtering selections, and [Selective Access](https://help.anaplan.com/anapedia/Content/Modeling/Users/Selective_Access.html). If the view contains hidden or filtered items, these do not display in the response.\n\n**Notes**:\n\n*   This call works with any dimension type\n*   The items in the response may not be ordered\n*   The response returns Items within a [flat list](https://help.anaplan.com/anapedia/Content/Modeling/Dimensions/Lists.html) (no hierarchy)\n*   This is a view-level call. For the model-level call, see Retrieve all data for items in a dimension\n*   This call only supports the retrieval of dimension items within a view that contains a maximum of 1,000,000 cells. If the specified view contains more than 1,000,000 dimension items, then the call returns a `400 Bad Request` HTTP status, instead of a subset of the dimension items. Use the [quick sum bar](https://help.anaplan.com/anapedia/Content/New_User_Experience/Use/Worksheets/Grid/Quick-sum-bar.htm) in Anaplan to identify the number of dimension items in a view\n*   Use of this call may be rate limited. If you call too frequently, you may receive a `429` response\n*   The `viewId` in this request can also be replaced by any valid `lineItemId`. If the Line Item has a changed dimensionality (has a Subsidiary View), the response returns the applicable dimension items for the given dimension. Otherwise, the response returns all default applicable dimension items for the given dimension\n\n**Note**: When the dimension has no items, the response omits the `items` key entirely rather than returning an empty array.\n\n**HIGH VOLUME** \u2014 all selected items are returned in one non-paginated response (observed ~149 KB). There is no `limit`/`offset` paging (the call is instead capped at 1,000,000 cells, returning `400` above that). Scope to the specific dimension and view you need rather than requesting broad dimensions.",
         "responses": {
           "200": {
@@ -1231,7 +1231,7 @@
       "get": {
         "operationId": "getUsers",
         "summary": "List users (large responses \u2014 see description)",
-        "description": "Minimum role: Standard User.\n\nRetrieves all users within the tenant.\n\nDeactivated users (`active` is `false`) are typically not relevant to callers listing people. Filter to `active=true` unless you specifically need inactive users.\n\n**HIGH VOLUME** \u2014 this returns every user in the tenant in one merged response. With no `limit` a client that auto-follows `meta.paging` combines every page and can overflow its token budget. Reduce volume in one or more of these ways:\n\n- Pass an explicit `limit` and page with `offset`.\n- Scope server-side with the `s=` search filter instead of full enumeration.\n- Use `search` to locate the specific op and params rather than pulling the whole collection.",
+        "description": "Minimum role: Standard User.\n\nRetrieves all users within the tenant. The response answers who can log in to the tenant.\n\nDeactivated users (`active` is `false`) are typically not relevant to callers listing people. Filter to `active=true` unless you specifically need inactive users.\n\n**HIGH VOLUME** \u2014 this returns every user in the tenant in one merged response. With no `limit` a client that auto-follows `meta.paging` combines every page and can overflow its token budget. Reduce volume in one or more of these ways:\n\n- Pass an explicit `limit` and page with `offset`.\n- Scope server-side with the `s=` search filter instead of full enumeration.\n- Use `search` to locate the specific op and params rather than pulling the whole collection.",
         "parameters": [
           {
             "$ref": "#/components/parameters/Search"
@@ -1356,7 +1356,7 @@
       ],
       "get": {
         "operationId": "getWorkspacesByWorkspaceidAdmins",
-        "summary": "List workspace administrators",
+        "summary": "List workspace admins (administrator users)",
         "description": "Minimum role: User Administrator.\n\nReturns all administrators for a workspace. Requires tenant admin privilege. Workspace admin access alone is insufficient.\n\nDeactivated administrators (`active` is `false`) are typically not relevant to callers listing people. Filter to `active=true` unless you specifically need inactive administrators.",
         "parameters": [
           {
@@ -1595,7 +1595,7 @@
       },
       "post": {
         "operationId": "postWorkspacesByWorkspaceidModelsByModelidExportsByExportidTasks",
-        "summary": "Start the export",
+        "summary": "Run export \u2014 start an export task",
         "description": "Minimum role: Standard User.\n\nYou can POST an export task to start the export. This returns a new `taskID`. Once you have started the export, you can use GET to receive a list of the export tasks as a JSON array. You can use this to monitor the status of the export tasks.\n\n### Run the export\n\nThis creates a task with the specified exportID and returns the newly-created taskID.\n\n### Headers\n\n*   `Authorization:AnaplanAuthToken {anaplan_auth_token}`\n*   `Content-Type:application/json`\n\n### Parameters\n\n#",
         "requestBody": {
           "content": {

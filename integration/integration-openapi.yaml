@@ -36,7 +36,7 @@ security:
 paths:
   /models:
     get:
-      summary: List user models (large responses — see description)
+      summary: List models the user can open (large responses — see description)
       description: |-
         Minimum role: Standard User.
 
@@ -90,7 +90,7 @@ paths:
     parameters:
     - $ref: '#/components/parameters/ModelId'
     get:
-      summary: Get single model metadata
+      summary: Get model by ID (single model metadata)
       description: 'Minimum role: Standard User.'
       tags:
       - General Workspace & Model Metadata
@@ -673,7 +673,7 @@ paths:
     - $ref: '#/components/parameters/ModelId'
     - $ref: '#/components/parameters/FileId'
     get:
-      summary: Get Chunks Details (model-direct)
+      summary: List file chunks to download file content (model-direct)
       description: |-
         Minimum role: Standard User.
 
@@ -725,7 +725,7 @@ paths:
     parameters:
     - $ref: '#/components/parameters/ModelId'
     get:
-      summary: Get a list of import actions
+      summary: List imports in a model (import actions)
       description: |-
         Minimum role: Standard User.
 
@@ -1415,7 +1415,7 @@ paths:
     - $ref: '#/components/parameters/ModelId'
     - $ref: '#/components/parameters/ModuleId'
     get:
-      summary: Retrieve all line item metadata in a module
+      summary: Retrieve line items in a module (all line item metadata)
       description: |-
         Minimum role: Standard User.
 
@@ -2033,11 +2033,11 @@ paths:
     - $ref: '#/components/parameters/ModelId'
     - $ref: '#/components/parameters/ViewId'
     get:
-      summary: Retrieve cell data for a view (large responses — see description)
+      summary: Read cell data for a view (large responses — see description)
       description: |-
         Minimum role: Standard User.
 
-        Returns the cell data of a view. You can either query for the default page, or provide page selectors to query for other pages. This call returns data in either a CSV grid response or as JSON.
+        Returns the cell data of a view. A module has a default view, so read module data with this call. You can either query for the default page, or provide page selectors to query for other pages. This call returns data in either a CSV grid response or as JSON.
 
         **Notes:**
 
@@ -2150,7 +2150,7 @@ paths:
     - $ref: '#/components/parameters/ViewId'
     - $ref: '#/components/parameters/DimensionId'
     get:
-      summary: Retrieve selected items in a dimension (large responses — see description)
+      summary: Retrieve selected items in view dimensions (large responses — see description)
       description: |-
         Minimum role: Standard User.
 
@@ -2210,7 +2210,7 @@ paths:
       description: |-
         Minimum role: Standard User.
 
-        Retrieves all users within the tenant.
+        Retrieves all users within the tenant. The response answers who can log in to the tenant.
 
         Deactivated users (`active` is `false`) are typically not relevant to callers listing people. Filter to `active=true` unless you specifically need inactive users.
 
@@ -2402,7 +2402,7 @@ paths:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
     get:
-      summary: List workspace administrators
+      summary: List workspace admins (administrator users)
       description: |-
         Minimum role: User Administrator.
 
@@ -3252,7 +3252,7 @@ paths:
                       $ref: '#/components/schemas/Task'
       x-anaplan-min-role: Standard User
     post:
-      summary: Start the export
+      summary: Run export — start an export task
       description: |-
         Minimum role: Standard User.
 
@@ -3647,7 +3647,7 @@ paths:
     - $ref: '#/components/parameters/ModelId'
     - $ref: '#/components/parameters/FileId'
     get:
-      summary: Get Chunks Details
+      summary: List file chunks to download file content
       description: |-
         Minimum role: Standard User.
 
@@ -3809,7 +3809,7 @@ paths:
     - $ref: '#/components/parameters/WorkspaceId'
     - $ref: '#/components/parameters/ModelId'
     get:
-      summary: Get a list of import actions
+      summary: List imports in a model (import actions)
       description: |-
         Minimum role: Standard User.
 
@@ -5125,7 +5125,7 @@ paths:
     - $ref: '#/components/parameters/ModelId'
     - $ref: '#/components/parameters/ModuleId'
     get:
-      summary: 'Workspace-scoped form: Retrieve all line item metadata in a module'
+      summary: 'Workspace-scoped form: Retrieve line items in a module (all line item metadata)'
       description: |-
         Minimum role: Standard User.
 
