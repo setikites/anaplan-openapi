@@ -1793,6 +1793,32 @@
       ]
     },
     {
+      "op_id": "postWorkspacesByWorkspaceidModelsByModelidListsByListidResetindex",
+      "method": "POST",
+      "path": "/workspaces/{workspaceId}/models/{modelId}/lists/{listId}/resetIndex",
+      "summary": "Reset the list index",
+      "parameters": [
+        {
+          "name": "workspaceId",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "name": "modelId",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "name": "listId",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        }
+      ]
+    },
+    {
       "op_id": "getWorkspacesByWorkspaceidModelsByModelidProcessesByProcessidTasks",
       "method": "GET",
       "path": "/workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks",
@@ -11062,6 +11088,41 @@
           }
         }
       }
+    },
+    "postWorkspacesByWorkspaceidModelsByModelidListsByListidResetindex": {
+      "description": "Minimum role: Workspace Administrator.\n\nResets the index counter of a list to 1. Each list item holds a unique list index. Reset the index when a list holds a large quantity of data, or when the list approaches the maximum index value of 999,999,999. Anaplan shows a notification as the index nears the one billion limit.\n\n**Notes**:\n\n*   Remove all list items from the full list hierarchy before you reset the index. A reset of a list that still holds items returns `400`.\n*   In a model in deployed mode, you can reset the index only for a production list. A reset of a non-production list in a deployed model returns `400`.\n*   The `itemCount` in list metadata counts the top level item. A list with a top level item and no real items reports `itemCount` 1 and can still be reset.\n*   A reset renumbers the index. It does not delete list items, and `itemCount` does not change.\n*   The request has no body, and the success response has no body.",
+      "parameters": [
+        {
+          "name": "workspaceId",
+          "in": "path",
+          "description": "Workspace identifier (32-char lowercase hex). When the path also has a `modelId`, use that model's `currentWorkspaceId` (`GET /models/{modelId}`, or `GET /models` matched by `name`). For workspace-only endpoints, scan `GET /workspaces` by `name`.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "modelId",
+          "in": "path",
+          "description": "Model identifier (32-character uppercase hex string). From `GET /models` or `GET /workspaces/{workspaceId}/models`.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "listId",
+          "in": "path",
+          "description": "List identifier (12-digit numeric string, prefix 101). From `GET /models/{modelId}/lists`.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "request_body": null,
+      "response": null,
+      "response_note": "no documented 2xx JSON response schema \u2014 probe a read operation to learn it"
     },
     "getWorkspacesByWorkspaceidModelsByModelidProcessesByProcessidTasks": {
       "description": "Minimum role: Standard User.\n\nThis lists the tasks in the process for the given processID. This returns a JSON array containing the list of tasks in the process definition.\n\n### Headers\n\n*   `Authorization:AnaplanAuthToken {anaplan_auth_token}`\n*   `Content-Type:application/json`\n\n### Parameters\n\n#\n\n**Note:** Returns `200` with an empty task list rather than `404` when the parent object does not exist. The same applies when the caller holds a NO ACCESS role on the model.",

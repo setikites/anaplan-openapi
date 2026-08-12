@@ -1105,6 +1105,70 @@ def test_get_list(integration_token, list_id):
     assert "name" in metadata, "List metadata must have a name"
 
 
+@pytest.mark.live
+def test_reset_list_index(integration_token, list_id):
+    """POST /workspaces/{workspaceId}/models/{modelId}/lists/{listId}/resetIndex.
+
+    Three documented outcomes: 200 with an empty body for an empty list, or 400
+    when the list holds items, or 400 for a non-production list in a model in
+    deployed mode. Only runs against a list that holds no items, so the reset
+    cannot renumber live data. Note that `itemCount` counts the top level item,
+    so an otherwise empty list reports 1.
+    """
+    with httpx.Client() as client:
+        headers = _auth_headers(integration_token)
+        metadata = client.get(
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/lists/{list_id}",
+            headers=headers,
+        ).json().get("metadata", {})
+        if metadata.get("itemCount"):
+            pytest.skip(f"List {list_id} holds items; refusing to reset its index")
+
+        response = client.post(
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/lists/{list_id}/resetIndex",
+            headers=headers,
+        )
+
+    assert response.status_code in (200, 400), f"{response.status_code}: {response.text[:200]}"
+    if response.status_code == 200:
+        assert response.text == "", "Success response must have an empty body"
+    else:
+        assert response.json()["status"]["code"] == 400
+
+
+@pytest.mark.live
+def test_reset_list_index_rejects_list_with_items(integration_token):
+    """POST .../lists/{listId}/resetIndex returns 400 for a list that holds items.
+
+    Non-mutating by construction: the call is rejected, so no index is renumbered.
+    Confirms that a reset never deletes list items — `itemCount` is unchanged.
+    """
+    with httpx.Client() as client:
+        headers = _auth_headers(integration_token)
+        base = f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+        target = None
+        for entry in client.get(f"{base}/lists", headers=headers).json().get("lists", []):
+            metadata = client.get(
+                f"{base}/lists/{entry['id']}", headers=headers
+            ).json().get("metadata", {})
+            # itemCount counts the top level item, so 2 or more means real items.
+            if metadata.get("productionData") and (metadata.get("itemCount") or 0) > 1:
+                target = (entry["id"], metadata["itemCount"])
+                break
+        if not target:
+            pytest.skip("No production list with items in test model")
+
+        list_id, before = target
+        response = client.post(f"{base}/lists/{list_id}/resetIndex", headers=headers)
+        after = client.get(
+            f"{base}/lists/{list_id}", headers=headers
+        ).json().get("metadata", {}).get("itemCount")
+
+    assert response.status_code == 400, f"{response.status_code}: {response.text[:200]}"
+    assert "contains data" in response.json()["status"]["message"]
+    assert after == before, "A rejected reset must not change the item count"
+
+
 # ─── Path-duality probes (issue #26) ──────────────────────────────────────────
 # For each endpoint that has both a model-direct and a workspace-prefixed URL form,
 # probe the alternate form and compare its response shape to the known baseline.

@@ -352,6 +352,11 @@ _NO_JSON_SCHEMA_INTENTIONAL: dict[tuple[str, str, str], str] = {
     ("integration", "PUT",
      "/workspaces/{workspaceId}/models/{modelId}/files/{fileId}/chunks/{chunkId}"):
         "204 No Content",
+    # Confirmed live: returns 200 with Content-Length 0 and no body, so there is
+    # no schema to declare.
+    ("integration", "POST",
+     "/workspaces/{workspaceId}/models/{modelId}/lists/{listId}/resetIndex"):
+        "200 with an empty body",
 
     # Non-JSON media type — the response is raw file content, and the
     # operation already declares `content` with the correct media type.
