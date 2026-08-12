@@ -34,10 +34,21 @@ Single-context layout: `CONTEXT.md` + `docs/adr/` at repo root. See `docs/agents
 
 Once a spec has live tests (a `tests/test_*_live.py` file exists for that API), the spec is **hand-maintained**. Do not run `scripts/build_spec.py` against it again — doing so will overwrite response schemas, security declarations, and any other edits derived from live testing.
 
-After editing a hand-maintained JSON spec, regenerate its YAML counterpart with:
+After editing a hand-maintained JSON spec, regenerate all three of its generated artifacts:
 ```
 uv run python scripts/sync_yaml.py <api>/<api>-openapi.json
+uv run python scripts/make_mcp.py <api>/<api>-openapi.json
+uv run python scripts/make_ptc.py <api>/<api>-openapi.json
 ```
+
+The `authentication`, `oauth`, and `financial-consolidation` APIs get no `-mcp.json` and no `-ptc.json` file. For those three, run `sync_yaml.py` alone. See [docs/mcp-agent-access.md](./docs/mcp-agent-access.md).
+
+Confirm that every generated artifact matches its source before you commit. CI runs the same check:
+```
+uv run python scripts/check_generated.py
+```
+
+Adding or removing an operation changes the committed operation counts. Update `test_committed_artifacts_hold_<N>_unique_operations` in `tests/test_make_ptc.py` and the counts in `docs/mcp-agent-access.md`.
 
 The current hand-maintained specs (live tests exist — do not rebuild):
 - `authentication/authentication-openapi.json`
