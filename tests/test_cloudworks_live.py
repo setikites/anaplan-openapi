@@ -866,6 +866,119 @@ def test_cloudworks_get_run_history_shape(cw_token, cw_base_url, cw_first_integr
         )
 
 
+# ── GET /integrations/run/{runId} ────────────────────────────────────────────
+# Absent from the Postman source. Specced from the anaplan-sdk client, which calls
+# it as get_run_status.
+
+@pytest.fixture(scope="module")
+def cw_run_id(cw_token, cw_base_url):
+    """Return the ID of any completed integration run, or skip if the tenant has none.
+
+    Scans integrations for the first one with run history, because most integrations
+    in a tenant have never run.
+    """
+    headers = {"Authorization": f"AnaplanAuthToken {cw_token}", "Accept": "application/json"}
+    with httpx.Client(timeout=30) as client:
+        listing = client.get(
+            f"{cw_base_url}/integrations", params={"offset": 0, "limit": 25}, headers=headers
+        )
+        if listing.status_code != 200:
+            pytest.skip(f"GET /integrations returned {listing.status_code}; cannot find a run")
+        for integration in listing.json().get("integrations", []):
+            history = client.get(
+                f"{cw_base_url}/integrations/runs/{integration['integrationId']}",
+                params={"offset": 0, "limit": 1},
+                headers=headers,
+            )
+            if history.status_code != 200:
+                continue
+            runs = history.json().get("history_of_runs", {}).get("runs", [])
+            if runs and runs[0].get("id"):
+                return runs[0]["id"]
+    pytest.skip("No integration in this tenant has run history; cannot probe run status")
+
+
+@pytest.mark.live
+def test_cloudworks_get_run_status_shape(cw_token, cw_base_url, cw_run_id):
+    """GET /integrations/run/{runId} returns the RunStatus shape.
+
+    Pins what this endpoint adds over a run-history RunRecord: it is addressable by
+    run ID alone, and it carries integrationId, which maps a bare run ID back to its
+    integration. POST /integrations/{integrationId}/run returns only a run ID, so
+    without this endpoint that mapping is unavailable.
+    """
+    with httpx.Client(timeout=30) as client:
+        response = client.get(
+            f"{cw_base_url}/integrations/run/{cw_run_id}",
+            headers={
+                "Authorization": f"AnaplanAuthToken {cw_token}",
+                "Accept": "application/json",
+            },
+        )
+
+    assert response.status_code == 200, (
+        f"Expected 200, got {response.status_code}. Body: {response.text[:200]}"
+    )
+    body = response.json()
+    assert body.get("status", {}).get("code") == 200
+    run = body.get("run")
+    assert run, f"Expected a 'run' object; keys were: {sorted(body)}"
+
+    assert run.get("id") == cw_run_id, "Returned run ID must match the requested one"
+    assert run.get("integrationId"), (
+        "integrationId is the reason this endpoint exists — it is absent from RunRecord"
+    )
+    assert isinstance(run.get("success"), bool)
+
+    trigger = run.get("triggerSource")
+    if trigger is not None:
+        assert trigger in ("scheduled", "manual", "scheduled_inf"), (
+            f"RunStatus.triggerSource {trigger!r} is not a known enum value"
+        )
+
+    declared = {
+        "id", "integrationId", "traceId", "startDate", "endDate", "success", "message",
+        "creationDate", "modificationDate", "createdBy", "modifiedBy",
+        "executionErrorCode", "flowGroupId", "triggerSource",
+    }
+    if set(run) != declared:
+        warnings.warn(
+            f"RunStatus fields drifted from the spec: extra={sorted(set(run) - declared)} "
+            f"missing={sorted(declared - set(run))}",
+            UserWarning, stacklevel=2,
+        )
+
+
+@pytest.mark.live
+def test_cloudworks_run_dumps_path_is_plural(cw_token, cw_base_url, cw_run_id):
+    """The integration-level error dump lives at /run/{runId}/dumps, not /dump.
+
+    The anaplan-sdk client requests the singular form. That path is unrouted: it
+    answers with an HTML 404 from the web server rather than the API's JSON error
+    envelope, which is what distinguishes a wrong path from a missing resource here.
+    """
+    headers = {"Authorization": f"AnaplanAuthToken {cw_token}"}
+    with httpx.Client(timeout=30) as client:
+        plural = client.get(f"{cw_base_url}/integrations/run/{cw_run_id}/dumps", headers=headers)
+        singular = client.get(f"{cw_base_url}/integrations/run/{cw_run_id}/dump", headers=headers)
+
+    # The plural form is routed: either a dump body, or a JSON 404 explaining that
+    # the run produced no errors.
+    assert plural.status_code in (200, 404), f"{plural.status_code}: {plural.text[:200]}"
+    if plural.status_code == 404:
+        assert "application/json" in plural.headers.get("content-type", ""), (
+            "The routed dumps path must answer with the API's JSON error envelope"
+        )
+        assert plural.json()["status"]["code"] == 404
+
+    # The singular form is not routed at all.
+    assert singular.status_code == 404, f"{singular.status_code}: {singular.text[:200]}"
+    assert "application/json" not in singular.headers.get("content-type", ""), (
+        "GET /integrations/run/{runId}/dump now returns the API's JSON envelope — "
+        "the singular path may have been added, so re-check the spec"
+    )
+
+
 # ── GET /integrations/notification/{notificationId} ──────────────────────────
 
 @pytest.mark.live

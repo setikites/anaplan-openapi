@@ -180,6 +180,11 @@ Endpoints covered (all paths relative to the `/2/0` base URL):
 | `test_tasks_sort_param` | The `sort` parameter on the task-list endpoints (issue #31) |
 | `test_view_data_pages_single_value` | `GET /models/{modelId}/views/{viewId}/data?pages=dimId:itemId` (issue #31) |
 | `test_view_data_pages_repeated_key` | The same endpoint with `pages` as a repeated key (issue #31) |
+| `test_get_model_status` | `GET /models/{modelId}/status` — asserts the bare `requestStatus` body, with no `meta` or `status` envelope |
+| `test_get_model_status_path_duality` | The same endpoint under `/workspaces/{workspaceId}/...`, field by field except `creationTime` |
+| `test_open_and_close_model` | `POST /models/{modelId}/open` then `POST .../close` (write-guarded; skips a model that is not already closed) |
+| `test_get_optimizer_solution_log` | `GET .../optimizeActions/{actionId}/tasks/{taskId}/solutionLogs` (skips — no reachable model holds an `OPTIMIZER` action) |
+| `test_optimizer_solution_log_404_is_indistinguishable_from_unknown_route` | That a 404 from `solutionLogs` matches the 404 for an unknown path |
 
 ### NO ACCESS masking sweep (issue #225)
 
@@ -392,6 +397,52 @@ Two paths absent from the original spec were probed via live testing:
 **`GET /workspaces/{workspaceId}/models`** is a working endpoint. Its response shape is **identical** to `GET /models` (top-level keys: `meta`, `status`, `models`; model object fields: `id`, `name`, `activeState`, `currentWorkspaceId`, `currentWorkspaceName`, `modelUrl`, `categoryValues`). The only behavioral difference is that results are scoped to the specified workspace. This path has been added to the spec.
 
 **`GET /workspaces/{workspaceId}/models/{modelId}`** returns `405 Method Not Allowed` with body `{"status": {"code": 405, "message": "Method Not Allowed"}, "path": "...", "timestamp": "..."}`. This is not a permissions issue (unlike the 404 on `GET /workspaces/{workspaceId}`) — the method simply does not exist on this path. Use `GET /models/{modelId}` for model detail lookups. This path is not added to the spec.
+
+### Endpoints recorded from the `anaplan-sdk` client, not from Anaplan sources
+
+Four Integration API paths are absent from both the Apiary blueprint and the Postman
+collection in `sources/`. They were found in the
+[`anaplan-sdk`](https://github.com/VinzenzKlass/anaplan-sdk) client, which calls them in
+`anaplan_sdk/_clients/`, and added to the spec after live probing. Their minimum roles
+are the best-known values rather than measured ones, so each carries
+`x-anaplan-min-role-needs-info`.
+
+| Path | SDK method | Live status |
+|------|-----------|-------------|
+| `GET /models/{modelId}/status` | `get_model_status` | **200** — shape confirmed, both URL forms |
+| `POST /models/{modelId}/open` | `wake_model` | Write-guarded; empty **200** expected, not yet exercised (see below) |
+| `POST /models/{modelId}/close` | `close_model` | Write-guarded; empty **200** expected, not yet exercised (see below) |
+| `GET .../optimizeActions/{actionId}/tasks/{taskId}/solutionLogs` | `get_optimizer_log` | Unverified — no reachable model holds an `OPTIMIZER` action |
+
+**`GET /models/{modelId}/status`** is the one Integration API response with no envelope.
+The body holds `requestStatus` alone — no `meta`, no `status`. A consumer that reads
+`status.code` to check success finds nothing. A model that is not loaded reports
+`currentStep` of `Closed` and `progress` of `-1.0`, and `creationTime` is rebuilt on every
+request, so it does not mark when the model opened. The workspace-prefixed form returns
+the same body, field for field apart from `creationTime`.
+
+`currentStep` has two observed idle values, `Closed` and `Open`. Both report `progress` of
+`-1.0`, so `-1.0` means the model is idle, not that it is closed. Read `currentStep` to
+tell the two apart.
+
+**`open` and `close` are still unexercised.** A run with `--allow-writes` (August 2026)
+self-skipped: `test_open_and_close_model` reads the status first and refuses to proceed
+unless the model already reports `Closed`, and the model had been opened by then. That
+guard is deliberate — a close evicts every user in the model with no warning, so the test
+will not create that state to test its way out of it. Run it again while the model is
+closed to confirm the empty **200** body. Until then both operations stay in
+`_NO_JSON_SCHEMA_KNOWN_GAPS` in `tests/test_spec_contract.py`.
+
+**`solutionLogs` stays provisional.** The response media type in the spec follows the SDK,
+which reads the body as bytes. It is not measured, because the test model holds no
+`OPTIMIZER` action. Probing cannot settle it either: this API answers an unknown path with
+the same generic `404` envelope it uses for a missing resource, so a `404` from
+`solutionLogs` is not evidence that the route exists. `test_optimizer_solution_log_404_is_indistinguishable_from_unknown_route`
+pins that equivalence, and will fail if Anaplan ever makes the two distinguishable —
+at which point the operation's `200` can be promoted out of provisional.
+
+The sources name `OPTIMIZER` only as an `actionType` value on
+`GET /models/{modelId}/processes/{processId}`. No optimizer endpoint is documented.
 
 ### Response key naming (confirmed via live tests)
 

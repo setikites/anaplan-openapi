@@ -91,6 +91,20 @@
       ]
     },
     {
+      "op_id": "postModelsByModelidClose",
+      "method": "POST",
+      "path": "/models/{modelId}/close",
+      "summary": "Close a model",
+      "parameters": [
+        {
+          "name": "modelId",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        }
+      ]
+    },
+    {
       "op_id": "getModelsByModelidCurrentperiod",
       "method": "GET",
       "path": "/models/{modelId}/currentPeriod",
@@ -629,6 +643,20 @@
       ]
     },
     {
+      "op_id": "postModelsByModelidOpen",
+      "method": "POST",
+      "path": "/models/{modelId}/open",
+      "summary": "Open a model",
+      "parameters": [
+        {
+          "name": "modelId",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        }
+      ]
+    },
+    {
       "op_id": "getModelsByModelidProcesses",
       "method": "GET",
       "path": "/models/{modelId}/processes",
@@ -682,6 +710,20 @@
           "name": "showImportDataSource",
           "in": "query",
           "required": false,
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "op_id": "getModelsByModelidStatus",
+      "method": "GET",
+      "path": "/models/{modelId}/status",
+      "summary": "Get model status",
+      "parameters": [
+        {
+          "name": "modelId",
+          "in": "path",
+          "required": true,
           "type": "string"
         }
       ]
@@ -1819,6 +1861,38 @@
       ]
     },
     {
+      "op_id": "getWorkspacesByWorkspaceidModelsByModelidOptimizeactionsByActionidTasksByTaskidSolutionlogs",
+      "method": "GET",
+      "path": "/workspaces/{workspaceId}/models/{modelId}/optimizeActions/{actionId}/tasks/{taskId}/solutionLogs",
+      "summary": "Get the solution log for an optimizer task",
+      "parameters": [
+        {
+          "name": "workspaceId",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "name": "modelId",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "name": "actionId",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "name": "taskId",
+          "in": "path",
+          "required": true,
+          "type": "string"
+        }
+      ]
+    },
+    {
       "op_id": "getWorkspacesByWorkspaceidModelsByModelidProcessesByProcessidTasks",
       "method": "GET",
       "path": "/workspaces/{workspaceId}/models/{modelId}/processes/{processId}/tasks",
@@ -2585,6 +2659,23 @@
           }
         }
       }
+    },
+    "postModelsByModelidClose": {
+      "description": "Minimum role: Workspace Administrator.\n\nUnloads an open model from memory and frees the workspace model slot it held.\n\n**Warning**: this closes the model for every user in it, not only for the caller, and Anaplan gives those users no warning. Check that the model is idle before you call it.\n\n**Notes**:\n\n*   The request has no body. Anaplan expects `Content-Type: application/text` on that empty body.\n*   The success response has no body.\n*   The call returns before the model finishes the transition. Follow it with `GET /models/{modelId}/status`.\n*   An open model holds a workspace model slot and consumes workspace memory.",
+      "parameters": [
+        {
+          "name": "modelId",
+          "in": "path",
+          "description": "Model identifier (32-character uppercase hex string). From `GET /models` or `GET /workspaces/{workspaceId}/models`.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "request_body": null,
+      "response": null,
+      "response_note": "no documented 2xx JSON response schema \u2014 probe a read operation to learn it"
     },
     "getModelsByModelidCurrentperiod": {
       "description": "Minimum role: Workspace Administrator.",
@@ -5946,6 +6037,23 @@
         }
       }
     },
+    "postModelsByModelidOpen": {
+      "description": "Minimum role: Workspace Administrator.\n\nLoads a closed model into memory \u2014 the transition Anaplan describes as waking a model. Call it when `GET /models/{modelId}/status` reports `currentStep` of `Closed` and later calls need the model loaded.\n\n**Notes**:\n\n*   The request has no body. Anaplan expects `Content-Type: application/text` on that empty body.\n*   The success response has no body.\n*   The call returns before the model finishes the transition. Follow it with `GET /models/{modelId}/status`.\n*   An open model holds a workspace model slot and consumes workspace memory.",
+      "parameters": [
+        {
+          "name": "modelId",
+          "in": "path",
+          "description": "Model identifier (32-character uppercase hex string). From `GET /models` or `GET /workspaces/{workspaceId}/models`.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "request_body": null,
+      "response": null,
+      "response_note": "no documented 2xx JSON response schema \u2014 probe a read operation to learn it"
+    },
     "getModelsByModelidProcesses": {
       "description": "Minimum role: Standard User.\n\nModel-direct form of `GET /workspaces/{workspaceId}/models/{modelId}/processes`. Returns the same response shape without requiring a workspace ID. Lists process definitions available for the specified model.",
       "parameters": [
@@ -6189,6 +6297,80 @@
                 },
                 "name": {
                   "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "getModelsByModelidStatus": {
+      "description": "Minimum role: Standard User.\n\nReturns the runtime state of a model \u2014 whether it is open, closed, or mid-load \u2014 and the progress of the current step. Use it to check that a model is loaded before a bulk or transactional call, or to follow a load that `POST /models/{modelId}/open` started.\n\n**Notes**:\n\n*   This response has no `meta` or `status` envelope. The body holds `requestStatus` alone. Most Integration API responses wrap their payload, so a client that reads `status.code` here finds nothing.\n*   An idle model reports `progress` of `-1.0` whether it is open or closed, so `-1.0` means idle rather than closed. `currentStep` tells the two apart, with `Closed` and `Open` as the observed idle values.\n*   `creationTime` changes on every call, because Anaplan builds the record per request. It does not mark when the model opened.\n*   The workspace-prefixed form `GET /workspaces/{workspaceId}/models/{modelId}/status` returns the same body.",
+      "parameters": [
+        {
+          "name": "modelId",
+          "in": "path",
+          "description": "Model identifier (32-character uppercase hex string). From `GET /models` or `GET /workspaces/{workspaceId}/models`.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "request_body": null,
+      "response": {
+        "status": "200",
+        "media_type": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "requestStatus": {
+              "description": "Runtime state of a model, as returned by `GET /models/{modelId}/status`. Reports whether the model is open, closed, or mid-load, and how far the current step has progressed. This is live state, not model metadata \u2014 for name, size, and workspace use `GET /models/{modelId}`.\n\n**Note:** the response that carries this object has no `meta` or `status` envelope. Its body holds `requestStatus` alone, unlike most Integration API responses.",
+              "type": "object",
+              "properties": {
+                "currentStep": {
+                  "type": "string",
+                  "description": "Human-readable model state. An idle model reports `Closed` or `Open`. A model that is loading or running a step reports the step it is on. Anaplan does not publish the full set of values, so treat this as an open string rather than an enum.",
+                  "example": "Closed"
+                },
+                "progress": {
+                  "type": "number",
+                  "format": "double",
+                  "description": "Progress of the current step as a fraction from 0.0 to 1.0. A model with no step running reports `-1.0`, whether that model is open or closed. So `-1.0` means idle, not closed \u2014 read `currentStep` to tell those apart.",
+                  "example": -1.0
+                },
+                "creationTime": {
+                  "type": "integer",
+                  "format": "int64",
+                  "description": "Time this status record was built, in milliseconds since epoch. Anaplan builds the record per request, so the value changes on every call and does not mark when the model opened.",
+                  "example": 1786576465308
+                },
+                "taskId": {
+                  "type": "string",
+                  "nullable": true,
+                  "description": "Identifier of the task that drives the current step. Null when no task is running."
+                },
+                "tooltip": {
+                  "type": "string",
+                  "nullable": true,
+                  "description": "Supplementary text for the current step, as shown in the Anaplan UI. Null when the step carries none."
+                },
+                "exportTaskType": {
+                  "type": "string",
+                  "nullable": true,
+                  "description": "Type of the running export task. Null unless an export drives the current step."
+                },
+                "peakMemoryUsageEstimate": {
+                  "type": "integer",
+                  "format": "int64",
+                  "nullable": true,
+                  "description": "Estimated peak memory of the model in bytes. Null when Anaplan holds no reading, which includes an idle model that is merely open."
+                },
+                "peakMemoryUsageTime": {
+                  "type": "integer",
+                  "format": "int64",
+                  "nullable": true,
+                  "description": "Time of the peak memory reading, in milliseconds since epoch. Null when no reading exists."
                 }
               }
             }
@@ -11114,6 +11296,50 @@
           "name": "listId",
           "in": "path",
           "description": "List identifier (12-digit numeric string, prefix 101). From `GET /models/{modelId}/lists`.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "request_body": null,
+      "response": null,
+      "response_note": "no documented 2xx JSON response schema \u2014 probe a read operation to learn it"
+    },
+    "getWorkspacesByWorkspaceidModelsByModelidOptimizeactionsByActionidTasksByTaskidSolutionlogs": {
+      "description": "Minimum role: Standard User.\n\nDownloads the solver log that an optimizer action writes. Use it to see how the solver reached its result, or why it found no solution. Pass an `actionId` whose `actionType` is `OPTIMIZER` in `GET /models/{modelId}/actions`, and a `taskId` that the same action spawned.\n\n**Notes**:\n\n*   The response body is raw log content, not JSON.\n*   **The success response is not yet validated against a real optimizer task.** No model reachable from this project holds an `OPTIMIZER` action, so the media type and schema below are provisional. A caller should not rely on the exact media type.\n*   A `404` does not distinguish a missing task from a missing route. This API answers an unknown path with the same generic `404` body.",
+      "parameters": [
+        {
+          "name": "workspaceId",
+          "in": "path",
+          "description": "Workspace identifier (32-char lowercase hex). When the path also has a `modelId`, use that model's `currentWorkspaceId` (`GET /models/{modelId}`, or `GET /models` matched by `name`). For workspace-only endpoints, scan `GET /workspaces` by `name`.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "modelId",
+          "in": "path",
+          "description": "Model identifier (32-character uppercase hex string). From `GET /models` or `GET /workspaces/{workspaceId}/models`.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "actionId",
+          "in": "path",
+          "description": "Action identifier. From `GET /models/{modelId}/actions`.",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "taskId",
+          "in": "path",
+          "description": "Task identifier, scoped to the parent action, import, export, or process that launched it. A taskId is valid only under the same parent. An action's taskId does not resolve under a process, import, or export. `POST /workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks` returns it, as does the equivalent actions, exports, or processes tasks endpoint. The matching `GET .../tasks` lists it under `tasks[].taskId`. The import tasks response instead nests it under `task.taskId`.",
           "required": true,
           "schema": {
             "type": "string"

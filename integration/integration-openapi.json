@@ -265,6 +265,30 @@
         "x-anaplan-min-role": "Standard User"
       }
     },
+    "/models/{modelId}/close": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ModelId"
+        }
+      ],
+      "post": {
+        "summary": "Close a model",
+        "description": "Minimum role: Workspace Administrator.\n\nUnloads an open model from memory and frees the workspace model slot it held.\n\n**Warning**: this closes the model for every user in it, not only for the caller, and Anaplan gives those users no warning. Check that the model is idle before you call it.\n\n**Notes**:\n\n*   The request has no body. Anaplan expects `Content-Type: application/text` on that empty body.\n*   The success response has no body.\n*   The call returns before the model finishes the transition. Follow it with `GET /models/{modelId}/status`.\n*   An open model holds a workspace model slot and consumes workspace memory.",
+        "tags": [
+          "Transactional Write"
+        ],
+        "responses": {
+          "200": {
+            "description": "The model is closing. The response has no body."
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundOrNoAccess"
+          }
+        },
+        "x-anaplan-min-role": "Workspace Administrator",
+        "x-anaplan-min-role-needs-info": true
+      }
+    },
     "/models/{modelId}/currentPeriod": {
       "parameters": [
         {
@@ -2196,6 +2220,30 @@
         "x-anaplan-min-role": "Standard User"
       }
     },
+    "/models/{modelId}/open": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ModelId"
+        }
+      ],
+      "post": {
+        "summary": "Open a model",
+        "description": "Minimum role: Workspace Administrator.\n\nLoads a closed model into memory — the transition Anaplan describes as waking a model. Call it when `GET /models/{modelId}/status` reports `currentStep` of `Closed` and later calls need the model loaded.\n\n**Notes**:\n\n*   The request has no body. Anaplan expects `Content-Type: application/text` on that empty body.\n*   The success response has no body.\n*   The call returns before the model finishes the transition. Follow it with `GET /models/{modelId}/status`.\n*   An open model holds a workspace model slot and consumes workspace memory.",
+        "tags": [
+          "Transactional Write"
+        ],
+        "responses": {
+          "200": {
+            "description": "The model is opening. The response has no body."
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundOrNoAccess"
+          }
+        },
+        "x-anaplan-min-role": "Workspace Administrator",
+        "x-anaplan-min-role-needs-info": true
+      }
+    },
     "/models/{modelId}/processes": {
       "parameters": [
         {
@@ -2378,6 +2426,54 @@
           }
         },
         "x-anaplan-min-role": "Standard User"
+      }
+    },
+    "/models/{modelId}/status": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ModelId"
+        }
+      ],
+      "get": {
+        "summary": "Get model status",
+        "description": "Minimum role: Standard User.\n\nReturns the runtime state of a model — whether it is open, closed, or mid-load — and the progress of the current step. Use it to check that a model is loaded before a bulk or transactional call, or to follow a load that `POST /models/{modelId}/open` started.\n\n**Notes**:\n\n*   This response has no `meta` or `status` envelope. The body holds `requestStatus` alone. Most Integration API responses wrap their payload, so a client that reads `status.code` here finds nothing.\n*   An idle model reports `progress` of `-1.0` whether it is open or closed, so `-1.0` means idle rather than closed. `currentStep` tells the two apart, with `Closed` and `Open` as the observed idle values.\n*   `creationTime` changes on every call, because Anaplan builds the record per request. It does not mark when the model opened.\n*   The workspace-prefixed form `GET /workspaces/{workspaceId}/models/{modelId}/status` returns the same body.",
+        "tags": [
+          "Model Metadata"
+        ],
+        "responses": {
+          "200": {
+            "description": "The model's runtime state.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "requestStatus": {
+                    "tooltip": null,
+                    "progress": -1.0,
+                    "currentStep": "Closed",
+                    "exportTaskType": null,
+                    "creationTime": 1786576465308,
+                    "taskId": null,
+                    "peakMemoryUsageEstimate": null,
+                    "peakMemoryUsageTime": null
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "requestStatus": {
+                      "$ref": "#/components/schemas/ModelStatus"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundOrNoAccess"
+          }
+        },
+        "x-anaplan-min-role": "Standard User",
+        "x-anaplan-min-role-needs-info": true
       }
     },
     "/models/{modelId}/versions": {
@@ -6835,6 +6931,53 @@
         "x-anaplan-min-role": "Standard User"
       }
     },
+    "/workspaces/{workspaceId}/models/{modelId}/optimizeActions/{actionId}/tasks/{taskId}/solutionLogs": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/WorkspaceId"
+        },
+        {
+          "$ref": "#/components/parameters/ModelId"
+        },
+        {
+          "$ref": "#/components/parameters/ActionId"
+        },
+        {
+          "$ref": "#/components/parameters/TaskId"
+        }
+      ],
+      "get": {
+        "summary": "Get the solution log for an optimizer task",
+        "description": "Minimum role: Standard User.\n\nDownloads the solver log that an optimizer action writes. Use it to see how the solver reached its result, or why it found no solution. Pass an `actionId` whose `actionType` is `OPTIMIZER` in `GET /models/{modelId}/actions`, and a `taskId` that the same action spawned.\n\n**Notes**:\n\n*   The response body is raw log content, not JSON.\n*   **The success response is not yet validated against a real optimizer task.** No model reachable from this project holds an `OPTIMIZER` action, so the media type and schema below are provisional. A caller should not rely on the exact media type.\n*   A `404` does not distinguish a missing task from a missing route. This API answers an unknown path with the same generic `404` body.",
+        "tags": [
+          "Bulk Other"
+        ],
+        "responses": {
+          "200": {
+            "description": "Solution log content. Provisional — see the operation description.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No solution log for this action and task. The body is the generic Anaplan error envelope with `status.code` of 404 and a message of `Not Found`. This API answers an unknown route with that same body, so a 404 here does not prove the route exists.\n\nAlso returned when the caller holds a NO ACCESS role on the model. Anaplan masks that as `404` rather than `403`, so the response does not confirm that the resource exists.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-anaplan-min-role": "Standard User",
+        "x-anaplan-min-role-needs-info": true
+      }
+    },
     "/workspaces/{workspaceId}/models/{modelId}/processes": {
       "parameters": [
         {
@@ -9606,6 +9749,56 @@
             "format": "date-time",
             "description": "UTC time at which the error was generated.",
             "example": "2026-07-14T13:55:12.198115662Z"
+          }
+        }
+      },
+      "ModelStatus": {
+        "description": "Runtime state of a model, as returned by `GET /models/{modelId}/status`. Reports whether the model is open, closed, or mid-load, and how far the current step has progressed. This is live state, not model metadata — for name, size, and workspace use `GET /models/{modelId}`.\n\n**Note:** the response that carries this object has no `meta` or `status` envelope. Its body holds `requestStatus` alone, unlike most Integration API responses.",
+        "type": "object",
+        "properties": {
+          "currentStep": {
+            "type": "string",
+            "description": "Human-readable model state. An idle model reports `Closed` or `Open`. A model that is loading or running a step reports the step it is on. Anaplan does not publish the full set of values, so treat this as an open string rather than an enum.",
+            "example": "Closed"
+          },
+          "progress": {
+            "type": "number",
+            "format": "double",
+            "description": "Progress of the current step as a fraction from 0.0 to 1.0. A model with no step running reports `-1.0`, whether that model is open or closed. So `-1.0` means idle, not closed — read `currentStep` to tell those apart.",
+            "example": -1.0
+          },
+          "creationTime": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Time this status record was built, in milliseconds since epoch. Anaplan builds the record per request, so the value changes on every call and does not mark when the model opened.",
+            "example": 1786576465308
+          },
+          "taskId": {
+            "type": "string",
+            "nullable": true,
+            "description": "Identifier of the task that drives the current step. Null when no task is running."
+          },
+          "tooltip": {
+            "type": "string",
+            "nullable": true,
+            "description": "Supplementary text for the current step, as shown in the Anaplan UI. Null when the step carries none."
+          },
+          "exportTaskType": {
+            "type": "string",
+            "nullable": true,
+            "description": "Type of the running export task. Null unless an export drives the current step."
+          },
+          "peakMemoryUsageEstimate": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true,
+            "description": "Estimated peak memory of the model in bytes. Null when Anaplan holds no reading, which includes an idle model that is merely open."
+          },
+          "peakMemoryUsageTime": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true,
+            "description": "Time of the peak memory reading, in milliseconds since epoch. Null when no reading exists."
           }
         }
       }

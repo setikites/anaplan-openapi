@@ -172,12 +172,35 @@ def wire_response_schema_refs(spec: dict) -> dict:
 
 # ─── Example validation ───────────────────────────────────────────────────────
 
+def _nullable_to_type_union(node):
+    """Rewrite OpenAPI `nullable: true` as a JSON Schema `["type", "null"]` union.
+
+    `jsonschema` validates plain JSON Schema, where `nullable` carries no meaning.
+    Without this rewrite, a faithful example that shows a null for a field the API
+    really returns as null fails against that field's declared `type`.
+    """
+    if isinstance(node, dict):
+        out = {key: _nullable_to_type_union(value) for key, value in node.items()}
+        declared = out.pop("nullable", False)
+        kind = out.get("type")
+        if declared and isinstance(kind, str):
+            out["type"] = [kind, "null"]
+        return out
+    if isinstance(node, list):
+        return [_nullable_to_type_union(item) for item in node]
+    return node
+
+
 def validate_response_examples(spec: dict) -> list[str]:
     """Validate each response example that has a sibling schema.
 
     Resolves $ref against components/schemas. Returns warning strings for mismatches.
     """
     warnings: list[str] = []
+    # Validate against a nullable-rewritten copy so both the inline schemas and
+    # anything they $ref agree on which fields accept null. The caller's spec is
+    # left untouched.
+    spec = _nullable_to_type_union(spec)
     resolver = jsonschema.RefResolver("", spec)
 
     for path_str, path_item in spec.get("paths", {}).items():

@@ -381,6 +381,12 @@ _NO_JSON_SCHEMA_INTENTIONAL: dict[tuple[str, str, str], str] = {
      "/workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests/{requestId}"
      "/pages/{pageNo}"):
         "non-JSON media type: text/csv",
+    # The solver log is raw log content. The media type is provisional — no
+    # reachable model holds an OPTIMIZER action to fetch a real log from.
+    ("integration", "GET",
+     "/workspaces/{workspaceId}/models/{modelId}/optimizeActions/{actionId}/tasks/{taskId}"
+     "/solutionLogs"):
+        "non-JSON media type: text/plain",
 
     # Browser redirect — the authorization endpoint answers with a 302 to the
     # client's redirect_uri, so there is no 2xx response by design.
@@ -394,6 +400,13 @@ _NO_JSON_SCHEMA_KNOWN_GAPS: set[tuple[str, str, str]] = {
     # cloudworks has no remaining gaps. Thirteen mutating operations were listed
     # here until the check learned to resolve $ref responses (issue #254), and
     # cancelIntegration until issue #255 gave it a schema.
+
+    # integration — model open/close. The anaplan-sdk client posts an empty body
+    # and reads no body back, so an empty 200 is expected, but neither has been
+    # exercised live yet: both mutate model availability for every user in the
+    # model. Reclassify as intentional once a live run confirms the empty body.
+    ("integration", "POST", "/models/{modelId}/open"),
+    ("integration", "POST", "/models/{modelId}/close"),
 
     # financial-consolidation
     ("financial-consolidation", "POST", "/odata/{tableName}"),

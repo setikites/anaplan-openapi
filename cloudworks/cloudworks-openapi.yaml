@@ -1061,6 +1061,67 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+  /integrations/run/{runId}:
+    parameters:
+    - $ref: '#/components/parameters/RunId'
+    get:
+      summary: Get integration run status
+      description: |-
+        Minimum role: Restricted Integration User.
+
+        Returns the status of one integration run, addressed by run ID alone. Use it to poll a run that `POST /integrations/{integrationId}/run` started — that call returns a run ID and nothing else.
+
+        **Notes**:
+
+        *   Unlike `GET /integrations/runs/{integrationId}`, this call needs no integration ID, and `run.integrationId` maps the run back to its integration.
+        *   The response holds more fields than a run-history `RunRecord`. See `RunStatus`.
+        *   `meta.schema` cites a `1/0` URL even though the endpoint is served under `2/0`.
+      operationId: getRunStatus
+      x-anaplan-min-role: Restricted Integration User
+      tags:
+      - History
+      responses:
+        '200':
+          description: Status of the run.
+          content:
+            application/json:
+              example:
+                status:
+                  code: 200
+                  message: Success
+                run:
+                  id: 91a01d97958d44baaa58ad8a3d45804e
+                  integrationId: 152b8666a0234754afc36f1cde0fd9d2
+                  traceId: 7b562956986244d789de52acd06c9205
+                  startDate: '2026-08-11T18:07:06.000Z'
+                  endDate: '2026-08-11T18:07:51.000Z'
+                  success: true
+                  message: Success
+                  creationDate: '2026-08-11T18:07:06.000Z'
+                  modificationDate: '2026-08-11T18:07:51.000Z'
+                  createdBy: Jane Roe
+                  modifiedBy: Jane Roe
+                  executionErrorCode: null
+                  flowGroupId: null
+                  triggerSource: scheduled
+                meta:
+                  schema: https://api.cloudworks.anaplan.com/1/0/integrations/objects/run
+              schema:
+                type: object
+                properties:
+                  status:
+                    $ref: '#/components/schemas/Status'
+                  run:
+                    $ref: '#/components/schemas/RunStatus'
+                  meta:
+                    description: Response metadata. `schema` is a URL to the JSON schema for this body.
+                    type: object
+                    properties:
+                      schema:
+                        type: string
+                        description: URL to the JSON schema definition for this response body.
+        '404':
+          $ref: '#/components/responses/NotFound'
   /integrations/notification:
     post:
       summary: Create a notification configuration
@@ -2107,6 +2168,70 @@ components:
                       - scheduled
                       - manual
                       - scheduled_inf
+    RunStatus:
+      description: Status of a single integration run, as returned by `GET /integrations/run/{runId}`. Holds more fields than
+        the `RunRecord` entries in run history — notably `integrationId`, which maps a bare run ID back to its integration.
+      type: object
+      properties:
+        id:
+          type: string
+          description: 32-character lowercase hex run ID.
+        integrationId:
+          type: string
+          description: ID of the integration this run belongs to. `RunRecord` omits this field, so this endpoint is the way
+            to map a run ID back to its integration.
+        traceId:
+          type: string
+          description: 32-character lowercase hex trace identifier, useful for support diagnostics.
+        startDate:
+          type: string
+          format: date-time
+          description: ISO 8601 UTC datetime when the run started.
+          example: '2026-08-11T18:07:06.000Z'
+        endDate:
+          type: string
+          format: date-time
+          description: ISO 8601 UTC datetime when the run ended.
+          example: '2026-08-11T18:07:51.000Z'
+        success:
+          type: boolean
+        message:
+          description: Outcome message. A partial-success import reports its row counts here even when `success` is `true`.
+          type: string
+          example: Success
+        creationDate:
+          type: string
+          format: date-time
+          description: ISO 8601 UTC datetime when the run record was created. Tracks `startDate`.
+        modificationDate:
+          type: string
+          format: date-time
+          description: ISO 8601 UTC datetime when the run record last changed. Tracks `endDate` for a finished run.
+        createdBy:
+          type: string
+          description: Display name of the user the run is attributed to.
+        modifiedBy:
+          type: string
+          nullable: true
+          description: Display name of the user who last changed the run record.
+        executionErrorCode:
+          description: 'Numeric error code. Null on full success. Known values: `12` (import data-type mismatch), `35`, `38`
+            (partial success), `39`.'
+          type: integer
+          nullable: true
+        flowGroupId:
+          type: string
+          nullable: true
+          description: ID of the integration flow that triggered this run. Null when no flow triggered it.
+        triggerSource:
+          description: 'What caused this run: `scheduled` (the integration''s own schedule), `manual` (started by a user),
+            or `scheduled_inf` (an integration flow schedule).'
+          type: string
+          enum:
+          - scheduled
+          - manual
+          - scheduled_inf
+          example: scheduled
   responses:
     SuccessStatus:
       description: Operation successful.

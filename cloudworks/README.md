@@ -104,6 +104,43 @@ All earlier open questions on auth, base URL, connection shapes, integration sha
 | GET /integrations/anaplanModels/{modelId}: returns HTML 404 from nginx — likely deprecated | ⚠️ |
 | GET /integrations/runerror/{runId}: returns `"runs": {}` (empty object, not array) when no errors | ⚠️ |
 
+### `GET /integrations/run/{runId}` — recorded from the `anaplan-sdk` client
+
+This path is absent from the Postman collection in `sources/`. It was found in the
+[`anaplan-sdk`](https://github.com/VinzenzKlass/anaplan-sdk) client, which calls it as
+`get_run_status`, and its **200** shape is live-confirmed (August 2026) by
+`test_cloudworks_get_run_status_shape`.
+
+It earns its place next to `GET /integrations/runs/{integrationId}` because it takes a run
+ID alone and returns `run.integrationId`. `POST /integrations/{integrationId}/run` hands
+back a bare run ID, and run history is keyed by integration, so without this endpoint a
+caller holding only a run ID cannot resolve it.
+
+`RunStatus` holds six fields that `RunRecord` does not: `integrationId`, `creationDate`,
+`modificationDate`, `createdBy`, `modifiedBy`, and `flowGroupId`. It omits `RunRecord`'s
+`lastRun` and `triggeredBy`. Its `meta.schema` cites a `1/0` URL
+(`https://api.cloudworks.anaplan.com/1/0/integrations/objects/run`) even though the
+endpoint is served under `2/0`.
+
+### The integration-level error dump path is `/dumps`, not `/dump`
+
+The `anaplan-sdk` client requests `GET /integrations/run/{runId}/dump` (singular) in
+`get_error_dump`. That path is not routed. The spec's plural `/dumps` is correct, and the
+two 404s differ in a way that settles it:
+
+| Path | Response |
+|---|---|
+| `/integrations/run/{runId}/dumps` | JSON 404 from the API — `{"status": {"code": 404, "message": "Your integration run was successful / no errors"}, ...}` |
+| `/integrations/run/{runId}/dump` | HTML 404 from the web server — `<title>404 Not Found</title>`, `Content-Type: text/html` |
+
+An API-shaped JSON envelope means the route exists and the resource does not. An HTML 404
+means the route itself is unrouted. `test_cloudworks_run_dumps_path_is_plural` asserts
+both, so the test fails if Anaplan later adds the singular alias. The client's
+process-level call, `GET /integrations/run/{runId}/process/import/{actionId}/dumps`, is
+already plural and agrees with the spec.
+
+This is a bug in the client, not a gap in the spec. No spec change was made for it.
+
 ### Connection lifecycle response shapes (issue #254)
 
 Live-tested July 2026 by `test_cloudworks_connection_lifecycle_response_shapes`, which runs only against `CLOUDWORKS_DISPOSABLE_CONNECTION_ID` and deletes that connection.
