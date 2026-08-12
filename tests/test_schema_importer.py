@@ -392,6 +392,40 @@ def test_validate_returns_empty_for_valid_example():
     assert warnings == []
 
 
+def test_validate_accepts_null_for_nullable_field():
+    """A null in an example is valid when the field declares OpenAPI `nullable: true`.
+
+    `jsonschema` gives `nullable` no meaning, so without the rewrite in
+    validate_response_examples a faithful example — one showing the null a live API
+    really returns — is reported as a type mismatch.
+    """
+    item_schema = {
+        "type": "object",
+        "properties": {"id": {"type": "string", "nullable": True}},
+    }
+    example = {"items": [{"id": None}]}
+
+    spec = _spec_with_schema_and_example(example, item_schema)
+
+    assert validate_response_examples(spec) == []
+    # The caller's spec keeps its OpenAPI form — the rewrite works on a copy.
+    assert spec["components"]["schemas"]["Item"]["properties"]["id"] == {
+        "type": "string",
+        "nullable": True,
+    }
+
+
+def test_validate_still_rejects_null_for_non_nullable_field():
+    """A null in an example is a mismatch when the field does not declare nullable."""
+    item_schema = {"type": "object", "properties": {"id": {"type": "string"}}}
+    example = {"items": [{"id": None}]}
+
+    warnings = validate_response_examples(_spec_with_schema_and_example(example, item_schema))
+
+    assert len(warnings) == 1
+    assert "not of type 'string'" in warnings[0]
+
+
 def test_validate_returns_warning_for_invalid_example():
     """Example that violates the schema produces a warning string."""
     item_schema = {

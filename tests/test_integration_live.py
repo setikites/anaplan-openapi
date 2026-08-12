@@ -1169,6 +1169,193 @@ def test_reset_list_index_rejects_list_with_items(integration_token):
     assert after == before, "A rejected reset must not change the item count"
 
 
+# ─── Model runtime state and lifecycle ────────────────────────────────────────
+# GET /models/{modelId}/status, POST .../open, and POST .../close are absent from
+# the Apiary and Postman sources. They are specced from the anaplan-sdk client.
+
+_MODEL_STATUS_FIELDS = {
+    "tooltip", "progress", "currentStep", "exportTaskType",
+    "creationTime", "taskId", "peakMemoryUsageEstimate", "peakMemoryUsageTime",
+}
+
+
+@pytest.mark.live
+def test_get_model_status(integration_token):
+    """GET /models/{modelId}/status returns the model's runtime state.
+
+    Pins the shape that makes this endpoint unusual: the body carries `requestStatus`
+    alone, with no `meta` or `status` envelope. A client that reads `status.code`
+    here finds nothing.
+    """
+    with httpx.Client() as client:
+        response = client.get(
+            f"{API_URL}/models/{MODEL_ID}/status",
+            headers=_auth_headers(integration_token),
+        )
+
+    assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
+    body = response.json()
+    assert "status" not in body, (
+        f"This endpoint must not wrap its payload in a status envelope; keys: {list(body)}"
+    )
+    assert "meta" not in body, f"Unexpected meta envelope; keys: {list(body)}"
+    assert set(body) == {"requestStatus"}, f"Expected requestStatus alone; keys: {list(body)}"
+
+    request_status = body["requestStatus"]
+    assert set(request_status) == _MODEL_STATUS_FIELDS, (
+        "requestStatus fields drifted from the spec: "
+        f"extra={set(request_status) - _MODEL_STATUS_FIELDS} "
+        f"missing={_MODEL_STATUS_FIELDS - set(request_status)}"
+    )
+    assert isinstance(request_status["currentStep"], str)
+    assert isinstance(request_status["progress"], (int, float))
+    assert isinstance(request_status["creationTime"], int)
+    # progress -1.0 marks an idle model, not a closed one — both Closed and Open
+    # report it. taskId is the thing that tracks whether a step is running.
+    if request_status["taskId"] is None:
+        assert request_status["progress"] == -1.0, (
+            "A model with no running task must report progress -1.0; "
+            f"got {request_status['progress']!r} at step "
+            f"{request_status['currentStep']!r}"
+        )
+
+
+@pytest.mark.live
+def test_get_model_status_path_duality(integration_token):
+    """The workspace-prefixed status form returns the same body as the model-direct one.
+
+    Kept out of test_path_duality because that probe asserts a `status` envelope,
+    which this endpoint does not return.
+    """
+    with httpx.Client() as client:
+        headers = _auth_headers(integration_token)
+        direct = client.get(f"{API_URL}/models/{MODEL_ID}/status", headers=headers)
+        prefixed = client.get(
+            f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}/status", headers=headers
+        )
+
+    assert direct.status_code == 200, f"{direct.status_code}: {direct.text[:200]}"
+    if prefixed.status_code in (404, 405):
+        warnings.warn(
+            f"GET /workspaces/{{workspaceId}}/models/{{modelId}}/status returned "
+            f"{prefixed.status_code} — the workspace-prefixed form is no longer available.",
+            UserWarning, stacklevel=2,
+        )
+        return
+
+    assert prefixed.status_code == 200, f"{prefixed.status_code}: {prefixed.text[:200]}"
+    # creationTime is rebuilt per request, so compare every other field.
+    direct_status = direct.json()["requestStatus"]
+    prefixed_status = prefixed.json()["requestStatus"]
+    assert set(direct_status) == set(prefixed_status)
+    for field in set(direct_status) - {"creationTime"}:
+        assert direct_status[field] == prefixed_status[field], (
+            f"{field} differs between URL forms: "
+            f"{direct_status[field]!r} vs {prefixed_status[field]!r}"
+        )
+
+
+@pytest.mark.live
+def test_open_and_close_model(integration_token):
+    """POST /models/{modelId}/open then POST /models/{modelId}/close.
+
+    Write-guarded, and runs only against a model that starts out closed, so the
+    round trip returns the model to the state it was found in. Skips a model that
+    is already open rather than closing it, because a close evicts every user in
+    the model without warning.
+
+    Confirms the empty 200 body that both operations declare.
+    """
+    with httpx.Client(timeout=60) as client:
+        headers = _auth_headers(integration_token)
+        status_url = f"{API_URL}/models/{MODEL_ID}/status"
+        before = client.get(status_url, headers=headers)
+        assert before.status_code == 200, f"{before.status_code}: {before.text[:200]}"
+        if before.json()["requestStatus"]["currentStep"] != "Closed":
+            pytest.skip("Model is not closed; refusing to close a model that is in use")
+
+        # Anaplan expects this Content-Type on the empty body.
+        lifecycle_headers = {**headers, "Content-Type": "application/text"}
+        opened = client.post(f"{API_URL}/models/{MODEL_ID}/open", headers=lifecycle_headers)
+        assert opened.status_code == 200, f"{opened.status_code}: {opened.text[:200]}"
+        assert opened.text == "", "Open must return an empty body"
+
+        closed = client.post(f"{API_URL}/models/{MODEL_ID}/close", headers=lifecycle_headers)
+        assert closed.status_code == 200, f"{closed.status_code}: {closed.text[:200]}"
+        assert closed.text == "", "Close must return an empty body"
+
+
+@pytest.mark.live
+def test_get_optimizer_solution_log(integration_token):
+    """GET .../optimizeActions/{actionId}/tasks/{taskId}/solutionLogs.
+
+    Skips unless the model holds an action whose actionType is OPTIMIZER, which no
+    model reachable from this project does. The spec records the 200 media type as
+    provisional for that reason — this test upgrades it the first time it runs
+    against a model with an optimizer action.
+    """
+    base = f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+    with httpx.Client(timeout=60) as client:
+        headers = _auth_headers(integration_token)
+        actions = client.get(f"{base}/actions", headers=headers)
+        assert actions.status_code == 200, f"{actions.status_code}: {actions.text[:200]}"
+        optimizers = [
+            a for a in actions.json().get("actions", [])
+            if a.get("actionType") == "OPTIMIZER"
+        ]
+        if not optimizers:
+            pytest.skip("No OPTIMIZER action in test model; cannot fetch a solution log")
+
+        action_id = optimizers[0]["id"]
+        tasks = client.get(f"{base}/optimizeActions/{action_id}/tasks", headers=headers)
+        if tasks.status_code != 200 or not tasks.json().get("tasks"):
+            pytest.skip(f"OPTIMIZER action {action_id} has spawned no tasks")
+
+        task_id = tasks.json()["tasks"][0]["taskId"]
+        response = client.get(
+            f"{base}/optimizeActions/{action_id}/tasks/{task_id}/solutionLogs",
+            headers=headers,
+        )
+
+    assert response.status_code in (200, 404), f"{response.status_code}: {response.text[:200]}"
+    if response.status_code == 200:
+        assert response.content, "A solution log response must carry content"
+        # Record what the API actually sends, so the provisional media type in the
+        # spec can be corrected rather than guessed at.
+        warnings.warn(
+            f"solutionLogs 200 content-type={response.headers.get('content-type')!r} "
+            f"first bytes={response.content[:80]!r} — update the spec's provisional "
+            "media type to match.",
+            UserWarning, stacklevel=2,
+        )
+
+
+@pytest.mark.live
+def test_optimizer_solution_log_404_is_indistinguishable_from_unknown_route(integration_token):
+    """A 404 from solutionLogs does not prove the route exists.
+
+    This API answers an unknown path with the same generic 404 envelope it uses for
+    a missing resource. The spec says so; this test holds that claim honest, because
+    it is the reason the operation's 200 stays provisional.
+    """
+    base = f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
+    bogus_task = "00000000000000000000000000000000"
+    with httpx.Client() as client:
+        headers = _auth_headers(integration_token)
+        solution_logs = client.get(
+            f"{base}/optimizeActions/118000000001/tasks/{bogus_task}/solutionLogs",
+            headers=headers,
+        )
+        unknown_route = client.get(f"{base}/totallyBogusSegment", headers=headers)
+
+    assert solution_logs.status_code == 404
+    assert unknown_route.status_code == 404
+    assert solution_logs.json()["status"] == unknown_route.json()["status"], (
+        "If these ever differ, a 404 becomes evidence about the route and the "
+        "solutionLogs 200 can be promoted out of provisional"
+    )
+
+
 # ─── Path-duality probes (issue #26) ──────────────────────────────────────────
 # For each endpoint that has both a model-direct and a workspace-prefixed URL form,
 # probe the alternate form and compare its response shape to the known baseline.

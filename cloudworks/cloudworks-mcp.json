@@ -991,6 +991,26 @@
         }
       }
     },
+    "/integrations/run/{runId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/RunId"
+        }
+      ],
+      "get": {
+        "operationId": "getRunStatus",
+        "summary": "Get integration run status",
+        "description": "Minimum role: Restricted Integration User.\n\nReturns the status of one integration run, addressed by run ID alone. Use it to poll a run that `POST /integrations/{integrationId}/run` started \u2014 that call returns a run ID and nothing else.\n\n**Notes**:\n\n*   Unlike `GET /integrations/runs/{integrationId}`, this call needs no integration ID, and `run.integrationId` maps the run back to its integration.\n*   The response holds more fields than a run-history `RunRecord`. See `RunStatus`.\n*   `meta.schema` cites a `1/0` URL even though the endpoint is served under `2/0`.",
+        "responses": {
+          "200": {
+            "description": "Status of the run."
+          },
+          "404": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/integrations/notification": {
       "post": {
         "operationId": "createNotification",
