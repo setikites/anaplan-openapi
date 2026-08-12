@@ -6386,6 +6386,53 @@
         "x-anaplan-min-role": "Standard User"
       }
     },
+    "/workspaces/{workspaceId}/models/{modelId}/lists/{listId}/resetIndex": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/WorkspaceId"
+        },
+        {
+          "$ref": "#/components/parameters/ModelId"
+        },
+        {
+          "$ref": "#/components/parameters/ListId"
+        }
+      ],
+      "post": {
+        "summary": "Reset the list index",
+        "description": "Minimum role: Workspace Administrator.\n\nResets the index counter of a list to 1. Each list item holds a unique list index. Reset the index when a list holds a large quantity of data, or when the list approaches the maximum index value of 999,999,999. Anaplan shows a notification as the index nears the one billion limit.\n\n**Notes**:\n\n*   Remove all list items from the full list hierarchy before you reset the index. A reset of a list that still holds items returns `400`.\n*   In a model in deployed mode, you can reset the index only for a production list. A reset of a non-production list in a deployed model returns `400`.\n*   The `itemCount` in list metadata counts the top level item. A list with a top level item and no real items reports `itemCount` 1 and can still be reset.\n*   A reset renumbers the index. It does not delete list items, and `itemCount` does not change.\n*   The request has no body, and the success response has no body.",
+        "tags": [
+          "Transactional Write"
+        ],
+        "responses": {
+          "200": {
+            "description": "List index reset successfully. The response has no body (`Content-Length: 0`)."
+          },
+          "400": {
+            "description": "Bad request. Two causes, each with its own message:\n\n*   The list holds list items — \"We can't reset the list item index of a list that contains data. Select an empty list that doesn't contain any list items.\"\n*   The model is in deployed mode and the list is not a production list — \"We cannot reset a list if the list is not production data and the model is in deployed mode.\"",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": {
+                    "code": 400,
+                    "message": "We can't reset the list item index of a list that contains data. Select an empty list that doesn't contain any list items."
+                  },
+                  "path": "/2/0/workspaces/d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1/models/D4E5F6A1B2C3D4E5F6A1B2C3D4E5F6A1/lists/101000000203/resetIndex",
+                  "timestamp": "2026-08-12T21:41:29.335509915Z"
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundOrNoAccess"
+          }
+        },
+        "x-anaplan-min-role": "Workspace Administrator"
+      }
+    },
     "/workspaces/{workspaceId}/models/{modelId}/modelCalendar": {
       "parameters": [
         {

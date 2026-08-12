@@ -120,6 +120,8 @@ Endpoints covered (all paths relative to the `/2/0` base URL):
 | `test_list_workspace_dimension_items` | `GET /workspaces/{workspaceId}/models/{modelId}/dimensions/{dimensionId}/items` |
 | `test_list_lists` | `GET /workspaces/{workspaceId}/models/{modelId}/lists` |
 | `test_get_list` | `GET /workspaces/{workspaceId}/models/{modelId}/lists/{listId}` |
+| `test_reset_list_index` | `POST /workspaces/{workspaceId}/models/{modelId}/lists/{listId}/resetIndex` (write-guarded; asserts **200**, empty body, or **400** for a non-production list in a deployed model) |
+| `test_reset_list_index_rejects_list_with_items` | `POST .../lists/{listId}/resetIndex` on a list that holds items (asserts **400** "contains data", and an unchanged `itemCount`) |
 | `test_get_list_items` | `GET /workspaces/{workspaceId}/models/{modelId}/lists/{listId}/items` |
 | `test_post_and_put_list_items` | `POST` + `PUT /workspaces/{workspaceId}/models/{modelId}/lists/{listId}/items` (write-guarded) |
 | `test_list_versions` | `GET /models/{modelId}/versions` |
