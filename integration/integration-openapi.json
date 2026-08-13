@@ -6948,7 +6948,7 @@
       ],
       "get": {
         "summary": "Get the solution log for an optimizer task",
-        "description": "Minimum role: Standard User.\n\nDownloads the solver log that an optimizer action writes. Use it to see how the solver reached its result, or why it found no solution. Pass an `actionId` whose `actionType` is `OPTIMIZER` in `GET /models/{modelId}/actions`, and a `taskId` that the same action spawned.\n\n**Notes**:\n\n*   The response body is raw log content, not JSON.\n*   **The success response is not yet validated against a real optimizer task.** No model reachable from this project holds an `OPTIMIZER` action, so the media type and schema below are provisional. A caller should not rely on the exact media type.\n*   A `404` does not distinguish a missing task from a missing route. This API answers an unknown path with the same generic `404` body.",
+        "description": "Minimum role: Standard User.\n\nDownloads the solver log that an optimizer action writes. Use it to see how the solver reached its result, or why it found no solution. Pass an `actionId` whose `actionType` is `OPTIMIZER` in `GET /models/{modelId}/actions`, and a `taskId` that the same action spawned.\n\n**Notes**:\n\n*   The response body is raw log content, not JSON.\n*   **The success response is not yet validated against a real optimizer task.** A live call against a completed optimizer task returned `403`, so the media type and schema below stay provisional. A caller must not depend on the exact media type.\n*   This path is the only `optimizeActions` route that answers a request. The collection, the item, and `.../optimizeActions/{actionId}/tasks` all return `404` for both `GET` and `POST`.\n*   To create a task, run the optimizer action with `POST /workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks`. The new task then appears in `GET .../actions/{actionId}/tasks`. The same task under `.../actions/{actionId}/tasks/{taskId}/solutionLogs` returns `404`, because only the `optimizeActions` path serves the log.\n*   A `404` does not distinguish a missing task from a missing route. This API answers an unknown path with the same generic `404` body.",
         "tags": [
           "Bulk Other"
         ],
@@ -6959,6 +6959,24 @@
               "text/plain": {
                 "schema": {
                   "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden — the caller cannot read the solution log for this task.\n\nA live call returned this status for a workspace administrator who passed a valid `taskId` from a completed optimizer task. The role that clears the `403` is not known, so treat the minimum role above as unconfirmed.\n\nThis status also proves that the route exists. This API answers an unknown route with `404`, not `403`.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": {
+                    "code": 403,
+                    "message": "Forbidden"
+                  },
+                  "path": "/2/0/workspaces/d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1/models/D4E5F6A1B2C3D4E5F6A1B2C3D4E5F6A1/optimizeActions/117000000000/tasks/A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4/solutionLogs",
+                  "timestamp": "2026-08-13T02:04:50.759696194Z"
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
