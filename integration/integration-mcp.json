@@ -180,7 +180,7 @@
         "summary": "Close a model",
         "description": "Minimum role: Workspace Administrator.\n\nUnloads an open model from memory and frees the workspace model slot it held.\n\n**Warning**: this closes the model for every user in it, not only for the caller, and Anaplan gives those users no warning. Check that the model is idle before you call it.\n\n**Notes**:\n\n*   The request has no body. Anaplan expects `Content-Type: application/text` on that empty body.\n*   The success response has no body.\n*   The call returns before the model finishes the transition. Follow it with `GET /models/{modelId}/status`.\n*   An open model holds a workspace model slot and consumes workspace memory.",
         "responses": {
-          "200": {
+          "204": {
             "description": "The model is closing. The response has no body."
           },
           "404": {
@@ -956,7 +956,7 @@
         "summary": "Open a model",
         "description": "Minimum role: Workspace Administrator.\n\nLoads a closed model into memory \u2014 the transition Anaplan describes as waking a model. Call it when `GET /models/{modelId}/status` reports `currentStep` of `Closed` and later calls need the model loaded.\n\n**Notes**:\n\n*   The request has no body. Anaplan expects `Content-Type: application/text` on that empty body.\n*   The success response has no body.\n*   The call returns before the model finishes the transition. Follow it with `GET /models/{modelId}/status`.\n*   An open model holds a workspace model slot and consumes workspace memory.",
         "responses": {
-          "200": {
+          "202": {
             "description": "The model is opening. The response has no body."
           },
           "404": {

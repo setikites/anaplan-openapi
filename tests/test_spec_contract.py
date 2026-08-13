@@ -357,6 +357,10 @@ _NO_JSON_SCHEMA_INTENTIONAL: dict[tuple[str, str, str], str] = {
     ("integration", "POST",
      "/workspaces/{workspaceId}/models/{modelId}/lists/{listId}/resetIndex"):
         "200 with an empty body",
+    # Confirmed live (August 2026): open answers 202 and close answers 204, both
+    # with an empty body. The empty 200 the SDK implied was never returned.
+    ("integration", "POST", "/models/{modelId}/open"): "202 with an empty body",
+    ("integration", "POST", "/models/{modelId}/close"): "204 No Content",
 
     # Non-JSON media type — the response is raw file content, and the
     # operation already declares `content` with the correct media type.
@@ -400,13 +404,6 @@ _NO_JSON_SCHEMA_KNOWN_GAPS: set[tuple[str, str, str]] = {
     # cloudworks has no remaining gaps. Thirteen mutating operations were listed
     # here until the check learned to resolve $ref responses (issue #254), and
     # cancelIntegration until issue #255 gave it a schema.
-
-    # integration — model open/close. The anaplan-sdk client posts an empty body
-    # and reads no body back, so an empty 200 is expected, but neither has been
-    # exercised live yet: both mutate model availability for every user in the
-    # model. Reclassify as intentional once a live run confirms the empty body.
-    ("integration", "POST", "/models/{modelId}/open"),
-    ("integration", "POST", "/models/{modelId}/close"),
 
     # financial-consolidation
     ("financial-consolidation", "POST", "/odata/{tableName}"),

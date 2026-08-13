@@ -182,7 +182,7 @@ Endpoints covered (all paths relative to the `/2/0` base URL):
 | `test_view_data_pages_repeated_key` | The same endpoint with `pages` as a repeated key (issue #31) |
 | `test_get_model_status` | `GET /models/{modelId}/status` — asserts the bare `requestStatus` body, with no `meta` or `status` envelope |
 | `test_get_model_status_path_duality` | The same endpoint under `/workspaces/{workspaceId}/...`, field by field except `creationTime` |
-| `test_open_and_close_model` | `POST /models/{modelId}/open` then `POST .../close` (write-guarded; skips a model that is not already closed) |
+| `test_open_and_close_model` | `POST /models/{modelId}/open` (empty **202**) then `POST .../close` (empty **204**) — write-guarded, skips a model that is not already closed |
 | `test_get_optimizer_solution_log` | `GET .../optimizeActions/{actionId}/tasks/{taskId}/solutionLogs` (skips — no reachable model holds an `OPTIMIZER` action) |
 | `test_optimizer_solution_log_404_is_indistinguishable_from_unknown_route` | That a 404 from `solutionLogs` matches the 404 for an unknown path |
 
@@ -410,8 +410,8 @@ are the best-known values rather than measured ones, so each carries
 | Path | SDK method | Live status |
 |------|-----------|-------------|
 | `GET /models/{modelId}/status` | `get_model_status` | **200** — shape confirmed, both URL forms |
-| `POST /models/{modelId}/open` | `wake_model` | Write-guarded; empty **200** expected, not yet exercised (see below) |
-| `POST /models/{modelId}/close` | `close_model` | Write-guarded; empty **200** expected, not yet exercised (see below) |
+| `POST /models/{modelId}/open` | `wake_model` | Write-guarded; empty **202** confirmed (see below) |
+| `POST /models/{modelId}/close` | `close_model` | Write-guarded; empty **204** confirmed (see below) |
 | `GET .../optimizeActions/{actionId}/tasks/{taskId}/solutionLogs` | `get_optimizer_log` | Unverified — no reachable model holds an `OPTIMIZER` action |
 
 **`GET /models/{modelId}/status`** is the one Integration API response with no envelope.
@@ -423,15 +423,27 @@ the same body, field for field apart from `creationTime`.
 
 `currentStep` has two observed idle values, `Closed` and `Open`. Both report `progress` of
 `-1.0`, so `-1.0` means the model is idle, not that it is closed. Read `currentStep` to
-tell the two apart.
+tell the two apart. A close in progress reports a third value, `Closing`.
 
-**`open` and `close` are still unexercised.** A run with `--allow-writes` (August 2026)
-self-skipped: `test_open_and_close_model` reads the status first and refuses to proceed
-unless the model already reports `Closed`, and the model had been opened by then. That
-guard is deliberate — a close evicts every user in the model with no warning, so the test
-will not create that state to test its way out of it. Run it again while the model is
-closed to confirm the empty **200** body. Until then both operations stay in
-`_NO_JSON_SCHEMA_KNOWN_GAPS` in `tests/test_spec_contract.py`.
+**`open` and `close` are confirmed.** A run with `--allow-writes` (August 2026) exercised
+both against a model that started out closed. Neither returns the empty **200** the SDK
+implied:
+
+| Operation | Status | Body |
+|---|---|---|
+| `POST /models/{modelId}/open` | **202** Accepted | empty |
+| `POST /models/{modelId}/close` | **204** No Content | empty |
+
+The spec now declares those codes, and both operations moved from
+`_NO_JSON_SCHEMA_KNOWN_GAPS` to `_NO_JSON_SCHEMA_INTENTIONAL` in
+`tests/test_spec_contract.py`.
+
+Both transitions are asynchronous. The status read right after the close reported
+`Closing`, and reported `Closed` a few seconds later. `test_open_and_close_model` still
+reads the status first and skips a model that does not already report `Closed`. That guard
+is deliberate — a close evicts every user in the model with no warning, so the test will
+not create that state to test its way out of it. The close now runs in a `finally` block,
+so a failed assertion on the open still returns the model to the state it was found in.
 
 **`solutionLogs` stays provisional.** The response media type in the spec follows the SDK,
 which reads the body as bytes. It is not measured, because the test model holds no

@@ -195,7 +195,7 @@ paths:
       tags:
       - Transactional Write
       responses:
-        '200':
+        '204':
           description: The model is closing. The response has no body.
         '404':
           $ref: '#/components/responses/NotFoundOrNoAccess'
@@ -1625,7 +1625,7 @@ paths:
       tags:
       - Transactional Write
       responses:
-        '200':
+        '202':
           description: The model is opening. The response has no body.
         '404':
           $ref: '#/components/responses/NotFoundOrNoAccess'
