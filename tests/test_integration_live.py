@@ -1264,7 +1264,9 @@ def test_open_and_close_model(integration_token):
     is already open rather than closing it, because a close evicts every user in
     the model without warning.
 
-    Confirms the empty 200 body that both operations declare.
+    Confirms the empty 202 (open) and 204 (close) bodies that both operations
+    declare. The close runs in a finally block, so a failed assertion on the open
+    still leaves the model closed.
     """
     with httpx.Client(timeout=60) as client:
         headers = _auth_headers(integration_token)
@@ -1277,12 +1279,22 @@ def test_open_and_close_model(integration_token):
         # Anaplan expects this Content-Type on the empty body.
         lifecycle_headers = {**headers, "Content-Type": "application/text"}
         opened = client.post(f"{API_URL}/models/{MODEL_ID}/open", headers=lifecycle_headers)
-        assert opened.status_code == 200, f"{opened.status_code}: {opened.text[:200]}"
-        assert opened.text == "", "Open must return an empty body"
-
-        closed = client.post(f"{API_URL}/models/{MODEL_ID}/close", headers=lifecycle_headers)
-        assert closed.status_code == 200, f"{closed.status_code}: {closed.text[:200]}"
+        try:
+            assert opened.status_code == 202, f"{opened.status_code}: {opened.text[:200]}"
+            assert opened.text == "", "Open must return an empty body"
+        finally:
+            closed = client.post(
+                f"{API_URL}/models/{MODEL_ID}/close", headers=lifecycle_headers
+            )
+        assert closed.status_code == 204, f"{closed.status_code}: {closed.text[:200]}"
         assert closed.text == "", "Close must return an empty body"
+
+        # Close is asynchronous: the status reads Closing while the transition
+        # runs, and Closed once it finishes. Either value means state is restored.
+        after = client.get(status_url, headers=headers)
+        assert after.json()["requestStatus"]["currentStep"] in ("Closing", "Closed"), (
+            "Model must be closing or closed again after the round trip"
+        )
 
 
 @pytest.mark.live
