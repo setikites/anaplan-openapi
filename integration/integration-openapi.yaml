@@ -5432,23 +5432,25 @@ paths:
         '429':
           description: Rate limited — too many requests. Retry after a delay.
       x-anaplan-min-role: Standard User
-  /workspaces/{workspaceId}/models/{modelId}/optimizeActions/{actionId}/tasks/{taskId}/solutionLogs:
+  /workspaces/{workspaceId}/models/{modelId}/optimizeActions/{actionId}/tasks/{correlationId}/solutionLogs:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
     - $ref: '#/components/parameters/ModelId'
     - $ref: '#/components/parameters/ActionId'
-    - $ref: '#/components/parameters/TaskId'
+    - $ref: '#/components/parameters/CorrelationId'
     get:
-      summary: Get the solution log for an optimizer task
+      summary: Get the solution log for an optimizer run
       description: |-
-        Minimum role: Standard User.
+        Minimum role: Workspace Administrator.
 
-        Downloads the solver log that an optimizer action writes. Use it to see how the solver reached its result, or why it found no solution. Pass an `actionId` whose `actionType` is `OPTIMIZER` in `GET /models/{modelId}/actions`, and a `taskId` that the same action spawned.
+        Downloads the solver log that an optimizer action writes. Use it to see how the solver reached its result, or why it found no solution.
 
         **Notes**:
 
-        *   The response body is raw log content, not JSON.
-        *   **The success response is not yet validated against a real optimizer task.** A live call against a completed optimizer task returned `403`, so the media type and schema below stay provisional. A caller must not depend on the exact media type.
+        *   The role is not optional. A Standard User on the model gets `403`, whatever the IDs. See the `403` response.
+        *   `actionId` must be the ID of the optimizer action itself — an action whose `actionType` is `OPTIMIZER` in `GET /models/{modelId}/actions`. A process ID returns `404`, even when that process contains the optimizer action.
+        *   `correlationId` is not a task ID of the optimizer action. The Anaplan UI shows the correlation ID after a run. A live call also accepted the `taskId` of a task of the process that contains the action, and it returned `200` with the solver log. The `correlationId` parameter describes how to find that process. The same value under the process ID as `actionId` returned `404`.
+        *   The response body is raw log content, not JSON. A live `200` sent `Content-Type: text/plain`.
         *   This path is the only `optimizeActions` route that answers a request. The collection, the item, and `.../optimizeActions/{actionId}/tasks` all return `404` for both `GET` and `POST`.
         *   To create a task, run the optimizer action with `POST /workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks`. The new task then appears in `GET .../actions/{actionId}/tasks`. The same task under `.../actions/{actionId}/tasks/{taskId}/solutionLogs` returns `404`, because only the `optimizeActions` path serves the log.
         *   A `404` does not distinguish a missing task from a missing route. This API answers an unknown path with the same generic `404` body.
@@ -5456,16 +5458,35 @@ paths:
       - Bulk Other
       responses:
         '200':
-          description: Solution log content. Provisional — see the operation description.
+          description: 'Solution log content. The body is the raw solver log. A live call sent `Content-Type: text/plain`.'
           content:
             text/plain:
+              example: |
+                Non-default parameters:
+                TimeLimit  299
+                MemLimit  105
+                LogToConsole  0
+                Threads  4
+
+                Optimize a model with 6 rows, 9 columns and 18 nonzeros (Min)
+                Model fingerprint: 0x1766d08b
+                Variable types: 0 continuous, 9 integer (0 binary)
+                Presolve time: 0.00s
+                Found heuristic solution: objective 27100.000000
+
+                Explored 1 nodes (4 simplex iterations) in 0.00 seconds (0.00 work units)
+
+                Optimal solution found (tolerance 1.00e-04)
+                Best objective 2.600000000000e+04, best bound 2.600000000000e+04, gap 0.0000%
               schema:
                 type: string
         '403':
           description: |-
-            Forbidden — the caller cannot read the solution log for this task.
+            Forbidden — the caller is below Workspace Administrator.
 
-            A live call returned this status for a workspace administrator who passed a valid `taskId` from a completed optimizer task. The role that clears the `403` is not known, so treat the minimum role above as unconfirmed.
+            A Standard User on the model gets `403` here, even for a run that the same user started. Raising that user to Workspace Administrator turns the same request into `200`.
+
+            The `403` comes before the IDs are read. A refused caller gets `403` for every request on this route, including one whose `actionId` does not exist. A `403` therefore says nothing about whether the action or the log exists, and it hides the `404` that a process ID would otherwise return.
 
             This status also proves that the route exists. This API answers an unknown route with `404`, not `403`.
           content:
@@ -5480,15 +5501,14 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: |-
-            No solution log for this action and task. The body is the generic Anaplan error envelope with `status.code` of 404 and a message of `Not Found`. This API answers an unknown route with that same body, so a 404 here does not prove the route exists.
+            No solution log for this action and correlation ID. Also returned when `actionId` is a process ID and not the ID of the optimizer action. The body is the generic Anaplan error envelope with `status.code` of 404 and a message of `Not Found`. This API answers an unknown route with that same body, so a 404 here does not prove the route exists.
 
             Also returned when the caller holds a NO ACCESS role on the model. Anaplan masks that as `404` rather than `403`, so the response does not confirm that the resource exists.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-      x-anaplan-min-role: Standard User
-      x-anaplan-min-role-needs-info: true
+      x-anaplan-min-role: Workspace Administrator
   /workspaces/{workspaceId}/models/{modelId}/processes:
     parameters:
     - $ref: '#/components/parameters/WorkspaceId'
@@ -6420,6 +6440,17 @@ components:
         returns it, as does the equivalent actions, exports, or processes tasks endpoint. The matching `GET .../tasks` lists
         it under `tasks[].taskId`. The import tasks response instead nests it under `task.taskId`.
       required: true
+      schema:
+        type: string
+      example: F37EA1512BC448D3B223431C33B844B6
+    CorrelationId:
+      name: correlationId
+      in: path
+      required: true
+      description: |-
+        Correlation ID of an optimizer run. The Anaplan UI shows it after an optimizer action runs. An API-only caller instead passes the `taskId` of a task of the process that contains the optimizer action.
+
+        To find that process, call `GET /workspaces/{workspaceId}/models/{modelId}/processes` and then `GET .../processes/{processId}` for each entry. Take the process whose `processMetadata.actions` holds an entry with this operation’s `actionId`. Its task IDs come from `GET .../processes/{processId}/tasks`, under `tasks[].taskId`.
       schema:
         type: string
       example: F37EA1512BC448D3B223431C33B844B6
