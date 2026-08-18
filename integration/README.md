@@ -183,8 +183,9 @@ Endpoints covered (all paths relative to the `/2/0` base URL):
 | `test_get_model_status` | `GET /models/{modelId}/status` — asserts the bare `requestStatus` body, with no `meta` or `status` envelope |
 | `test_get_model_status_path_duality` | The same endpoint under `/workspaces/{workspaceId}/...`, field by field except `creationTime` |
 | `test_open_and_close_model` | `POST /models/{modelId}/open` (empty **202**) then `POST .../close` (empty **204**) — write-guarded, skips a model that is not already closed |
-| `test_get_optimizer_solution_log` | `GET .../optimizeActions/{actionId}/tasks/{taskId}/solutionLogs` (skips — no reachable model holds an `OPTIMIZER` action) |
-| `test_optimizer_solution_log_404_is_indistinguishable_from_unknown_route` | That a 404 from `solutionLogs` matches the 404 for an unknown path |
+| `test_get_optimizer_solution_log` | `GET .../optimizeActions/{actionId}/tasks/{correlationId}/solutionLogs` — asserts the **200**, its `text/plain` media type, and a raw log body |
+| `test_optimizer_solution_log_rejects_the_process_id` | That the process ID as `actionId` gives a 404 that matches the 404 for an unknown path |
+| `test_run_optimizer_process_then_read_its_solution_log` | Runs the optimizer process, polls its task, then reads that task's log — write-guarded |
 
 ### NO ACCESS masking sweep (issue #225)
 
@@ -214,6 +215,42 @@ Expected skips:
 ## Discovered Discrepancies
 
 _Document differences between Apiary docs, Postman collection, and live API behavior here as they are discovered._
+
+### Optimizer solution logs need Workspace Administrator (issue #282)
+
+`GET .../optimizeActions/{actionId}/tasks/{correlationId}/solutionLogs` needs the Workspace
+Administrator role. Anaplan documents the requirement in
+[Optimizer logs for debugging](https://help.anaplan.com/optimizer-logs-for-debugging-b76bb63f-a36f-4d35-93b5-533183b8351f).
+The spec had recorded `Standard User` with a `needs-info` flag; live testing corrected it.
+
+One account, one model (`9119361D…`), one `actionId` (`117000000000`, `actionType`
+`OPTIMIZER`), one `correlationId`, two roles:
+
+- **Standard User → `403`.** The account read the model, listed the optimizer action, ran
+  the process that contains it, and polled its task to `COMPLETE` with `successful` true.
+  Its own task's log still answered `403`, so the refusal is not about who started the task.
+- **Workspace Administrator → `200`**, `Content-Type: text/plain`, with the solver log.
+  This confirmed the media type, which the spec had carried as provisional.
+
+Nothing about the request changed between the two — only the role. Issue #280 recorded a
+`403` for an account described as a workspace administrator on another model. That
+observation stays unexplained; the role was not re-checked against the workspace in the
+path.
+
+The `403` precedes the ID check: for a refused caller an `actionId` that does not exist
+draws the same `403`. That is why the two ID rules below are only observable once the role
+is right.
+
+`actionId` must be the optimizer action. The ID of the process that contains it returns
+`404`, even with a correlation ID that the same process produced.
+
+The last path segment is a **correlation ID**, not a task ID.
+[Retrieve Optimizer action log](https://help.anaplan.com/retrieve-optimizer-action-log-7e4dc987-4b11-491d-91de-046fc2c8947a)
+names it `correlationId` and says the Anaplan UI shows it after an optimizer action runs.
+Live testing found that the `taskId` of a task of the containing process also resolves as
+one, which is how these tests reach the log without the UI. The spec declares the segment
+as `correlationId` and no longer shares the `TaskId` parameter, whose scoping rule — a task
+resolves only under the parent that created it — does not describe this route.
 
 ### NO ACCESS model role is masked as `404` (issue #225)
 
@@ -412,7 +449,7 @@ are the best-known values rather than measured ones, so each carries
 | `GET /models/{modelId}/status` | `get_model_status` | **200** — shape confirmed, both URL forms |
 | `POST /models/{modelId}/open` | `wake_model` | Write-guarded; empty **202** confirmed (see below) |
 | `POST /models/{modelId}/close` | `close_model` | Write-guarded; empty **204** confirmed (see below) |
-| `GET .../optimizeActions/{actionId}/tasks/{taskId}/solutionLogs` | `get_optimizer_log` | Unverified — no reachable model holds an `OPTIMIZER` action |
+| `GET .../optimizeActions/{actionId}/tasks/{correlationId}/solutionLogs` | `get_optimizer_log` | **200** — `text/plain`, needs Workspace Administrator (issue #282) |
 
 **`GET /models/{modelId}/status`** is the one Integration API response with no envelope.
 The body holds `requestStatus` alone — no `meta`, no `status`. A consumer that reads

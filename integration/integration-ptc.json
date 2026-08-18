@@ -1861,10 +1861,10 @@
       ]
     },
     {
-      "op_id": "getWorkspacesByWorkspaceidModelsByModelidOptimizeactionsByActionidTasksByTaskidSolutionlogs",
+      "op_id": "getWorkspacesByWorkspaceidModelsByModelidOptimizeactionsByActionidTasksByCorrelationidSolutionlogs",
       "method": "GET",
-      "path": "/workspaces/{workspaceId}/models/{modelId}/optimizeActions/{actionId}/tasks/{taskId}/solutionLogs",
-      "summary": "Get the solution log for an optimizer task",
+      "path": "/workspaces/{workspaceId}/models/{modelId}/optimizeActions/{actionId}/tasks/{correlationId}/solutionLogs",
+      "summary": "Get the solution log for an optimizer run",
       "parameters": [
         {
           "name": "workspaceId",
@@ -1885,7 +1885,7 @@
           "type": "string"
         },
         {
-          "name": "taskId",
+          "name": "correlationId",
           "in": "path",
           "required": true,
           "type": "string"
@@ -11306,8 +11306,8 @@
       "response": null,
       "response_note": "no documented 2xx JSON response schema \u2014 probe a read operation to learn it"
     },
-    "getWorkspacesByWorkspaceidModelsByModelidOptimizeactionsByActionidTasksByTaskidSolutionlogs": {
-      "description": "Minimum role: Standard User.\n\nDownloads the solver log that an optimizer action writes. Use it to see how the solver reached its result, or why it found no solution. Pass an `actionId` whose `actionType` is `OPTIMIZER` in `GET /models/{modelId}/actions`, and a `taskId` that the same action spawned.\n\n**Notes**:\n\n*   The response body is raw log content, not JSON.\n*   **The success response is not yet validated against a real optimizer task.** A live call against a completed optimizer task returned `403`, so the media type and schema below stay provisional. A caller must not depend on the exact media type.\n*   This path is the only `optimizeActions` route that answers a request. The collection, the item, and `.../optimizeActions/{actionId}/tasks` all return `404` for both `GET` and `POST`.\n*   To create a task, run the optimizer action with `POST /workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks`. The new task then appears in `GET .../actions/{actionId}/tasks`. The same task under `.../actions/{actionId}/tasks/{taskId}/solutionLogs` returns `404`, because only the `optimizeActions` path serves the log.\n*   A `404` does not distinguish a missing task from a missing route. This API answers an unknown path with the same generic `404` body.",
+    "getWorkspacesByWorkspaceidModelsByModelidOptimizeactionsByActionidTasksByCorrelationidSolutionlogs": {
+      "description": "Minimum role: Workspace Administrator.\n\nDownloads the solver log that an optimizer action writes. Use it to see how the solver reached its result, or why it found no solution.\n\n**Notes**:\n\n*   The role is not optional. A Standard User on the model gets `403`, whatever the IDs. See the `403` response.\n*   `actionId` must be the ID of the optimizer action itself \u2014 an action whose `actionType` is `OPTIMIZER` in `GET /models/{modelId}/actions`. A process ID returns `404`, even when that process contains the optimizer action.\n*   `correlationId` is not a task ID of the optimizer action. The Anaplan UI shows the correlation ID after a run. A live call also accepted the `taskId` of a task of the process that contains the action, and it returned `200` with the solver log. The `correlationId` parameter describes how to find that process. The same value under the process ID as `actionId` returned `404`.\n*   The response body is raw log content, not JSON. A live `200` sent `Content-Type: text/plain`.\n*   This path is the only `optimizeActions` route that answers a request. The collection, the item, and `.../optimizeActions/{actionId}/tasks` all return `404` for both `GET` and `POST`.\n*   To create a task, run the optimizer action with `POST /workspaces/{workspaceId}/models/{modelId}/actions/{actionId}/tasks`. The new task then appears in `GET .../actions/{actionId}/tasks`. The same task under `.../actions/{actionId}/tasks/{taskId}/solutionLogs` returns `404`, because only the `optimizeActions` path serves the log.\n*   A `404` does not distinguish a missing task from a missing route. This API answers an unknown path with the same generic `404` body.",
       "parameters": [
         {
           "name": "workspaceId",
@@ -11337,10 +11337,10 @@
           }
         },
         {
-          "name": "taskId",
+          "name": "correlationId",
           "in": "path",
-          "description": "Task identifier, scoped to the parent action, import, export, or process that launched it. A taskId is valid only under the same parent. An action's taskId does not resolve under a process, import, or export. `POST /workspaces/{workspaceId}/models/{modelId}/imports/{importId}/tasks` returns it, as does the equivalent actions, exports, or processes tasks endpoint. The matching `GET .../tasks` lists it under `tasks[].taskId`. The import tasks response instead nests it under `task.taskId`.",
           "required": true,
+          "description": "Correlation ID of an optimizer run. The Anaplan UI shows it after an optimizer action runs. An API-only caller instead passes the `taskId` of a task of the process that contains the optimizer action.\n\nTo find that process, call `GET /workspaces/{workspaceId}/models/{modelId}/processes` and then `GET .../processes/{processId}` for each entry. Take the process whose `processMetadata.actions` holds an entry with this operation\u2019s `actionId`. Its task IDs come from `GET .../processes/{processId}/tasks`, under `tasks[].taskId`.",
           "schema": {
             "type": "string"
           }

@@ -385,11 +385,11 @@ _NO_JSON_SCHEMA_INTENTIONAL: dict[tuple[str, str, str], str] = {
      "/workspaces/{workspaceId}/models/{modelId}/views/{viewId}/readRequests/{requestId}"
      "/pages/{pageNo}"):
         "non-JSON media type: text/csv",
-    # The solver log is raw log content. The media type is provisional — no
-    # reachable model holds an OPTIMIZER action to fetch a real log from.
+    # The solver log is raw log content. A live 200 sent text/plain (issue #282);
+    # the route needs Workspace Administrator, and answers 403 below it.
     ("integration", "GET",
-     "/workspaces/{workspaceId}/models/{modelId}/optimizeActions/{actionId}/tasks/{taskId}"
-     "/solutionLogs"):
+     "/workspaces/{workspaceId}/models/{modelId}/optimizeActions/{actionId}/tasks"
+     "/{correlationId}/solutionLogs"):
         "non-JSON media type: text/plain",
 
     # Browser redirect — the authorization endpoint answers with a 302 to the

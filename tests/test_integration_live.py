@@ -49,6 +49,15 @@ INTEGRATION_FILE_ID = os.getenv("INTEGRATION_FILE", "")
 INTEGRATION_LIST_ID = os.getenv("INTEGRATION_LIST", "")
 INTEGRATION_MODULE_ID = os.getenv("INTEGRATION_MODULE", "")  # default view ID equals module ID
 
+# Optimizer model from issue #282. The certificate account holds a regular-user
+# role on it. Override any of these to point the optimizer tests at another model.
+OPTIMIZER_WORKSPACE_ID = os.getenv("INTEGRATION_OPTIMIZER_WORKSPACE", "8a81b00f73a0b97e0173b8e908f70392")
+OPTIMIZER_MODEL_ID = os.getenv("INTEGRATION_OPTIMIZER_MODEL", "9119361D2B4F4FFCB624FA6D959C9D28")
+OPTIMIZER_ACTION_ID = os.getenv("INTEGRATION_OPTIMIZER_ACTION", "117000000000")  # Solve Transportation
+OPTIMIZER_PROCESS_ID = os.getenv("INTEGRATION_OPTIMIZER_PROCESS", "118000000001")  # Run Optimizer
+# The log takes a correlationId, not a taskId. A process task ID resolves as one.
+OPTIMIZER_CORRELATION_ID = os.getenv("INTEGRATION_OPTIMIZER_CORRELATION_ID", "92C8A9450E204DAEAA38FEED302635DA")
+
 
 def _sign_data(data: bytes, key_path: str, key_password: str | None = None) -> str:
     """Sign bytes with a private key using SHA512withRSA, return base64-encoded signature."""
@@ -1297,76 +1306,127 @@ def test_open_and_close_model(integration_token):
         )
 
 
-@pytest.mark.live
-def test_get_optimizer_solution_log(integration_token):
-    """GET .../optimizeActions/{actionId}/tasks/{taskId}/solutionLogs.
-
-    Skips unless the model holds an action whose actionType is OPTIMIZER, which no
-    model reachable from this project does. The spec records the 200 media type as
-    provisional for that reason — this test upgrades it the first time it runs
-    against a model with an optimizer action.
-    """
-    base = f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
-    with httpx.Client(timeout=60) as client:
-        headers = _auth_headers(integration_token)
-        actions = client.get(f"{base}/actions", headers=headers)
-        assert actions.status_code == 200, f"{actions.status_code}: {actions.text[:200]}"
-        optimizers = [
-            a for a in actions.json().get("actions", [])
-            if a.get("actionType") == "OPTIMIZER"
-        ]
-        if not optimizers:
-            pytest.skip("No OPTIMIZER action in test model; cannot fetch a solution log")
-
-        action_id = optimizers[0]["id"]
-        tasks = client.get(f"{base}/optimizeActions/{action_id}/tasks", headers=headers)
-        if tasks.status_code != 200 or not tasks.json().get("tasks"):
-            pytest.skip(f"OPTIMIZER action {action_id} has spawned no tasks")
-
-        task_id = tasks.json()["tasks"][0]["taskId"]
-        response = client.get(
-            f"{base}/optimizeActions/{action_id}/tasks/{task_id}/solutionLogs",
-            headers=headers,
+def _optimizer_base(client, headers):
+    """Return the base URL of the optimizer model, or skip when it is unreachable."""
+    base = f"{API_URL}/workspaces/{OPTIMIZER_WORKSPACE_ID}/models/{OPTIMIZER_MODEL_ID}"
+    reachable = client.get(f"{API_URL}/models/{OPTIMIZER_MODEL_ID}", headers=headers)
+    if reachable.status_code != 200:
+        pytest.skip(
+            f"Optimizer model {OPTIMIZER_MODEL_ID} is not reachable "
+            f"({reachable.status_code}); set INTEGRATION_OPTIMIZER_* for this tenant"
         )
-
-    assert response.status_code in (200, 404), f"{response.status_code}: {response.text[:200]}"
-    if response.status_code == 200:
-        assert response.content, "A solution log response must carry content"
-        # Record what the API actually sends, so the provisional media type in the
-        # spec can be corrected rather than guessed at.
-        warnings.warn(
-            f"solutionLogs 200 content-type={response.headers.get('content-type')!r} "
-            f"first bytes={response.content[:80]!r} — update the spec's provisional "
-            "media type to match.",
-            UserWarning, stacklevel=2,
-        )
+    return base
 
 
-@pytest.mark.live
-def test_optimizer_solution_log_404_is_indistinguishable_from_unknown_route(integration_token):
-    """A 404 from solutionLogs does not prove the route exists.
-
-    This API answers an unknown path with the same generic 404 envelope it uses for
-    a missing resource. The spec says so; this test holds that claim honest, because
-    it is the reason the operation's 200 stays provisional.
-    """
-    base = f"{API_URL}/workspaces/{WORKSPACE_ID}/models/{MODEL_ID}"
-    bogus_task = "00000000000000000000000000000000"
-    with httpx.Client() as client:
-        headers = _auth_headers(integration_token)
-        solution_logs = client.get(
-            f"{base}/optimizeActions/118000000001/tasks/{bogus_task}/solutionLogs",
-            headers=headers,
-        )
-        unknown_route = client.get(f"{base}/totallyBogusSegment", headers=headers)
-
-    assert solution_logs.status_code == 404
-    assert unknown_route.status_code == 404
-    assert solution_logs.json()["status"] == unknown_route.json()["status"], (
-        "If these ever differ, a 404 becomes evidence about the route and the "
-        "solutionLogs 200 can be promoted out of provisional"
+def _solution_log(client, headers, action_id, correlation_id=None):
+    """GET the solution log for one actionId under the optimizer model."""
+    base = _optimizer_base(client, headers)
+    return client.get(
+        f"{base}/optimizeActions/{action_id}/tasks"
+        f"/{correlation_id or OPTIMIZER_CORRELATION_ID}/solutionLogs",
+        headers=headers,
     )
 
+
+@pytest.mark.live
+def test_get_optimizer_solution_log(integration_token):
+    """GET .../optimizeActions/{actionId}/tasks/{correlationId}/solutionLogs.
+
+    actionId is the optimizer action. The correlationId used here is the taskId of a
+    task of the process that contains it — the pairing issue #282 recorded. Needs
+    Workspace Administrator on the model: a Standard User gets 403. Pins the media
+    type the spec long carried as provisional.
+    """
+    with httpx.Client(timeout=60) as client:
+        headers = _auth_headers(integration_token)
+        response = _solution_log(client, headers, OPTIMIZER_ACTION_ID)
+
+    if response.status_code == 403:
+        pytest.skip("This account is below Workspace Administrator on the optimizer model")
+    assert response.status_code == 200, (
+        f"{response.status_code}: {response.text[:200]} — a 404 can also mean that "
+        f"run {OPTIMIZER_CORRELATION_ID} aged out; run the process again and set "
+        "INTEGRATION_OPTIMIZER_CORRELATION_ID to the new task ID"
+    )
+    assert response.headers["content-type"].startswith("text/plain"), (
+        f"Spec declares text/plain; got {response.headers.get('content-type')!r}"
+    )
+    assert response.content, "A solution log response must carry content"
+    assert not response.text.lstrip().startswith("{"), (
+        "The body must be raw log content, not the Anaplan JSON envelope"
+    )
+
+
+@pytest.mark.live
+def test_optimizer_solution_log_rejects_the_process_id(integration_token):
+    """The process ID is not accepted as actionId (issue #282).
+
+    The same correlationId that returns 200 under the optimizer action returns 404
+    under the process that contains it. That 404 carries the envelope this API sends for an
+    unknown route, so it is no evidence about the route either. Only a caller the route
+    does not refuse can see this: a 403 comes before the ID check.
+    """
+    with httpx.Client(timeout=60) as client:
+        headers = _auth_headers(integration_token)
+        by_action = _solution_log(client, headers, OPTIMIZER_ACTION_ID)
+        if by_action.status_code == 403:
+            pytest.skip("Below Workspace Administrator; the 403 hides the ID check")
+        by_process = _solution_log(client, headers, OPTIMIZER_PROCESS_ID)
+        unknown_action = _solution_log(client, headers, "999000000000")
+        unknown_route = client.get(
+            f"{API_URL}/workspaces/{OPTIMIZER_WORKSPACE_ID}/models/{OPTIMIZER_MODEL_ID}"
+            "/totallyBogusSegment",
+            headers=headers,
+        )
+
+    assert by_process.status_code == 404, f"{by_process.status_code}: {by_process.text[:200]}"
+    assert unknown_action.status_code == 404, "An unknown actionId must give 404 too"
+    assert by_process.json()["status"] == unknown_route.json()["status"], (
+        "The 404 for a process ID must stay indistinguishable from an unknown route; "
+        "if these ever differ, the spec's 404 description needs an update"
+    )
+
+
+@pytest.mark.live
+@pytest.mark.write
+def test_run_optimizer_process_then_read_its_solution_log(integration_token):
+    """Run the optimizer process, then read the solution log of the task it creates.
+
+    Covers the whole loop on one account. Starting the task grants nothing on its own:
+    as a Standard User this same call was refused for a task this account had just run
+    to COMPLETE, and only the Workspace Administrator role cleared it (issue #282).
+
+    Marked write: it runs a solver.
+    """
+    h = _auth_headers(integration_token)
+    with httpx.Client(timeout=60) as client:
+        base = _optimizer_base(client, h)
+        run = client.post(
+            f"{base}/processes/{OPTIMIZER_PROCESS_ID}/tasks",
+            headers={**h, "Content-Type": "application/json"},
+            json={"localeName": "en_US"},
+        )
+        assert run.status_code == 200, f"{run.status_code}: {run.text[:200]}"
+        body = run.json()
+        task_id = body.get("task", {}).get("taskId") or body.get("taskId")
+        assert task_id, f"Expected taskId in POST response; keys: {list(body.keys())}"
+
+        task = _poll_to_terminal(
+            client, f"{base}/processes/{OPTIMIZER_PROCESS_ID}/tasks/{task_id}", h, timeout=180
+        )
+        assert task.get("taskState") == "COMPLETE", (
+            f"Process task did not complete within 180s; last: {task.get('taskState')}"
+        )
+
+        response = _solution_log(client, h, OPTIMIZER_ACTION_ID, correlation_id=task_id)
+
+    if response.status_code == 403:
+        pytest.skip("This account is below Workspace Administrator on the optimizer model")
+    assert response.status_code == 200, f"{response.status_code}: {response.text[:200]}"
+    assert response.headers["content-type"].startswith("text/plain"), (
+        f"Spec declares text/plain; got {response.headers.get('content-type')!r}"
+    )
+    assert response.content, "A solution log response must carry content"
 
 # ─── Path-duality probes (issue #26) ──────────────────────────────────────────
 # For each endpoint that has both a model-direct and a workspace-prefixed URL form,
