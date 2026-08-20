@@ -6445,7 +6445,7 @@ components:
       in: path
       required: true
       description: |-
-        Correlation ID of an optimizer run. The Anaplan UI shows it after an optimizer action runs. An API-only caller instead passes the `taskId` of a task of the process that contains the optimizer action.
+        Correlation ID of an optimizer run is the task ID from a process that runs an optimizer action.
 
         To find that process, call `GET /workspaces/{workspaceId}/models/{modelId}/processes` and then `GET .../processes/{processId}` for each entry. Take the process whose `processMetadata.actions` holds an entry with this operation’s `actionId`. Its task IDs come from `GET .../processes/{processId}/tasks`, under `tasks[].taskId`.
       schema:
