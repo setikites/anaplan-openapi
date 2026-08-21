@@ -342,7 +342,6 @@ _NO_JSON_SCHEMA_INTENTIONAL: dict[tuple[str, str, str], str] = {
     ("authentication", "POST", "/token/logout"): "204 No Content",
     ("exception", "PATCH", "/permissions/exception-users/users/{userGuid}"):
         "204 No Content",
-    ("scim", "DELETE", "/Users/{id}"): "204 No Content",
     ("integration", "PUT", "/workspaces/{workspaceId}/models/{modelId}/files/{fileId}"):
         "204 No Content",
     ("integration", "DELETE", "/workspaces/{workspaceId}/models/{modelId}/files/{fileId}"):

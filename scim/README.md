@@ -6,7 +6,7 @@
 |--------|-----------|-------|
 | Apiary docs | ✓ | https://scimapi.docs.apiary.io/ — primary source |
 | Postman collection | ✓ | Official Anaplan Collection — top-level "SCIM" folder (Users CRUD, Metadata: ServiceProviderConfig, ResourceTypes, Schemas) |
-| Live testing | Partial | Auth schemes (#44), `DELETE /Users/{id}` probe (#43), filter operators and attributes (#223), and the `USER_ADMIN` role gate (#180) confirmed. User create, update, and delete write paths not tested. |
+| Live testing | Partial | Auth schemes (#44), `DELETE /Users/{id}` probe (#43, #289), filter operators and attributes (#223), and the `USER_ADMIN` role gate (#180) confirmed. User create, update, and delete write paths not tested. |
 
 ## Servers
 
@@ -75,7 +75,7 @@ Calls to `/Users` require either an Anaplan API Key or a user with the `USER_ADM
 | GET | `/ResourceTypes` | Retrieve supported resource types |
 | GET | `/Schemas` | Retrieve attribute metadata for supported schemas |
 
-`DELETE /Users/{id}` is **not documented** in the Apiary docs but is confirmed implemented via live testing (issue #43) — see Discrepancies below.
+`DELETE /Users/{id}` is **not part of this spec**. Apiary never documented it; live testing (issue #43) once found it implemented (403), but it now reports 501 Not Implemented (issue #289) — see Discrepancies below.
 
 ## Filtering and Pagination (`GET /Users`)
 
@@ -156,7 +156,7 @@ uv run --env-file .env pytest tests/test_scim_live.py --live
 | `GET /Users/{id}` | — | — | Not tested |
 | `PUT /Users/{id}` | — | — | Write path not tested |
 | `PATCH /Users/{id}` | — | — | Write path not tested |
-| `DELETE /Users/{id}` | — | ✓ | Endpoint existence confirmed — a fake user ID returns 403, not 405 (issue #43) |
+| `DELETE /Users/{id}` | — | ✓ | Excluded from the spec — now returns 501 Not Implemented (issue #289) |
 | `GET /ServiceProviderConfig` | ✓ | — | Returns 200 with no `Authorization` header (issue #180) |
 | `GET /ResourceTypes` | ✓ | — | Live response captured above. Returns 200 with no `Authorization` header (issue #180) |
 | `GET /Schemas` | ✓ | — | Live response captured above. Returns 200 with no `Authorization` header (issue #180) |
@@ -169,6 +169,6 @@ Not covered by a live test: the Anaplan API key sent as the `Bearer` credential 
 - **`id` and `externalId` have `caseExact: false`**: The live schema response flags both as non-RFC — the SCIM standard requires `caseExact: true` for these fields.
 - **`active` represented inconsistently in Apiary examples**: The Apiary response examples show `"active": "True"` (string) alongside `"active": true` (boolean) in the same object. The live schema defines it as a boolean; treat the string form as a documentation artifact.
 - **`ServiceProviderConfig` claims `patch: false` and `filter: false`**: The Apiary `GET /ServiceProviderConfig` example response shows both as `supported: false`, but the same Apiary docs document a working `PATCH /Users/{id}` endpoint and `filter` query parameter on `GET /Users`. The ServiceProviderConfig example appears outdated.
-- **`DELETE /Users/{id}` absent from Apiary but implemented**: Apiary does not document this endpoint. Live testing (issue #43) sent `DELETE /Users/{fake-uuid}` and received 403 (not 405 Method Not Allowed), confirming the endpoint exists — the 403 is the standard no-`USER_ADMIN`-role response. The spec includes `DELETE /Users/{id}` on this basis.
+- **`DELETE /Users/{id}` excluded**: Apiary never documented this endpoint. Live testing (issue #43) once sent `DELETE /Users/{fake-uuid}` and received 403 (not 405 Method Not Allowed), so the endpoint was added to the spec on that basis. It now returns 501 Not Implemented (issue #289), so the spec drops it again.
 - **`GET /Users` example uses `localhost:8090`**: The Apiary example response contains `location` URLs pointing to `localhost:8090` — a test artifact, not the production API.
 - **Typo in Apiary POST example**: The `Host` header in the `POST /Users` example reads `api.anplan.com` (missing the second `a` in `anaplan`).

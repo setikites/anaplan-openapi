@@ -259,25 +259,6 @@
             "description": "User not found."
           }
         }
-      },
-      "delete": {
-        "operationId": "deleteUser",
-        "summary": "Delete user",
-        "description": "Minimum role: User Administrator.\n\nDeletes a user by their Anaplan ID. DELETE returns 403 (not 405) when the caller lacks USER_ADMIN role.",
-        "responses": {
-          "204": {
-            "description": "User deleted."
-          },
-          "401": {
-            "description": "Missing or invalid authentication token."
-          },
-          "403": {
-            "description": "Caller does not have USER_ADMIN role."
-          },
-          "404": {
-            "description": "User not found."
-          }
-        }
       }
     },
     "/ResourceTypes": {

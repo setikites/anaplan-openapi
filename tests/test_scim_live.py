@@ -209,10 +209,13 @@ def test_scim_users_http_basic_probe():
 def test_scim_delete_user_endpoint_exists(scim_token):
     """Probes whether DELETE /Users/{id} is implemented on the SCIM endpoint.
 
-    Apiary does not document DELETE; issue #43 excluded it from the spec on that
-    basis. This test sends DELETE with a nonexistent user ID to distinguish:
+    Apiary does not document DELETE. Issue #43 added it to the spec after live
+    testing found it returned 403 (not 405), then issue #289 dropped it again
+    after the endpoint started reporting 501. This test sends DELETE with a
+    nonexistent user ID to distinguish:
       - 404 → endpoint exists, user not found (DELETE is implemented)
       - 405 → Method Not Allowed (DELETE not implemented; spec exclusion correct)
+      - 501 → Not Implemented (DELETE not implemented; spec exclusion correct)
       - 403 → endpoint exists, auth ok but no permission
 
     Requires --allow-writes because DELETE is a write method. The target ID is a
@@ -229,9 +232,9 @@ def test_scim_delete_user_endpoint_exists(scim_token):
     status = response.status_code
     print(f"\nDELETE /Users/{{fake_id}}: {status}")
 
-    if status == 405:
+    if status in (405, 501):
         warnings.warn(
-            "DELETE /Users/{id} returned 405 Method Not Allowed — "
+            f"DELETE /Users/{{id}} returned {status} — "
             "endpoint is not implemented; spec exclusion is correct.",
             UserWarning,
             stacklevel=2,
