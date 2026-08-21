@@ -204,7 +204,7 @@ document assembly runs at request time.
   request-body and 2xx response schemas. The consumer fetches it on demand.
 
 Seven APIs are covered: `administration`, `alm`, `audit`, `cloudworks`, `exception`,
-`integration` and `scim`. Together they hold 140 operations.
+`integration` and `scim`. Together they hold 139 operations.
 
 The same three APIs get no `-ptc.json` and no `-mcp.json` file at all. `authentication` and
 `oauth` are excluded because token minting is host-side and stays outside the surface an
@@ -214,7 +214,7 @@ cannot reach an excluded operation.
 
 Two properties of the source documents shape the output.
 
-1. 18 of the 140 operations document no 2xx JSON response schema. Their `detail` entry
+1. 17 of the 139 operations document no 2xx JSON response schema. Their `detail` entry
    carries `"response": null` and a `response_note`, never an empty object. An agent that
    can tell "undocumented" from "returns no fields" knows to probe.
 2. The response `$ref` graph is recursive. The resolver carries a per-branch cycle guard

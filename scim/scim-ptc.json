@@ -104,20 +104,6 @@
       ]
     },
     {
-      "op_id": "deleteUser",
-      "method": "DELETE",
-      "path": "/Users/{id}",
-      "summary": "Delete user",
-      "parameters": [
-        {
-          "name": "id",
-          "in": "path",
-          "required": true,
-          "type": "string"
-        }
-      ]
-    },
-    {
       "op_id": "getResourceTypes",
       "method": "GET",
       "path": "/ResourceTypes",
@@ -1243,25 +1229,6 @@
           }
         }
       }
-    },
-    "deleteUser": {
-      "description": "Minimum role: User Administrator.\n\nDeletes a user by their Anaplan ID. DELETE returns 403 (not 405) when the caller lacks USER_ADMIN role.",
-      "parameters": [
-        {
-          "name": "id",
-          "in": "path",
-          "description": "Anaplan-assigned hex-32 GUID of the user \u2014 the same value as the Anaplan user ID. From `GET /Users` (`Resources[].id`). If SCIM access is unavailable, the same GUID comes from `GET /users` or `GET /users/me` in the Integration API.",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "pattern": "^[0-9a-f]{32}$"
-          },
-          "example": "8a8b8c8d8e8f1a2b3c4d5e6f78901234"
-        }
-      ],
-      "request_body": null,
-      "response": null,
-      "response_note": "no documented 2xx JSON response schema \u2014 probe a read operation to learn it"
     },
     "getResourceTypes": {
       "description": "Minimum role: None.\n\nReturns the SCIM resource types supported by this service provider.",

@@ -163,7 +163,7 @@ def test_no_committed_artifact_for_excluded_apis(api):
     assert not (REPO / api / f"{api}-ptc.json").exists()
 
 
-def test_committed_artifacts_hold_140_unique_operations():
+def test_committed_artifacts_hold_139_unique_operations():
     files = sorted(REPO.glob("*/*-ptc.json"))
     assert len(files) == 7
     op_ids = [
@@ -171,5 +171,5 @@ def test_committed_artifacts_hold_140_unique_operations():
         for f in files
         for e in json.loads(f.read_text(encoding="utf-8"))["catalog"]
     ]
-    assert len(op_ids) == 140
-    assert len(set(op_ids)) == 140
+    assert len(op_ids) == 139
+    assert len(set(op_ids)) == 139
