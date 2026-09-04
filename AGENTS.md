@@ -20,6 +20,23 @@ Standard triage labels: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-
 
 Single-context layout: `CONTEXT.md` + `docs/adr/` at repo root. See `docs/agents/domain.md`.
 
+### Pull request body format
+
+When you create or edit a pull request body with `gh pr create` or `gh pr edit`,
+pass multiline Markdown with `--body-file` instead of `--body`.
+
+Use this pattern to avoid literal `\n` text in the rendered description:
+```
+@'
+## Summary
+- first item
+- second item
+
+## Notes
+- note item
+'@ | gh pr edit <number> --body-file -
+```
+
 ## Repository layout
 
 - `scripts/` — build and maintenance tooling; `scripts/oauth/` — interactive OAuth helpers
