@@ -4,7 +4,7 @@
       "op_id": "listUsers",
       "method": "GET",
       "path": "/Users",
-      "summary": "List users",
+      "summary": "List users (created, lastModified, workspace entitlements)",
       "parameters": [
         {
           "name": "filter",
@@ -49,7 +49,7 @@
       "op_id": "getUser",
       "method": "GET",
       "path": "/Users/{id}",
-      "summary": "Get user",
+      "summary": "Get user (created, lastModified, workspace entitlements)",
       "parameters": [
         {
           "name": "id",

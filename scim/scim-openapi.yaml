@@ -36,7 +36,7 @@ security:
 paths:
   /Users:
     get:
-      summary: List users
+      summary: List users (created, lastModified, workspace entitlements)
       description: |-
         Minimum role: User Administrator.
 
@@ -161,7 +161,7 @@ paths:
         pattern: ^[0-9a-f]{32}$
       example: 8a8b8c8d8e8f1a2b3c4d5e6f78901234
     get:
-      summary: Get user
+      summary: Get user (created, lastModified, workspace entitlements)
       description: |-
         Minimum role: User Administrator.
 
