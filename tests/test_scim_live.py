@@ -18,11 +18,15 @@ Optional variables:
 """
 
 import base64
+import json
 import os
 import warnings
+from datetime import datetime
 
 import httpx
 import pytest
+
+from oauth.token_keyring import load_token
 
 AUTH_URL = "https://auth.anaplan.com"
 SCIM_BASE_URL = os.getenv(
@@ -371,3 +375,20 @@ def test_scim_metadata_requires_no_auth(path):
         f"expected 200 unauthenticated on GET {path}, got {status} "
         "(if 401, auth is required — re-annotate to Standard User)"
     )
+
+
+@pytest.mark.live
+def test_scim_users_meta_has_created_and_last_modified():
+    """Each user's meta holds created and lastModified as ISO 8601 UTC strings."""
+    blob = load_token(os.getenv("ANAPLAN_OAUTH_KEYRING_SERVICE", "anaplan-oauth-authcode"))
+    if not blob:
+        pytest.skip("No OAuth token in keyring")
+    response = _scim_get(json.loads(blob)["access_token"], "/Users?count=5")
+    assert response.status_code == 200
+    users = response.json().get("Resources", [])
+    assert users, "no users returned"
+    for user in users:
+        for field in ("created", "lastModified"):
+            value = user["meta"].get(field)
+            assert isinstance(value, str), f"meta.{field} missing on {user['id']}"
+            datetime.fromisoformat(value.replace("Z", "+00:00"))
