@@ -13,6 +13,13 @@ Probes the GET /events and POST /events/search endpoints to verify that:
   semantics (401 is normally "unauthenticated", not "unauthorized"), but it
   is the real API's behavior. The token IS accepted; 401 here means missing role.
 
+**Confirmed behavior, POST /events/search paging (live testing 2026-10-02, issue #292):**
+- `limit` and `offset` in the JSON body are ignored. The server returns its
+  default page of 20 events at offset 0 (`meta.paging.currentPageSize` is 20).
+- `limit` and `offset` in the query string are honored, as on GET /events.
+- When both places carry a value, the query-string value is used.
+- `meta.paging.nextUrl` carries `limit` and `offset`, so a client can follow it.
+
 Run with:
     uv run --env-file .env pytest tests/test_audit_live.py --live
 
@@ -373,6 +380,66 @@ def test_audit_post_search_response_shape(audit_token):
         "POST /events/search body must have a top-level 'response' key"
     )
     assert isinstance(body["response"], list), "'response' must be an array"
+
+
+def _post_search(token, body=None, **params):
+    """POST /events/search with the given JSON body and query params."""
+    with httpx.Client(timeout=_REQUEST_TIMEOUT) as client:
+        return client.post(
+            f"{AUDIT_BASE_URL}/events/search",
+            params=params,
+            json=body,
+            headers={
+                "Authorization": f"AnaplanAuthToken {token}",
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+            },
+        )
+
+
+def _search_page_size(response):
+    """Return (record count, currentPageSize, offSet) or skip without the role."""
+    if _is_no_role_401(response):
+        pytest.skip("User lacks Tenant Auditor role — cannot verify paging")
+    assert response.status_code == 200, response.text[:200]
+    body = response.json()
+    paging = body["meta"]["paging"]
+    return len(body["response"]), paging["currentPageSize"], paging["offSet"]
+
+
+@pytest.mark.live
+def test_audit_post_search_ignores_limit_offset_in_body(audit_token):
+    """limit/offset in the JSON body do not change the page (default 20, offset 0)."""
+    response = _post_search(audit_token, {"interval": 168, "limit": 3, "offset": 3})
+    count, size, offset = _search_page_size(response)
+    assert (count, size, offset) == (20, 20, 0)
+
+
+@pytest.mark.live
+def test_audit_post_search_honors_limit_offset_in_query(audit_token):
+    """limit/offset in the query string set the page, as on GET /events."""
+    response = _post_search(audit_token, {"interval": 168}, limit="3", offset="3")
+    assert _search_page_size(response) == (3, 3, 3)
+
+
+@pytest.mark.live
+def test_audit_post_search_query_wins_over_body(audit_token):
+    """When body and query both carry limit/offset, the query values are used."""
+    response = _post_search(
+        audit_token, {"interval": 168, "limit": 3, "offset": 3}, limit="5", offset="5"
+    )
+    assert _search_page_size(response) == (5, 5, 5)
+
+
+@pytest.mark.live
+def test_audit_post_search_query_paging_matches_get_events(audit_token):
+    """Query-string limit gives the same page size and cursor shape as GET /events."""
+    post = _post_search(audit_token, {"interval": 168}, limit="3")
+    count, size, _ = _search_page_size(post)
+    get = _get_events(audit_token, intervalInHours="168", limit="3")
+    get_paging = _paging_or_skip(get)
+    assert (count, size) == (3, get_paging["currentPageSize"])
+    assert post.json()["meta"]["paging"]["nextOffset"] == get_paging["nextOffset"]
 
 
 # ── CEF format probe ──────────────────────────────────────────────────────────

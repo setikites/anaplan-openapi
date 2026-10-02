@@ -34,13 +34,13 @@ Confirmed via live testing (the Apiary blueprint is not publicly readable):
 | Method | Path | Description |
 |--------|------|-------------|
 | GET | `/events` | Retrieve audit events. Supports `type` filtering, `dateFrom`/`dateTo` or `intervalInHours` (≤ 30 days), `limit`/`offset` paging, and JSON or CEF (`Accept: text/plain`) output. |
-| POST | `/events/search` | Retrieve audit events using a JSON request body for the time range (`from`/`to` or `interval`). |
+| POST | `/events/search` | Retrieve audit events using a JSON request body for the time range (`from`/`to` or `interval`). Page with `limit`/`offset` in the **query string**; the server ignores them in the body. |
 
 ## Spec Lifecycle
 
 Canonical lifecycle and confidence are in the [confidence table in CONTEXT.md](../CONTEXT.md#confidence-table).
 
-The spec is **hand-maintained and live-tested** (`tests/test_audit_live.py`, 21 tests, issues #58–#61). Both the `/events` and `/events/search` paths were discovered and confirmed against the live API with the Tenant Auditor role. Do not rebuild from the bootstrap script.
+The spec is **hand-maintained and live-tested** (`tests/test_audit_live.py`, 25 tests, issues #58–#61). Both the `/events` and `/events/search` paths were discovered and confirmed against the live API with the Tenant Auditor role. Do not rebuild from the bootstrap script.
 
 Run the suite with:
 
@@ -50,7 +50,7 @@ uv run --env-file .env pytest tests/test_audit_live.py --live
 
 The tests need an Authorization Code grant token in the OS keyring for an account that holds the Tenant Auditor role. Without it the role-gated tests skip. The setup steps are in [docs/TESTING.md](../docs/TESTING.md#authorization-code-grant--audit-live-tests-issue-58).
 
-Coverage by area: auth and role gate, the `AuditEvent` field and type contract, schema validation of real records, the `type` filter enum, date-range and `intervalInHours` windows, the 30-day cap, `limit` and `offset` paging, and CEF (`text/plain`) output. `POST /events/search` is covered for the response envelope only.
+Coverage by area: auth and role gate, the `AuditEvent` field and type contract, schema validation of real records, the `type` filter enum, date-range and `intervalInHours` windows, the 30-day cap, `limit` and `offset` paging, and CEF (`text/plain`) output. `POST /events/search` is covered for the response envelope and for `limit`/`offset` placement (body ignored, query honored).
 
 ## Discovered Discrepancies
 
@@ -133,6 +133,10 @@ Confirmed against real, multi-record data with a role-enabled token:
   exposes `nextOffset`/`nextUrl` when more results exist, and **`previousUrl`** once
   paging past the first page. `previousUrl` was undocumented and has been added to
   the `AuditPaging` schema.
+- **`POST /events/search` paging** (confirmed 2026-10-02) — `limit` and `offset` in
+  the JSON body are ignored; the server returns its default page of 20 events. In the
+  query string they work as on `GET /events`, and the query value wins when both are
+  sent. The spec declares them as query parameters only.
 - **`limit` max not enforced** — the docs state a cap of 10000, but the server
   honors larger limits (`limit=15000` returned 15000 records). The spec's hard
   `maximum: 10000` constraint was removed and the description updated to match.
