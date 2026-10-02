@@ -36,11 +36,11 @@ security:
 paths:
   /Users:
     get:
-      summary: List users
+      summary: List users (created, lastModified, workspace entitlements)
       description: |-
         Minimum role: User Administrator.
 
-        Returns a paginated list of users. Supports SCIM filtering, pagination, and count controls. Maximum 100 users per call.
+        Returns a paginated list of users. Each user includes the `created` and `lastModified` dates and the workspace `entitlements`. Supports SCIM filtering, pagination, and count controls. Maximum 100 users per call.
       operationId: listUsers
       x-anaplan-min-role: User Administrator
       parameters:
@@ -161,11 +161,11 @@ paths:
         pattern: ^[0-9a-f]{32}$
       example: 8a8b8c8d8e8f1a2b3c4d5e6f78901234
     get:
-      summary: Get user
+      summary: Get user (created, lastModified, workspace entitlements)
       description: |-
         Minimum role: User Administrator.
 
-        Retrieves a single user by their Anaplan ID.
+        Retrieves a single user by their Anaplan ID. The response includes the `created` and `lastModified` dates and the workspace `entitlements` of the user.
       operationId: getUser
       x-anaplan-min-role: User Administrator
       responses:

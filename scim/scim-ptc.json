@@ -4,7 +4,7 @@
       "op_id": "listUsers",
       "method": "GET",
       "path": "/Users",
-      "summary": "List users",
+      "summary": "List users (created, lastModified, workspace entitlements)",
       "parameters": [
         {
           "name": "filter",
@@ -49,7 +49,7 @@
       "op_id": "getUser",
       "method": "GET",
       "path": "/Users/{id}",
-      "summary": "Get user",
+      "summary": "Get user (created, lastModified, workspace entitlements)",
       "parameters": [
         {
           "name": "id",
@@ -127,7 +127,7 @@
   ],
   "detail": {
     "listUsers": {
-      "description": "Minimum role: User Administrator.\n\nReturns a paginated list of users. Supports SCIM filtering, pagination, and count controls. Maximum 100 users per call.",
+      "description": "Minimum role: User Administrator.\n\nReturns a paginated list of users. Each user includes the `created` and `lastModified` dates and the workspace `entitlements`. Supports SCIM filtering, pagination, and count controls. Maximum 100 users per call.",
       "parameters": [
         {
           "name": "filter",
@@ -648,7 +648,7 @@
       }
     },
     "getUser": {
-      "description": "Minimum role: User Administrator.\n\nRetrieves a single user by their Anaplan ID.",
+      "description": "Minimum role: User Administrator.\n\nRetrieves a single user by their Anaplan ID. The response includes the `created` and `lastModified` dates and the workspace `entitlements` of the user.",
       "parameters": [
         {
           "name": "id",
