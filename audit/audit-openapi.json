@@ -132,7 +132,7 @@
     "/events/search": {
       "post": {
         "summary": "Search audit events (large responses — see description)",
-        "description": "Minimum role: Tenant Auditor.\n\nRetrieves audit events for the tenant associated with the authenticated user using a JSON request body to specify the time range. Use `from`/`to` for a specific date range, or `interval` for a rolling window in hours. Use `type` query parameter to filter by event category.\n\n**HIGH VOLUME** — audit events are unbounded. A single busy hour can exceed 1,500 events (~825 KB). With no date filter, the default window is the previous 30 days. With no `limit`, a client that auto-follows `meta.paging` merges every page into one response and overflows its token budget. Always pass an explicit `limit` (start small, ~50–100) and narrow the query with `type` plus a tight time range (`intervalInHours`/`interval` or explicit dates). To sweep the full set, hand-page with `limit`+`offset` or filter server-side — never pull a whole window in one call. CEF output (`Accept: text/plain`) ignores `limit`/`offset` and always returns the entire window.\n\nSet `Accept: text/plain` to receive results in Common Event Format (CEF). Default is `application/json`.",
+        "description": "Minimum role: Tenant Auditor.\n\nRetrieves audit events for the tenant associated with the authenticated user using a JSON request body to specify the time range. Use `from`/`to` for a specific date range, or `interval` for a rolling window in hours. Use `type` query parameter to filter by event category.\n\n**HIGH VOLUME** — audit events are unbounded. A single busy hour can exceed 1,500 events (~825 KB). With no date filter, the default window is the previous 30 days. Without `limit`, the server returns pages of 20 events. Pass `limit` and `offset` as **query parameters**: the server ignores `limit` and `offset` in the JSON body. If both places carry a value, the query-string value is used. Narrow the query with `type` plus a tight time range (`interval` or explicit dates), and page with `limit` and `offset` or follow `meta.paging.nextUrl`. For controlled paging, `GET /events` accepts the same `limit` and `offset` query parameters. CEF output (`Accept: text/plain`) ignores `limit`/`offset` and always returns the entire window.\n\nSet `Accept: text/plain` to receive results in Common Event Format (CEF). Default is `application/json`.",
         "operationId": "searchAuditEvents",
         "x-anaplan-min-role": "Tenant Auditor",
         "tags": [
@@ -157,6 +157,22 @@
                 "forecaster"
               ],
               "default": "all"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of results to return per page. Default is 20. Send this as a query parameter: the server ignores `limit` in the JSON body.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Zero-based index of the first result to return. Default is 0. Send this as a query parameter: the server ignores `offset` in the JSON body.",
+            "schema": {
+              "type": "integer"
             }
           }
         ],
