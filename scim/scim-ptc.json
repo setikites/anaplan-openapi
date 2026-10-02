@@ -325,6 +325,20 @@
                       "resourceType": {
                         "type": "string"
                       },
+                      "created": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Date and time the user account was created, in UTC.",
+                        "example": "2023-11-21T04:40:50Z",
+                        "readOnly": true
+                      },
+                      "lastModified": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Date and time the user account was last modified, in UTC.",
+                        "example": "2026-08-21T08:22:57Z",
+                        "readOnly": true
+                      },
                       "location": {
                         "type": "string"
                       }
@@ -464,6 +478,20 @@
                 "resourceType": {
                   "type": "string"
                 },
+                "created": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Date and time the user account was created, in UTC.",
+                  "example": "2023-11-21T04:40:50Z",
+                  "readOnly": true
+                },
+                "lastModified": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Date and time the user account was last modified, in UTC.",
+                  "example": "2026-08-21T08:22:57Z",
+                  "readOnly": true
+                },
                 "location": {
                   "type": "string"
                 }
@@ -595,6 +623,20 @@
               "properties": {
                 "resourceType": {
                   "type": "string"
+                },
+                "created": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Date and time the user account was created, in UTC.",
+                  "example": "2023-11-21T04:40:50Z",
+                  "readOnly": true
+                },
+                "lastModified": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Date and time the user account was last modified, in UTC.",
+                  "example": "2026-08-21T08:22:57Z",
+                  "readOnly": true
                 },
                 "location": {
                   "type": "string"
@@ -745,6 +787,20 @@
                 "resourceType": {
                   "type": "string"
                 },
+                "created": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Date and time the user account was created, in UTC.",
+                  "example": "2023-11-21T04:40:50Z",
+                  "readOnly": true
+                },
+                "lastModified": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Date and time the user account was last modified, in UTC.",
+                  "example": "2026-08-21T08:22:57Z",
+                  "readOnly": true
+                },
                 "location": {
                   "type": "string"
                 }
@@ -893,6 +949,20 @@
                 "resourceType": {
                   "type": "string"
                 },
+                "created": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Date and time the user account was created, in UTC.",
+                  "example": "2023-11-21T04:40:50Z",
+                  "readOnly": true
+                },
+                "lastModified": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Date and time the user account was last modified, in UTC.",
+                  "example": "2026-08-21T08:22:57Z",
+                  "readOnly": true
+                },
                 "location": {
                   "type": "string"
                 }
@@ -1024,6 +1094,20 @@
               "properties": {
                 "resourceType": {
                   "type": "string"
+                },
+                "created": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Date and time the user account was created, in UTC.",
+                  "example": "2023-11-21T04:40:50Z",
+                  "readOnly": true
+                },
+                "lastModified": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Date and time the user account was last modified, in UTC.",
+                  "example": "2026-08-21T08:22:57Z",
+                  "readOnly": true
                 },
                 "location": {
                   "type": "string"
@@ -1221,6 +1305,20 @@
                 "resourceType": {
                   "type": "string"
                 },
+                "created": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Date and time the user account was created, in UTC.",
+                  "example": "2023-11-21T04:40:50Z",
+                  "readOnly": true
+                },
+                "lastModified": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Date and time the user account was last modified, in UTC.",
+                  "example": "2026-08-21T08:22:57Z",
+                  "readOnly": true
+                },
                 "location": {
                   "type": "string"
                 }
@@ -1415,6 +1513,20 @@
                     "properties": {
                       "resourceType": {
                         "type": "string"
+                      },
+                      "created": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Date and time the user account was created, in UTC.",
+                        "example": "2023-11-21T04:40:50Z",
+                        "readOnly": true
+                      },
+                      "lastModified": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Date and time the user account was last modified, in UTC.",
+                        "example": "2026-08-21T08:22:57Z",
+                        "readOnly": true
                       },
                       "location": {
                         "type": "string"
