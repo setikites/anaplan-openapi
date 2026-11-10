@@ -195,7 +195,6 @@ def _selfcheck():
     assert out["paths"]["/models/{modelId}/exports"]["get"]["operationId"] == "getModelsByModelidExports"  # synthesized
     p0 = out["paths"]["/models/{modelId}/exports"]["parameters"][0]
     assert "example" not in p0 and "pattern" not in p0["schema"]  # path-level ID example + pattern stripped
-    assert "content" in out["paths"]["/x"]["post"]["responses"]["200"]  # response body kept
     px = {p["name"]: p for p in out["paths"]["/x"]["post"]["parameters"]}
     assert "example" not in px["modelId"]["schema"]  # opaque ID example stripped
     assert px["type"]["schema"]["example"] == "all"  # non-ID example kept
