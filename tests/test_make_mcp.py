@@ -21,8 +21,7 @@ REPO = pathlib.Path(__file__).parent.parent
 def _spec():
     # Schemas declared in source order (Zeta, Alpha, Mid) that differs from ref-discovery
     # order (requestBody -> Alpha, then its props -> Mid, Zeta), so source-order emission
-    # is distinguishable from BFS / set-iteration order. transform() strips response bodies,
-    # so the reachability seed must come through requestBody.
+    # is distinguishable from BFS / set-iteration order.
     return {
         "openapi": "3.0.0",
         "info": {"title": "t", "version": "1"},
@@ -60,6 +59,16 @@ def test_schema_emission_follows_source_order():
     out = transform(_spec())
     # All three are reachable via requestBody (Alpha -> Mid, Zeta); emitted in SOURCE order.
     assert list(out["components"]["schemas"]) == ["Zeta", "Alpha", "Mid"]
+
+
+def test_responses_keep_full_detail_and_their_schemas():
+    spec = _spec()
+    resp = {"description": "ok", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Out"}}}}
+    spec["paths"]["/x"]["post"]["responses"]["200"] = resp
+    spec["components"]["schemas"]["Out"] = {"type": "object"}
+    out = transform(spec)
+    assert out["paths"]["/x"]["post"]["responses"]["200"] == resp
+    assert "Out" in out["components"]["schemas"]  # response-only schema is now reachable
 
 
 def test_render_is_deterministic():

@@ -31,10 +31,81 @@
         "description": "Minimum role: Restricted Integration User.\n\nRetrieve all connections available to the authenticated user. Nothing in the returned record says whether a connection is referenced: determining that requires sweeping every integration with `getIntegrationById` and collecting `jobs[].sources[]`/`targets[].connectionId`.",
         "responses": {
           "200": {
-            "description": "List of connections."
+            "description": "List of connections.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "$ref": "#/components/schemas/Status"
+                    },
+                    "connections": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "connectionId": {
+                            "type": "string"
+                          },
+                          "connectionType": {
+                            "type": "string",
+                            "enum": [
+                              "AmazonS3",
+                              "GoogleBigQuery",
+                              "AzureBlob"
+                            ]
+                          },
+                          "body": {
+                            "type": "object",
+                            "description": "Connection-type-specific fields. For AzureBlob includes `name`, `storageAccountName`, `containerName`, and `authMethod` (camelCase in response, contrasting with snake_case `auth_method` in create/update requests)."
+                          },
+                          "creationDate": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "modificationDate": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "createdBy": {
+                            "type": "string"
+                          },
+                          "modifiedBy": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "description": "Connection health: 1 = active, 0 = error.",
+                            "type": "integer"
+                          },
+                          "integrationErrorCode": {
+                            "description": "Error code set when `status` is 0. The value is null when the connection is healthy.",
+                            "type": "integer",
+                            "nullable": true
+                          },
+                          "workspaceId": {
+                            "description": "Anaplan workspace ID for restricted-user connections. The value is null for unrestricted connections.",
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "authMethod": {
+                            "description": "Authentication method used by this connection (denormalized from `body.authMethod`). `\"SAS-based\"` for SAS-token connections. The value is null for connections created before this field was introduced.",
+                            "type": "string",
+                            "nullable": true
+                          }
+                        }
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/PagingMeta"
+                    }
+                  }
+                }
+              }
+            }
           },
           "403": {
-            "description": ""
+            "$ref": "#/components/responses/Forbidden"
           }
         }
       },
@@ -300,16 +371,31 @@
         },
         "responses": {
           "200": {
-            "description": "Connection created."
+            "description": "Connection created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "$ref": "#/components/schemas/Status"
+                    },
+                    "connectionId": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
-            "description": ""
+            "$ref": "#/components/responses/BadRequest"
           },
           "403": {
-            "description": ""
+            "$ref": "#/components/responses/Forbidden"
           },
           "500": {
-            "description": ""
+            "$ref": "#/components/responses/InternalServerError"
           }
         }
       }
@@ -367,16 +453,16 @@
         },
         "responses": {
           "200": {
-            "description": ""
+            "$ref": "#/components/responses/SuccessStatus"
           },
           "400": {
-            "description": ""
+            "$ref": "#/components/responses/BadRequest"
           },
           "403": {
-            "description": ""
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": ""
+            "$ref": "#/components/responses/NotFound"
           }
         }
       },
@@ -411,16 +497,16 @@
         },
         "responses": {
           "200": {
-            "description": ""
+            "$ref": "#/components/responses/SuccessStatus"
           },
           "400": {
-            "description": ""
+            "$ref": "#/components/responses/BadRequest"
           },
           "403": {
-            "description": ""
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": ""
+            "$ref": "#/components/responses/NotFound"
           }
         }
       },
@@ -430,16 +516,16 @@
         "description": "Minimum role: Restricted Integration User.",
         "responses": {
           "200": {
-            "description": ""
+            "$ref": "#/components/responses/SuccessStatus"
           },
           "403": {
-            "description": ""
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": ""
+            "$ref": "#/components/responses/NotFound"
           },
           "409": {
-            "description": ""
+            "$ref": "#/components/responses/Conflict"
           }
         }
       }
@@ -492,10 +578,65 @@
         ],
         "responses": {
           "200": {
-            "description": "List of integrations."
+            "description": "List of integrations.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "$ref": "#/components/schemas/Status"
+                    },
+                    "integrations": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/IntegrationSummary"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/PagingMeta"
+                    }
+                  }
+                },
+                "example": {
+                  "status": {
+                    "code": 200,
+                    "message": "Success"
+                  },
+                  "integrations": [
+                    {
+                      "integrationId": "e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2a",
+                      "name": "sample import integration",
+                      "createdBy": "John Smith",
+                      "creationDate": "2020-09-29T01:31:16.000Z",
+                      "modificationDate": "2020-09-29T01:31:26.000Z",
+                      "modifiedBy": "John Smith",
+                      "latestRun": {
+                        "triggeredBy": "John Smith",
+                        "startDate": "2020-09-28T23:09:31.000Z",
+                        "endDate": "2020-09-28T23:13:07.000Z",
+                        "success": true,
+                        "message": "Success",
+                        "executionErrorCode": null
+                      },
+                      "notificationId": "f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c4",
+                      "nuxVisible": false
+                    }
+                  ],
+                  "meta": {
+                    "paging": {
+                      "currentPageSize": 1,
+                      "totalSize": 1,
+                      "offset": 0
+                    },
+                    "schema": "https://api.cloudworks.anaplan.com/1/0/integrations/objects/integrations"
+                  }
+                }
+              }
+            }
           },
           "403": {
-            "description": ""
+            "$ref": "#/components/responses/Forbidden"
           }
         }
       },
@@ -562,19 +703,39 @@
         },
         "responses": {
           "200": {
-            "description": "Integration created."
+            "description": "Integration created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "$ref": "#/components/schemas/Status"
+                    },
+                    "integration": {
+                      "type": "object",
+                      "properties": {
+                        "integrationId": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
-            "description": ""
+            "$ref": "#/components/responses/BadRequest"
           },
           "403": {
-            "description": ""
+            "$ref": "#/components/responses/Forbidden"
           },
           "409": {
-            "description": ""
+            "$ref": "#/components/responses/Conflict"
           },
           "500": {
-            "description": ""
+            "$ref": "#/components/responses/InternalServerError"
           }
         }
       }
@@ -591,13 +752,28 @@
         "description": "Minimum role: Restricted Integration User.\n\nThe only op that reveals which connections an integration uses: `integration.jobs[].sources[]` and `targets[]` carry `connectionId`. `getIntegrations` does not return `jobs`, so mapping connections to integrations costs one call per integration.\n\nImports bind the connection in `sources`, exports in `targets` \u2014 read both. `integrationType: \"Process\"` does not mean no connection. A process integration also carries `jobs` with `sources`/`targets` that point at a connection. This happens when its actions read from or write to the connected cloud data store. A sweep must therefore cover every integration type.",
         "responses": {
           "200": {
-            "description": "Integration details."
+            "description": "Integration details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "$ref": "#/components/schemas/Status"
+                    },
+                    "integration": {
+                      "$ref": "#/components/schemas/IntegrationDetail"
+                    }
+                  }
+                }
+              }
+            }
           },
           "403": {
-            "description": ""
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": ""
+            "$ref": "#/components/responses/NotFound"
           }
         }
       },
@@ -655,16 +831,16 @@
         },
         "responses": {
           "200": {
-            "description": ""
+            "$ref": "#/components/responses/SuccessStatus"
           },
           "400": {
-            "description": ""
+            "$ref": "#/components/responses/BadRequest"
           },
           "403": {
-            "description": ""
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": ""
+            "$ref": "#/components/responses/NotFound"
           }
         }
       },
@@ -674,16 +850,16 @@
         "description": "Minimum role: Restricted Integration User.",
         "responses": {
           "200": {
-            "description": ""
+            "$ref": "#/components/responses/SuccessStatus"
           },
           "403": {
-            "description": ""
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": ""
+            "$ref": "#/components/responses/NotFound"
           },
           "500": {
-            "description": ""
+            "$ref": "#/components/responses/InternalServerError"
           }
         }
       }
@@ -706,13 +882,31 @@
         "description": "Minimum role: Restricted Integration User.\n\n**Deprecated:** This endpoint is no longer served \u2014 it returns an HTTP 404 from the gateway for any modelId, under every role. Retained in the spec for historical completeness. Do not call it. See cloudworks/README.md for details.",
         "responses": {
           "200": {
-            "description": "Integrations associated with the model."
+            "description": "Integrations associated with the model.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "$ref": "#/components/schemas/Status"
+                    },
+                    "integrations": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/IntegrationSummary"
+                      }
+                    }
+                  }
+                }
+              }
+            }
           },
           "403": {
-            "description": ""
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": ""
+            "$ref": "#/components/responses/NotFound"
           }
         }
       }
@@ -740,22 +934,43 @@
         },
         "responses": {
           "200": {
-            "description": "Integration run started."
+            "description": "Integration run started.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "$ref": "#/components/schemas/Status"
+                    },
+                    "run": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "example": "hy40d89893084f0dkb985cmme9i5io2a"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
           },
           "403": {
-            "description": ""
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": ""
+            "$ref": "#/components/responses/NotFound"
           },
           "409": {
-            "description": ""
+            "$ref": "#/components/responses/Conflict"
           },
           "500": {
-            "description": ""
+            "$ref": "#/components/responses/InternalServerError"
           },
           "503": {
-            "description": ""
+            "$ref": "#/components/responses/ServiceUnavailable"
           }
         }
       }
@@ -772,16 +987,16 @@
         "description": "Minimum role: Restricted Integration User.",
         "responses": {
           "200": {
-            "description": ""
+            "$ref": "#/components/responses/SuccessStatus"
           },
           "403": {
-            "description": ""
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": ""
+            "$ref": "#/components/responses/NotFound"
           },
           "409": {
-            "description": ""
+            "$ref": "#/components/responses/Conflict"
           }
         }
       }
@@ -820,16 +1035,16 @@
         },
         "responses": {
           "200": {
-            "description": ""
+            "$ref": "#/components/responses/SuccessStatus"
           },
           "400": {
-            "description": ""
+            "$ref": "#/components/responses/BadRequest"
           },
           "403": {
-            "description": ""
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": ""
+            "$ref": "#/components/responses/NotFound"
           }
         }
       },
@@ -857,16 +1072,16 @@
         },
         "responses": {
           "200": {
-            "description": ""
+            "$ref": "#/components/responses/SuccessStatus"
           },
           "400": {
-            "description": ""
+            "$ref": "#/components/responses/BadRequest"
           },
           "403": {
-            "description": ""
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": ""
+            "$ref": "#/components/responses/NotFound"
           }
         }
       },
@@ -876,13 +1091,13 @@
         "description": "Minimum role: Restricted Integration User.",
         "responses": {
           "200": {
-            "description": ""
+            "$ref": "#/components/responses/SuccessStatus"
           },
           "403": {
-            "description": ""
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": ""
+            "$ref": "#/components/responses/NotFound"
           }
         }
       }
@@ -912,13 +1127,13 @@
         "description": "Minimum role: Restricted Integration User.\n\nEnable or disable the schedule for an integration.",
         "responses": {
           "200": {
-            "description": ""
+            "$ref": "#/components/responses/SuccessStatus"
           },
           "403": {
-            "description": ""
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": ""
+            "$ref": "#/components/responses/NotFound"
           }
         }
       }
@@ -957,13 +1172,95 @@
         ],
         "responses": {
           "200": {
-            "description": "Run history."
+            "description": "Run history.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "$ref": "#/components/schemas/Status"
+                    },
+                    "history_of_runs": {
+                      "type": "object",
+                      "properties": {
+                        "integrationId": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "integrationType": {
+                          "description": "Integration type.",
+                          "type": "string",
+                          "enum": [
+                            "Process",
+                            "Export",
+                            "Import"
+                          ]
+                        },
+                        "processId": {
+                          "description": "Anaplan process ID. Present only for Process integrations.",
+                          "type": "string"
+                        },
+                        "version": {
+                          "description": "Integration schema version. The current value is \"2.0\".",
+                          "type": "string"
+                        },
+                        "schedule": {
+                          "type": "object",
+                          "nullable": true
+                        },
+                        "workspaceId": {
+                          "type": "string"
+                        },
+                        "modelId": {
+                          "type": "string"
+                        },
+                        "creationDate": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "modificationDate": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "createdBy": {
+                          "type": "string"
+                        },
+                        "modifiedBy": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "integer"
+                        },
+                        "notificationId": {
+                          "type": "string"
+                        },
+                        "runs": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/RunRecord"
+                          }
+                        },
+                        "totalRuns": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/PagingMeta"
+                    }
+                  }
+                }
+              }
+            }
           },
           "403": {
-            "description": ""
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": ""
+            "$ref": "#/components/responses/NotFound"
           }
         }
       }
@@ -980,13 +1277,95 @@
         "description": "Minimum role: Restricted Integration User.",
         "responses": {
           "200": {
-            "description": "Run error details."
+            "description": "Run error details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "$ref": "#/components/schemas/Status"
+                    },
+                    "runs": {
+                      "description": "Array of error records when errors exist. **Note (live-tested June 2026):** Returns `{}` (empty object, not empty array) when the run completed without errors. Treat both `{}` and `[]` as \"no errors\".",
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "errorMessages": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "errorMessage": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "localMessageText": {
+                                        "type": "string"
+                                      },
+                                      "occurrences": {
+                                        "type": "integer"
+                                      },
+                                      "type": {
+                                        "type": "string"
+                                      },
+                                      "values": {
+                                        "type": "array",
+                                        "items": {}
+                                      }
+                                    }
+                                  }
+                                },
+                                "actionId": {
+                                  "type": "string"
+                                },
+                                "actionName": {
+                                  "type": "string"
+                                },
+                                "failureDumpGenerated": {
+                                  "type": "boolean"
+                                }
+                              }
+                            }
+                          },
+                          "taskId": {
+                            "type": "string"
+                          },
+                          "creationDate": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "modificationDate": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "createdBy": {
+                            "type": "string"
+                          },
+                          "modifiedBy": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "meta": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
           },
           "403": {
-            "description": ""
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": ""
+            "$ref": "#/components/responses/NotFound"
           }
         }
       }
@@ -1003,10 +1382,60 @@
         "description": "Minimum role: Restricted Integration User.\n\nReturns the status of one integration run, addressed by run ID alone. Use it to poll a run that `POST /integrations/{integrationId}/run` started \u2014 that call returns a run ID and nothing else.\n\n**Notes**:\n\n*   Unlike `GET /integrations/runs/{integrationId}`, this call needs no integration ID, and `run.integrationId` maps the run back to its integration.\n*   The response holds more fields than a run-history `RunRecord`. See `RunStatus`.\n*   `meta.schema` cites a `1/0` URL even though the endpoint is served under `2/0`.",
         "responses": {
           "200": {
-            "description": "Status of the run."
+            "description": "Status of the run.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": {
+                    "code": 200,
+                    "message": "Success"
+                  },
+                  "run": {
+                    "id": "91a01d97958d44baaa58ad8a3d45804e",
+                    "integrationId": "152b8666a0234754afc36f1cde0fd9d2",
+                    "traceId": "7b562956986244d789de52acd06c9205",
+                    "startDate": "2026-08-11T18:07:06.000Z",
+                    "endDate": "2026-08-11T18:07:51.000Z",
+                    "success": true,
+                    "message": "Success",
+                    "creationDate": "2026-08-11T18:07:06.000Z",
+                    "modificationDate": "2026-08-11T18:07:51.000Z",
+                    "createdBy": "Jane Roe",
+                    "modifiedBy": "Jane Roe",
+                    "executionErrorCode": null,
+                    "flowGroupId": null,
+                    "triggerSource": "scheduled"
+                  },
+                  "meta": {
+                    "schema": "https://api.cloudworks.anaplan.com/1/0/integrations/objects/run"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "$ref": "#/components/schemas/Status"
+                    },
+                    "run": {
+                      "$ref": "#/components/schemas/RunStatus"
+                    },
+                    "meta": {
+                      "description": "Response metadata. `schema` is a URL to the JSON schema for this body.",
+                      "type": "object",
+                      "properties": {
+                        "schema": {
+                          "type": "string",
+                          "description": "URL to the JSON schema definition for this response body."
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
           },
           "404": {
-            "description": ""
+            "$ref": "#/components/responses/NotFound"
           }
         }
       }
@@ -1028,13 +1457,28 @@
         },
         "responses": {
           "200": {
-            "description": "Notification configuration created."
+            "description": "Notification configuration created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "$ref": "#/components/schemas/Status"
+                    },
+                    "notificationId": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
-            "description": ""
+            "$ref": "#/components/responses/BadRequest"
           },
           "403": {
-            "description": ""
+            "$ref": "#/components/responses/Forbidden"
           }
         }
       }
@@ -1057,13 +1501,31 @@
         "description": "Minimum role: Restricted Integration User.",
         "responses": {
           "200": {
-            "description": "Notification configuration."
+            "description": "Notification configuration.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "$ref": "#/components/schemas/Status"
+                    },
+                    "notifications": {
+                      "$ref": "#/components/schemas/NotificationConfig"
+                    },
+                    "meta": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
           },
           "403": {
-            "description": ""
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": ""
+            "$ref": "#/components/responses/NotFound"
           }
         }
       },
@@ -1083,16 +1545,16 @@
         },
         "responses": {
           "200": {
-            "description": ""
+            "$ref": "#/components/responses/SuccessStatus"
           },
           "400": {
-            "description": ""
+            "$ref": "#/components/responses/BadRequest"
           },
           "403": {
-            "description": ""
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": ""
+            "$ref": "#/components/responses/NotFound"
           }
         }
       },
@@ -1102,13 +1564,13 @@
         "description": "Minimum role: Restricted Integration User.",
         "responses": {
           "200": {
-            "description": ""
+            "$ref": "#/components/responses/SuccessStatus"
           },
           "403": {
-            "description": ""
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": ""
+            "$ref": "#/components/responses/NotFound"
           }
         }
       }
@@ -1125,13 +1587,25 @@
         "description": "Minimum role: Restricted Integration User.\n\nRetrieve the import error log (dump file) for a specific run. The response body contains a CSV-formatted error log.",
         "responses": {
           "200": {
-            "description": "Import error log."
+            "description": "Import error log.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "$ref": "#/components/schemas/Status"
+                    }
+                  }
+                }
+              }
+            }
           },
           "403": {
-            "description": ""
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": ""
+            "$ref": "#/components/responses/NotFound"
           }
         }
       }
@@ -1157,13 +1631,25 @@
         "description": "Minimum role: Restricted Integration User.\n\nRetrieve the process import error log (dump file) for a specific run and action.",
         "responses": {
           "200": {
-            "description": "Process error log."
+            "description": "Process error log.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "$ref": "#/components/schemas/Status"
+                    }
+                  }
+                }
+              }
+            }
           },
           "403": {
-            "description": ""
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": ""
+            "$ref": "#/components/responses/NotFound"
           }
         }
       }
@@ -1193,10 +1679,31 @@
         ],
         "responses": {
           "200": {
-            "description": "List of integration flows."
+            "description": "List of integration flows.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "$ref": "#/components/schemas/Status"
+                    },
+                    "integrationFlows": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/IntegrationFlowSummary"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/PagingMeta"
+                    }
+                  }
+                }
+              }
+            }
           },
           "403": {
-            "description": ""
+            "$ref": "#/components/responses/Forbidden"
           }
         }
       },
@@ -1304,16 +1811,36 @@
         },
         "responses": {
           "200": {
-            "description": "Integration flow created."
+            "description": "Integration flow created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "$ref": "#/components/schemas/Status"
+                    },
+                    "integrationFlow": {
+                      "type": "object",
+                      "properties": {
+                        "integrationFlowId": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
-            "description": ""
+            "$ref": "#/components/responses/BadRequest"
           },
           "403": {
-            "description": ""
+            "$ref": "#/components/responses/Forbidden"
           },
           "500": {
-            "description": ""
+            "$ref": "#/components/responses/InternalServerError"
           }
         }
       }
@@ -1330,13 +1857,31 @@
         "description": "Minimum role: Restricted Integration User.",
         "responses": {
           "200": {
-            "description": "Integration flow details including all step definitions."
+            "description": "Integration flow details including all step definitions.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "$ref": "#/components/schemas/Status"
+                    },
+                    "integrationFlow": {
+                      "$ref": "#/components/schemas/IntegrationFlowDetail"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/PagingMeta"
+                    }
+                  }
+                }
+              }
+            }
           },
           "403": {
-            "description": ""
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": ""
+            "$ref": "#/components/responses/NotFound"
           }
         }
       },
@@ -1357,16 +1902,16 @@
         },
         "responses": {
           "200": {
-            "description": ""
+            "$ref": "#/components/responses/SuccessStatus"
           },
           "400": {
-            "description": ""
+            "$ref": "#/components/responses/BadRequest"
           },
           "403": {
-            "description": ""
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": ""
+            "$ref": "#/components/responses/NotFound"
           }
         }
       },
@@ -1376,13 +1921,13 @@
         "description": "Minimum role: Restricted Integration User.",
         "responses": {
           "200": {
-            "description": ""
+            "$ref": "#/components/responses/SuccessStatus"
           },
           "403": {
-            "description": ""
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": ""
+            "$ref": "#/components/responses/NotFound"
           }
         }
       }
@@ -1418,19 +1963,39 @@
         },
         "responses": {
           "200": {
-            "description": "Integration flow run started."
+            "description": "Integration flow run started.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "$ref": "#/components/schemas/Status"
+                    },
+                    "run": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
-            "description": ""
+            "$ref": "#/components/responses/BadRequest"
           },
           "403": {
-            "description": ""
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": ""
+            "$ref": "#/components/responses/NotFound"
           },
           "409": {
-            "description": ""
+            "$ref": "#/components/responses/Conflict"
           }
         }
       }
@@ -1438,6 +2003,20 @@
   },
   "components": {
     "schemas": {
+      "Status": {
+        "description": "Response envelope present on every successful CloudWorks operation.",
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "example": 200
+          },
+          "message": {
+            "type": "string",
+            "example": "Success"
+          }
+        }
+      },
       "Job": {
         "type": "object",
         "required": [
@@ -1668,6 +2247,208 @@
           }
         }
       },
+      "IntegrationSummary": {
+        "description": "Summary view of an integration, returned in list responses.",
+        "type": "object",
+        "properties": {
+          "integrationId": {
+            "type": "string",
+            "description": "32-character lowercase hex string uniquely identifying this integration.",
+            "example": "e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2"
+          },
+          "name": {
+            "type": "string"
+          },
+          "integrationType": {
+            "type": "string",
+            "enum": [
+              "Process",
+              "Export",
+              "Import"
+            ]
+          },
+          "processId": {
+            "type": "string",
+            "description": "Anaplan process ID (numeric string). Present only for `Process` integrations.",
+            "example": "118000000114"
+          },
+          "workspaceId": {
+            "type": "string",
+            "description": "32-character lowercase hex Anaplan workspace ID."
+          },
+          "modelId": {
+            "type": "string",
+            "description": "32-character **uppercase** hex Anaplan model ID. Note: `modelId` is the only ID field in CloudWorks that uses uppercase hex.",
+            "example": "E559BFF3B1GD4RKE874P745BEL259711"
+          },
+          "createdBy": {
+            "type": "string"
+          },
+          "creationDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "modificationDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "modifiedBy": {
+            "type": "string"
+          },
+          "latestRun": {
+            "description": "Details of the most recent run. Absent if the integration has never been run.",
+            "type": "object",
+            "properties": {
+              "triggeredBy": {
+                "description": "Display name of the user who triggered the run.",
+                "type": "string"
+              },
+              "startDate": {
+                "description": "ISO 8601 UTC datetime when the run started. Format: `YYYY-MM-DDTHH:MM:SS.sssZ`.",
+                "type": "string",
+                "format": "date-time",
+                "example": "2026-06-19T01:30:16.000Z"
+              },
+              "endDate": {
+                "description": "ISO 8601 UTC datetime when the run ended. Format: `YYYY-MM-DDTHH:MM:SS.sssZ`.",
+                "type": "string",
+                "format": "date-time",
+                "example": "2026-06-19T01:31:21.000Z"
+              },
+              "success": {
+                "type": "boolean"
+              },
+              "message": {
+                "description": "Outcome message. Common values: `\"Success\"`, `\"Cancelled\"`, `\"Process failed\"`, `\"Anaplan model was deleted\"`. Partial-success imports include row counts in this field even when `success` is `true`.",
+                "type": "string",
+                "example": "Success"
+              },
+              "executionErrorCode": {
+                "description": "Numeric error code. Null on full success. Known values: `12` (import data-type mismatch), `35`, `38` (partial success), `39`.",
+                "type": "integer",
+                "nullable": true,
+                "example": 12
+              },
+              "triggerSource": {
+                "description": "What triggered this run.\n\n- `scheduled`: the integration's own schedule.\n- `manual`: a user, from the CloudWorks UI or the API.\n- `scheduled_inf`: the schedule of an integration flow.\n- `manual_inf`: a user, from within an integration flow.\n- `nux_dashboard`: the CloudWorks NUX dashboard.",
+                "type": "string",
+                "enum": [
+                  "scheduled",
+                  "manual",
+                  "scheduled_inf",
+                  "manual_inf",
+                  "nux_dashboard"
+                ],
+                "example": "scheduled"
+              }
+            }
+          },
+          "notificationId": {
+            "description": "32-character lowercase hex ID of the notification configuration attached to this integration, if any.",
+            "type": "string"
+          },
+          "nuxVisible": {
+            "description": "Whether this integration is visible in the CloudWorks UI.",
+            "type": "boolean"
+          },
+          "schedule": {
+            "description": "Active schedule for this integration, if one has been configured.",
+            "$ref": "#/components/schemas/Schedule"
+          }
+        }
+      },
+      "IntegrationDetail": {
+        "description": "Full integration details, returned by the get-by-ID endpoint. Extends IntegrationSummary.",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/IntegrationSummary"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "workspaceId": {
+                "type": "string"
+              },
+              "modelId": {
+                "type": "string"
+              },
+              "version": {
+                "description": "Integration schema version. The current value is \"2.0\".",
+                "type": "string"
+              },
+              "jobs": {
+                "description": "Import/export job definitions, each carrying the `connectionId` of the connection it binds. Present on a process integration whose actions read from or write to the connected cloud data store. `integrationType: \"Process\"` therefore does not imply the absence of a connection.",
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Job"
+                }
+              },
+              "schedule": {
+                "$ref": "#/components/schemas/Schedule"
+              }
+            }
+          }
+        ]
+      },
+      "RunRecord": {
+        "description": "Record of a single integration run, returned in run history responses.",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "32-character lowercase hex run ID."
+          },
+          "triggeredBy": {
+            "description": "Display name of the user who triggered the run.",
+            "type": "string"
+          },
+          "lastRun": {
+            "type": "integer",
+            "description": "Unix timestamp (seconds since epoch) of when this run ended. Duplicates `endDate` in epoch form.",
+            "example": 1781832681
+          },
+          "startDate": {
+            "description": "ISO 8601 UTC datetime when the run started. Format: `YYYY-MM-DDTHH:MM:SS.sssZ`.",
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-06-19T01:30:16.000Z"
+          },
+          "endDate": {
+            "description": "ISO 8601 UTC datetime when the run ended. Format: `YYYY-MM-DDTHH:MM:SS.sssZ`.",
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-06-19T01:31:21.000Z"
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "description": "Outcome message. Common values: `\"Success\"`, `\"Cancelled\"`, `\"Process failed\"`, `\"Anaplan model was deleted\"`. Partial-success imports include row counts here even when `success` is `true`.",
+            "type": "string",
+            "example": "Success"
+          },
+          "executionErrorCode": {
+            "description": "Numeric error code. Null on full success. Known values: `12` (import data-type mismatch), `35`, `38` (partial success), `39`.",
+            "type": "integer",
+            "nullable": true,
+            "example": 12
+          },
+          "traceId": {
+            "description": "32-character lowercase hex trace identifier, useful for support diagnostics.",
+            "type": "string"
+          },
+          "triggerSource": {
+            "description": "What caused this run: `scheduled` (integration's own schedule), `manual` (started by a user), or `scheduled_inf` (triggered by an integration flow schedule).",
+            "type": "string",
+            "enum": [
+              "scheduled",
+              "manual",
+              "scheduled_inf"
+            ],
+            "example": "scheduled"
+          }
+        }
+      },
       "NotificationRequest": {
         "type": "object",
         "required": [
@@ -1733,6 +2514,378 @@
                 }
               }
             }
+          }
+        }
+      },
+      "NotificationConfig": {
+        "description": "Notification configuration as returned by the API. Mirrors NotificationRequest plus resolved user details.",
+        "type": "object",
+        "properties": {
+          "notificationId": {
+            "type": "string"
+          },
+          "integrationIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "channels": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "notifications": {
+            "type": "object",
+            "properties": {
+              "config": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string"
+                    },
+                    "users": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "userGuid": {
+                            "type": "string"
+                          },
+                          "firstName": {
+                            "type": "string"
+                          },
+                          "lastName": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "PagingMeta": {
+        "description": "Pagination metadata block returned with list responses.",
+        "type": "object",
+        "properties": {
+          "paging": {
+            "type": "object",
+            "properties": {
+              "currentPageSize": {
+                "type": "integer"
+              },
+              "totalSize": {
+                "type": "integer"
+              },
+              "offset": {
+                "type": "integer"
+              }
+            }
+          },
+          "tenantCurrentCount": {
+            "description": "Total number of integrations (including integration flows) in the tenant. Present in GET /integrations responses.",
+            "type": "integer"
+          },
+          "tenantMaxAllowed": {
+            "description": "Maximum number of integrations allowed for this tenant. Present in GET /integrations responses.",
+            "type": "integer"
+          },
+          "schema": {
+            "description": "URL to the JSON schema definition for this response type.",
+            "type": "string"
+          }
+        }
+      },
+      "IntegrationFlowSummary": {
+        "description": "Summary view of an integration flow, returned in the GET /integrationflows list response.",
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Unique identifier for the integration flow.",
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "createdBy": {
+            "type": "string"
+          },
+          "creationDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "modificationDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "modifiedBy": {
+            "type": "string"
+          },
+          "nuxVisible": {
+            "description": "Whether this integration flow is visible in the CloudWorks UI.",
+            "type": "boolean"
+          },
+          "stepsCount": {
+            "description": "Number of steps defined in this integration flow.",
+            "type": "integer"
+          },
+          "latestRun": {
+            "description": "Details of the most recent run. Absent if the flow has never been run.",
+            "type": "object",
+            "properties": {
+              "triggeredBy": {
+                "type": "string"
+              },
+              "startDate": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "endDate": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "success": {
+                "type": "boolean"
+              },
+              "message": {
+                "type": "string"
+              },
+              "executionErrorCode": {
+                "type": "integer",
+                "nullable": true
+              },
+              "triggerSource": {
+                "type": "string",
+                "enum": [
+                  "scheduled",
+                  "manual",
+                  "scheduled_inf"
+                ]
+              }
+            }
+          },
+          "schedule": {
+            "description": "Active schedule for this integration flow, if configured.",
+            "$ref": "#/components/schemas/Schedule"
+          }
+        }
+      },
+      "IntegrationFlowDetail": {
+        "description": "Full integration flow details including all step definitions. Returned by GET /integrationflows/{id}.",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/IntegrationFlowSummary"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "version": {
+                "description": "Schema version. The current value is \"2.0\".",
+                "type": "string",
+                "example": "2.0"
+              },
+              "steps": {
+                "description": "Ordered step definitions for this integration flow.",
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "referrer": {
+                      "description": "The integration ID referenced by this step.",
+                      "type": "string"
+                    },
+                    "name": {
+                      "description": "Display name of the referenced integration.",
+                      "type": "string"
+                    },
+                    "type": {
+                      "description": "Integration type of the referenced integration.",
+                      "type": "string",
+                      "enum": [
+                        "Process",
+                        "Export",
+                        "Import"
+                      ]
+                    },
+                    "createdBy": {
+                      "type": "string"
+                    },
+                    "createdDate": {
+                      "description": "Creation timestamp. Format: 'YYYY-MM-DD HH:MM:SS.ffffff+00:00' (not ISO 8601).",
+                      "type": "string"
+                    },
+                    "modifiedDate": {
+                      "description": "Last modification timestamp. Same format as createdDate.",
+                      "type": "string"
+                    },
+                    "modifiedBy": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "modelId": {
+                      "type": "string"
+                    },
+                    "workspaceId": {
+                      "type": "string"
+                    },
+                    "dependsOn": {
+                      "description": "referrer IDs of steps that must complete before this step runs. Empty array for the first step.",
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "isSkipped": {
+                      "description": "When true, this step is excluded from the next run.",
+                      "type": "boolean"
+                    },
+                    "exceptionBehavior": {
+                      "description": "Defines flow behavior when this step fails or partially succeeds.",
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "type": {
+                            "type": "string",
+                            "enum": [
+                              "failure",
+                              "partial_success"
+                            ]
+                          },
+                          "strategy": {
+                            "type": "string",
+                            "enum": [
+                              "stop",
+                              "continue"
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    "latestRun": {
+                      "description": "Details of the most recent run for this specific step.",
+                      "type": "object",
+                      "properties": {
+                        "triggeredBy": {
+                          "type": "string"
+                        },
+                        "startDate": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "endDate": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "success": {
+                          "type": "boolean"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "executionErrorCode": {
+                          "description": "Error code if the step failed. The value is null on success. Code 38 indicates partial success.",
+                          "type": "integer",
+                          "nullable": true
+                        },
+                        "triggerSource": {
+                          "type": "string",
+                          "enum": [
+                            "scheduled",
+                            "manual",
+                            "scheduled_inf"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "RunStatus": {
+        "description": "Status of a single integration run, as returned by `GET /integrations/run/{runId}`. Holds more fields than the `RunRecord` entries in run history \u2014 notably `integrationId`, which maps a bare run ID back to its integration.",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "32-character lowercase hex run ID."
+          },
+          "integrationId": {
+            "type": "string",
+            "description": "ID of the integration this run belongs to. `RunRecord` omits this field, so this endpoint is the way to map a run ID back to its integration."
+          },
+          "traceId": {
+            "type": "string",
+            "description": "32-character lowercase hex trace identifier, useful for support diagnostics."
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 UTC datetime when the run started.",
+            "example": "2026-08-11T18:07:06.000Z"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 UTC datetime when the run ended.",
+            "example": "2026-08-11T18:07:51.000Z"
+          },
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "description": "Outcome message. A partial-success import reports its row counts here even when `success` is `true`.",
+            "type": "string",
+            "example": "Success"
+          },
+          "creationDate": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 UTC datetime when the run record was created. Tracks `startDate`."
+          },
+          "modificationDate": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 UTC datetime when the run record last changed. Tracks `endDate` for a finished run."
+          },
+          "createdBy": {
+            "type": "string",
+            "description": "Display name of the user the run is attributed to."
+          },
+          "modifiedBy": {
+            "type": "string",
+            "nullable": true,
+            "description": "Display name of the user who last changed the run record."
+          },
+          "executionErrorCode": {
+            "description": "Numeric error code. Null on full success. Known values: `12` (import data-type mismatch), `35`, `38` (partial success), `39`.",
+            "type": "integer",
+            "nullable": true
+          },
+          "flowGroupId": {
+            "type": "string",
+            "nullable": true,
+            "description": "ID of the integration flow that triggered this run. Null when no flow triggered it."
+          },
+          "triggerSource": {
+            "description": "What caused this run: `scheduled` (the integration's own schedule), `manual` (started by a user), or `scheduled_inf` (an integration flow schedule).",
+            "type": "string",
+            "enum": [
+              "scheduled",
+              "manual",
+              "scheduled_inf"
+            ],
+            "example": "scheduled"
           }
         }
       }

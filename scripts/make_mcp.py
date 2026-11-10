@@ -1,9 +1,9 @@
 """Transform <api>-openapi.json -> minimal <api>-mcp.json for MCP tool generation.
 
 Keeps what an MCP server needs to expose one tool per operation: operationId (synthesized
-when absent), summary, description, parameters, requestBody, security, plus servers,
-top-level security, and securitySchemes. Strips response bodies to bare status+description
-and drops every component schema not reachable from a parameter or requestBody.
+when absent), summary, description, parameters, requestBody, responses, security, plus servers,
+top-level security, and securitySchemes. Drops every component schema not reachable from a
+parameter, requestBody, or response.
 
 Dedup: where the same operation is reachable both model-direct (`/models/{modelId}/X`) and
 workspace-scoped (`/workspaces/{workspaceId}/models/{modelId}/X`), the longer workspace path
@@ -28,7 +28,7 @@ import sys
 EXCLUDED = {"authentication", "oauth", "financial-consolidation"}
 
 METHODS = {"get", "post", "put", "patch", "delete", "head", "options", "trace"}
-KEEP = ("summary", "description", "parameters", "requestBody", "security")
+KEEP = ("summary", "description", "parameters", "requestBody", "responses", "security")
 WS = re.compile(r"^/workspaces/\{workspaceId\}(/models/\{modelId\}/.*)$")
 ID_PARAM = re.compile(r"Id$")  # opaque IDs (modelId, exportId, ...): agent copies real values from prior calls
 
@@ -84,10 +84,6 @@ def transform(d):
             nop.update({f: op[f] for f in KEEP if f in op})
             if isinstance(nop.get("parameters"), list):
                 strip_id_constraints(nop["parameters"])
-            nop["responses"] = {
-                c: {"description": r.get("description", "")} if isinstance(r, dict) else r
-                for c, r in op.get("responses", {}).items()
-            }
             new_item[key] = nop
         out_paths[path] = new_item
 
@@ -199,11 +195,11 @@ def _selfcheck():
     assert out["paths"]["/models/{modelId}/exports"]["get"]["operationId"] == "getModelsByModelidExports"  # synthesized
     p0 = out["paths"]["/models/{modelId}/exports"]["parameters"][0]
     assert "example" not in p0 and "pattern" not in p0["schema"]  # path-level ID example + pattern stripped
-    assert out["paths"]["/x"]["post"]["responses"]["200"] == {"description": "ok"}  # response body stripped
+    assert "content" in out["paths"]["/x"]["post"]["responses"]["200"]  # response body kept
     px = {p["name"]: p for p in out["paths"]["/x"]["post"]["parameters"]}
     assert "example" not in px["modelId"]["schema"]  # opaque ID example stripped
     assert px["type"]["schema"]["example"] == "all"  # non-ID example kept
-    assert set(out["components"]["schemas"]) == {"Req", "Sub"}  # Resp (response-only) pruned, Sub kept transitively
+    assert set(out["components"]["schemas"]) == {"Req", "Sub", "Resp"}  # Resp kept via response, Sub kept transitively
     cp = out["components"]["parameters"]
     assert set(cp) == {"FooId"}  # referenced param carried, Unused pruned
     assert "example" not in cp["FooId"] and "pattern" not in cp["FooId"]["schema"]  # ID constraints stripped on carried param
