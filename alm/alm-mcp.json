@@ -158,7 +158,14 @@
         ],
         "responses": {
           "200": {
-            "description": "List of compatible source model revisions."
+            "description": "List of compatible source model revisions.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RevisionListResponse"
+                }
+              }
+            }
           },
           "403": {
             "description": "Forbidden. Caller lacks Workspace Administrator role on one or both models."
@@ -181,7 +188,14 @@
         "description": "Minimum role: Workspace Administrator.\n\nReturns the most recent revision for the model, if one exists.",
         "responses": {
           "200": {
-            "description": "Latest revision, or an empty result if no revisions exist."
+            "description": "Latest revision, or an empty result if no revisions exist.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RevisionResponse"
+                }
+              }
+            }
           },
           "403": {
             "description": "Forbidden. Caller lacks Workspace Administrator role."
@@ -248,7 +262,14 @@
         ],
         "responses": {
           "200": {
-            "description": "Paginated list of revisions."
+            "description": "Paginated list of revisions.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RevisionListResponse"
+                }
+              }
+            }
           },
           "403": {
             "description": "Forbidden. Caller lacks Workspace Administrator role."
@@ -274,7 +295,14 @@
         },
         "responses": {
           "201": {
-            "description": "Revision created."
+            "description": "Revision created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RevisionResponse"
+                }
+              }
+            }
           },
           "400": {
             "description": "name exceeds 60 characters or description exceeds 250 characters."
@@ -312,7 +340,14 @@
         "description": "Minimum role: Workspace Administrator.\n\nReturns all models that have had this revision applied. Deleted models are included with `modelDeleted: true`. Their `modelName` and `workspaceId` are omitted.\n\nThe first model in this list is the source model where revisions are created. Any model in this list can be a `sourceModelId` for discovering this revision (using `GET /models/{modelId}/alm/syncableRevisions`) and syncing it (using `POST /models/{modelId}/alm/syncTasks`).",
         "responses": {
           "200": {
-            "description": "List of models the revision has been applied to."
+            "description": "List of models the revision has been applied to.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppliedModelsResponse"
+                }
+              }
+            }
           },
           "403": {
             "description": "Forbidden. Caller lacks Workspace Administrator role."
@@ -335,7 +370,14 @@
         "description": "Minimum role: Workspace Administrator.\n\nReturns sync tasks that are in progress or completed within the last 48 hours. Up to ~20,000 results are retained per model before oldest tasks are removed.",
         "responses": {
           "200": {
-            "description": "List of sync tasks."
+            "description": "List of sync tasks.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SyncTaskListResponse"
+                }
+              }
+            }
           },
           "403": {
             "description": "Forbidden. Caller lacks Workspace Administrator role."
@@ -361,7 +403,14 @@
         },
         "responses": {
           "201": {
-            "description": "Sync task created and running."
+            "description": "Sync task created and running.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SyncTaskResponse"
+                }
+              }
+            }
           },
           "400": {
             "description": "Missing required fields in request body."
@@ -399,7 +448,14 @@
         "description": "Minimum role: Workspace Administrator.\n\nReturns the current status and result of a sync task. Task states: `IN_PROGRESS`, `COMPLETE`. On failure, `result.successful` is false and `result.error` contains details.",
         "responses": {
           "200": {
-            "description": "Sync task details."
+            "description": "Sync task details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SyncTaskResponse"
+                }
+              }
+            }
           },
           "403": {
             "description": "Forbidden. Caller lacks Workspace Administrator role."
@@ -432,7 +488,14 @@
         },
         "responses": {
           "201": {
-            "description": "Comparison report task created."
+            "description": "Comparison report task created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportTaskResponse"
+                }
+              }
+            }
           },
           "403": {
             "description": "Forbidden. Caller lacks Workspace Administrator role on one or both models."
@@ -461,7 +524,14 @@
         "description": "Minimum role: Workspace Administrator.\n\nReturns the status of a comparison report generation task. On success, `result.successful` is true and `result.reportFileUrl` contains the download URL. On failure, `result.error` contains title and messageText.",
         "responses": {
           "200": {
-            "description": "Comparison report task details."
+            "description": "Comparison report task details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportTaskResponse"
+                }
+              }
+            }
           },
           "403": {
             "description": "Forbidden."
@@ -490,7 +560,15 @@
         "description": "Minimum role: Workspace Administrator.\n\nDownloads the full comparison report as a tab-separated values (TSV) file. The report is available for 48 hours after generation. It has these sections:\n\n- Lists Added\n- Modules Added\n- Roles Changed\n- Changes Within Lists\n- Line Items Added\n\n**HIGH VOLUME** \u2014 the full report is returned whole in one non-paginated response (observed ~147 KB) and can be larger. There is no paging. Fetch it only when you need the complete diff.",
         "responses": {
           "200": {
-            "description": "Comparison report file (TSV)."
+            "description": "Comparison report file (TSV).",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
           },
           "403": {
             "description": "Forbidden."
@@ -523,7 +601,14 @@
         },
         "responses": {
           "201": {
-            "description": "Summary report task created."
+            "description": "Summary report task created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportTaskResponse"
+                }
+              }
+            }
           },
           "403": {
             "description": "Forbidden. Caller lacks Workspace Administrator role."
@@ -552,7 +637,14 @@
         "description": "Minimum role: Workspace Administrator.\n\nReturns the status of a summary report generation task. On success, `result.successful` is true and `result.reportFileUrl` contains the download URL.",
         "responses": {
           "200": {
-            "description": "Summary report task details."
+            "description": "Summary report task details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportTaskResponse"
+                }
+              }
+            }
           },
           "403": {
             "description": "Forbidden."
@@ -581,7 +673,14 @@
         "description": "Minimum role: Workspace Administrator.\n\nDownloads the summary report as JSON. The report is available for 48 hours after generation. Change types with zero differences are omitted. Properties within a change type are omitted if items were only created (not modified or deleted).",
         "responses": {
           "200": {
-            "description": "Summary report."
+            "description": "Summary report.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SummaryReportResponse"
+                }
+              }
+            }
           },
           "403": {
             "description": "Forbidden."
@@ -675,6 +774,350 @@
             "type": "string",
             "pattern": "^[0-9A-F]{32}$",
             "description": "Target revision identifier (32-character uppercase hex string). From `GET /models/{modelId}/alm/revisions` (`revisions[].id`) on the request-path model (`{modelId}`). Required for comparison and summary report tasks."
+          }
+        }
+      },
+      "Revision": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "createdOn": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdBy": {
+            "type": "string"
+          },
+          "creationMethod": {
+            "type": "string",
+            "description": "How the revision was created.",
+            "example": "user"
+          },
+          "appliedOn": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "appliedBy": {
+            "type": "string"
+          }
+        }
+      },
+      "SyncTask": {
+        "type": "object",
+        "properties": {
+          "taskId": {
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$"
+          },
+          "taskUrl": {
+            "type": "string",
+            "description": "URL to poll for this task's current status."
+          },
+          "taskState": {
+            "type": "string",
+            "enum": [
+              "IN_PROGRESS",
+              "COMPLETE"
+            ]
+          },
+          "creationTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "result": {
+            "$ref": "#/components/schemas/TaskResult"
+          }
+        }
+      },
+      "TaskResult": {
+        "type": "object",
+        "description": "Outcome of an async task. Check `successful` first. If it is false, `error` contains details. On successful report tasks, `reportFileUrl` is populated with a download URL.",
+        "properties": {
+          "successful": {
+            "type": "boolean"
+          },
+          "reportFileUrl": {
+            "type": "string",
+            "description": "URL to download the report file (present on successful report tasks)."
+          },
+          "error": {
+            "$ref": "#/components/schemas/TaskError"
+          }
+        }
+      },
+      "TaskError": {
+        "type": "object",
+        "description": "Error details for a failed async task.",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Short error title summarising the failure."
+          },
+          "messageText": {
+            "type": "string",
+            "description": "Detailed error message body."
+          }
+        }
+      },
+      "AppliedModel": {
+        "type": "object",
+        "properties": {
+          "modelId": {
+            "type": "string",
+            "pattern": "^[0-9A-F]{32}$",
+            "description": "Model identifier (32-character uppercase hex string). Omitted when modelDeleted is true."
+          },
+          "modelName": {
+            "type": "string",
+            "description": "Omitted when modelDeleted is true."
+          },
+          "workspaceId": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$",
+            "description": "Workspace identifier (32-character lowercase hex string). Omitted when modelDeleted is true."
+          },
+          "appliedBy": {
+            "type": "string"
+          },
+          "appliedOn": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "appliedMethod": {
+            "type": "string"
+          },
+          "modelDeleted": {
+            "type": "boolean"
+          }
+        }
+      },
+      "Meta": {
+        "type": "object",
+        "description": "Response envelope metadata. Contains the schema URL that identifies the response type and optional paging information for list responses.",
+        "required": [
+          "schema"
+        ],
+        "properties": {
+          "schema": {
+            "type": "string",
+            "description": "URL identifying the response schema."
+          },
+          "paging": {
+            "$ref": "#/components/schemas/Paging"
+          }
+        }
+      },
+      "Paging": {
+        "type": "object",
+        "required": [
+          "currentPageSize",
+          "offset",
+          "totalSize"
+        ],
+        "properties": {
+          "currentPageSize": {
+            "type": "integer"
+          },
+          "offset": {
+            "type": "integer"
+          },
+          "totalSize": {
+            "type": "integer"
+          }
+        }
+      },
+      "Status": {
+        "type": "object",
+        "description": "Anaplan API response status. The code mirrors the HTTP status code. The message is a human-readable outcome string.",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "description": "Numeric response code, mirrors the HTTP status code.",
+            "example": 200
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable outcome string.",
+            "example": "Success"
+          }
+        }
+      },
+      "RevisionResponse": {
+        "type": "object",
+        "description": "Response for the latestRevision endpoint. When no revision exists, the response contains only meta and status \u2014 the 'revisions' key is omitted. When a revision exists, 'revisions' contains exactly one item.",
+        "properties": {
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "status": {
+            "$ref": "#/components/schemas/Status"
+          },
+          "revisions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Revision"
+            }
+          }
+        }
+      },
+      "RevisionListResponse": {
+        "type": "object",
+        "properties": {
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "status": {
+            "$ref": "#/components/schemas/Status"
+          },
+          "revisions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Revision"
+            }
+          }
+        }
+      },
+      "SyncTaskResponse": {
+        "type": "object",
+        "properties": {
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "status": {
+            "$ref": "#/components/schemas/Status"
+          },
+          "task": {
+            "$ref": "#/components/schemas/SyncTask"
+          }
+        }
+      },
+      "SyncTaskListResponse": {
+        "type": "object",
+        "description": "When no sync tasks exist in the last 48 hours, the response contains only meta and status. The 'tasks' key is omitted rather than returned as an empty array.",
+        "properties": {
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "status": {
+            "$ref": "#/components/schemas/Status"
+          },
+          "tasks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SyncTask"
+            }
+          }
+        }
+      },
+      "ReportTaskResponse": {
+        "type": "object",
+        "properties": {
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "status": {
+            "$ref": "#/components/schemas/Status"
+          },
+          "task": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string",
+                "pattern": "^[0-9A-F]{32}$",
+                "description": "Report task identifier (32-character uppercase hex string)."
+              },
+              "taskUrl": {
+                "type": "string"
+              },
+              "taskState": {
+                "type": "string",
+                "enum": [
+                  "IN_PROGRESS",
+                  "COMPLETE"
+                ]
+              },
+              "result": {
+                "$ref": "#/components/schemas/TaskResult"
+              }
+            }
+          }
+        }
+      },
+      "AppliedModelsResponse": {
+        "type": "object",
+        "properties": {
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "status": {
+            "$ref": "#/components/schemas/Status"
+          },
+          "appliedToModels": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AppliedModel"
+            }
+          }
+        }
+      },
+      "SummaryReportResponse": {
+        "type": "object",
+        "properties": {
+          "summaryReport": {
+            "type": "object",
+            "properties": {
+              "targetRevisionId": {
+                "type": "string",
+                "pattern": "^[0-9A-F]{32}$",
+                "description": "Target revision identifier (32-character uppercase hex string)."
+              },
+              "sourceRevisionId": {
+                "type": "string",
+                "pattern": "^[0-9A-F]{32}$",
+                "description": "Source revision identifier (32-character uppercase hex string)."
+              },
+              "totals": {
+                "type": "object",
+                "properties": {
+                  "modified": {
+                    "type": "integer"
+                  },
+                  "deleted": {
+                    "type": "integer"
+                  },
+                  "created": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "differences": {
+                "type": "object",
+                "description": "Change details by category. Categories with no changes are omitted.",
+                "properties": {
+                  "lineItems": {
+                    "type": "object"
+                  },
+                  "rolesContents": {
+                    "type": "object"
+                  },
+                  "lists": {
+                    "type": "object"
+                  },
+                  "modules": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
           }
         }
       }

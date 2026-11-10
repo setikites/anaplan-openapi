@@ -88,13 +88,34 @@
         ],
         "responses": {
           "200": {
-            "description": "CSV file containing user records. Columns: `username`, `first_name`, `last_name`, `licenses`."
+            "description": "CSV file containing user records. Columns: `username`, `first_name`, `last_name`, `licenses`.",
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "401": {
-            "description": "Missing or invalid authentication token."
+            "description": "Missing or invalid authentication token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminErrorResponse"
+                }
+              }
+            }
           },
           "403": {
-            "description": "Caller lacks the required administrator role."
+            "description": "Caller lacks the required administrator role.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminErrorResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -126,22 +147,109 @@
         },
         "responses": {
           "207": {
-            "description": "Import processed. Contains per-row counts and any line-level validation errors."
+            "description": "Import processed. Contains per-row counts and any line-level validation errors.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserImportResponse"
+                },
+                "example": {
+                  "accepted": 3,
+                  "created": 2,
+                  "updated": 1,
+                  "errors": []
+                }
+              }
+            }
           },
           "400": {
-            "description": "Request rejected before processing. Possible causes: missing file, empty CSV, more than 500 rows, duplicate email addresses, or empty cells."
+            "description": "Request rejected before processing. Possible causes: missing file, empty CSV, more than 500 rows, duplicate email addresses, or empty cells.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminErrorResponse"
+                }
+              }
+            }
           },
           "401": {
-            "description": "Missing or invalid authentication token."
+            "description": "Missing or invalid authentication token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminErrorResponse"
+                }
+              }
+            }
           },
           "403": {
-            "description": "Caller lacks the required administrator role."
+            "description": "Caller lacks the required administrator role.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminErrorResponse"
+                }
+              }
+            }
           }
         }
       }
     }
   },
   "components": {
+    "schemas": {
+      "UserImportResponse": {
+        "type": "object",
+        "properties": {
+          "accepted": {
+            "type": "integer",
+            "description": "Total number of data rows found in the CSV (excluding the header)."
+          },
+          "created": {
+            "type": "integer",
+            "description": "Number of rows that resulted in a new user being created."
+          },
+          "updated": {
+            "type": "integer",
+            "description": "Number of rows that resulted in an existing user being updated."
+          },
+          "errors": {
+            "type": "array",
+            "description": "Line-level validation errors. Empty when all rows were accepted.",
+            "items": {
+              "$ref": "#/components/schemas/UserImportError"
+            }
+          }
+        }
+      },
+      "UserImportError": {
+        "type": "object",
+        "properties": {
+          "line": {
+            "type": "integer",
+            "description": "1-based line number in the CSV (excluding the header row) where the error occurred."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable description of why the row was rejected."
+          }
+        }
+      },
+      "AdminErrorResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "Machine-readable error code.",
+            "example": "FAILURE_BAD_REQUEST"
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error description."
+          }
+        }
+      }
+    },
     "securitySchemes": {
       "AnaplanAuthToken": {
         "type": "apiKey",

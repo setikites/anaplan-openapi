@@ -117,16 +117,44 @@
         ],
         "responses": {
           "200": {
-            "description": "A paginated list of users."
+            "description": "A paginated list of users.",
+            "content": {
+              "application/scim+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListResponse"
+                }
+              }
+            }
           },
           "400": {
-            "description": "Invalid filter expression or request."
+            "description": "Invalid filter expression or request.",
+            "content": {
+              "application/scim+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScimError"
+                }
+              }
+            }
           },
           "401": {
-            "description": "Missing or invalid authentication token."
+            "description": "Missing or invalid authentication token.",
+            "content": {
+              "application/scim+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScimError"
+                }
+              }
+            }
           },
           "403": {
-            "description": "Caller does not have USER_ADMIN role."
+            "description": "Caller does not have USER_ADMIN role.",
+            "content": {
+              "application/scim+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScimError"
+                }
+              }
+            }
           }
         }
       },
@@ -146,19 +174,54 @@
         },
         "responses": {
           "201": {
-            "description": "User created."
+            "description": "User created.",
+            "content": {
+              "application/scim+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
           },
           "400": {
-            "description": "Invalid request body or missing required fields."
+            "description": "Invalid request body or missing required fields.",
+            "content": {
+              "application/scim+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScimError"
+                }
+              }
+            }
           },
           "401": {
-            "description": "Missing or invalid authentication token."
+            "description": "Missing or invalid authentication token.",
+            "content": {
+              "application/scim+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScimError"
+                }
+              }
+            }
           },
           "403": {
-            "description": "Caller does not have USER_ADMIN role."
+            "description": "Caller does not have USER_ADMIN role.",
+            "content": {
+              "application/scim+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScimError"
+                }
+              }
+            }
           },
           "409": {
-            "description": "User already exists (conflict on userName)."
+            "description": "User already exists (conflict on userName).",
+            "content": {
+              "application/scim+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScimError"
+                }
+              }
+            }
           }
         }
       }
@@ -183,16 +246,44 @@
         "description": "Minimum role: User Administrator.\n\nRetrieves a single user by their Anaplan ID. The response includes the `created` and `lastModified` dates and the workspace `entitlements` of the user.",
         "responses": {
           "200": {
-            "description": "The requested user."
+            "description": "The requested user.",
+            "content": {
+              "application/scim+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
           },
           "401": {
-            "description": "Missing or invalid authentication token."
+            "description": "Missing or invalid authentication token.",
+            "content": {
+              "application/scim+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScimError"
+                }
+              }
+            }
           },
           "403": {
-            "description": "Caller does not have USER_ADMIN role."
+            "description": "Caller does not have USER_ADMIN role.",
+            "content": {
+              "application/scim+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScimError"
+                }
+              }
+            }
           },
           "404": {
-            "description": "User not found."
+            "description": "User not found.",
+            "content": {
+              "application/scim+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScimError"
+                }
+              }
+            }
           }
         }
       },
@@ -212,19 +303,54 @@
         },
         "responses": {
           "200": {
-            "description": "User replaced."
+            "description": "User replaced.",
+            "content": {
+              "application/scim+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
           },
           "400": {
-            "description": "Invalid request body."
+            "description": "Invalid request body.",
+            "content": {
+              "application/scim+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScimError"
+                }
+              }
+            }
           },
           "401": {
-            "description": "Missing or invalid authentication token."
+            "description": "Missing or invalid authentication token.",
+            "content": {
+              "application/scim+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScimError"
+                }
+              }
+            }
           },
           "403": {
-            "description": "Caller does not have USER_ADMIN role."
+            "description": "Caller does not have USER_ADMIN role.",
+            "content": {
+              "application/scim+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScimError"
+                }
+              }
+            }
           },
           "404": {
-            "description": "User not found."
+            "description": "User not found.",
+            "content": {
+              "application/scim+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScimError"
+                }
+              }
+            }
           }
         }
       },
@@ -244,19 +370,54 @@
         },
         "responses": {
           "200": {
-            "description": "User updated."
+            "description": "User updated.",
+            "content": {
+              "application/scim+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
           },
           "400": {
-            "description": "Invalid PatchOp or unsupported operation."
+            "description": "Invalid PatchOp or unsupported operation.",
+            "content": {
+              "application/scim+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScimError"
+                }
+              }
+            }
           },
           "401": {
-            "description": "Missing or invalid authentication token."
+            "description": "Missing or invalid authentication token.",
+            "content": {
+              "application/scim+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScimError"
+                }
+              }
+            }
           },
           "403": {
-            "description": "Caller does not have USER_ADMIN role."
+            "description": "Caller does not have USER_ADMIN role.",
+            "content": {
+              "application/scim+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScimError"
+                }
+              }
+            }
           },
           "404": {
-            "description": "User not found."
+            "description": "User not found.",
+            "content": {
+              "application/scim+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScimError"
+                }
+              }
+            }
           }
         }
       }
@@ -266,15 +427,46 @@
         "operationId": "getResourceTypes",
         "summary": "Get resource types",
         "description": "Minimum role: None.\n\nReturns the SCIM resource types supported by this service provider.",
-        "security": [],
         "responses": {
           "200": {
-            "description": "List of supported resource types."
+            "description": "List of supported resource types.",
+            "content": {
+              "application/scim+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "schemas": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "totalResults": {
+                      "type": "integer"
+                    },
+                    "Resources": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
           },
           "401": {
-            "description": "Missing or invalid authentication token."
+            "description": "Missing or invalid authentication token.",
+            "content": {
+              "application/scim+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScimError"
+                }
+              }
+            }
           }
-        }
+        },
+        "security": []
       }
     },
     "/Schemas": {
@@ -282,15 +474,29 @@
         "operationId": "getSchemas",
         "summary": "Get schemas",
         "description": "Minimum role: None.\n\nReturns the SCIM schema definitions supported by this service provider.",
-        "security": [],
         "responses": {
           "200": {
-            "description": "List of schema definitions."
+            "description": "List of schema definitions.",
+            "content": {
+              "application/scim+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListResponse"
+                }
+              }
+            }
           },
           "401": {
-            "description": "Missing or invalid authentication token."
+            "description": "Missing or invalid authentication token.",
+            "content": {
+              "application/scim+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScimError"
+                }
+              }
+            }
           }
-        }
+        },
+        "security": []
       }
     },
     "/ServiceProviderConfig": {
@@ -298,15 +504,111 @@
         "operationId": "getServiceProviderConfig",
         "summary": "Get service provider configuration",
         "description": "Minimum role: None.\n\nReturns a description of the service provider's SCIM configuration and capabilities (patch support, bulk, filter, sort, etc.).",
-        "security": [],
         "responses": {
           "200": {
-            "description": "Service provider configuration."
+            "description": "Service provider configuration.",
+            "content": {
+              "application/scim+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "schemas": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "patch": {
+                      "type": "object",
+                      "properties": {
+                        "supported": {
+                          "type": "boolean"
+                        }
+                      }
+                    },
+                    "bulk": {
+                      "type": "object",
+                      "properties": {
+                        "supported": {
+                          "type": "boolean"
+                        },
+                        "maxOperations": {
+                          "type": "integer"
+                        },
+                        "maxPayloadSize": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "filter": {
+                      "type": "object",
+                      "properties": {
+                        "supported": {
+                          "type": "boolean"
+                        },
+                        "maxResults": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "changePassword": {
+                      "type": "object",
+                      "properties": {
+                        "supported": {
+                          "type": "boolean"
+                        }
+                      }
+                    },
+                    "sort": {
+                      "type": "object",
+                      "properties": {
+                        "supported": {
+                          "type": "boolean"
+                        }
+                      }
+                    },
+                    "etag": {
+                      "type": "object",
+                      "properties": {
+                        "supported": {
+                          "type": "boolean"
+                        }
+                      }
+                    },
+                    "authenticationSchemes": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "type": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
           },
           "401": {
-            "description": "Missing or invalid authentication token."
+            "description": "Missing or invalid authentication token.",
+            "content": {
+              "application/scim+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScimError"
+                }
+              }
+            }
           }
-        }
+        },
+        "security": []
       }
     }
   },
@@ -451,6 +753,71 @@
                 "type": "string"
               }
             }
+          }
+        }
+      },
+      "ListResponse": {
+        "type": "object",
+        "description": "SCIM ListResponse envelope (RFC 7644 \u00a73.4.2).",
+        "required": [
+          "schemas",
+          "totalResults"
+        ],
+        "properties": {
+          "schemas": {
+            "type": "array",
+            "description": "List of SCIM schema URNs declaring the envelope type. The value is always `[\"urn:ietf:params:scim:api:messages:2.0:ListResponse\"]`.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "totalResults": {
+            "type": "integer",
+            "description": "Total number of results matching the query."
+          },
+          "startIndex": {
+            "type": "integer",
+            "description": "1-based index of the first result returned."
+          },
+          "itemsPerPage": {
+            "type": "integer",
+            "description": "Number of results returned in this response."
+          },
+          "Resources": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/User"
+            }
+          }
+        }
+      },
+      "ScimError": {
+        "type": "object",
+        "description": "SCIM error response (RFC 7644 \u00a73.12).",
+        "required": [
+          "schemas",
+          "status"
+        ],
+        "properties": {
+          "schemas": {
+            "type": "array",
+            "description": "List of SCIM schema URNs declaring the error type. The value is always `[\"urn:ietf:params:scim:api:messages:2.0:Error\"]`.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "status": {
+            "type": "string",
+            "description": "HTTP status code as a string."
+          },
+          "detail": {
+            "type": "string",
+            "description": "Human-readable error message."
+          },
+          "scimType": {
+            "type": "string",
+            "description": "SCIM-specific error type.",
+            "example": "invalidValue"
           }
         }
       },
